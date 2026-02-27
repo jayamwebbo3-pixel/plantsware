@@ -1,0 +1,10 @@
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Facebot
+Allow: /
+
+User-agent: *
+Disallow: /admin/    # ← example — block sensitive areas if needed
+Disallow: /private/
+# Or keep Disallow: / if you really want to block general crawlers, but then add more Allow: lines above for other bots you care about

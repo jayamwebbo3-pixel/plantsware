@@ -1,0 +1,335 @@
+<?php
+
+namespace App\Http\Controllers\Admin; 
+
+use App\Http\Controllers\Controller;
+use App\Models\Blog;
+use App\Models\BlogCategory;
+use App\Models\Tag;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+
+class BlogController extends Controller
+{
+    public function index(Request $request)
+    {
+        $search = $request->query('search');
+
+        $blogs = Blog::with('blogCategory') // Note: use blogCategory (relation name)
+            ->when($search, function ($query, $search) {
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(10); // 10 or 20 — your choice
+
+        return view('admin.blogs.index', compact('blogs', 'search'));
+    }
+
+    public function create()
+    {
+        $categories = BlogCategory::where('is_active', true)->get();
+        $tags = Tag::orderBy('name')->get();
+
+        return view('admin.blogs.create', compact('categories', 'tags'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title'             => 'required|string|max:255',
+            // 'blog_category_id'  => 'nullable|exists:blog_categories,id',
+            'content'           => 'required|string',
+            'excerpt'           => 'nullable|string',
+            'image'             => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'author_name'       => 'nullable|string|max:255',
+            'is_active'         => 'boolean',
+            'published_at'      => 'nullable|date',
+            'tags'              => 'nullable|array',
+            'tags.*'            => 'exists:tags,id',
+            'meta_title'        => 'nullable|string|max:255',
+            'meta_description'  => 'nullable|string|max:500',
+        ]);
+
+        $validated['slug'] = Str::slug($validated['title']);
+
+        // Set default author if not provided
+        // $validated['author_name'] = $validated['author_name'] ?? auth()->user()?->name ?? 'Admin';
+
+        // Set default publish date if not provided
+        $validated['published_at'] = $validated['published_at'] ?? now();
+
+        // Default active status
+        $validated['is_active'] = $validated['is_active'] ?? true;
+        
+        
+        
+        // Handle image upload
+        // if ($request->hasFile('image')) {
+        //     $validated['image'] = $request->file('image')->store('blogs', 'public');
+        // }
+        
+        // new code for featured img 21/01/2026
+        // Handle image upload (NO symlink)
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $filename = 'featured_' . uniqid() . '.' . $image->getClientOriginalExtension();
+        
+            // Save directly inside public folder
+            $image->move(public_path('uploads/blogs'), $filename);
+        
+            // Store relative path in DB
+            $validated['image'] = 'uploads/blogs/' . $filename;
+        }
+
+        // end here 
+        
+        
+        // Create the blog — this line saves ALL validated fields
+        $blog = Blog::create($validated);
+
+        // Attach tags
+        if ($request->has('tags')) {
+            $blog->tags()->sync($request->input('tags'));
+        }
+
+        return redirect()->route('admin.blogs.index')
+            ->with('success', 'Blog created successfully!');
+    }
+
+    public function show(Blog $blog)
+    {
+        $blog->load(['blogCategory', 'tags']);
+
+        // Simple related posts (sharing at least one tag)
+        $related = Blog::whereHas('tags', function ($q) use ($blog) {
+                $q->whereIn('tags.id', $blog->tags->pluck('id'));
+            })
+            ->where('id', '!=', $blog->id)
+            ->where('is_active', true)
+            ->latest()
+            ->limit(3)
+            ->get();
+
+        return view('admin.blogs.show', compact('blog', 'related'));
+    }
+
+    public function edit(Blog $blog)
+    {
+        $blog->load('tags'); // Important for pre-selecting tags
+
+        $categories = BlogCategory::where('is_active', true)->get();
+        $tags = Tag::orderBy('name')->get();
+
+        return view('admin.blogs.edit', compact('blog', 'categories', 'tags'));
+    }
+
+    // public function update(Request $request, Blog $blog)
+    // {
+    //     $validated = $request->validate([
+    //         'title'             => 'required|string|max:255',
+    //         // 'blog_category_id'  => 'nullable|exists:blog_categories,id',
+    //         'content'           => 'required|string',
+    //         'excerpt'           => 'nullable|string',
+    //         'image'             => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    //         'author_name'       => 'nullable|string|max:255',
+    //         'is_active'         => 'boolean',
+    //         'published_at'      => 'nullable|date',
+    //         'tags'              => 'nullable|array',
+    //         'tags.*'            => 'exists:tags,id',
+    //         'meta_title'        => 'nullable|string|max:255',
+    //         'meta_description'  => 'nullable|string|max:500',
+    //     ]);
+
+    //     $validated['slug'] = Str::slug($validated['title']);
+
+    //     if ($request->hasFile('image')) {
+    //         if ($blog->image) {
+    //             Storage::disk('public')->delete($blog->image);
+    //         }
+    //         $validated['image'] = $request->file('image')->store('blogs', 'public');
+    //     }
+
+    //     $blog->update($validated);
+
+    //     // Sync tags (will remove old ones not in new list)
+    //     $blog->tags()->sync($request->input('tags', []));
+
+    //     return redirect()->route('admin.blogs.index')
+    //         ->with('success', 'Blog updated successfully!');
+    // }
+    
+    // update img fix 22/01/2026
+    public function update(Request $request, Blog $blog)
+{
+    $validated = $request->validate([
+        'title'             => 'required|string|max:255',
+        'content'           => 'required|string',
+        'excerpt'           => 'nullable|string',
+        'image'             => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'author_name'       => 'nullable|string|max:255',
+        'is_active'         => 'boolean',
+        'published_at'      => 'nullable|date',
+        'tags'              => 'nullable|array',
+        'tags.*'            => 'exists:tags,id',
+        'meta_title'        => 'nullable|string|max:255',
+        'meta_description'  => 'nullable|string|max:500',
+    ]);
+
+    $validated['slug'] = Str::slug($validated['title']);
+
+    // ✅ Handle image upload (Option 2: NO storage disk)
+    if ($request->hasFile('image')) {
+
+        // ✅ Delete old image if exists
+        if ($blog->image && file_exists(public_path($blog->image))) {
+            unlink(public_path($blog->image));
+        }
+
+        $file = $request->file('image');
+        $filename = 'featured_' . time() . '.' . $file->getClientOriginalExtension();
+
+        $file->move(public_path('uploads/blogs'), $filename);
+
+        $validated['image'] = 'uploads/blogs/' . $filename;
+    }
+
+    $blog->update($validated);
+
+    // Sync tags
+    $blog->tags()->sync($request->input('tags', []));
+
+    return redirect()->route('admin.blogs.index')
+        ->with('success', 'Blog updated successfully!');
+}
+
+    // end
+
+
+    // To show embedded img 
+// In BlogController.php
+// public function ckeditorUpload(Request $request)
+// {
+//     $request->validate([
+//         'upload' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+//     ]);
+
+//     $file = $request->file('upload');
+//     $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+//     $path = $file->storeAs('blogs/ckeditor', $filename, 'public');
+
+//     return response()->json([
+//         'uploaded' => true,
+//         'url' => Storage::url($path)
+//     ]);
+// }
+
+// changes to be made from here 
+// public function ckeditorUpload(Request $request)
+// {
+//     // Force JSON response (important!)
+//     $request->headers->set('Accept', 'application/json');
+
+//     try {
+//         $request->validate([
+//             'upload' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+//         ]);
+
+//         $file = $request->file('upload');
+
+//         if (!$file->isValid()) {
+//             throw new \Exception('File upload invalid: ' . $file->getErrorMessage());
+//         }
+
+//         $filename = "blog_" . rand(1000, 9999) . time() . '.' . $file->getClientOriginalExtension();
+//         $path = $file->storeAs('blogs/ckeditor', $filename, 'public');
+
+//         $url = Storage::url($path);
+
+//         return response()->json([
+//             'uploaded' => true,
+//             'url' => $url
+//         ])->header('Content-Type', 'application/json');
+//     } catch (\Illuminate\Validation\ValidationException $e) {
+//         return response()->json([
+//             'uploaded' => false,
+//             'error' => [
+//                 'message' => $e->errors()['upload'][0] ?? 'Validation failed'
+//             ]
+//         ], 422)->header('Content-Type', 'application/json');
+//     } catch (\Exception $e) {
+//         Log::error('CKEditor upload failed: ' . $e->getMessage());
+
+//         return response()->json([
+//             'uploaded' => false,
+//             'error' => [
+//                 'message' => $e->getMessage() ?: 'Server error'
+//             ]
+//         ], 500)->header('Content-Type', 'application/json');
+//     }
+// }
+// commented out 
+
+// new change start
+public function ckeditorUpload(Request $request)
+{
+    $request->headers->set('Accept', 'application/json');
+
+    try {
+        $request->validate([
+            'upload' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $file = $request->file('upload');
+
+        if (!$file->isValid()) {
+            throw new \Exception('File upload invalid');
+        }
+
+        $filename = 'blog_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+        // ✅ SAVE DIRECTLY TO PUBLIC (NO STORAGE, NO SYMLINK)
+        $file->move(public_path('uploads/blogs'), $filename);
+
+        // ✅ PUBLIC URL
+        $url = asset('uploads/blogs/' . $filename);
+
+        return response()->json([
+            'uploaded' => true,
+            'url' => $url
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'uploaded' => false,
+            'error' => [
+                'message' => $e->errors()['upload'][0] ?? 'Validation failed'
+            ]
+        ], 422);
+    } catch (\Exception $e) {
+        \Log::error('CKEditor upload failed: ' . $e->getMessage());
+
+        return response()->json([
+            'uploaded' => false,
+            'error' => [
+                'message' => 'Server error'
+            ]
+        ], 500);
+    }
+}
+
+    //  new change end
+
+    public function destroy(Blog $blog)
+    {
+        if ($blog->image) {
+            Storage::disk('public')->delete($blog->image);
+        }
+
+        $blog->tags()->detach(); // Clean up pivot table
+        $blog->delete();
+
+        return redirect()->route('admin.blogs.index')
+            ->with('success', 'Blog deleted successfully!');
+    }
+}
