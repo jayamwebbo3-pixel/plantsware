@@ -1,5 +1,2 @@
 <?php
-
-
-
-echo 'dgdfgdfh';
+require __DIR__.'/public/index.php';
