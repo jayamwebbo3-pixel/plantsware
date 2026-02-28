@@ -56,17 +56,30 @@
         <div class="card mb-4">
             <div class="card-header"><h5>Update Status</h5></div>
             <div class="card-body">
-                <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST">
-                    @csrf @method('PATCH')
-                    <select name="status" class="form-select mb-3">
-                        <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Processing</option>
-                        <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Shipped</option>
-                        <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
-                        <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary w-100">Update Status</button>
-                </form>
+                @if (in_array($order->status, ['cancelled', 'returned']))
+                    <div class="alert alert-secondary border-0 mb-0 text-center">
+                        This order is <strong>{{ ucfirst($order->status) }}</strong>. It is read-only.
+                    </div>
+                @elseif ($order->status === 'delivered')
+                    <div class="alert alert-success border-0 mb-0 text-center">
+                        This order has been <strong>Delivered</strong>.
+                    </div>
+                @else
+                    <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST">
+                        @csrf @method('PATCH')
+                        
+                        @if ($order->status === 'pending')
+                            <button type="submit" name="status" value="processing" class="btn btn-success w-100 mb-2">Accept Order</button>
+                            <button type="submit" name="status" value="cancelled" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</button>
+                        @elseif ($order->status === 'processing')
+                            <button type="submit" name="status" value="shipped" class="btn btn-primary w-100 mb-2">Ship Order</button>
+                            <button type="submit" name="status" value="cancelled" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</button>
+                        @elseif ($order->status === 'shipped')
+                            <button type="submit" name="status" value="delivered" class="btn btn-success w-100 mb-2">Mark Delivered</button>
+                            <button type="submit" name="status" value="returned" class="btn btn-warning w-100" onclick="return confirm('Are you sure you want to mark this order as returned?')">Return Order</button>
+                        @endif
+                    </form>
+                @endif
             </div>
         </div>
 

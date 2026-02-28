@@ -21,11 +21,22 @@ class ProductController extends Controller
         return view('admin.products-management.products', compact('products'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $categories = Category::where('is_active', true)->get();
         $subcategories = Subcategory::where('is_active', true)->get();
-        return view('admin.products.create',  compact('categories', 'subcategories'));
+        
+        $selectedSubcategoryId = $request->query('subcategory_id');
+        $selectedCategoryId = null;
+
+        if ($selectedSubcategoryId) {
+            $subcategory = Subcategory::find($selectedSubcategoryId);
+            if ($subcategory) {
+                $selectedCategoryId = $subcategory->category_id;
+            }
+        }
+
+        return view('admin.products.create',  compact('categories', 'subcategories', 'selectedCategoryId', 'selectedSubcategoryId'));
     }
 
     public function store(Request $request)

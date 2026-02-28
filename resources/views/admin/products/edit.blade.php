@@ -238,36 +238,40 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
-    // Dynamic subcategory filtering based on selected category (preserves current selection on edit)
-    const allSubcategories = @json($subcategories);
-    const currentCategoryId = "{{ old('category_id', $product->category_id) }}";
-    const currentSubcategoryId = "{{ old('subcategory_id', $product->subcategory_id) }}";
+    document.addEventListener('DOMContentLoaded', function () {
+        // Dynamic subcategory filtering based on selected category (preserves current selection on edit)
+        const allSubcategories = @json($subcategories);
+        const currentCategoryId = "{{ old('category_id', $product->category_id) }}";
+        const currentSubcategoryId = "{{ old('subcategory_id', $product->subcategory_id) }}";
 
-    function populateSubcategories(categoryId) {
-        const subcategorySelect = document.getElementById('subcategory_id');
-        subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+        function populateSubcategories(categoryId) {
+            const subcategorySelect = document.getElementById('subcategory_id');
+            subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
 
-        const filtered = allSubcategories.filter(sub => sub.category_id == categoryId);
+            if (categoryId) {
+                const filtered = allSubcategories.filter(sub => sub.category_id == categoryId);
 
-        filtered.forEach(sub => {
-            const option = document.createElement('option');
-            option.value = sub.id;
-            option.textContent = sub.name;
-            if (sub.id == currentSubcategoryId) option.selected = true;
-            subcategorySelect.appendChild(option);
+                filtered.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.id;
+                    option.textContent = sub.name;
+                    if (sub.id == currentSubcategoryId) option.selected = true;
+                    subcategorySelect.appendChild(option);
+                });
+            }
+        }
+
+        // On page load: populate subcategories if category is already selected
+        if (currentCategoryId) {
+            populateSubcategories(currentCategoryId);
+        }
+
+        // On category change
+        document.getElementById('category_id').addEventListener('change', function() {
+            populateSubcategories(this.value);
         });
-    }
-
-    // On page load: populate subcategories if category is already selected
-    if (currentCategoryId) {
-        populateSubcategories(currentCategoryId);
-    }
-
-    // On category change
-    document.getElementById('category_id').addEventListener('change', function() {
-        populateSubcategories(this.value);
     });
 </script>
-@endsection
+@endpush
