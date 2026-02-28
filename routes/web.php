@@ -95,9 +95,13 @@ Route::middleware('auth')
 // ================= AUTH ROUTES (USER) ==================
 // ======================================================
 
-Route::middleware('guest')->get('/login', [LoginController::class, 'showLoginForm'])
+Route::get('/login', [LoginController::class, 'showLoginForm'])
     ->name('login');
-    
+
+Route::post('/login/otp', [LoginController::class, 'sendOtp'])->name('login.otp');
+Route::post('/verify-otp', [LoginController::class, 'verifyOtp'])->name('verify.otp');
+Route::post('/set-name', [LoginController::class, 'setName'])->name('set.name')->middleware('auth');
+
 Route::middleware('web')->group(function () {
     Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])
         ->name('auth.google');
@@ -146,11 +150,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('orders.updateStatus');
 
         Route::get('users', [UserController::class, 'index'])->name('users.index');
-        
-          // for embedded imgs new added line 
+
+        // for embedded imgs new added line 
         Route::post('ckeditor/upload-image', [App\Http\Controllers\Admin\BlogController::class, 'ckeditorImageUpload'])->name('ckeditor.image.upload');
-         Route::post('ckeditor/upload', [App\Http\Controllers\Admin\BlogController::class, 'ckeditorUpload'])
-    ->name('ckeditor.upload');
+        Route::post('ckeditor/upload', [App\Http\Controllers\Admin\BlogController::class, 'ckeditorUpload'])
+            ->name('ckeditor.upload');
         // end
 
         Route::get('settings', [HeaderFooterController::class, 'index'])->name('settings');

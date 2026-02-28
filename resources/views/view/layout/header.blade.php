@@ -27,15 +27,15 @@
         $blogImage = (isset($blog) && !empty($blog->image))
             ? url('/plantsware2/public/uploads/blogs/' . basename($blog->image))
             : url('/plantsware2/public/uploads/blogs/default.jpg');
-    
+
         $blogTitle = isset($blog)
             ? $blog->title
             : 'Plantly Blog';
-    
+
         $blogDescription = isset($blog)
             ? \Illuminate\Support\Str::limit(strip_tags($blog->excerpt ?? $blog->content), 150)
             : 'Read the latest articles on Plantly';
-    
+
         $blogUrl = url()->current();
     @endphp
     
@@ -166,7 +166,7 @@
                                                 </form>
                                             @else
                                                 <a class="dropdown-item font-weight-bolderer" href="{{ url('login') }}">Login</a>
-                                                <a class="dropdown-item font-weight-bolderer" href="{{ url('register') }}">Register</a>
+                                                {{-- <a class="dropdown-item font-weight-bolderer" href="{{ url('register') }}">Register</a> --}}
                                             @endauth
                                         </span>
                                     </li>
