@@ -23,6 +23,8 @@ class User extends Authenticatable
         'city',
         'state',
         'pincode',
+        'otp',
+        'otp_expires_at',
     ];
 
     /**
@@ -31,6 +33,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'otp',
     ];
 
     /**
@@ -38,10 +41,11 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password'          => 'hashed',
+        'password' => 'hashed',
+        'otp_expires_at' => 'datetime',
 
         // Keep ONLY if address column is JSON
-        'address'           => 'array',
+        'address' => 'array',
     ];
 
     /*
@@ -74,7 +78,7 @@ class User extends Authenticatable
     public function hasInWishlist(Product $product): bool
     {
         return $this->wishlist()
-                    ->where('product_id', $product->id)
-                    ->exists();
+            ->where('product_id', $product->id)
+            ->exists();
     }
 }
