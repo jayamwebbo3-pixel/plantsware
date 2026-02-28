@@ -212,9 +212,12 @@
                                         <i class="btn-icon fas fa-shopping-cart"></i>
                                     </button>
                                 </form>
-                                <button class="btn btn-wishlist" data-tooltip="Wishlist">
-                                    <i class="far fa-heart"></i>
-                                </button>
+                                <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -286,9 +289,12 @@
                                         <i class="btn-icon fas fa-shopping-cart"></i>
                                     </button>
                                 </form>
-                                <button class="btn btn-wishlist" data-tooltip="Wishlist">
-                                    <i class="far fa-heart"></i>
-                                </button>
+                                <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
