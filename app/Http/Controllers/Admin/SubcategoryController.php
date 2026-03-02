@@ -13,7 +13,20 @@ class SubcategoryController extends Controller
 {
     public function index()
     {
-        $subcategories = Subcategory::with('category')->latest()->paginate(20);
+        $search = request('search');
+        $perPage = request('per_page', 20);
+
+        $subcategories = Subcategory::with('category')
+            ->when($search, function ($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy(
+                request('sort', 'sort_order'),
+                request('direction', 'asc')
+            )
+            ->paginate($perPage)
+            ->appends(request()->query());
+
         // Updated view path to match products-management convention
         return view('admin.products-management.subcategories', compact('subcategories'));
     }

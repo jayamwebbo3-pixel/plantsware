@@ -14,10 +14,21 @@ class ProductController extends Controller
 {
     public function index()
     {
+        $search = request('search');
+        $perPage = request('per_page', 20);
+
         $products = Product::with(['category', 'subcategory'])
-            ->orderBy('sort_order', 'asc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->when($search, function ($query) use ($search) {
+                 return $query->where('name', 'like', "%{$search}%")
+                              ->orWhere('sku', 'like', "%{$search}%");
+            })
+            ->orderBy(
+                request('sort', 'sort_order'),
+                request('direction', 'asc')
+            )
+            ->paginate($perPage)
+            ->appends(request()->query());
+            
         return view('admin.products-management.products', compact('products'));
     }
 

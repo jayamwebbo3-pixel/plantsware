@@ -10,7 +10,20 @@ class TestimonialController extends Controller
 {
     public function index()
     {
-        $testimonials = Testimonial::latest()->paginate(20);
+        $search = request('search');
+        $perPage = request('per_page', 20);
+
+        $testimonials = Testimonial::when($search, function ($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%")
+                             ->orWhere('title', 'like', "%{$search}%");
+            })
+            ->orderBy(
+                request('sort', 'created_at'),
+                request('direction', 'desc')
+            )
+            ->paginate($perPage)
+            ->appends(request()->query());
+            
         return view('admin.testimonials.index', compact('testimonials'));
     }
 

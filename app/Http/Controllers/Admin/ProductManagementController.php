@@ -15,14 +15,39 @@ class ProductManagementController extends Controller
     // Step 1: Show all categories
     public function categories()
     {
-        $categories = Category::orderBy('sort_order')->orderBy('name')->paginate(20);
+        $perPage = request('per_page', 20);
+        $search = request('search');
+
+        $categories = Category::when($search, function ($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy(
+                request('sort', 'sort_order'),
+                request('direction', 'asc')
+            )
+            ->paginate($perPage)
+            ->appends(request()->query());
+
         return view('admin.products-management.categories', compact('categories'));
     }
 
     // Step 2: Show subcategories of a category
     public function subcategories(Category $category)
     {
-        $subcategories = $category->subcategories()->orderBy('sort_order')->paginate(20);
+        $perPage = request('per_page', 20);
+        $search = request('search');
+
+        $subcategories = $category->subcategories()
+            ->when($search, function ($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy(
+                request('sort', 'sort_order'),
+                request('direction', 'asc')
+            )
+            ->paginate($perPage)
+            ->appends(request()->query());
+
         return view('admin.products-management.subcategories', compact('category', 'subcategories'));
     }
 

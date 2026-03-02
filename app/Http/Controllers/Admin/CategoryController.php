@@ -12,7 +12,19 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::latest()->paginate(20);
+        $search = request('search');
+        $perPage = request('per_page', 20);
+
+        $categories = Category::when($search, function ($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy(
+                request('sort', 'sort_order'),
+                request('direction', 'asc')
+            )
+            ->paginate($perPage)
+            ->appends(request()->query());
+
         return view('admin.categories.index', compact('categories'));
     }
 
