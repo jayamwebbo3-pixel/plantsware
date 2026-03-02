@@ -1,46 +1,35 @@
-{{-- DO NOT add or use PHP namespace or use statements in Blade templates --}}
-{{-- Instead of `use Illuminate\Support\Str;`, call Str methods via the global helper/class --}}
-
 @include('view.layout.header')
 
 <section class="plant-categories-section">
     <div class="plant-categories-container">
+
         <div class="categories-carousel-container">
-            <!-- Carousel Navigation Buttons (Disabled) -->
-            <!-- 
-            <button class="carousel-btn carousel-btn-prev" id="prevBtn">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="carousel-btn carousel-btn-next" id="nextBtn">
-                <i class="fas fa-chevron-right"></i>
-            </button> 
-            -->
             <!-- Carousel -->
             <div class="plant-categories-carousel" id="plantCategoriesCarousel">
                 @forelse($categories as $category)
-                    <div class="plant-category-item">
-                        <a href="{{ route('category.show', $category->slug) }}" class="plant-category-card">
-                            <div class="category-image-container">
-                                @if($category->badge_type)
-                                    <span class="category-badge badge-{{ $category->badge_type }}">{{ \Illuminate\Support\Str::upper($category->badge_type) }}</span>
+                <div class="plant-category-item">
+                    <a href="{{ route('category.show', $category->slug ?? $category->id) }}" class="plant-category-card">
+                        <div class="category-image-container">
+                            @if($category->badge_type)
+                                <span class="category-badge badge-{{ $category->badge_type }}">{{ \Illuminate\Support\Str::upper($category->badge_type) }}</span>
+                            @endif
+                            <div class="plant-category-image">
+                                @if($category->image)
+                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}">
+                                @else
+                                    <img src="{{ asset('assets/images/category-placeholder.jpg') }}" alt="{{ $category->name }}">
                                 @endif
-                                <div class="plant-category-image">
-                                    @if($category->image)
-                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}">
-                                    @else
-                                        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="{{ $category->name }}">
-                                    @endif
-                                </div>
                             </div>
-                            <div class="plant-category-content">
-                                <h3 class="plant-category-name">{{ $category->name }}</h3>
-                            </div>
-                        </a>
-                    </div>
+                        </div>
+                        <div class="plant-category-content">
+                            <h3 class="plant-category-name">{{ $category->name }}</h3>
+                        </div>
+                    </a>
+                </div>
                 @empty
-                    <div class="plant-category-item">
-                        <p class="text-center">No categories available</p>
-                    </div>
+                <div class="plant-category-item">
+                    <p class="text-center w-100">No categories available</p>
+                </div>
                 @endforelse
             </div>
         </div>
@@ -50,7 +39,6 @@
 <!-- vertical menu and slider -->
 <div id="home_vertical_menu" class="menu_slider ">
     <div class="row ">
-        <!-- col-md-3 vertical_menu -->
         <div class="col-lg-12 col-md-12 main_slider">
             <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                 @if($sliders->count() > 0)
@@ -64,23 +52,20 @@
                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                         <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}">
                         <div class="carousel-caption container silder_text">
-                            @if($slider->subtitle)
-                                <p class="arrival">{{ $slider->subtitle }}</p>
-                            @endif
-                            @if($slider->title)
-                                <h5 class="headding">{{ $slider->title }}</h5>
-                            @endif
-                            @if($slider->button_text && $slider->button_link)
-                                <a href="{{ $slider->button_link }}" type="btn" class="shop-now">{{ $slider->button_text }}</a>
-                            @endif
+                            @if($slider->subtitle)<p class="arrival">{{ $slider->subtitle }}</p>@endif
+                            @if($slider->title)<h5 class="headding">{{ $slider->title }}</h5>@endif
+                            @if($slider->button_link && $slider->button_text)<a href="{{ $slider->button_link }}" type="btn" class="shop-now">{{ $slider->button_text }}</a>@endif
                         </div>
                     </div>
                     @endforeach
                 </div>
                 @else
+                <ol class="carousel-indicators">
+                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                </ol>
                 <div class="carousel-inner">
                     <div class="carousel-item active">
-                        <img src="{{ asset('uploads/img2/slider/11.png') }}" class="d-block w-100 img-fluid" alt="Default">
+                        <img src="{{ asset('uploads/img2/slider/11.png') }}" class="d-block w-100 img-fluid" alt="s1">
                         <div class="carousel-caption container silder_text">
                             <p class="arrival">Complete Care for Every Plant</p>
                             <h5 class="headding">From Soil to<br>Bloom Naturally</h5>
@@ -89,13 +74,13 @@
                     </div>
                 </div>
                 @endif
-                <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev"></a>
-                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next"></a>
+                <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button"
+                    data-slide="prev"></a>
+                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button"
+                    data-slide="next"></a>
             </div>
         </div>
-        <!-- col-md-9 main_slider -->
     </div>
-    <!-- row -->
 </div>
 <!-- vertical menu and slider end -->
 
@@ -152,13 +137,62 @@
                 </ul>
             </div>
         </div>
-        <!-- row -->
     </div>
-    <!-- main_services -->
 </div>
 <!-- services end -->
 
-<!-- Section 1: New Arrivals (Add to Cart Button Functional) -->
+{{-- Product Card Macro block --}}
+@php
+if (!function_exists('renderProductCard')) {
+    function renderProductCard($product) {
+        $imgSrc = $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg');
+        $slug = $product->slug ?? $product->id;
+        $price = number_format($product->price ?? 0, 2);
+        $salePrice = ($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price) ? number_format($product->sale_price, 2) : null;
+        $discount = $product->discount_percentage ?? null;
+
+        return '
+        <div class="swiper-slide">
+            <div class="product-card">
+                <div class="product-image-container">
+                    <a href="'.route('product.show', $slug).'">
+                        <img src="'.$imgSrc.'" alt="'.$product->name.'" class="product-image main-image">
+                        <img src="'.$imgSrc.'" alt="'.$product->name.'" class="product-image hover-image">
+                        '.($salePrice && $discount > 0 ? '<span class="discount-badge">'.$discount.'% OFF</span>' : '').'
+                    </a>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">'.$product->name.'</h3>
+                    <div class="product-price">
+                        '.($salePrice 
+                            ? '<span class="original-price">₹'.$price.'</span><span class="current-price">₹'.$salePrice.'</span>' 
+                            : '<span class="current-price">₹'.$price.'</span>').'
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" data-tooltip="Buy Now">
+                            <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
+                        </button>
+                        <form class="add-to-cart-form d-inline-block text-white" method="POST" action="'.route('cart.add', $product->id).'" style="display:inline;">
+                            '.csrf_field().'
+                            <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
+                                <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
+                            </button>
+                        </form>
+                        <form class="d-inline-block" method="POST" action="'.route('wishlist.add', $product->id).'" style="display:inline;">
+                            '.csrf_field().'
+                            <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>';
+    }
+}
+@endphp
+
+<!-- Section 1: New Arrivals -->
 <section class="bg-white-section">
     <div class="container-fluid px-4">
         <div class="section-title">
@@ -167,65 +201,13 @@
                 <a href="{{ url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
             </div>
         </div>
+
         <div class="swiper product-swiper">
             <div class="swiper-wrapper">
                 @forelse($newArrivals as $product)
-                <div class="swiper-slide">
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <a href="{{ route('product.show', $product->slug) }}">
-                                @if($product->image)
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                        class="product-image main-image">
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                        class="product-image hover-image">
-                                @else
-                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
-                                        class="product-image main-image">
-                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
-                                        class="product-image hover-image">
-                                @endif
-                                @if($product->sale_price && $product->discount_percentage > 0)
-                                    <span class="discount-badge">{{ $product->discount_percentage }}% OFF</span>
-                                @endif
-                            </a>
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-title">{{ $product->name }}</h3>
-                            <div class="product-price">
-                                @if($product->sale_price)
-                                    <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
-                                    <span class="current-price">₹{{ number_format($product->sale_price, 2) }}</span>
-                                @else
-                                    <span class="current-price">₹{{ number_format($product->price, 2) }}</span>
-                                @endif
-                            </div>
-                            <div class="product-actions">
-                                <button class="btn btn-primary" data-tooltip="Buy Now">
-                                    <span class="btn-text">Buy Now</span>
-                                    <i class="btn-icon fas fa-shopping-bag"></i>
-                                </button>
-                                <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                        <span class="btn-text">Add to Cart</span>
-                                        <i class="btn-icon fas fa-shopping-cart"></i>
-                                    </button>
-                                </form>
-                                <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
-                                        <i class="far fa-heart"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    {!! renderProductCard($product) !!}
                 @empty
-                <div class="swiper-slide">
-                    <p class="text-center">No products available</p>
-                </div>
+                    <div class="swiper-slide"><p class="text-center w-100">No products found</p></div>
                 @endforelse
             </div>
             <div class="swiper-button-next"></div>
@@ -240,69 +222,16 @@
         <div class="section-title">
             <h2>Garden Products</h2>
             <div class="title-link">
-                <a href="{{ route('products.index') }}">More <i class="fas fa-chevron-right"></i></a>
+                <a href="{{ url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
             </div>
         </div>
 
         <div class="swiper product-swiper">
             <div class="swiper-wrapper">
                 @forelse($gardenProducts as $product)
-                <div class="swiper-slide">
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <a href="{{ route('product.show', $product->slug) }}">
-                                @if($product->image)
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                        class="product-image main-image">
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                        class="product-image hover-image">
-                                @else
-                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
-                                        class="product-image main-image">
-                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
-                                        class="product-image hover-image">
-                                @endif
-                                @if($product->sale_price && $product->discount_percentage > 0)
-                                    <span class="discount-badge">{{ $product->discount_percentage }}% OFF</span>
-                                @endif
-                            </a>
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-title">{{ $product->name }}</h3>
-                            <div class="product-price">
-                                @if($product->sale_price)
-                                    <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
-                                    <span class="current-price">₹{{ number_format($product->sale_price, 2) }}</span>
-                                @else
-                                    <span class="current-price">₹{{ number_format($product->price, 2) }}</span>
-                                @endif
-                            </div>
-                            <div class="product-actions">
-                                <button class="btn btn-primary" data-tooltip="Buy Now">
-                                    <span class="btn-text">Buy Now</span>
-                                    <i class="btn-icon fas fa-shopping-bag"></i>
-                                </button>
-                                <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                        <span class="btn-text">Add to Cart</span>
-                                        <i class="btn-icon fas fa-shopping-cart"></i>
-                                    </button>
-                                </form>
-                                <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
-                                        <i class="far fa-heart"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    {!! renderProductCard($product) !!}
                 @empty
-                <div class="swiper-slide">
-                    <p class="text-center">No garden products available</p>
-                </div>
+                    <div class="swiper-slide"><p class="text-center w-100">No products found</p></div>
                 @endforelse
             </div>
             <div class="swiper-button-next"></div>
@@ -311,32 +240,207 @@
     </div>
 </section>
 
-<!-- Other sections unchanged, keep as before -->
 <section class="ad-banner">
     <div class="banner-content">
         <h1 class="big-title">Fresh Plant-Based Goodness</h1>
         <p class="small-title">Discover our organic, sustainable products for a healthier lifestyle</p>
-        <a href="#" class="contact-btn">Shop Now <i class="fas fa-leaf"></i></a>
+        <a href="{{ url('categories') }}" class="contact-btn">Shop Now <i class="fas fa-leaf"></i></a>
     </div>
 </section>
 
-<!-- Blog section should go here (unchanged) -->
-@include('view.layout.blog')
-<!-- Blog section should end here --> 
+<!-- Section 3: Planted Aquarium Products -->
+<section class="bg-white-section">
+    <div class="container-fluid px-4">
+        <div class="section-title">
+            <h2>Planted Aquarium Products</h2>
+            <div class="title-link">
+                <a href="{{ url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
 
+        <div class="swiper product-swiper">
+            <div class="swiper-wrapper">
+                @forelse($aquariumProducts as $product)
+                    {!! renderProductCard($product) !!}
+                @empty
+                    <div class="swiper-slide"><p class="text-center w-100">No products found</p></div>
+                @endforelse
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+</section>
 
+<!-- Section 4: Natural Products -->
+<section class="bg-light-section">
+    <div class="container-fluid px-4">
+        <div class="section-title">
+            <h2>Natural Products</h2>
+            <div class="title-link">
+                <a href="{{ url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <div class="swiper product-swiper">
+            <div class="swiper-wrapper">
+                @forelse($naturalProducts as $product)
+                    {!! renderProductCard($product) !!}
+                @empty
+                    <div class="swiper-slide"><p class="text-center w-100">No products found</p></div>
+                @endforelse
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+</section>
+
+<!---------------------------------------------------------- testimonials ------------------------------------------------------->
+<div class="reviews-carousel">
+    <div class="carousel-header">
+        <h2 class="section-title1 text-center">Trusted by thousands</h2>
+        <div class="see-more">See more reviews</div>
+    </div>
+
+    <!-- Swiper -->
+    <div class="swiper testimonial-swiper">
+        <div class="swiper-wrapper">
+            @forelse($testimonials ?? [] as $testimonial)
+                <div class="swiper-slide">
+                    <div class="review-card">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">{{ $testimonial->name }}</div>
+                            <div class="verified-badge">
+                                <i class="fas fa-badge-check"></i>
+                                <span>Verified Buyer</span>
+                            </div>
+                        </div>
+                        <div class="review-date">{{ $testimonial->created_at->format('m/d/y') }}</div>
+                        <div class="star-rating">
+                            @for($i=1; $i<=5; $i++)
+                                <i class="fas fa-star {{ $i <= ($testimonial->rating ?? 5) ? 'star' : 'text-muted' }}"></i>
+                            @endfor
+                        </div>
+                        @if($testimonial->title)
+                            <h3 class="review-title">{{ $testimonial->title }}</h3>
+                        @endif
+                        <p class="review-content">
+                            {{ $testimonial->message }}
+                        </p>
+                    </div>
+                </div>
+            @empty
+                <!-- Default Hardcoded Examples if no DB testimonials -->
+                <div class="swiper-slide">
+                    <div class="review-card">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Emma J.</div>
+                            <div class="verified-badge">
+                                <i class="fas fa-badge-check"></i>
+                                <span>Verified Buyer</span>
+                            </div>
+                        </div>
+                        <div class="review-date">11/07/25</div>
+                        <div class="star-rating">
+                            <i class="fas fa-star star"></i><i class="fas fa-star star"></i><i class="fas fa-star star"></i><i class="fas fa-star star"></i><i class="fas fa-star star"></i>
+                        </div>
+                        <h3 class="review-title">Very happy with all of</h3>
+                        <p class="review-content">
+                            Very happy with all of my new plants. Prices were good, delivery was fast, and the plants are gorgeous.
+                        </p>
+                    </div>
+                </div>
+            @endforelse
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="carousel-nav">
+        <div class="nav-btn swiper-button-prev1">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="nav-btn swiper-button-next1">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </div>
+</div>
+
+<section class="bg-light-section">
+    <div class="container-fluid px-4">
+        <div class="section-title">
+            <h2>Blogs</h2>
+            <div class="title-link">
+                <a href="{{ url('blogs') }}">More <i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="blog-grid">
+                <div class="row g-4">
+                    @forelse($blogs ?? [] as $blog)
+                    <div class="col-md-6 col-lg-4">
+                        <div class="blog-card">
+                            <div class="blog-card-image">
+                                @if($blog->image)
+                                    <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}">
+                                @else
+                                    <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="{{ $blog->title }}">
+                                @endif
+                                <span class="blog-card-category">{{ $blog->category->name ?? 'General' }}</span>
+                            </div>
+                            <div class="blog-card-content">
+                                <div class="blog-card-date">{{ $blog->created_at->format('M d, Y') }}</div>
+                                <h3 class="blog-card-title">{{ $blog->title }}</h3>
+                                <p class="blog-card-excerpt">
+                                    {{ \Illuminate\Support\Str::limit(strip_tags($blog->content), 100) }}
+                                </p>
+                                <div class="blog-card-footer">
+                                    <span class="blog-card-author">{{ $blog->author_name ?? 'Admin' }}</span>
+                                    <a href="#" class="read-more-link">Read →</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <!-- Default Blog Cards -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="blog-card">
+                            <div class="blog-card-image">
+                                <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="Indoor plant care">
+                                <span class="blog-card-category">Plant Care</span>
+                            </div>
+                            <div class="blog-card-content">
+                                <div class="blog-card-date">Nov 15, 2024</div>
+                                <h3 class="blog-card-title">10 Essential Tips to Keep Indoor Plants Healthy</h3>
+                                <p class="blog-card-excerpt">
+                                    Learn the fundamental watering, lighting, and soil requirements that help indoor plants grow stronger and greener.
+                                </p>
+                                <div class="blog-card-footer">
+                                    <span class="blog-card-author">Sophia Green</span>
+                                    <a href="#" class="read-more-link">Read →</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 @include('view.layout.footer')
 
-<!-- Show notification after Add to Cart (shows Bootstrap alert for 2s) -->
+<!-- Notification after Add to Cart -->
 <div id="cart-alert-container" style="position: fixed; z-index: 99999; left: 50%; transform: translateX(-50%); top: 20px; display: none;">
     <div class="alert alert-success alert-dismissible fade show" role="alert" id="cart-added-alert" style="min-width: 250px;">
-        Product added to cart!
+        Item added with success!
     </div>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.add-to-cart-form').forEach(function(form) {
+    document.querySelectorAll('.add-to-cart-form, .wishlist-form').forEach(function(form) {
         form.addEventListener('submit', function(event) {
             setTimeout(function() {
                 var alertContainer = document.getElementById('cart-alert-container');

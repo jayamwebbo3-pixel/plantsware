@@ -52,7 +52,11 @@
                                 <img src="{{ asset('storage/' . $subcategory->image) }}" alt="{{ $subcategory->name }}" class="img-thumbnail" style="max-width: 200px;">
                             </div>
                         @endif
-                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*" onchange="if(this.files[0]) { document.getElementById('imagePreview').src = window.URL.createObjectURL(this.files[0]); document.getElementById('previewContainer').style.display = 'block'; } else { document.getElementById('previewContainer').style.display = 'none'; }">
+                        <div id="previewContainer" class="mt-2 text-center" style="display: none;">
+                            <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-height: 200px;">
+                            <small class="text-success d-block mt-1">New Image Preview</small>
+                        </div>
                     </div>
 
                     {{-- <div class="mb-3">

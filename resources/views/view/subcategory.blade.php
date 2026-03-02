@@ -31,7 +31,12 @@
 <section class="sub-category-section pt-0" style="background:var(--white);">
     <div class="container">
 
-        <div class="sub-category-header-wrap">
+        <div class="sub-category-header-wrap text-center">
+            @if(isset($subcategory) && $subcategory->image)
+                <div class="subcategory-image-banner mb-4">
+                    <img src="{{ asset('storage/' . $subcategory->image) }}" alt="{{ $subcategory->name }}" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                </div>
+            @endif
             <h1 class="sub-category-title">{{ isset($subcategory) ? $subcategory->name : 'Subcategory' }}</h1>
             <span class="sub-category-count">Result: {{ isset($products) ? $products->total() : 0 }} products.</span>
 
@@ -58,7 +63,7 @@
                                 <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
                                     class="product-image hover-image">
                             @endif
-                            @if($product->sale_price && $product->discount_percentage > 0)
+                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price && $product->discount_percentage > 0)
                                 <span class="discount-badge">{{ $product->discount_percentage }}% OFF</span>
                             @endif
                         </a>
@@ -66,7 +71,7 @@
                     <div class="product-info">
                         <h3 class="product-title">{{ $product->name }}</h3>
                         <div class="product-price">
-                            @if($product->sale_price)
+                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
                                 <span class="current-price">₹{{ number_format($product->sale_price, 2) }}</span>
                             @else

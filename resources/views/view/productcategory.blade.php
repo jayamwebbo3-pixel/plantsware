@@ -328,6 +328,11 @@
             <div class="col-lg-9 col-md-8">
                 <div class="products-area">
                     <div class="products-header bg-white rounded p-3 mb-4">
+                        @if(isset($category) && $category->image)
+                            <div class="category-image-banner mb-4 text-center">
+                                <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            </div>
+                        @endif
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
                             <h2 class="category-name mb-2 mb-md-0">{{ isset($category) ? $category->name : 'All Categories' }}</h2>
 
@@ -361,7 +366,7 @@
                                                 <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
                                                     class="product-image hover-image">
                                             @endif
-                                            @if($product->sale_price && $product->discount_percentage > 0)
+                                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price && $product->discount_percentage > 0)
                                                 <span class="discount-badge">{{ $product->discount_percentage }}% OFF</span>
                                             @endif
                                         </a>
@@ -369,7 +374,7 @@
                                     <div class="product-info">
                                         <h3 class="product-title">{{ $product->name }}</h3>
                                         <div class="product-price">
-                                            @if($product->sale_price)
+                                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                                 <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
                                                 <span class="current-price">₹{{ number_format($product->sale_price, 2) }}</span>
                                             @else
@@ -425,7 +430,7 @@
                                                         <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
                                                             class="product-image hover-image">
                                                     @endif
-                                                    @if($product->sale_price && $product->discount_percentage > 0)
+                                                    @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price && $product->discount_percentage > 0)
                                                         <span class="discount-badge">{{ $product->discount_percentage }}% OFF</span>
                                                     @endif
                                                 </a>
@@ -433,7 +438,7 @@
                                             <div class="product-info">
                                                 <h3 class="product-title">{{ $product->name }}</h3>
                                                 <div class="product-price">
-                                                    @if($product->sale_price)
+                                                    @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                                         <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
                                                         <span class="current-price">₹{{ number_format($product->sale_price, 2) }}</span>
                                                     @else

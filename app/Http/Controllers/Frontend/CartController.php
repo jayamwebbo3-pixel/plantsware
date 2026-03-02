@@ -19,7 +19,10 @@ class CartController extends Controller
         $cartItems = Cart::current()->with('product')->get();
 
         $subtotal = $cartItems->sum(function ($item) {
-            return $item->product->price * $item->quantity;
+            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                ? $item->product->sale_price 
+                : $item->product->price;
+            return $priceToUse * $item->quantity;
         });
 
         $total = $subtotal;
@@ -77,7 +80,10 @@ class CartController extends Controller
         $cartCount = Cart::current()->sum('quantity') ?? 0;
         $cartItems = Cart::current()->with('product')->get();
         $subtotal = $cartItems->sum(function ($item) {
-            return $item->product->price * $item->quantity;
+            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                ? $item->product->sale_price 
+                : $item->product->price;
+            return $priceToUse * $item->quantity;
         });
 
         if ($request->ajax()) {
@@ -123,10 +129,16 @@ class CartController extends Controller
         $cartCount = Cart::current()->sum('quantity') ?? 0;
         $cartItems = Cart::current()->with('product')->get();
         $subtotal = $cartItems->sum(function ($item) {
-            return $item->product->price * $item->quantity;
+            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                ? $item->product->sale_price 
+                : $item->product->price;
+            return $priceToUse * $item->quantity;
         });
         
-        $itemTotal = $cartItem->product->price * $quantity;
+        $priceToUseForItem = ($cartItem->product->sale_price && $cartItem->product->sale_price > 0 && $cartItem->product->sale_price < $cartItem->product->price) 
+            ? $cartItem->product->sale_price 
+            : $cartItem->product->price;
+        $itemTotal = $priceToUseForItem * $quantity;
 
         if ($request->ajax()) {
             return response()->json([
@@ -159,7 +171,10 @@ class CartController extends Controller
         $cartCount = Cart::current()->sum('quantity') ?? 0;
         $cartItems = Cart::current()->with('product')->get();
         $subtotal = $cartItems->sum(function ($item) {
-            return $item->product->price * $item->quantity;
+            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                ? $item->product->sale_price 
+                : $item->product->price;
+            return $priceToUse * $item->quantity;
         });
 
         if ($request->ajax()) {

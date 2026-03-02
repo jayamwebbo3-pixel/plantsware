@@ -60,7 +60,12 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                <span class="text-success fw-bold">₹{{ number_format($item->product->price, 2) }}</span>
+                                                @php
+                                                    $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                                                        ? $item->product->sale_price 
+                                                        : $item->product->price;
+                                                @endphp
+                                                <span class="text-success fw-bold">₹{{ number_format($priceToUse, 2) }}</span>
                                             </td>
                                             <td>
                                                 @if($item->product->stock_quantity > 0)
@@ -153,7 +158,12 @@
                             <div class="product-info">
                                 <h3 class="product-title">{{ $item->product->name }}</h3>
                                 <div class="product-price">
-                                    <span class="current-price">₹{{ number_format($item->product->price, 2) }}</span>
+                                    @php
+                                        $relatedPriceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                                            ? $item->product->sale_price 
+                                            : $item->product->price;
+                                    @endphp
+                                    <span class="current-price">₹{{ number_format($relatedPriceToUse, 2) }}</span>
                                 </div>
                                 <div class="product-actions">
                                     <form action="{{ route('cart.add', $item->product->id) }}" method="POST" class="d-inline">
