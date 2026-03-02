@@ -31,7 +31,12 @@
 <section class="sub-category-section pt-0" style="background:var(--white);">
     <div class="container">
 
-        <div class="sub-category-header-wrap">
+        <div class="sub-category-header-wrap text-center">
+            @if(isset($subcategory) && $subcategory->image)
+                <div class="subcategory-image-banner mb-4">
+                    <img src="{{ asset('storage/' . $subcategory->image) }}" alt="{{ $subcategory->name }}" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                </div>
+            @endif
             <h1 class="sub-category-title">{{ isset($subcategory) ? $subcategory->name : 'Subcategory' }}</h1>
             <span class="sub-category-count">Result: {{ isset($products) ? $products->total() : 0 }} products.</span>
 

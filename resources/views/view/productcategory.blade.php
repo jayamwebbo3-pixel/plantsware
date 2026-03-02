@@ -328,6 +328,11 @@
             <div class="col-lg-9 col-md-8">
                 <div class="products-area">
                     <div class="products-header bg-white rounded p-3 mb-4">
+                        @if(isset($category) && $category->image)
+                            <div class="category-image-banner mb-4 text-center">
+                                <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            </div>
+                        @endif
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
                             <h2 class="category-name mb-2 mb-md-0">{{ isset($category) ? $category->name : 'All Categories' }}</h2>
 

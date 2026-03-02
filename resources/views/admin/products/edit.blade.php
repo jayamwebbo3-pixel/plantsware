@@ -209,13 +209,18 @@
                                 <small class="text-muted d-block mt-1">Current image</small>
                             </div>
                         @endif
-                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*" onchange="if(this.files[0]) { document.getElementById('imagePreview').src = window.URL.createObjectURL(this.files[0]); document.getElementById('previewContainer').style.display = 'block'; } else { document.getElementById('previewContainer').style.display = 'none'; }">
+                        <div id="previewContainer" class="mt-2 text-center" style="display: none;">
+                            <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-height: 200px;">
+                            <small class="text-success d-block mt-1">New Image Preview</small>
+                        </div>
                         <small class="text-muted">Leave empty to keep current image</small>
                     </div>
 
                     <div class="mb-3">
                         <label for="gallery_images" class="form-label">Add More Gallery Images</label>
                         <input type="file" class="form-control" id="gallery_images" name="gallery_images[]" accept="image/*" multiple>
+                        <div id="galleryPreviewContainer" class="d-flex flex-wrap mt-2"></div>
                         <small class="text-muted">Hold Ctrl/Cmd to select multiple. Existing gallery images remain unless deleted separately.</small>
                     </div>
 
@@ -272,6 +277,79 @@
         document.getElementById('category_id').addEventListener('change', function() {
             populateSubcategories(this.value);
         });
+
+        // Gallery Images Preview and Removal
+        const galleryInput = document.getElementById('gallery_images');
+        const galleryPreviewContainer = document.getElementById('galleryPreviewContainer');
+        let selectedFiles = [];
+
+        if (galleryInput) {
+            galleryInput.addEventListener('change', function(e) {
+                // When new files are selected, append them to our existing selectedFiles array
+                const newFiles = Array.from(e.target.files);
+                
+                // Optional: prevent duplicate files based on name and size
+                newFiles.forEach(newFile => {
+                    const exists = selectedFiles.some(existingFile => 
+                        existingFile.name === newFile.name && existingFile.size === newFile.size
+                    );
+                    if (!exists) {
+                        selectedFiles.push(newFile);
+                    }
+                });
+                
+                updateInputFiles();
+                updateGalleryPreview();
+            });
+        }
+
+        function updateGalleryPreview() {
+            galleryPreviewContainer.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'position-relative d-inline-block m-1';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'img-thumbnail border-secondary';
+                    img.style.width = '80px';
+                    img.style.height = '80px';
+                    img.style.objectFit = 'cover';
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle';
+                    btn.style.padding = '0';
+                    btn.style.width = '20px';
+                    btn.style.height = '20px';
+                    btn.style.lineHeight = '18px';
+                    btn.style.fontSize = '12px';
+                    btn.style.transform = 'translate(30%, -30%)';
+                    btn.innerHTML = '&times;';
+                    btn.onclick = function(event) {
+                        event.preventDefault();
+                        selectedFiles.splice(index, 1); // Remove from array
+                        updateInputFiles();             // Update DataTransfer and input
+                        updateGalleryPreview();         // Re-render
+                    };
+
+                    div.appendChild(img);
+                    div.appendChild(btn);
+                    galleryPreviewContainer.appendChild(div);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function updateInputFiles() {
+            const dataTransfer = new DataTransfer();
+            selectedFiles.forEach(file => {
+                dataTransfer.items.add(file);
+            });
+            galleryInput.files = dataTransfer.files;
+        }
     });
 </script>
 @endpush
