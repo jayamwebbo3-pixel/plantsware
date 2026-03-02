@@ -35,7 +35,7 @@ class OrderController extends Controller
         }
 
         // Filter by status
-        if ($status && in_array($status, ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'])) {
+        if ($status && in_array($status, ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'])) {
             $query->where('status', $status);
         }
 
@@ -48,6 +48,7 @@ class OrderController extends Controller
         $stats = [
             'total' => Order::count(),
             'pending' => Order::where('status', 'pending')->count(),
+            'confirmed' => Order::where('status', 'confirmed')->count(),
             'processing' => Order::where('status', 'processing')->count(),
             'shipped' => Order::where('status', 'shipped')->count(),
             'delivered' => Order::where('status', 'delivered')->count(),
@@ -70,7 +71,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled,returned'
+            'status' => 'required|in:pending,confirmed,processing,shipped,delivered,returned'
         ]);
 
         $order->update(['status' => $request->status]);

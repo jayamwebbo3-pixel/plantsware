@@ -8,6 +8,7 @@ use App\Http\Controllers\Frontend\ProductController as FrontendProductController
 use App\Http\Controllers\Frontend\BlogController as FrontendBlogController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\CheckoutController;
+use App\Http\Controllers\Frontend\PaymentController;
 use App\Http\Controllers\Frontend\UserDashboardController;
 
 // ================= AUTH CONTROLLERS =================
@@ -85,11 +86,23 @@ Route::middleware('auth')
         Route::get('/order/{order}/confirmation', 'confirmation')->name('confirmation');
     });
 
-// ================= USER DASHBOARD =================
+// ================= PAYMENT (AUTH REQUIRED) =================
 
 Route::middleware('auth')
-    ->get('/user/dashboard', [UserDashboardController::class, 'index'])
-    ->name('user.dashboard');
+    ->prefix('payment')
+    ->name('payment.')
+    ->controller(PaymentController::class)
+    ->group(function () {
+        Route::get('/gateway/{transaction_ref}', 'gateway')->name('gateway');
+        Route::post('/callback', 'callback')->name('callback');
+    });
+
+// ================= USER DASHBOARD =================
+
+Route::middleware('auth')->group(function () {
+    Route::get('/user/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
+    Route::post('/user/order/{id}/cancel', [UserDashboardController::class, 'cancelOrder'])->name('user.order.cancel');
+});
 
 // ======================================================
 // ================= AUTH ROUTES (USER) ==================

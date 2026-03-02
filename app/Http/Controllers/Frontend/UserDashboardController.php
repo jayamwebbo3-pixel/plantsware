@@ -18,5 +18,18 @@ class UserDashboardController extends Controller
             'wishlist'  => $user->wishlist()->with('product')->get(),
         ]);
     }
+
+    public function cancelOrder($id)
+    {
+        $order = Auth::user()->orders()->findOrFail($id);
+
+        if (in_array($order->status, ['shipped', 'delivered', 'cancelled'])) {
+            return back()->with('error', 'This order cannot be cancelled.');
+        }
+
+        $order->update(['status' => 'cancelled']);
+
+        return back()->with('success', 'Order has been successfully cancelled.');
+    }
 }
 

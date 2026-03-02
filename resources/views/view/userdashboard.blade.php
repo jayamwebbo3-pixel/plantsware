@@ -196,9 +196,19 @@
                             <div class="order-info">
                                 <h4>Order {{ $order->order_number }}</h4>
                                 <p>Date: {{ $order->created_at->format('d M Y') }}</p>
-                                <span class="order-status {{ $order->status }}">{{ ucfirst($order->status) }}</span>
+
+                                <span class="order-status {{ strtolower($order->status) }}" style="padding: 3px 8px; border-radius: 4px; color: white; background-color: {{ strtolower($order->status) === 'cancelled' ? '#dc3545' : (strtolower($order->status) === 'shipped' ? '#17a2b8' : (strtolower($order->status) === 'delivered' ? '#28a745' : '#ffc107')) }};">
+                                    {{ ucfirst($order->status) }}
+                                </span>
+
+                                @if(!in_array(strtolower($order->status), ['shipped', 'delivered', 'cancelled']))
+                                    <form action="{{ route('user.order.cancel', $order->id) }}" method="POST" style="display:inline; margin-left:10px;" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                        @csrf
+                                        <button type="submit" style="background-color: transparent; border: 1px solid #dc3545; color: #dc3545; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Cancel</button>
+                                    </form>
+                                @endif
                             </div>
-                            <div class="order-price">₹{{ number_format($order->total_amount, 2) }}</div>
+                            <div class="order-price">₹{{ number_format($order->total ?? 0, 2) }}</div>
                         </div>
                         @empty
                         <div style="padding: 20px; color: #666; font-style: italic;">

@@ -104,6 +104,10 @@
                             <small class="text-muted">Pending</small>
                         </div>
                         <div class="col-lg-2 col-md-4 col-6 mb-3">
+                            <h4 class="mb-0 text-success">{{ $stats['confirmed'] ?? 0 }}</h4>
+                            <small class="text-muted">Confirmed</small>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-6 mb-3">
                             <h4 class="mb-0 text-primary">{{ $stats['shipped'] ?? 0 }}</h4>
                             <small class="text-muted">Shipped</small>
                         </div>
@@ -171,6 +175,7 @@
                         @php
                             $statuses = [
                                 '' => ['label' => 'All', 'class' => 'status-all'],
+                                'confirmed' => ['label' => 'Confirmed', 'class' => 'status-processing'],
                                 'processing' => ['label' => 'Processing', 'class' => 'status-processing'],
                                 'shipped' => ['label' => 'Shipped', 'class' => 'status-shipped'],
                                 'delivered' => ['label' => 'Delivered', 'class' => 'status-delivered'],
@@ -274,6 +279,7 @@
                                     } else {
                                         $statusColor = [
                                             'pending' => 'bg-warning text-dark',
+                                            'confirmed' => 'bg-success text-white',
                                             'processing' => 'bg-info text-dark',
                                             'shipped' => 'bg-primary',
                                             'delivered' => 'bg-success',
@@ -297,9 +303,6 @@
                                 </a>
                                 @if($order->status == 'processing')
                                     <a href="#" class="btn btn-sm btn-primary" disabled title="Ship order (not implemented)">Ship</a>
-                                @endif
-                                @if(in_array($order->status, ['pending', 'processing']))
-                                    <a href="#" class="btn btn-sm btn-danger" disabled title="Cancel order (not implemented)">Cancel</a>
                                 @endif
                             </td>
                         </tr>

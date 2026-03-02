@@ -132,55 +132,48 @@ class CheckoutController extends Controller {
             }
         }
 
-        // Create order in transaction
-        return DB::transaction(function () use ($cartItems, $shippingAddress, $request) {
-            $subtotal = $cartItems->sum(function ($item) {
-                $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                    ? $item->product->sale_price 
-                    : $item->product->price;
-                return $priceToUse * $item->quantity;
-            });
-            $shipping = 0;
-            $tax = 0;
-            $total = $subtotal + $shipping + $tax;
+        $subtotal = $cartItems->sum(function ($item) {
+            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                ? $item->product->sale_price 
+                : $item->product->price;
+            return $priceToUse * $item->quantity;
+        });
+        $shipping = 0;
+        $tax = 0;
+        $total = $subtotal + $shipping + $tax;
 
-            $order = Order::create([
-                'order_number' => 'ORD-' . strtoupper(uniqid()),
-                'user_id' => auth()->id(),
-                'shipping_address' => json_encode($shippingAddress),
+        $checkoutItems = [];
+        foreach ($cartItems as $item) {
+            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
+                ? $item->product->sale_price
+                : $item->product->price;
+            $checkoutItems[] = [
+                'product_id' => $item->product_id,
+                'product_name' => $item->product->name,
+                'product_image' => $item->product->image,
+                'price' => $priceToUse,
+                'quantity' => $item->quantity,
+                'total' => $priceToUse * $item->quantity,
+            ];
+        }
+
+        $transaction = \App\Models\PaymentTransaction::create([
+            'user_id' => auth()->id(),
+            'transaction_ref' => 'TXN-' . strtoupper(uniqid()),
+            'amount' => $total,
+            'payment_method' => 'online', // COD is disabled
+            'status' => 'INITIATED',
+            'checkout_data' => [
+                'shipping_address' => $shippingAddress,
+                'cart_items' => $checkoutItems,
                 'subtotal' => $subtotal,
                 'shipping' => $shipping,
                 'tax' => $tax,
-                'total' => $total,
-                'status' => 'pending',
-                'payment_status' => 'pending',
-                'payment_method' => $request->payment_method ?? 'cod',
-            ]);
+                'total' => $total
+            ]
+        ]);
 
-            foreach ($cartItems as $item) {
-                $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                    ? $item->product->sale_price 
-                    : $item->product->price;
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item->product_id,
-                    'product_name' => $item->product->name,
-                    'product_image' => $item->product->image,
-                    'price' => $priceToUse,
-                    'quantity' => $item->quantity,
-                    'total' => $priceToUse * $item->quantity,
-                ]);
-
-                // Reduce stock
-                $item->product->decrement('stock_quantity', $item->quantity);
-            }
-
-            // Clear cart
-            Cart::current()->delete();
-            session()->forget('shipping_address');
-
-            return redirect()->route('checkout.confirmation', $order->id)->with('success', 'Order placed successfully!');
-        });
+        return redirect()->route('payment.gateway', ['transaction_ref' => $transaction->transaction_ref]);
     }
     
     public function confirmation(Order $order) {

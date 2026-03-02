@@ -68,12 +68,10 @@
                     <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST">
                         @csrf @method('PATCH')
                         
-                        @if ($order->status === 'pending')
-                            <button type="submit" name="status" value="processing" class="btn btn-success w-100 mb-2">Accept Order</button>
-                            <button type="submit" name="status" value="cancelled" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</button>
+                        @if ($order->status === 'confirmed' || $order->status === 'pending')
+                            <button type="submit" name="status" value="processing" class="btn btn-success w-100 mb-2">Accept Order (Processing)</button>
                         @elseif ($order->status === 'processing')
                             <button type="submit" name="status" value="shipped" class="btn btn-primary w-100 mb-2">Ship Order</button>
-                            <button type="submit" name="status" value="cancelled" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</button>
                         @elseif ($order->status === 'shipped')
                             <button type="submit" name="status" value="delivered" class="btn btn-success w-100 mb-2">Mark Delivered</button>
                             <button type="submit" name="status" value="returned" class="btn btn-warning w-100" onclick="return confirm('Are you sure you want to mark this order as returned?')">Return Order</button>
