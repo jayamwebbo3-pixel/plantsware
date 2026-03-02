@@ -32,7 +32,7 @@
                     <div class="product-page-gallery">
                         <div class="product-page-gallery-main position-relative">
                             <img id="mainProductImage" src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}" class="w-100">
-                            @if($product->sale_price && $product->sale_price < $product->price)
+                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="product-page-badge-sale">
                                     -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
                                 </span>
@@ -70,7 +70,7 @@
                         </div>
                         <!-- Price -->
                         <div class="product-page-price mb-4">
-                            @if($product->sale_price && $product->sale_price < $product->price)
+                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="product-page-current-price h3">₹{{ number_format($product->sale_price, 2) }}</span>
                                 <span class="product-page-original-price ms-3 text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</span>
                             @else
@@ -149,7 +149,7 @@
                                     <img src="{{ $relatedProduct->image ? asset('storage/' . $relatedProduct->image) : asset('assets/images/product/product1.jpg') }}"
                                          alt="{{ $relatedProduct->name }}"
                                          class="product-image hover-image w-100 h-100 object-fit-cover">
-                                    @if($relatedProduct->sale_price && $relatedProduct->sale_price < $relatedProduct->price)
+                                    @if($relatedProduct->sale_price && $relatedProduct->sale_price > 0 && $relatedProduct->sale_price < $relatedProduct->price)
                                         <span class="discount-badge">{{ round((($relatedProduct->price - $relatedProduct->sale_price) / $relatedProduct->price) * 100) }}% OFF</span>
                                     @endif
                                 </a>
@@ -157,7 +157,7 @@
                             <div class="product-info mt-3 flex-grow-1 d-flex flex-column">
                                 <h3 class="product-title">{{ $relatedProduct->name }}</h3>
                                 <div class="product-price mt-auto">
-                                    @if($relatedProduct->sale_price && $relatedProduct->sale_price < $relatedProduct->price)
+                                    @if($relatedProduct->sale_price && $relatedProduct->sale_price > 0 && $relatedProduct->sale_price < $relatedProduct->price)
                                         <span class="original-price">₹{{ number_format($relatedProduct->price, 2) }}</span>
                                         <span class="current-price ms-2">₹{{ number_format($relatedProduct->sale_price, 2) }}</span>
                                     @else

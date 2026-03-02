@@ -35,9 +35,14 @@
                             </div>
                             <div class="item-details">
                                 <h3 class="item-name">{{ $item->product->name }}</h3>
-                                <div class="item-price">₹{{ number_format($item->product->price ?? 0, 2) }}</div>
+                                @php
+                                    $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                                        ? $item->product->sale_price 
+                                        : $item->product->price;
+                                @endphp
+                                <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
                                 <div class="item-total" id="itemTotal_{{ $item->id }}">
-                                    ₹{{ number_format($item->product->price * $item->quantity, 2) }}
+                                    ₹{{ number_format($priceToUse * $item->quantity, 2) }}
                                 </div>
                                 <div class="quantity-controls">
                                     <span class="qty-label">Quantity:</span>

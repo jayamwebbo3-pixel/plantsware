@@ -98,7 +98,12 @@ class CheckoutController extends Controller {
             return redirect()->route('checkout.address')->with('error', 'Please provide shipping address.');
         }
 
-        $subtotal = $cartItems->sum(fn($item) => $item->product->price * $item->quantity);
+        $subtotal = $cartItems->sum(function ($item) {
+            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                ? $item->product->sale_price 
+                : $item->product->price;
+            return $priceToUse * $item->quantity;
+        });
         $shipping = 0; // Fixed or calculate
         $tax = 0; // Fixed or calculate
         $total = $subtotal + $shipping + $tax;
@@ -129,7 +134,12 @@ class CheckoutController extends Controller {
 
         // Create order in transaction
         return DB::transaction(function () use ($cartItems, $shippingAddress, $request) {
-            $subtotal = $cartItems->sum(fn($item) => $item->product->price * $item->quantity);
+            $subtotal = $cartItems->sum(function ($item) {
+                $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                    ? $item->product->sale_price 
+                    : $item->product->price;
+                return $priceToUse * $item->quantity;
+            });
             $shipping = 0;
             $tax = 0;
             $total = $subtotal + $shipping + $tax;
@@ -148,14 +158,17 @@ class CheckoutController extends Controller {
             ]);
 
             foreach ($cartItems as $item) {
+                $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                    ? $item->product->sale_price 
+                    : $item->product->price;
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item->product_id,
                     'product_name' => $item->product->name,
                     'product_image' => $item->product->image,
-                    'price' => $item->product->price,
+                    'price' => $priceToUse,
                     'quantity' => $item->quantity,
-                    'total' => $item->product->price * $item->quantity,
+                    'total' => $priceToUse * $item->quantity,
                 ]);
 
                 // Reduce stock

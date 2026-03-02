@@ -235,7 +235,12 @@
                                         {{ $item->product->name }}
                                     </a>
                                 </div>
-                                <div class="product-price" style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">₹{{ number_format($item->product->price, 2) }}</div>
+                                @php
+                                    $dashPriceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                                        ? $item->product->sale_price 
+                                        : $item->product->price;
+                                @endphp
+                                <div class="product-price" style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">₹{{ number_format($dashPriceToUse, 2) }}</div>
                                 
                                 <form action="{{ route('cart.add', $item->product->id) }}" method="POST">
                                     @csrf

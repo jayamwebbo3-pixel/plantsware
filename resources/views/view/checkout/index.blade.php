@@ -14,8 +14,13 @@
                         <tr>
                             <td>{{ $item->product->name }}</td>
                             <td>{{ $item->quantity }}</td>
-                            <td>₹{{ number_format($item->product->price, 2) }}</td>
-                            <td>₹{{ number_format($item->product->price * $item->quantity, 2) }}</td>
+                            @php
+                                $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                                    ? $item->product->sale_price 
+                                    : $item->product->price;
+                            @endphp
+                            <td>₹{{ number_format($priceToUse, 2) }}</td>
+                            <td>₹{{ number_format($priceToUse * $item->quantity, 2) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
