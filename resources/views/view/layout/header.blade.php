@@ -25,8 +25,8 @@
      <!--Blog sharing altered for img inclusion-->
        @php
         $blogImage = (isset($blog) && !empty($blog->image))
-            ? url('/plantsware2/public/uploads/blogs/' . basename($blog->image))
-            : url('/plantsware2/public/uploads/blogs/default.jpg');
+            ? asset('storage/' . $blog->image)
+            : asset('assets/images/blog/default.jpg');
 
         $blogTitle = isset($blog)
             ? $blog->title

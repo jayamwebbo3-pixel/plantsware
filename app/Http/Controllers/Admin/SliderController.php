@@ -11,7 +11,20 @@ class SliderController extends Controller
 {
     public function index()
     {
-        $sliders = Slider::orderBy('sort_order')->latest()->paginate(20);
+        $search = request('search');
+        $perPage = request('per_page', 20);
+
+        $sliders = Slider::when($search, function ($query) use ($search) {
+                return $query->where('title', 'like', "%{$search}%")
+                             ->orWhere('subtitle', 'like', "%{$search}%");
+            })
+            ->orderBy(
+                request('sort', 'sort_order'),
+                request('direction', 'asc')
+            )
+            ->paginate($perPage)
+            ->appends(request()->query());
+            
         return view('admin.sliders.index', compact('sliders'));
     }
 

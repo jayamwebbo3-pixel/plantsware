@@ -196,7 +196,15 @@
 <!-- Wishlist JavaScript -->
 <script>
 // Base URL for your application
-const baseUrl = window.location.origin + '/plantsware2';
+let baseUrl = '';
+if (window.APP_URL) {
+    baseUrl = window.APP_URL;
+} else if (document.querySelector('meta[name="base-url"]')) {
+    baseUrl = document.querySelector('meta[name="base-url"]').content;
+} else {
+    // Remove trailing slash from origin
+    baseUrl = window.location.origin.replace(/\/$/, '');
+}
 
 // Get CSRF token
 function getCsrfToken() {

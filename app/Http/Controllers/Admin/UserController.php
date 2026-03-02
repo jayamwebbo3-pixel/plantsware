@@ -9,7 +9,15 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::latest()->get();
+        $search = request('search');
+        
+        $users = User::when($search, function ($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%")
+                             ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->get();
+            
         return view('admin.users.index', compact('users'));
     }
 }
