@@ -29,7 +29,7 @@
                                 <select class="form-select" id="category_id" name="category_id">
                                     <option value="">Select Category</option>
                                     @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                        <option value="{{ $category->id }}" {{ old('category_id', $selectedCategoryId ?? '') == $category->id ? 'selected' : '' }}>
                                             {{ $category->name }}
                                         </option>
                                     @endforeach
@@ -42,7 +42,7 @@
                                 <select class="form-select" id="subcategory_id" name="subcategory_id">
                                     <option value="">Select Subcategory</option>
                                     @foreach($subcategories as $subcategory)
-                                        <option value="{{ $subcategory->id }}" {{ old('subcategory_id') == $subcategory->id ? 'selected' : '' }}>
+                                        <option value="{{ $subcategory->id }}" {{ old('subcategory_id', $selectedSubcategoryId ?? '') == $subcategory->id ? 'selected' : '' }}>
                                             {{ $subcategory->name }}
                                         </option>
                                     @endforeach
@@ -280,26 +280,36 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
-    // Dynamic subcategory filtering based on selected category
-    const allSubcategories = @json($subcategories);
-
-    document.getElementById('category_id').addEventListener('change', function() {
-        const categoryId = this.value;
+    document.addEventListener('DOMContentLoaded', function () {
+        // Dynamic subcategory filtering based on selected category
+        const allSubcategories = @json($subcategories);
+        const categorySelect = document.getElementById('category_id');
         const subcategorySelect = document.getElementById('subcategory_id');
 
-        subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+        function filterSubcategories() {
+            const categoryId = categorySelect.value;
+            const currentSubcategoryId = '{{ old("subcategory_id", $selectedSubcategoryId ?? "") }}';
 
-        const filtered = allSubcategories.filter(sub => sub.category_id == categoryId);
+            subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
 
-        filtered.forEach(sub => {
-            const option = document.createElement('option');
-            option.value = sub.id;
-            option.textContent = sub.name;
-            if ('{{ old('subcategory_id') }}' == sub.id) option.selected = true;
-            subcategorySelect.appendChild(option);
-        });
+            if (categoryId) {
+                const filtered = allSubcategories.filter(sub => sub.category_id == categoryId);
+                filtered.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.id;
+                    option.textContent = sub.name;
+                    if (currentSubcategoryId == sub.id) option.selected = true;
+                    subcategorySelect.appendChild(option);
+                });
+            }
+        }
+
+        categorySelect.addEventListener('change', filterSubcategories);
+
+        // Run on load to set initial state
+        filterSubcategories();
     });
 </script>
-@endsection
+@endpush

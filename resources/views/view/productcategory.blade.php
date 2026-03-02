@@ -377,15 +377,21 @@
                                             @endif
                                         </div>
                                         <div class="product-actions">
-                                            <button class="btn btn-primary" data-tooltip="Buy Now" type="button">
+                                            <button class="btn btn-primary" data-tooltip="Buy Now" type="button" onclick="window.location='{{ route('checkout.index') }}'">
                                                 <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
                                             </button>
-                                            <button class="btn btn-secondary" data-tooltip="Add to Cart" type="button">
-                                                <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
-                                            </button>
-                                            <button class="btn btn-wishlist" data-tooltip="Wishlist" type="button">
-                                                <i class="far fa-heart"></i>
-                                            </button>
+                                            <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
+                                                    <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
+                                                </button>
+                                            </form>
+                                            <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
+                                                    <i class="far fa-heart"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -435,15 +441,21 @@
                                                     @endif
                                                 </div>
                                                 <div class="product-actions">
-                                                    <button class="btn btn-primary" data-tooltip="Buy Now" type="button">
+                                                    <button class="btn btn-primary" data-tooltip="Buy Now" type="button" onclick="window.location='{{ route('checkout.index') }}'">
                                                         <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
                                                     </button>
-                                                    <button class="btn btn-secondary" data-tooltip="Add to Cart" type="button">
-                                                        <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
-                                                    </button>
-                                                    <button class="btn btn-wishlist" data-tooltip="Wishlist" type="button">
-                                                        <i class="far fa-heart"></i>
-                                                    </button>
+                                                    <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
+                                                            <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
+                                                            <i class="far fa-heart"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>

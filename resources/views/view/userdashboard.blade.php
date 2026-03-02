@@ -187,41 +187,24 @@
                 <div class="content-section" id="order-history">
                     <h2 class="section-title">Order History</h2>
                     <div class="order-items">
-                        <div class="order-item">
+                        @forelse($orders as $order)
+                        <div class="order-item" onclick="window.location='{{ route('checkout.confirmation', $order->id) }}'" style="cursor: pointer;">
                             <div class="order-image">
-                                <i class="fas fa-leaf" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                <!-- Could render related product image if relationships exist, displaying a reliable icon fallback -->
+                                <i class="fas fa-box" style="font-size: 2rem; color: var(--primary-color);"></i>
                             </div>
                             <div class="order-info">
-                                <h4>Monstera Deliciosa Plant</h4>
-                                <p>Order ID: #123456</p>
-                                <span class="order-status delivered">Delivered</span>
+                                <h4>Order {{ $order->order_number }}</h4>
+                                <p>Date: {{ $order->created_at->format('d M Y') }}</p>
+                                <span class="order-status {{ $order->status }}">{{ ucfirst($order->status) }}</span>
                             </div>
-                            <div class="order-price">₹1,299</div>
+                            <div class="order-price">₹{{ number_format($order->total_amount, 2) }}</div>
                         </div>
-
-                        <div class="order-item">
-                            <div class="order-image">
-                                <i class="fas fa-leaf" style="font-size: 2rem; color: var(--secondary-color);"></i>
-                            </div>
-                            <div class="order-info">
-                                <h4>Snake Plant - Indoor Green</h4>
-                                <p>Order ID: #123457</p>
-                                <span class="order-status pending">In Transit</span>
-                            </div>
-                            <div class="order-price">₹899</div>
+                        @empty
+                        <div style="padding: 20px; color: #666; font-style: italic;">
+                            You have no orders yet.
                         </div>
-
-                        <div class="order-item">
-                            <div class="order-image">
-                                <i class="fas fa-leaf" style="font-size: 2rem; color: var(--accent-color);"></i>
-                            </div>
-                            <div class="order-info">
-                                <h4>Pothos Ivy Climbing Plant</h4>
-                                <p>Order ID: #123458</p>
-                                <span class="order-status delivered">Delivered</span>
-                            </div>
-                            <div class="order-price">₹599</div>
-                        </div>
+                        @endforelse
                     </div>
                 </div>
 
@@ -229,93 +212,43 @@
                 <div class="content-section" id="wishlist">
                     <h2 class="section-title">Wishlist</h2>
                     <div class="wishlist-grid">
+                        @forelse($wishlist as $item)
+                        @if($item->product)
                         <div class="product-card">
-                            <div class="product-image">
-                                <i class="fas fa-leaf" style="font-size: 3rem; color: var(--primary-color); opacity: 0.3;"></i>
-                                <button class="wishlist-remove" title="Remove from wishlist">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <div class="product-image" style="position: relative;">
+                                @if($item->product->image)
+                                    <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" style="width: 100%; height: 200px; object-fit: cover;">
+                                @else
+                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $item->product->name }}" style="width: 100%; height: 200px; object-fit: cover;">
+                                @endif
+                                <form action="{{ route('wishlist.remove', $item->product->id) }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="wishlist-remove" title="Remove from wishlist" style="background: white; border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: red; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
-                            <div class="product-info">
-                                <div class="product-name">Monstera Plant</div>
-                                <div class="product-price">₹1,299</div>
-                                <div class="product-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                    (248)
+                            <div class="product-info" style="padding: 15px;">
+                                <div class="product-name" style="font-weight: 600; margin-bottom: 5px;">
+                                    <a href="{{ route('product.show', $item->product->slug) }}" style="text-decoration: none; color: inherit;">
+                                        {{ $item->product->name }}
+                                    </a>
                                 </div>
-                                <button class="add-to-cart-btn">Add to Cart</button>
+                                <div class="product-price" style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">₹{{ number_format($item->product->price, 2) }}</div>
+                                
+                                <form action="{{ route('cart.add', $item->product->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="add-to-cart-btn" style="width: 100%; padding: 8px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s;">Add to Cart</button>
+                                </form>
                             </div>
                         </div>
-
-                        <div class="product-card">
-                            <div class="product-image">
-                                <i class="fas fa-leaf" style="font-size: 3rem; color: var(--secondary-color); opacity: 0.3;"></i>
-                                <button class="wishlist-remove" title="Remove from wishlist">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-name">Snake Plant</div>
-                                <div class="product-price">₹899</div>
-                                <div class="product-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    (156)
-                                </div>
-                                <button class="add-to-cart-btn">Add to Cart</button>
-                            </div>
+                        @endif
+                        @empty
+                        <div style="grid-column: 1 / -1; padding: 20px; color: #666; font-style: italic;">
+                            Your wishlist is empty.
                         </div>
-
-                        <div class="product-card">
-                            <div class="product-image">
-                                <i class="fas fa-leaf" style="font-size: 3rem; color: var(--accent-color); opacity: 0.3;"></i>
-                                <button class="wishlist-remove" title="Remove from wishlist">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-name">Pothos Ivy</div>
-                                <div class="product-price">₹599</div>
-                                <div class="product-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                    (312)
-                                </div>
-                                <button class="add-to-cart-btn">Add to Cart</button>
-                            </div>
-                        </div>
-
-                        <div class="product-card">
-                            <div class="product-image">
-                                <i class="fas fa-leaf" style="font-size: 3rem; color: var(--primary-color); opacity: 0.3;"></i>
-                                <button class="wishlist-remove" title="Remove from wishlist">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-name">Fern Plant</div>
-                                <div class="product-price">₹749</div>
-                                <div class="product-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    (89)
-                                </div>
-                                <button class="add-to-cart-btn">Add to Cart</button>
-                            </div>
-                        </div>
+                        @endforelse
                     </div>
                 </div>
 
@@ -382,12 +315,7 @@
         }
     }
 
-    // Wishlist Remove
-    document.querySelectorAll('.wishlist-remove').forEach(btn => {
-        btn.addEventListener('click', () => {
-            btn.closest('.product-card').remove();
-        });
-    });
+
 
     // Add to Cart
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
