@@ -7,6 +7,7 @@ use App\Models\PaymentTransaction;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -114,7 +115,11 @@ class PaymentController extends Controller
 
                 DB::commit();
 
-                // Cart is cleared in the transaction start placeOrder inside CheckoutController
+                // Clear cart logic
+                try {
+                    Cart::where('user_id', $transaction->user_id)->delete();
+                    session()->forget('shipping_address');
+                } catch (Exception $e) { }
 
                 return redirect()->route('checkout.confirmation', $order->id)->with('success', 'Payment successful and Order placed!');
 
