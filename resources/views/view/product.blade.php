@@ -94,6 +94,15 @@
                         <div class="product-page-action-buttons d-flex gap-3 mb-4">
                             <!-- Add to Cart Form -->
                             @if($product->stock_quantity > 0)
+                                <form action="{{ route('cart.add', $product) }}" method="POST" class="d-inline" id="buyNowForm">
+                                    @csrf
+                                    <input type="hidden" name="quantity" id="buyNowQuantity" value="1">
+                                    <input type="hidden" name="buy_now" value="1">
+                                    <button type="submit" class="product-page-btn-add-cart btn btn-lg btn-success d-flex align-items-center gap-2">
+                                        <i class="fas fa-bolt"></i>
+                                        Buy Now
+                                    </button>
+                                </form>
                                 <form action="{{ route('cart.add', $product) }}" method="POST" class="d-inline" id="addToCartForm">
                                     @csrf
                                     <input type="hidden" name="quantity" id="cartQuantity" value="1">
@@ -224,6 +233,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (value < 1) value = 1;
         input.value = value;
         document.getElementById('cartQuantity').value = value;
+        const buyNowInput = document.getElementById('buyNowQuantity');
+        if(buyNowInput) buyNowInput.value = value;
     };
 });
 </script>

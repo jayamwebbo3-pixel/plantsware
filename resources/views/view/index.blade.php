@@ -170,9 +170,13 @@ if (!function_exists('renderProductCard')) {
                     </div>
                     <div class="product-actions">
                         '.($product->stock_quantity > 0 ? '
-                        <button class="btn btn-primary" data-tooltip="Buy Now">
-                            <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
-                        </button>
+                        <form class="d-inline-block text-white" method="POST" action="'.route('cart.add', $product->id).'" style="display:inline;">
+                            '.csrf_field().'
+                            <input type="hidden" name="buy_now" value="1">
+                            <button type="submit" class="btn btn-primary" data-tooltip="Buy Now">
+                                <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
+                            </button>
+                        </form>
                         <form class="add-to-cart-form d-inline-block text-white" method="POST" action="'.route('cart.add', $product->id).'" style="display:inline;">
                             '.csrf_field().'
                             <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">

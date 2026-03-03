@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class OrderController extends Controller
 {
@@ -100,5 +102,38 @@ class OrderController extends Controller
         $order->update(['payment_status' => $request->payment_status]);
 
         return back()->with('success', 'Payment status updated successfully.');
+    }
+
+    public function generateInvoice($order_id)
+    {
+        $order = Order::with('items')->findOrFail($order_id);
+
+        // Prevent generating an invoice if payment is still pending/failed
+        if (!in_array($order->payment_status, ['paid', 'refunded'])) {
+            return back()->with('error', 'Cannot generate an invoice for an unpaid order.');
+        }
+
+        $data = [
+            'invoice_number' => $order->order_number, // User template used invoice_no, adjusting to order_number which is the column name in this codebase
+            'order_date' => $order->created_at->format('d/M/Y'),
+            'payment_status' => $order->payment_status,
+            'store_logo' => asset('assets/images/logo/logo.png'), 
+            'store_name' => 'Plantsware',
+            'store_address' => 'Plantsware Admin, Tamil Nadu',
+            'store_email' => 'support@plantsware.in',
+            'store_phone' => '+91 98765 43210',
+            'customer_name' => collect($order->shipping_address)->get('name') ?? ($order->user->name ?? 'Guest'),
+            'customer_email' => $order->user->email ?? 'N/A',
+            'customer_phone' => collect($order->shipping_address)->get('phone') ?? 'N/A',
+            'customer_address' => $order->shipping_address,
+            'order_items' => $order->items,
+            'subtotal' => $order->subtotal,
+            'discount_amount' => $order->discount,
+            'tax_amount' => $order->shipping, // Adjusting mapping based on database
+            'grand_total' => $order->total,
+        ];
+
+        $pdf = PDF::loadView('invoices.order_invoice', $data); 
+        return $pdf->download('Invoice_'.$order->order_number.'.pdf');
     }
 }

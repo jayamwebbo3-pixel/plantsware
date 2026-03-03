@@ -162,6 +162,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('orders', OrderController::class)->only(['index', 'show']);
         Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('orders.updateStatus');
+        Route::get('orders/{order}/invoice', [OrderController::class, 'generateInvoice'])
+            ->name('orders.invoice');
 
         Route::get('users', [UserController::class, 'index'])->name('users.index');
 

@@ -80,9 +80,13 @@
                         </div>
                         <div class="product-actions">
                             @if($product->stock_quantity > 0)
-                                <button class="btn btn-primary" data-tooltip="Buy Now" type="button" onclick="window.location='{{ route('checkout.index') }}'">
-                                    <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
-                                </button>
+                                <form class="d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                    @csrf
+                                    <input type="hidden" name="buy_now" value="1">
+                                    <button class="btn btn-primary" data-tooltip="Buy Now" type="submit">
+                                        <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
+                                    </button>
+                                </form>
                                 <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
                                     @csrf
                                     <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">

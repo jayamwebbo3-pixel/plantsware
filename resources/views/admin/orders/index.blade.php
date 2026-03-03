@@ -298,9 +298,11 @@
                                 <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-info" title="View Order">
                                     <i class="fas fa-eye"></i> View
                                 </a>
-                                <a href="#" class="btn btn-sm btn-success" title="View Invoice" disabled>
-                                    <i class="fas fa-file-invoice"></i> Invoice
-                                </a>
+                                @if($order->payment_status === 'paid' || $order->payment_status === 'refunded')
+                                    <a href="{{ route('admin.orders.invoice', $order) }}" class="btn btn-sm btn-success" target="_blank" title="View Invoice">
+                                        <i class="fas fa-file-invoice"></i> Invoice
+                                    </a>
+                                @endif
                                 @if($order->status == 'processing')
                                     <a href="#" class="btn btn-sm btn-primary" disabled title="Ship order (not implemented)">Ship</a>
                                 @endif
