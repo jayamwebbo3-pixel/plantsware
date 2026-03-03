@@ -93,14 +93,20 @@
                         <!-- Action Buttons -->
                         <div class="product-page-action-buttons d-flex gap-3 mb-4">
                             <!-- Add to Cart Form -->
-                            <form action="{{ route('cart.add', $product) }}" method="POST" class="d-inline" id="addToCartForm">
-                                @csrf
-                                <input type="hidden" name="quantity" id="cartQuantity" value="1">
-                                <button type="submit" class="product-page-btn-add-cart btn btn-lg btn-primary d-flex align-items-center gap-2">
-                                    <i class="fas fa-shopping-bag"></i>
-                                    Add to Cart
+                            @if($product->stock_quantity > 0)
+                                <form action="{{ route('cart.add', $product) }}" method="POST" class="d-inline" id="addToCartForm">
+                                    @csrf
+                                    <input type="hidden" name="quantity" id="cartQuantity" value="1">
+                                    <button type="submit" class="product-page-btn-add-cart btn btn-lg btn-primary d-flex align-items-center gap-2">
+                                        <i class="fas fa-shopping-bag"></i>
+                                        Add to Cart
+                                    </button>
+                                </form>
+                            @else
+                                <button class="product-page-btn-add-cart btn btn-lg btn-secondary d-flex align-items-center gap-2" style="cursor: not-allowed;" disabled>
+                                    Out of Stock
                                 </button>
-                            </form>
+                            @endif
                             <!-- Wishlist Form -->
                             <form action="{{ route('wishlist.add', $product) }}" method="POST" class="d-inline">
                                 @csrf
@@ -165,11 +171,15 @@
                                     @endif
                                 </div>
                                 <div class="product-actions mt-3 d-flex gap-2">
-                                    <form action="{{ route('cart.add', $relatedProduct) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="btn btn-sm btn-primary flex-fill">Add to Cart</button>
-                                    </form>
+                                    @if($relatedProduct->stock_quantity > 0)
+                                        <form action="{{ route('cart.add', $relatedProduct) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-sm btn-primary flex-fill">Add to Cart</button>
+                                        </form>
+                                    @else
+                                        <button class="btn btn-sm btn-secondary flex-fill" style="cursor: not-allowed;" disabled>Out of Stock</button>
+                                    @endif
                                     <form action="{{ route('wishlist.add', $relatedProduct) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-outline-danger">

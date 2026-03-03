@@ -51,66 +51,58 @@ class PaymentController extends Controller
         // Check if 10 mins have passed
         if ($transaction->created_at->diffInMinutes(now()) > 10) {
             $transaction->update(['status' => 'EXPIRED']);
-            return redirect()->route('cart.index')->with('error', 'Payment expired due to 10-minutes timeout.');
+            if ($transaction->order_id) {
+                $orderToFail = Order::find($transaction->order_id);
+                if ($orderToFail) {
+                    $orderToFail->items()->delete();
+                    $orderToFail->delete();
+                }
+            }
+            return redirect()->route('cart.index')->with('error', 'Payment expired due to 10-minutes timeout. Order was not created.');
         }
 
         if ($status === 'FAILED') {
             $transaction->update(['status' => 'FAILED']);
-            return redirect()->route('cart.index')->with('error', 'Payment failed.');
+            if ($transaction->order_id) {
+                $orderToFail = Order::find($transaction->order_id);
+                if ($orderToFail) {
+                    $orderToFail->items()->delete();
+                    $orderToFail->delete();
+                }
+            }
+            return redirect()->route('cart.index')->with('error', 'Payment failed. Order was not created.');
         }
 
         if ($status === 'SUCCESS') {
             try {
-                // Ensure order is not duplicated
-                if ($transaction->order_id) {
+                // Ensure transaction hasn't already been processed
+                if ($transaction->status === 'SUCCESS') {
                      return redirect()->route('home');
                 }
 
                 DB::beginTransaction();
 
-                $checkoutData = $transaction->checkout_data;
-                $cartItems = $checkoutData['cart_items'];
-                $shippingAddress = $checkoutData['shipping_address'];
+                $order = Order::with('items.product')->findOrFail($transaction->order_id);
                 
-                // Re-verify stock before creating order
-                foreach ($cartItems as $item) {
-                    $product = Product::find($item['product_id']);
-                    if (!$product || $item['quantity'] > $product->stock_quantity) {
-                        throw new Exception("Insufficient stock for one or more items.");
+                // Re-verify stock before confirming the order
+                foreach ($order->items as $item) {
+                    if (!$item->product || $item->quantity > $item->product->stock_quantity) {
+                        throw new Exception("Insufficient stock for one or more items: " . ($item->product->name ?? 'Unknown item'));
                     }
                 }
 
-                $order = Order::create([
-                    'order_number' => 'ORD-' . strtoupper(uniqid()),
-                    'user_id' => $transaction->user_id,
-                    'shipping_address' => json_encode($shippingAddress),
-                    'subtotal' => $checkoutData['subtotal'],
-                    'shipping' => $checkoutData['shipping'],
-                    'tax' => $checkoutData['tax'],
-                    'total' => $checkoutData['total'],
+                $order->update([
                     'status' => 'confirmed', // Fulfilment starts at confirmed
                     'payment_status' => 'paid', // Or success
-                    'payment_method' => $transaction->payment_method,
                 ]);
 
-                foreach ($cartItems as $item) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $item['product_id'],
-                        'product_name' => $item['product_name'],
-                        'product_image' => $item['product_image'],
-                        'price' => $item['price'],
-                        'quantity' => $item['quantity'],
-                        'total' => $item['total'],
-                    ]);
-
+                foreach ($order->items as $item) {
                     // Reduce stock
-                    Product::where('id', $item['product_id'])->decrement('stock_quantity', $item['quantity']);
+                    Product::where('id', $item->product_id)->decrement('stock_quantity', $item->quantity);
                 }
 
                 $transaction->update([
-                    'status' => 'SUCCESS',
-                    'order_id' => $order->id
+                    'status' => 'SUCCESS'
                 ]);
 
                 DB::commit();

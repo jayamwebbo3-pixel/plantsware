@@ -56,6 +56,55 @@
                         <i class="fas fa-users"></i> <span>Users</span>
                     </a>
 
+                    <!-- Informative Pages Dropdown -->
+                    <a class="nav-link" data-bs-toggle="collapse" href="#informativePagesCollapse" role="button" aria-expanded="{{ request()->routeIs('admin.pages.*') ? 'true' : 'false' }}" aria-controls="informativePagesCollapse">
+                        <i class="fas fa-file-alt"></i> Informative Pages <i class="fas fa-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
+                    </a>
+                    <div class="collapse {{ request()->routeIs('admin.pages.*') ? 'show' : '' }}" id="informativePagesCollapse">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/about-us/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'about-us') }}">
+                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> About Us
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/contact-us/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'contact-us') }}">
+                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Contact Us
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/services/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'services') }}">
+                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Services
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/management-team/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'management-team') }}">
+                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Management Team
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/terms-conditions/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'terms-conditions') }}">
+                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Terms & Conditions
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/privacy-policy/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'privacy-policy') }}">
+                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Privacy Policy
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/return-refund-policy/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'return-refund-policy') }}">
+                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Return & Refund Policy
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/shipping-policy/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'shipping-policy') }}">
+                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Shipping Policy
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
                     {{-- <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
                         <i class="fas fa-box"></i> Products
                     </a> --}}

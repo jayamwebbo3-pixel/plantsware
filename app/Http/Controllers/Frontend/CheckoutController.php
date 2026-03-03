@@ -157,20 +157,39 @@ class CheckoutController extends Controller {
             ];
         }
 
+        $order = Order::create([
+            'order_number' => 'ORD-' . strtoupper(uniqid()),
+            'user_id' => auth()->id(),
+            'shipping_address' => $shippingAddress, // JSON encoded via Model cast
+            'subtotal' => $subtotal,
+            'shipping' => $shipping,
+            'tax' => $tax,
+            'total' => $total,
+            'status' => 'pending', 
+            'payment_status' => 'pending', 
+            'payment_method' => 'online',
+        ]);
+
+        foreach ($checkoutItems as $item) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $item['product_id'],
+                'product_name' => $item['product_name'],
+                'product_image' => $item['product_image'],
+                'price' => $item['price'],
+                'quantity' => $item['quantity'],
+                'total' => $item['total'],
+            ]);
+        }
+
         $transaction = \App\Models\PaymentTransaction::create([
             'user_id' => auth()->id(),
             'transaction_ref' => 'TXN-' . strtoupper(uniqid()),
             'amount' => $total,
-            'payment_method' => 'online', // COD is disabled
+            'payment_method' => 'online',
             'status' => 'INITIATED',
-            'checkout_data' => [
-                'shipping_address' => $shippingAddress,
-                'cart_items' => $checkoutItems,
-                'subtotal' => $subtotal,
-                'shipping' => $shipping,
-                'tax' => $tax,
-                'total' => $total
-            ]
+            'order_id' => $order->id,
+            'checkout_data' => [] // No longer need to save array in JSON, the order contains it all
         ]);
 
         return redirect()->route('payment.gateway', ['transaction_ref' => $transaction->transaction_ref]);

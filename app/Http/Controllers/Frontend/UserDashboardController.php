@@ -31,5 +31,25 @@ class UserDashboardController extends Controller
 
         return back()->with('success', 'Order has been successfully cancelled.');
     }
+    public function returnOrder(\Illuminate\Http\Request $request, $id)
+    {
+        $order = Auth::user()->orders()->findOrFail($id);
+
+        if ($order->status !== 'delivered') {
+            return back()->with('error', 'Only delivered orders can be returned.');
+        }
+
+        if (!$order->delivered_at || $order->delivered_at->diffInDays(now()) > 3) {
+            return back()->with('error', 'Return window (3 days) has expired.');
+        }
+
+        $order->update([
+            'status' => 'return_requested',
+            'return_requested_at' => now(),
+            'return_reason' => $request->input('reason', 'User requested return')
+        ]);
+
+        return back()->with('success', 'Return request submitted successfully.');
+    }
 }
 

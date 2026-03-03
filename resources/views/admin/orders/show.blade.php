@@ -60,10 +60,32 @@
                     <div class="alert alert-secondary border-0 mb-0 text-center">
                         This order is <strong>{{ ucfirst($order->status) }}</strong>. It is read-only.
                     </div>
+                @elseif (in_array($order->status, ['completed']))
+                    <div class="alert alert-success border-0 mb-0 text-center">
+                        This order is <strong>Completed</strong> and the return window is closed.
+                    </div>
+                @elseif ($order->status === 'return_rejected')
+                    <div class="alert alert-danger border-0 mb-0 text-center">
+                        Return request was <strong>Rejected</strong>. Reason: {{ $order->return_rejection_reason ?? 'Admin rejection' }}
+                    </div>
                 @elseif ($order->status === 'delivered')
                     <div class="alert alert-success border-0 mb-0 text-center">
                         This order has been <strong>Delivered</strong>.
                     </div>
+                @elseif ($order->status === 'return_requested')
+                    <div class="alert alert-warning border-0 mb-2">
+                        <strong>Return Requested</strong><br>
+                        <small>Reason: {{ $order->return_reason ?? 'User requested a return' }}</small>
+                    </div>
+                    <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST">
+                        @csrf @method('PATCH')
+                        <button type="submit" name="status" value="returned" class="btn btn-success w-100 mb-2" onclick="return confirm('Approve the return and mark as Returned?')">Approve Return</button>
+                        
+                        <div class="input-group mb-2">
+                            <input type="text" name="return_rejection_reason" class="form-control" placeholder="Rejection reason" required>
+                            <button type="submit" name="status" value="return_rejected" class="btn btn-danger" onclick="return confirm('Reject this return request?')">Reject Return</button>
+                        </div>
+                    </form>
                 @else
                     <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST">
                         @csrf @method('PATCH')

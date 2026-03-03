@@ -10,10 +10,14 @@ class Order extends Model {
 
     protected $fillable = [
         'order_number', 'user_id', 'shipping_address', 'subtotal', 'shipping', 'tax', 'total',
-        'status', 'payment_status', 'payment_method'
+        'status', 'payment_status', 'payment_method', 'delivered_at', 'return_requested_at', 'return_reason', 'return_rejection_reason'
     ];
 
-    protected $casts = ['shipping_address' => 'array'];
+    protected $casts = [
+        'shipping_address' => 'array',
+        'delivered_at' => 'datetime',
+        'return_requested_at' => 'datetime'
+    ];
 
     public function user() {
         return $this->belongsTo(User::class);
@@ -23,14 +27,18 @@ class Order extends Model {
         return $this->hasMany(OrderItem::class);
     }
 
-    // Helper for badge class (as in your OrderController)
     public function getStatusBadgeClass() {
         return [
             'pending' => 'bg-warning text-dark',
+            'confirmed' => 'bg-info text-dark',
             'processing' => 'bg-info text-dark',
             'shipped' => 'bg-primary',
             'delivered' => 'bg-success',
             'cancelled' => 'bg-danger',
+            'returned' => 'bg-dark',
+            'return_requested' => 'bg-warning text-dark',
+            'return_rejected' => 'bg-danger',
+            'completed' => 'bg-success',
         ][$this->status] ?? 'bg-secondary';
     }
 }

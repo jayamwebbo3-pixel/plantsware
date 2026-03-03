@@ -102,6 +102,7 @@ Route::middleware('auth')
 Route::middleware('auth')->group(function () {
     Route::get('/user/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
     Route::post('/user/order/{id}/cancel', [UserDashboardController::class, 'cancelOrder'])->name('user.order.cancel');
+    Route::post('/user/order/{id}/return', [UserDashboardController::class, 'returnOrder'])->name('user.order.return');
 });
 
 // ======================================================
@@ -172,6 +173,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('settings', [HeaderFooterController::class, 'index'])->name('settings');
         Route::post('settings', [HeaderFooterController::class, 'update'])->name('settings.update');
+
+        // Informative Pages Management
+        Route::get('pages/{slug}/edit', [\App\Http\Controllers\Admin\PageController::class, 'edit'])->name('pages.edit');
+        Route::put('pages/{slug}', [\App\Http\Controllers\Admin\PageController::class, 'update'])->name('pages.update');
 
         // Product Management Flow
         Route::get('products-management', [ProductManagementController::class, 'categories'])

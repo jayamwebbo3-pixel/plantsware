@@ -35,7 +35,7 @@ class OrderController extends Controller
         }
 
         // Filter by status
-        if ($status && in_array($status, ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'])) {
+        if ($status && in_array($status, ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned', 'return_requested', 'return_rejected', 'completed'])) {
             $query->where('status', $status);
         }
 
@@ -53,10 +53,10 @@ class OrderController extends Controller
             'shipped' => Order::where('status', 'shipped')->count(),
             'delivered' => Order::where('status', 'delivered')->count(),
             'cancelled' => Order::where('status', 'cancelled')->count(),
-            'returned' => Order::where('status', 'returned')->count(), // if you add this status
-            'return_requested' => 0, // placeholder for future
-            'return_approved' => 0,
-            'return_rejected' => 0,
+            'cancelled' => Order::where('status', 'cancelled')->count(),
+            'returned' => Order::where('status', 'returned')->count(),
+            'return_requested' => Order::where('status', 'return_requested')->count(),
+            'return_rejected' => Order::where('status', 'return_rejected')->count(),
         ];
 
         return view('admin.orders.index', compact('orders', 'stats'));
@@ -71,10 +71,21 @@ class OrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:pending,confirmed,processing,shipped,delivered,returned'
+            'status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled,returned,return_requested,return_rejected,completed',
+            'return_rejection_reason' => 'nullable|string'
         ]);
 
-        $order->update(['status' => $request->status]);
+        $data = ['status' => $request->status];
+
+        if ($request->status === 'delivered' && !$order->delivered_at) {
+            $data['delivered_at'] = now();
+        }
+
+        if ($request->status === 'return_rejected') {
+            $data['return_rejection_reason'] = $request->input('return_rejection_reason', 'Rejected by admin');
+        }
+
+        $order->update($data);
 
         return back()->with('success', 'Order status updated successfully.');
     }
