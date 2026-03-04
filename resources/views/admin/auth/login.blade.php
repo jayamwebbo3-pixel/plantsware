@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #134e5e, #71b280);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -27,7 +27,7 @@
             margin-bottom: 30px;
         }
         .login-header h2 {
-            color: #667eea;
+            color: #1590ceff;
             font-weight: 600;
         }
         .form-control:focus {
@@ -35,7 +35,7 @@
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
         .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+           background: linear-gradient(135deg, #134e5e, #71b280);
             border: none;
             padding: 12px;
             font-weight: 600;
@@ -51,7 +51,7 @@
     <div class="login-card">
         <div class="login-header">
             <h2><i class="fas fa-leaf"></i> Admin Login</h2>
-            <p class="text-muted">Plantsware Admin Panel</p>
+            <!-- <p class="text-muted">Plantsware Admin Panel</p> -->
         </div>
 
         @if(session('success'))
