@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\HeaderFooterController;
 use App\Http\Controllers\Admin\ProductManagementController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ComboPackController;
 
 // ======================================================
 // ================= FRONTEND ROUTES =====================
@@ -167,6 +168,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('categories/{category}/subcategories', [ProductManagementController::class, 'subcategories'])
             ->name('categories.subcategories');
 
+        Route::get('categories/{category}/subcategories_json', function (App\Models\Category $category) {
+            return response()->json($category->subcategories);
+        })->name('categories.subcategories.json');
+
         Route::get('categories/{category}/subcategories/create', [ProductManagementController::class, 'createSubcategory'])
             ->name('categories.subcategories.create');
 
@@ -175,5 +180,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('subcategories/{subcategory}/products', [ProductManagementController::class, 'products'])
             ->name('subcategories.products');
+
+        Route::get('combo-packs', [ComboPackController::class, 'index'])->name('combo-packs.index');
+        Route::post('combo-packs', [ComboPackController::class, 'store'])->name('combo-packs.store');
+        Route::get('combo-packs/{combo}/edit', [ComboPackController::class, 'edit'])->name('combo-packs.edit');
+        Route::put('combo-packs/{combo}', [ComboPackController::class, 'update'])->name('combo-packs.update');
+        Route::delete('combo-packs/{id}', [ComboPackController::class, 'destroy'])->name('combo-packs.destroy');
+        Route::patch('combo-packs/{combo}/status', [ComboPackController::class, 'updateStatus'])->name('combo-packs.update-status');
+        Route::get('combo-packs/get-items', [ComboPackController::class, 'getItems'])->name('combo-packs.get-items');
     });
 });

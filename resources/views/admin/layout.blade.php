@@ -6,6 +6,7 @@
     <title>@yield('title', 'Admin Panel') - Plantsware</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @stack('styles')
     <style>
         .sidebar {
             min-height: 100vh;
@@ -50,6 +51,9 @@
                     </a>
                     <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
                         <i class="fa-solid fa-truck"></i> Orders Management
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('admin.combo-packs.*') ? 'active' : '' }}" href="{{ route('admin.combo-packs.index') }}">
+                        <i class="fas fa-cubes"></i> Combo Packs
                     </a>
 
                     <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">

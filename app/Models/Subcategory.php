@@ -32,5 +32,10 @@ class Subcategory extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function comboPacks(): HasMany
+    {
+        return $this->hasMany(ComboPack::class);
+    }
 }
 
