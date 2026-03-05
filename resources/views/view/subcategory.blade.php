@@ -79,15 +79,25 @@
                             @endif
                         </div>
                         <div class="product-actions">
-                            <button class="btn btn-primary" data-tooltip="Buy Now" type="button" onclick="window.location='{{ route('checkout.index') }}'">
-                                <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
-                            </button>
-                            <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
-                                @csrf
-                                <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                    <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
+                            @if($product->stock_quantity > 0)
+                                <form class="d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                    @csrf
+                                    <input type="hidden" name="buy_now" value="1">
+                                    <button class="btn btn-primary" data-tooltip="Buy Now" type="submit">
+                                        <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
+                                    </button>
+                                </form>
+                                <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
+                                        <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
+                                    </button>
+                                </form>
+                            @else
+                                <button class="btn btn-secondary w-75" style="background-color: #6c757d; border-color: #6c757d; color: white; cursor: not-allowed;" disabled>
+                                    <span class="btn-text">Out of Stock</span>
                                 </button>
-                            </form>
+                            @endif
                             <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
                                 @csrf
                                 <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">

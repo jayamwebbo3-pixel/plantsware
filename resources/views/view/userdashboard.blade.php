@@ -196,9 +196,26 @@
                             <div class="order-info">
                                 <h4>Order {{ $order->order_number }}</h4>
                                 <p>Date: {{ $order->created_at->format('d M Y') }}</p>
-                                <span class="order-status {{ $order->status }}">{{ ucfirst($order->status) }}</span>
+
+                                <span class="order-status {{ strtolower($order->status) }}" style="padding: 3px 8px; border-radius: 4px; color: white; background-color: {{ in_array(strtolower($order->status), ['cancelled', 'return_rejected']) ? '#dc3545' : (strtolower($order->status) === 'shipped' ? '#17a2b8' : (in_array(strtolower($order->status), ['delivered', 'completed']) ? '#28a745' : (strtolower($order->status) === 'returned' ? '#343a40' : '#ffc107'))) }};">
+                                    {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                                </span>
+
+                                @if(!in_array(strtolower($order->status), ['shipped', 'delivered', 'cancelled', 'returned', 'return_requested', 'return_rejected', 'completed']))
+                                    <form action="{{ route('user.order.cancel', $order->id) }}" method="POST" style="display:inline; margin-left:10px;" onclick="event.stopPropagation();" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                        @csrf
+                                        <button type="submit" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid #dc3545; color: #dc3545; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Cancel</button>
+                                    </form>
+                                @endif
+                                
+                                @if(strtolower($order->status) === 'delivered' && $order->delivered_at && $order->delivered_at->diffInDays(now()) <= 3)
+                                    <form action="{{ route('user.order.return', $order->id) }}" method="POST" style="display:inline; margin-left:10px;" onclick="event.stopPropagation();" onsubmit="var reason = prompt('Please enter a reason for returning this order:'); if(reason) { this.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'reason\' value=\'' + reason + '\'>'); return true; } return false;">
+                                        @csrf
+                                        <button type="submit" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid #ffc107; color: #ffc107; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Request Return</button>
+                                    </form>
+                                @endif
                             </div>
-                            <div class="order-price">₹{{ number_format($order->total_amount, 2) }}</div>
+                            <div class="order-price">₹{{ number_format($order->total ?? 0, 2) }}</div>
                         </div>
                         @empty
                         <div style="padding: 20px; color: #666; font-style: italic;">

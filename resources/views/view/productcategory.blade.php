@@ -19,17 +19,17 @@
         <div class="row">
             <!-- Side Menu for Categories with Filters -->
             <div class="col-lg-3 col-md-4 mb-4">
-                <div class="side-menu bg-white rounded shadow-sm p-3 sticky-top" style="top: 20px; z-index: 1; border: 1px solid #ddd;">
+                <form id="filter-form" action="{{ url()->current() }}" method="GET" class="side-menu bg-white rounded shadow-sm p-3 sticky-top" style="top: 20px; z-index: 1; border: 1px solid #ddd;">
                     <h2 class="side-menu-title mb-3">Filters</h2>
                     
                     <!-- Price Range Filter -->
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Price Range
-                            <span class="price-range-value" id="display-price-range">₹0 - ₹5000</span>
+                            <span class="price-range-value" id="display-price-range">₹0 - ₹{{ request('price_max', 5000) }}</span>
                         </h3>
                         <div class="filter-options d-flex align-items-center">
-                            <input type="range" class="form-range flex-grow-1 me-2" min="0" max="10000" step="100" id="price-max" value="5000" style="width: 100%;">
+                            <input type="range" name="price_max" class="form-range flex-grow-1 me-2" min="0" max="10000" step="100" id="price-max" value="{{ request('price_max', 5000) }}" style="width: 100%;">
                         </div>
                     </div>
                     
@@ -38,35 +38,35 @@
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Discount</h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-all" class="filter-radio" value="all" checked>
+                                <input type="radio" name="discount" id="discount-all" class="filter-radio" value="all" {{ request('discount', 'all') == 'all' ? 'checked' : '' }}>
                                 <label for="discount-all" class="filter-label">
                                     All Discounts
                                     <span class="filter-count">(45)</span>
                                 </label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-50" class="filter-radio" value="50">
+                                <input type="radio" name="discount" id="discount-50" class="filter-radio" value="50" {{ request('discount') == '50' ? 'checked' : '' }}>
                                 <label for="discount-50" class="filter-label">
                                     50% and above
                                     <span class="filter-count">(8)</span>
                                 </label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-30" class="filter-radio" value="30-50">
+                                <input type="radio" name="discount" id="discount-30" class="filter-radio" value="30-50" {{ request('discount') == '30-50' ? 'checked' : '' }}>
                                 <label for="discount-30" class="filter-label">
                                     30% - 50%
                                     <span class="filter-count">(12)</span>
                                 </label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-10" class="filter-radio" value="10-30">
+                                <input type="radio" name="discount" id="discount-10" class="filter-radio" value="10-30" {{ request('discount') == '10-30' ? 'checked' : '' }}>
                                 <label for="discount-10" class="filter-label">
                                     10% - 30%
                                     <span class="filter-count">(18)</span>
                                 </label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-below10" class="filter-radio" value="below10">
+                                <input type="radio" name="discount" id="discount-below10" class="filter-radio" value="below10" {{ request('discount') == 'below10' ? 'checked' : '' }}>
                                 <label for="discount-below10" class="filter-label">
                                     Below 10%
                                     <span class="filter-count">(7)</span>
@@ -198,14 +198,14 @@
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Availability</h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="checkbox" id="in-stock" class="filter-checkbox" value="in-stock" checked>
+                                <input type="checkbox" name="availability[]" id="in-stock" class="filter-checkbox" value="in-stock" {{ is_array(request('availability')) && in_array('in-stock', request('availability')) ? 'checked' : (!request()->has('availability') ? 'checked' : '') }}>
                                 <label for="in-stock" class="filter-label">
                                     In Stock
                                     <span class="filter-count">(40)</span>
                                 </label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" id="out-of-stock" class="filter-checkbox" value="out-of-stock">
+                                <input type="checkbox" name="availability[]" id="out-of-stock" class="filter-checkbox" value="out-of-stock" {{ is_array(request('availability')) && in_array('out-of-stock', request('availability')) ? 'checked' : '' }}>
                                 <label for="out-of-stock" class="filter-label">
                                     Out of Stock
                                     <span class="filter-count">(5)</span>
@@ -226,27 +226,27 @@
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Sort By</h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-popular" class="filter-radio" value="popularity" checked>
+                                <input type="radio" name="sort" id="sort-popular" class="filter-radio" value="popularity" {{ request('sort', 'popularity') == 'popularity' ? 'checked' : '' }}>
                                 <label for="sort-popular" class="filter-label">Popularity</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-price-low" class="filter-radio" value="price-low">
+                                <input type="radio" name="sort" id="sort-price-low" class="filter-radio" value="price-low" {{ request('sort') == 'price-low' ? 'checked' : '' }}>
                                 <label for="sort-price-low" class="filter-label">Price: Low to High</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-price-high" class="filter-radio" value="price-high">
+                                <input type="radio" name="sort" id="sort-price-high" class="filter-radio" value="price-high" {{ request('sort') == 'price-high' ? 'checked' : '' }}>
                                 <label for="sort-price-high" class="filter-label">Price: High to Low</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-new" class="filter-radio" value="newest">
+                                <input type="radio" name="sort" id="sort-new" class="filter-radio" value="newest" {{ request('sort') == 'newest' ? 'checked' : '' }}>
                                 <label for="sort-new" class="filter-label">Newest First</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-discount" class="filter-radio" value="discount">
+                                <input type="radio" name="sort" id="sort-discount" class="filter-radio" value="discount" {{ request('sort') == 'discount' ? 'checked' : '' }}>
                                 <label for="sort-discount" class="filter-label">Discount</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-rating" class="filter-radio" value="rating">
+                                <input type="radio" name="sort" id="sort-rating" class="filter-radio" value="rating" {{ request('sort') == 'rating' ? 'checked' : '' }}>
                                 <label for="sort-rating" class="filter-label">Customer Rating</label>
                             </div>
                         </div>
@@ -310,18 +310,10 @@
 
                     <!-- Filter Actions -->
                     <div class="filter-actions d-flex gap-2 mt-3">
-                        <button class="btn-filter btn-apply flex-fill" id="apply-filters" type="button">Apply Filters</button>
-                        <button class="btn-filter btn-reset flex-fill" id="reset-filters" type="button">Reset All</button>
+                        <button class="btn-filter btn-apply flex-fill" id="apply-filters" type="submit">Apply Filters</button>
+                        <a href="{{ url()->current() }}" class="btn-filter btn-reset flex-fill text-center text-decoration-none" style="display:flex; justify-content:center; align-items:center;">Reset All</a>
                     </div>
-
-                    <!-- Active Filters Display -->
-                    <div class="active-filters mt-3 d-none" id="active-filters">
-                        <h4 class="mb-2">Active Filters:</h4>
-                        <div class="d-flex flex-wrap gap-2" id="active-filters-list">
-                            <!-- Active filters will be added here dynamically -->
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
 
             <!-- Products Display Area -->
@@ -338,18 +330,18 @@
 
                             <div class="sort-options">
                                 <select id="sort-products" class="form-select">
-                                    <option value="default">Sort by: Default</option>
-                                    <option value="name-asc">Name: A to Z</option>
-                                    <option value="name-desc">Name: Z to A</option>
-                                    <option value="price-low">Price: Low to High</option>
-                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Sort by: Popularity</option>
+                                    <option value="name-asc" {{ request('sort') == 'name-asc' ? 'selected' : '' }}>Name: A to Z</option>
+                                    <option value="name-desc" {{ request('sort') == 'name-desc' ? 'selected' : '' }}>Name: Z to A</option>
+                                    <option value="price-low" {{ request('sort') == 'price-low' ? 'selected' : '' }}>Price: Low to High</option>
+                                    <option value="price-high" {{ request('sort') == 'price-high' ? 'selected' : '' }}>Price: High to Low</option>
                                 </select>
                             </div>
                         </div>
                     </div>
 
                     <div class="products-grid row g-3" id="products-container">
-                        @if(isset($category) && isset($products))
+                        @if(isset($products))
                             @forelse($products as $product)
                             <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
                                 <div class="product-card">
@@ -382,15 +374,25 @@
                                             @endif
                                         </div>
                                         <div class="product-actions">
-                                            <button class="btn btn-primary" data-tooltip="Buy Now" type="button" onclick="window.location='{{ route('checkout.index') }}'">
-                                                <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
-                                            </button>
-                                            <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
-                                                @csrf
-                                                <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                                    <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
+                                            @if($product->stock_quantity > 0)
+                                                <form class="d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                                    @csrf
+                                                    <input type="hidden" name="buy_now" value="1">
+                                                    <button class="btn btn-primary" data-tooltip="Buy Now" type="submit">
+                                                        <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
+                                                    </button>
+                                                </form>
+                                                <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
+                                                        <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <button class="btn btn-secondary w-75" style="background-color: #6c757d; border-color: #6c757d; color: white; cursor: not-allowed;" disabled>
+                                                    <span class="btn-text">Out of Stock</span>
                                                 </button>
-                                            </form>
+                                            @endif
                                             <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
                                                 @csrf
                                                 <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
@@ -407,71 +409,10 @@
                             </div>
                             @endforelse
                             @if(isset($products) && method_exists($products, 'links'))
-                            <div class="col-12 mt-4">
-                                {{ $products->links() }}
+                            <div class="col-12 mt-4 text-center">
+                                {{ $products->links('pagination::bootstrap-5') }}
                             </div>
                             @endif
-                        @else
-                            @forelse($categories as $cat)
-                                @if($cat->products && $cat->products->count() > 0)
-                                    @foreach($cat->products->take(12) as $product)
-                                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
-                                        <div class="product-card">
-                                            <div class="product-image-container">
-                                                <a href="{{ route('product.show', $product->slug) }}">
-                                                    @if($product->image)
-                                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                                            class="product-image main-image">
-                                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                                            class="product-image hover-image">
-                                                    @else
-                                                        <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
-                                                            class="product-image main-image">
-                                                        <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
-                                                            class="product-image hover-image">
-                                                    @endif
-                                                    @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price && $product->discount_percentage > 0)
-                                                        <span class="discount-badge">{{ $product->discount_percentage }}% OFF</span>
-                                                    @endif
-                                                </a>
-                                            </div>
-                                            <div class="product-info">
-                                                <h3 class="product-title">{{ $product->name }}</h3>
-                                                <div class="product-price">
-                                                    @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                                        <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
-                                                        <span class="current-price">₹{{ number_format($product->sale_price, 2) }}</span>
-                                                    @else
-                                                        <span class="current-price">₹{{ number_format($product->price, 2) }}</span>
-                                                    @endif
-                                                </div>
-                                                <div class="product-actions">
-                                                    <button class="btn btn-primary" data-tooltip="Buy Now" type="button" onclick="window.location='{{ route('checkout.index') }}'">
-                                                        <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
-                                                    </button>
-                                                    <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                                            <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
-                                                        </button>
-                                                    </form>
-                                                    <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
-                                                            <i class="far fa-heart"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                @endif
-                            @empty
-                            <div class="col-12">
-                                <p class="text-center">No categories or products found.</p>
-                            </div>
-                            @endforelse
                         @endif
 
                         <!-- Demo products for display if nothing found (optional, comment out for production) -->
@@ -488,7 +429,13 @@
                                     <h3 class="product-title">Vermiculite</h3>
                                     <div class="product-price"><span class="current-price">₹699.00</span></div>
                                     <div class="product-actions">
-                                        <button class="btn btn-primary" data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i></button>
+                                        <form class="d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                            @csrf
+                                            <input type="hidden" name="buy_now" value="1">
+                                            <button class="btn btn-primary" data-tooltip="Buy Now" type="submit">
+                                                <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
+                                            </button>
+                                        </form>
                                         <button class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button>
                                         <button class="btn btn-wishlist" data-tooltip="Wishlist"><i class="far fa-heart"></i></button>
                                     </div>
@@ -510,136 +457,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const priceInput = document.getElementById('price-max');
     const displayPriceRange = document.getElementById('display-price-range');
     let minPrice = 0;
-    priceInput.addEventListener('input', function() {
-        displayPriceRange.textContent = `₹${minPrice} - ₹${priceInput.value}`;
-    });
-
-    // Filter functionality
-    const applyFiltersBtn = document.getElementById('apply-filters');
-    const resetFiltersBtn = document.getElementById('reset-filters');
-    const checkboxes = document.querySelectorAll('.filter-checkbox');
-    const activeFiltersContainer = document.getElementById('active-filters');
-    const activeFiltersList = document.getElementById('active-filters-list');
-
-    // Apply filters
-    applyFiltersBtn.addEventListener('click', function() {
-        const selectedFilters = [];
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                const label = checkbox.nextElementSibling.textContent.trim();
-                selectedFilters.push(label.replace(/\s+\(\d+\)$/, ''));
-            }
+    if(priceInput) {
+        priceInput.addEventListener('input', function() {
+            displayPriceRange.textContent = `₹${minPrice} - ₹${priceInput.value}`;
         });
+    }
 
-        // Discount
-        const discount = document.querySelector('input[name="discount"]:checked');
-        if (discount) {
-            const discountLabel = discount.nextElementSibling.textContent.trim();
-            selectedFilters.push(discountLabel.replace(/\s+\(\d+\)$/, ''));
-        }
-
-        // Ratings
-        const rating = document.querySelector('input[name="rating"]:checked');
-        if (rating) {
-            const ratingLabel = rating.nextElementSibling.textContent.trim();
-            selectedFilters.push(ratingLabel.replace(/\s+\(\d+\)$/, ''));
-        }
-
-        // Sort
-        const sort = document.querySelector('input[name="sort"]:checked');
-        if (sort) {
-            const sortLabel = sort.nextElementSibling.textContent.trim();
-            selectedFilters.push('Sort: ' + sortLabel);
-        }
-
-        // Price Range
-        selectedFilters.push(displayPriceRange.textContent);
-
-        if (selectedFilters.length > 0) {
-            // Optionally update UI
-            activeFiltersContainer.classList.remove('d-none');
-            activeFiltersList.innerHTML = '';
-            selectedFilters.forEach(fltr => {
-                const span = document.createElement('span');
-                span.className = 'badge bg-primary text-white';
-                span.textContent = fltr;
-                activeFiltersList.appendChild(span);
-            });
-            console.log('Applied filters:', selectedFilters);
-            alert('Filters applied: ' + selectedFilters.join(', '));
-        } else {
-            alert('Please select at least one filter');
-        }
-    });
-
-    // Reset filters
-    resetFiltersBtn.addEventListener('click', function() {
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
+    // Sort Dropdown Auto Submit
+    const sortDropdown = document.getElementById('sort-products');
+    if (sortDropdown) {
+        sortDropdown.addEventListener('change', function() {
+            let url = new URL(window.location.href);
+            url.searchParams.set('sort', this.value);
+            window.location.href = url.href;
         });
+    }
 
-        // Reset radio buttons to default states
-        let discountDefault = document.getElementById('discount-all');
-        if (discountDefault) discountDefault.checked = true;
-        let sortDefault = document.getElementById('sort-popular');
-        if (sortDefault) sortDefault.checked = true;
-
-        let ratingRadios = document.querySelectorAll('input[name="rating"]');
-        ratingRadios.forEach(radio => radio.checked = false);
-
-        // Reset price range
-        priceInput.value = 5000;
-        displayPriceRange.textContent = `₹0 - ₹5000`;
-
-        // Hide active filters
-        activeFiltersContainer.classList.add('d-none');
-        activeFiltersList.innerHTML = '';
-        console.log('Filters reset');
-    });
-
-    // Product actions functionality
-    document.querySelectorAll('.btn-secondary').forEach(button => {
-        button.addEventListener('click', function() {
-            const product = this.closest('.product-card').querySelector('.product-title').textContent;
-            alert(product + ' added to cart!');
-        });
-    });
-
-    document.querySelectorAll('.btn-primary').forEach(button => {
-        button.addEventListener('click', function() {
-            const product = this.closest('.product-card').querySelector('.product-title').textContent;
-            alert('Buying now: ' + product);
-        });
-    });
-
+    // Toggle heart icon color dynamically for wishlist
     document.querySelectorAll('.btn-wishlist').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('mousedown', function() {
             const icon = this.querySelector('i');
-            const product = this.closest('.product-card').querySelector('.product-title').textContent;
-            if (icon.classList.contains('far')) {
+            if (icon && icon.classList.contains('far')) {
                 icon.classList.remove('far');
                 icon.classList.add('fas');
                 icon.style.color = '#e53e3e';
-                alert(product + ' added to wishlist!');
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                icon.style.color = '';
-                alert(product + ' removed from wishlist!');
             }
         });
-    });
-
-    // Sort functionality
-    document.getElementById('sort-products').addEventListener('change', function() {
-        // Add actual sorting logic as necessary.
-        console.log('Sorting by: ' + this.value);
     });
 
     // Collapsible filter sections
     document.querySelectorAll('.filter-title').forEach(title => {
         title.addEventListener('click', function(e) {
-            // Prevent collapse if filter section has no options (title only, not desired here)
             if(this.parentElement.querySelector('.filter-options')) {
                 this.parentElement.classList.toggle('active');
             }

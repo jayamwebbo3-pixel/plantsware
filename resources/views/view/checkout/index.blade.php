@@ -43,15 +43,13 @@
     </div>
     <form action="{{ route('checkout.placeOrder') }}" method="POST">
         @csrf
-        <!-- Payment method selection (e.g., COD, Card) -->
-        <div class="form-group">
-            <label>Payment Method</label>
-            <select name="payment_method" class="form-control">
-                <option value="cod">Cash on Delivery</option>
-                <option value="card">Credit/Debit Card</option>
+        <div class="form-group mb-4">
+            <label class="font-weight-bold">Payment Method</label>
+            <select name="payment_method" class="form-control" readonly>
+                <option value="online">Online Payment (Cards/UPI/Netbanking)</option>
             </select>
         </div>
-        <button type="submit" class="btn btn-success w-100">Place Order</button>
+        <button type="submit" class="btn btn-success w-100 py-3 font-weight-bold">Proceed to Payment -> </button>
     </form>
 </div>
 

@@ -169,15 +169,23 @@ if (!function_exists('renderProductCard')) {
                             : '<span class="current-price">₹'.$price.'</span>').'
                     </div>
                     <div class="product-actions">
-                        <button class="btn btn-primary" data-tooltip="Buy Now">
-                            <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
-                        </button>
+                        '.($product->stock_quantity > 0 ? '
+                        <form class="d-inline-block text-white" method="POST" action="'.route('cart.add', $product->id).'" style="display:inline;">
+                            '.csrf_field().'
+                            <input type="hidden" name="buy_now" value="1">
+                            <button type="submit" class="btn btn-primary" data-tooltip="Buy Now">
+                                <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
+                            </button>
+                        </form>
                         <form class="add-to-cart-form d-inline-block text-white" method="POST" action="'.route('cart.add', $product->id).'" style="display:inline;">
                             '.csrf_field().'
                             <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
                                 <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
                             </button>
-                        </form>
+                        </form>' : '
+                        <button class="btn btn-secondary w-75" style="background-color: #6c757d; border-color: #6c757d; color: white; cursor: not-allowed;" disabled>
+                            <span class="btn-text">Out of Stock</span>
+                        </button>').'
                         <form class="d-inline-block" method="POST" action="'.route('wishlist.add', $product->id).'" style="display:inline;">
                             '.csrf_field().'
                             <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">

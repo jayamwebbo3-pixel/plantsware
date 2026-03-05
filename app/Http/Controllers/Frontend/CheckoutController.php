@@ -132,55 +132,67 @@ class CheckoutController extends Controller {
             }
         }
 
-        // Create order in transaction
-        return DB::transaction(function () use ($cartItems, $shippingAddress, $request) {
-            $subtotal = $cartItems->sum(function ($item) {
-                $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                    ? $item->product->sale_price 
-                    : $item->product->price;
-                return $priceToUse * $item->quantity;
-            });
-            $shipping = 0;
-            $tax = 0;
-            $total = $subtotal + $shipping + $tax;
-
-            $order = Order::create([
-                'order_number' => 'ORD-' . strtoupper(uniqid()),
-                'user_id' => auth()->id(),
-                'shipping_address' => json_encode($shippingAddress),
-                'subtotal' => $subtotal,
-                'shipping' => $shipping,
-                'tax' => $tax,
-                'total' => $total,
-                'status' => 'pending',
-                'payment_status' => 'pending',
-                'payment_method' => $request->payment_method ?? 'cod',
-            ]);
-
-            foreach ($cartItems as $item) {
-                $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                    ? $item->product->sale_price 
-                    : $item->product->price;
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item->product_id,
-                    'product_name' => $item->product->name,
-                    'product_image' => $item->product->image,
-                    'price' => $priceToUse,
-                    'quantity' => $item->quantity,
-                    'total' => $priceToUse * $item->quantity,
-                ]);
-
-                // Reduce stock
-                $item->product->decrement('stock_quantity', $item->quantity);
-            }
-
-            // Clear cart
-            Cart::current()->delete();
-            session()->forget('shipping_address');
-
-            return redirect()->route('checkout.confirmation', $order->id)->with('success', 'Order placed successfully!');
+        $subtotal = $cartItems->sum(function ($item) {
+            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
+                ? $item->product->sale_price 
+                : $item->product->price;
+            return $priceToUse * $item->quantity;
         });
+        $shipping = 0;
+        $tax = 0;
+        $total = $subtotal + $shipping + $tax;
+
+        $checkoutItems = [];
+        foreach ($cartItems as $item) {
+            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
+                ? $item->product->sale_price
+                : $item->product->price;
+            $checkoutItems[] = [
+                'product_id' => $item->product_id,
+                'product_name' => $item->product->name,
+                'product_image' => $item->product->image,
+                'price' => $priceToUse,
+                'quantity' => $item->quantity,
+                'total' => $priceToUse * $item->quantity,
+            ];
+        }
+
+        $order = Order::create([
+            'order_number' => 'ORD-' . strtoupper(uniqid()),
+            'user_id' => auth()->id(),
+            'shipping_address' => $shippingAddress, // JSON encoded via Model cast
+            'subtotal' => $subtotal,
+            'shipping' => $shipping,
+            'tax' => $tax,
+            'total' => $total,
+            'status' => 'pending', 
+            'payment_status' => 'pending', 
+            'payment_method' => 'online',
+        ]);
+
+        foreach ($checkoutItems as $item) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $item['product_id'],
+                'product_name' => $item['product_name'],
+                'product_image' => $item['product_image'],
+                'price' => $item['price'],
+                'quantity' => $item['quantity'],
+                'total' => $item['total'],
+            ]);
+        }
+
+        $transaction = \App\Models\PaymentTransaction::create([
+            'user_id' => auth()->id(),
+            'transaction_ref' => 'TXN-' . strtoupper(uniqid()),
+            'amount' => $total,
+            'payment_method' => 'online',
+            'status' => 'INITIATED',
+            'order_id' => $order->id,
+            'checkout_data' => [] // No longer need to save array in JSON, the order contains it all
+        ]);
+
+        return redirect()->route('payment.gateway', ['transaction_ref' => $transaction->transaction_ref]);
     }
     
     public function confirmation(Order $order) {

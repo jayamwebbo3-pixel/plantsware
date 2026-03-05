@@ -96,6 +96,10 @@ class CartController extends Controller
             ]);
         }
 
+        if ($request->input('buy_now')) {
+            return redirect()->route('checkout.address')->with('success', "{$quantity} × {$product->name} added to cart! Proceeding to checkout.");
+        }
+
         return back()->with('success', "{$quantity} × {$product->name} added to cart!");
     }
 

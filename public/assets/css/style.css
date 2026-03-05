@@ -6626,29 +6626,39 @@ del {
     letter-spacing: 0.5px;
 }
 
-/* Fixed column widths */
+/* Fixed column widths for 6 columns */
 .gi-table th:nth-child(1) {
-    width: 10%;
-}
-
-/* S. NO */
-.gi-table th:nth-child(2) {
-    width: 20%;
+    width: 8%;
+    text-align: center;
 }
 
 /* Image */
-.gi-table th:nth-child(3) {
-    width: 40%;
+.gi-table th:nth-child(2) {
+    width: 12%;
+    text-align: center;
 }
 
 /* Name - More space for product name */
-.gi-table th:nth-child(4) {
-    width: 15%;
+.gi-table th:nth-child(3) {
+    width: 35%;
 }
 
 /* Price */
+.gi-table th:nth-child(4) {
+    width: 15%;
+    text-align: center;
+}
+
+/* Stock */
 .gi-table th:nth-child(5) {
-    width: 11%;
+    width: 15%;
+    text-align: center;
+}
+
+/* Actions */
+.gi-table th:nth-child(6) {
+    width: 15%;
+    text-align: center;
 }
 
 /* Actions */
@@ -6659,6 +6669,14 @@ del {
     border-bottom: 1px solid var(--border-color);
     transition: background-color 0.2s ease;
     word-wrap: break-word;
+}
+
+.gi-table td:nth-child(1),
+.gi-table td:nth-child(2),
+.gi-table td:nth-child(4),
+.gi-table td:nth-child(5),
+.gi-table td:nth-child(6) {
+    text-align: center;
 }
 
 .gi-table tr:last-child td {
@@ -6675,7 +6693,7 @@ del {
     object-fit: cover;
     border-radius: 8px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-    display: block;
+    display: inline-block;
 }
 
 .tbl-btn {
@@ -6747,15 +6765,15 @@ del {
 /* Responsive adjustments */
 @media (max-width: 992px) {
     .gi-table th:nth-child(1) {
-        width: 10%;
+        width: 8%;
     }
 
     .gi-table th:nth-child(2) {
-        width: 15%;
+        width: 12%;
     }
 
     .gi-table th:nth-child(3) {
-        width: 40%;
+        width: 30%;
     }
 
     .gi-table th:nth-child(4) {
@@ -6763,6 +6781,10 @@ del {
     }
 
     .gi-table th:nth-child(5) {
+        width: 15%;
+    }
+
+    .gi-table th:nth-child(6) {
         width: 20%;
     }
 }
@@ -6803,23 +6825,12 @@ del {
     }
 
     /* Adjust column widths for mobile */
-    .gi-table th:nth-child(1) {
-        width: auto;
-    }
-
-    .gi-table th:nth-child(2) {
-        width: auto;
-    }
-
-    .gi-table th:nth-child(3) {
-        width: auto;
-    }
-
-    .gi-table th:nth-child(4) {
-        width: auto;
-    }
-
-    .gi-table th:nth-child(5) {
+    .gi-table th:nth-child(1),
+    .gi-table th:nth-child(2),
+    .gi-table th:nth-child(3),
+    .gi-table th:nth-child(4),
+    .gi-table th:nth-child(5),
+    .gi-table th:nth-child(6) {
         width: auto;
     }
 }
