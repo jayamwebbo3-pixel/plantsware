@@ -27,45 +27,72 @@
                 <div class="col-lg-8">
                     <div class="cart-items-wrapper" id="cartItemsWrapper">
                         @foreach($cartItems as $item)
-                        @if(isset($item->product))
-                        <div class="cart-item" id="cartItem_{{ $item->id }}">
-                            <div class="item-image">
-                                <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('assets/images/product/product1.jpg') }}" 
-                                     alt="{{ $item->product->name }}">
-                            </div>
-                            <div class="item-details">
-                                <h3 class="item-name">{{ $item->product->name }}</h3>
-                                @php
-                                    $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                                        ? $item->product->sale_price 
-                                        : $item->product->price;
-                                @endphp
-                                <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
-                                <div class="item-total" id="itemTotal_{{ $item->id }}">
-                                    ₹{{ number_format($priceToUse * $item->quantity, 2) }}
-                                </div>
-                                <div class="quantity-controls">
-                                    <span class="qty-label">Quantity:</span>
-                                    <div class="qty-input-group">
-                                        <button type="button" class="qty-btn decrement" 
-                                                data-item-id="{{ $item->id }}">−</button>
-                                        <input type="number" id="quantity_{{ $item->id }}" 
-                                               value="{{ $item->quantity }}" min="1" 
-                                               class="qty-input" readonly>
-                                        <button type="button" class="qty-btn increment" 
-                                                data-item-id="{{ $item->id }}">+</button>
+                            @php
+                                $isCombo = (bool) $item->combo_pack_id;
+                                $p = $isCombo ? $item->comboPack : $item->product;
+                            @endphp
+                            @if($p)
+                                <div class="cart-item" id="cartItem_{{ $item->id }}">
+                                    <div class="item-image position-relative d-flex align-items-center justify-content-center" style="background: #fdfdfd; border-radius: 8px; overflow: hidden; width: 80px; height: 80px;">
+                                        @php
+                                            $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+                                        @endphp
+
+                                        @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
+                                            <div class="cart-dual-image d-flex align-items-center justify-content-center w-100 h-100 p-1">
+                                                <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
+                                                <span style="font-size: 12px; font-weight: bold; color: #72a420; margin: 0 2px;">+</span>
+                                                <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
+                                            </div>
+                                        @else
+                                            @php
+                                                $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
+                                            @endphp
+                                            <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}" 
+                                                 alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        @endif
+
+                                        @if($isCombo)
+                                            <span class="badge badge-danger position-absolute" style="top:2px; left:2px; font-size: 8px; padding: 2px 4px;">COMBO</span>
+                                        @endif
+                                    </div>
+                                    <div class="item-details">
+                                        <h3 class="item-name">{{ $p->name }}</h3>
+                                        @php
+                                            if ($isCombo) {
+                                                $priceToUse = $p->offer_price;
+                                            } else {
+                                                $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
+                                                    ? $p->sale_price
+                                                    : $p->price;
+                                            }
+                                        @endphp
+                                        <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
+                                        <div class="item-total" id="itemTotal_{{ $item->id }}">
+                                            ₹{{ number_format($priceToUse * $item->quantity, 2) }}
+                                        </div>
+                                        <div class="quantity-controls">
+                                            <span class="qty-label">Quantity:</span>
+                                            <div class="qty-input-group">
+                                                <button type="button" class="qty-btn decrement" 
+                                                        data-item-id="{{ $item->id }}">−</button>
+                                                <input type="number" id="quantity_{{ $item->id }}" 
+                                                       value="{{ $item->quantity }}" min="1" 
+                                                       class="qty-input" readonly>
+                                                <button type="button" class="qty-btn increment" 
+                                                        data-item-id="{{ $item->id }}">+</button>
+                                            </div>
+                                        </div>
+                                        <div class="item-actions">
+                                            <button type="button" class="action-btn remove" 
+                                                    data-item-id="{{ $item->id }}">
+                                                <i class="fas fa-trash-alt"></i> Remove
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="item-actions">
-                                    <button type="button" class="action-btn remove" 
-                                            data-item-id="{{ $item->id }}">
-                                        <i class="fas fa-trash-alt"></i> Remove
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                    @endforeach
+                            @endif
+                        @endforeach
                     </div>
                 </div>
 

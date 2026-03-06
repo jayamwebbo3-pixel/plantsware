@@ -11,13 +11,44 @@
                 </thead>
                 <tbody>
                     @foreach($cartItems as $item)
+                        @php
+                            $isCombo = (bool) $item->combo_pack_id;
+                            $p = $isCombo ? $item->comboPack : $item->product;
+                        @endphp
                         <tr>
-                            <td>{{ $item->product->name }}</td>
+                            <td>
+                                @php
+                                    $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+                                @endphp
+                                <div class="d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px; background: #fdfdfd; border-radius: 4px; overflow: hidden; margin-right: 15px; vertical-align: middle;">
+                                    @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
+                                        <div class="checkout-dual-image d-flex align-items-center justify-content-center w-100 h-100 p-1">
+                                            <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
+                                            <span style="font-size: 10px; font-weight: bold; color: #72a420; margin: 0 1px;">+</span>
+                                            <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
+                                        </div>
+                                    @else
+                                        @php
+                                            $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
+                                        @endphp
+                                        <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}" 
+                                             alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    @endif
+                                </div>
+                                {{ $p->name }}
+                                @if($isCombo)
+                                    <span class="badge badge-danger ms-2">COMBO</span>
+                                @endif
+                            </td>
                             <td>{{ $item->quantity }}</td>
                             @php
-                                $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                                    ? $item->product->sale_price 
-                                    : $item->product->price;
+                                if ($isCombo) {
+                                    $priceToUse = $p->offer_price;
+                                } else {
+                                    $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
+                                        ? $p->sale_price
+                                        : $p->price;
+                                }
                             @endphp
                             <td>₹{{ number_format($priceToUse, 2) }}</td>
                             <td>₹{{ number_format($priceToUse * $item->quantity, 2) }}</td>

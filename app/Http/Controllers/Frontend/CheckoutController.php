@@ -11,39 +11,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class CheckoutController extends Controller {
+class CheckoutController extends Controller
+{
     // Show address form (from cart "Proceed to Checkout")
-    public function address() {
-        $cartItems = Cart::current()->with('product')->get();
+    public function address()
+    {
+        $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
         // Pre-fill address if user has one saved
         $savedAddress = [];
-        
+
         // Check if user is logged in and has address
         if (Auth::check()) {
             $user = Auth::user();
-            // Try different possible address fields
-            if (!empty($user->address)) {
-                if (is_string($user->address) && json_decode($user->address)) {
-                    // Address stored as JSON string
-                    $savedAddress = json_decode($user->address, true);
-                } elseif (is_array($user->address)) {
-                    // Address stored as array
-                    $savedAddress = $user->address;
-                } elseif (is_object($user->address)) {
-                    // Address stored as object
-                    $savedAddress = (array) $user->address;
-                }
+
+            // 'address' is cast to 'array' in User model, so Eloquent auto-decodes it
+            if (!empty($user->address) && is_array($user->address)) {
+                $savedAddress = $user->address;
             }
-            
-            // Also check individual fields if they exist
+
+            // Fallback to individual user fields if no address array found
             if (empty($savedAddress)) {
                 $savedAddress = [
                     'name' => $user->name ?? '',
-                    'address' => $user->address_line1 ?? $user->address ?? '',
+                    'address' => $user->address_line1 ?? '',
                     'city' => $user->city ?? '',
                     'state' => $user->state ?? '',
                     'pincode' => $user->pincode ?? $user->zip_code ?? '',
@@ -51,7 +45,7 @@ class CheckoutController extends Controller {
                 ];
             }
         }
-        
+
         // Also check session for previously entered address
         if (session()->has('shipping_address')) {
             $savedAddress = array_merge($savedAddress, session('shipping_address'));
@@ -61,7 +55,8 @@ class CheckoutController extends Controller {
     }
 
     // Save address and redirect to checkout
-    public function saveAddress(Request $request) {
+    public function saveAddress(Request $request)
+    {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
@@ -73,7 +68,7 @@ class CheckoutController extends Controller {
 
         // Save to session
         session(['shipping_address' => $validated]);
-        
+
         // Optionally save to user profile if logged in
         if (Auth::check()) {
             Auth::user()->update([
@@ -87,8 +82,9 @@ class CheckoutController extends Controller {
     }
 
     // Show checkout/review page
-    public function index() {
-        $cartItems = Cart::current()->with('product')->get();
+    public function index()
+    {
+        $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
@@ -99,9 +95,13 @@ class CheckoutController extends Controller {
         }
 
         $subtotal = $cartItems->sum(function ($item) {
-            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                ? $item->product->sale_price 
-                : $item->product->price;
+            if ($item->combo_pack_id) {
+                return ($item->comboPack->offer_price ?? 0) * $item->quantity;
+            }
+            $p = $item->product;
+            $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
+                ? $p->sale_price
+                : $p->price;
             return $priceToUse * $item->quantity;
         });
         $shipping = 0; // Fixed or calculate
@@ -112,10 +112,11 @@ class CheckoutController extends Controller {
     }
 
     // Place order (confirm and save)
-    public function placeOrder(Request $request) {
+    public function placeOrder(Request $request)
+    {
         // dd(auth()->check(), auth()->id());
 
-        $cartItems = Cart::current()->with('product')->get();
+        $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
@@ -127,15 +128,21 @@ class CheckoutController extends Controller {
 
         // Validate stock again
         foreach ($cartItems as $item) {
-            if ($item->quantity > $item->product->stock_quantity) {
-                return back()->with('error', "Insufficient stock for {$item->product->name}.");
+            $stock = $item->combo_pack_id ? $item->comboPack->stock_quantity : $item->product->stock_quantity;
+            $name = $item->combo_pack_id ? $item->comboPack->name : $item->product->name;
+            if ($item->quantity > $stock) {
+                return back()->with('error', "Insufficient stock for {$name}.");
             }
         }
 
         $subtotal = $cartItems->sum(function ($item) {
-            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                ? $item->product->sale_price 
-                : $item->product->price;
+            if ($item->combo_pack_id) {
+                return ($item->comboPack->offer_price ?? 0) * $item->quantity;
+            }
+            $p = $item->product;
+            $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
+                ? $p->sale_price
+                : $p->price;
             return $priceToUse * $item->quantity;
         });
         $shipping = 0;
@@ -144,16 +151,25 @@ class CheckoutController extends Controller {
 
         $checkoutItems = [];
         foreach ($cartItems as $item) {
-            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
-                ? $item->product->sale_price
-                : $item->product->price;
+            if ($item->combo_pack_id) {
+                $p = $item->comboPack;
+                $price = $p->offer_price;
+            } else {
+                $p = $item->product;
+                $price = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price) ? $p->sale_price : $p->price;
+            }
+
+            $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+            $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : (is_string($p->image) ? $p->image : null);
+
             $checkoutItems[] = [
                 'product_id' => $item->product_id,
-                'product_name' => $item->product->name,
-                'product_image' => $item->product->image,
-                'price' => $priceToUse,
+                'combo_pack_id' => $item->combo_pack_id,
+                'product_name' => $p->name,
+                'product_image' => $firstImg,
+                'price' => $price,
                 'quantity' => $item->quantity,
-                'total' => $priceToUse * $item->quantity,
+                'total' => $price * $item->quantity,
             ];
         }
 
@@ -165,8 +181,8 @@ class CheckoutController extends Controller {
             'shipping' => $shipping,
             'tax' => $tax,
             'total' => $total,
-            'status' => 'pending', 
-            'payment_status' => 'pending', 
+            'status' => 'pending',
+            'payment_status' => 'pending',
             'payment_method' => 'online',
         ]);
 
@@ -174,6 +190,7 @@ class CheckoutController extends Controller {
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $item['product_id'],
+                'combo_pack_id' => $item['combo_pack_id'],
                 'product_name' => $item['product_name'],
                 'product_image' => $item['product_image'],
                 'price' => $item['price'],
@@ -194,9 +211,11 @@ class CheckoutController extends Controller {
 
         return redirect()->route('payment.gateway', ['transaction_ref' => $transaction->transaction_ref]);
     }
-    
-    public function confirmation(Order $order) {
-        if ($order->user_id !== auth()->id()) abort(403);
+
+    public function confirmation(Order $order)
+    {
+        if ($order->user_id !== auth()->id())
+            abort(403);
         return view('view.order.confirmation', compact('order'));
     }
 }

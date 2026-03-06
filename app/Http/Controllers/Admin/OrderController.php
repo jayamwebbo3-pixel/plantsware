@@ -25,14 +25,14 @@ class OrderController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('order_number', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($uq) use ($search) {
-                      $uq->where('name', 'like', "%{$search}%")
-                         ->orWhere('email', 'like', "%{$search}%")
-                         ->orWhere('phone', 'like', "%{$search}%");
-                  })
-                  ->orWhereJsonContains('shipping_address->phone', $search)
-                  ->orWhereJsonContains('shipping_address->address', "%{$search}%")
-                  ->orWhereJsonContains('shipping_address->city', "%{$search}%");
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('phone', 'like', "%{$search}%");
+                    })
+                    ->orWhereJsonContains('shipping_address->phone', $search)
+                    ->orWhereJsonContains('shipping_address->address', "%{$search}%")
+                    ->orWhereJsonContains('shipping_address->city', "%{$search}%");
             });
         }
 
@@ -43,8 +43,8 @@ class OrderController extends Controller
 
         // Sort by latest
         $orders = $query->orderBy('created_at', 'desc')
-                        ->paginate($perPage)
-                        ->appends($request->query());
+            ->paginate($perPage)
+            ->appends($request->query());
 
         // Stats for Top Bar
         $stats = [
@@ -54,7 +54,6 @@ class OrderController extends Controller
             'processing' => Order::where('status', 'processing')->count(),
             'shipped' => Order::where('status', 'shipped')->count(),
             'delivered' => Order::where('status', 'delivered')->count(),
-            'cancelled' => Order::where('status', 'cancelled')->count(),
             'cancelled' => Order::where('status', 'cancelled')->count(),
             'returned' => Order::where('status', 'returned')->count(),
             'return_requested' => Order::where('status', 'return_requested')->count(),
@@ -66,7 +65,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load(['items.product', 'user']);
+        $order->load(['items.product', 'items.comboPack', 'user']);
         return view('admin.orders.show', compact('order'));
     }
 
@@ -106,7 +105,7 @@ class OrderController extends Controller
 
     public function generateInvoice($order_id)
     {
-        $order = Order::with('items')->findOrFail($order_id);
+        $order = Order::with(['items.product', 'items.comboPack'])->findOrFail($order_id);
 
         // Prevent generating an invoice if payment is still pending/failed
         if (!in_array($order->payment_status, ['paid', 'refunded'])) {
@@ -117,7 +116,7 @@ class OrderController extends Controller
             'invoice_number' => $order->order_number, // User template used invoice_no, adjusting to order_number which is the column name in this codebase
             'order_date' => $order->created_at->format('d/M/Y'),
             'payment_status' => $order->payment_status,
-            'store_logo' => asset('assets/images/logo/logo.png'), 
+            'store_logo' => asset('assets/images/logo/logo.png'),
             'store_name' => 'Plantsware',
             'store_address' => 'Plantsware Admin, Tamil Nadu',
             'store_email' => 'support@plantsware.in',
@@ -133,7 +132,7 @@ class OrderController extends Controller
             'grand_total' => $order->total,
         ];
 
-        $pdf = PDF::loadView('invoices.order_invoice', $data); 
-        return $pdf->download('Invoice_'.$order->order_number.'.pdf');
+        $pdf = PDF::loadView('invoices.order_invoice', $data);
+        return $pdf->download('Invoice_' . $order->order_number . '.pdf');
     }
 }

@@ -49,11 +49,11 @@
                     <a class="nav-link {{ request()->routeIs('admin.products.management') ? 'active' : '' }}" href="{{ route('admin.products.management') }}">
                         <i class="fas fa-boxes"></i> Product Management
                     </a>
-                    <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
-                        <i class="fa-solid fa-truck"></i> Orders Management
-                    </a>
                     <a class="nav-link {{ request()->routeIs('admin.combo-packs.*') ? 'active' : '' }}" href="{{ route('admin.combo-packs.index') }}">
                         <i class="fas fa-cubes"></i> Combo Packs
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
+                        <i class="fa-solid fa-truck"></i> Orders Management
                     </a>
 
                     <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">

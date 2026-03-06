@@ -17,4 +17,9 @@ class Wishlist extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function comboPack()
+    {
+        return $this->belongsTo(ComboPack::class);
+    }
 }

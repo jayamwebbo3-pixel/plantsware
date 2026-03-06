@@ -180,10 +180,10 @@
             </div>
         </div>
         <!-- header-top py-2 border-bottom shadow-sm -->
-        <div class="header_bottom shadow-sm rounded d-md-block d-sm-block d-lg-block sticky-top">
+        <div class="header_bottom shadow-sm rounded d-md-block d-sm-block d-lg-block">
             <div>
                 <div class="row">
-                    <div class="col-lg-12 d-flex justify-content-center">
+                    <div class="col-lg-12">
                         <!-- Toggler for mobile/tablet -->
                         <button class="navbar-toggler d-lg-none d-md-block d-sm-block" type="button" id="menuToggle" aria-label="Open Menu">
                             <span class="navbar-toggler-icon">☰</span>
@@ -344,6 +344,7 @@
                                     </div>
                                 </ul>
                             </li>
+                            <li><a href="{{ route('combo_packs.frontend_index') }}">Combo Packs</a></li>
                             <li><a href="{{ url('about') }}">About Plantsware</a></li>
                             <!--<li><a href="{{ url('blog-categories') }}">Blog</a></li>-->
                             <li><a href="{{ route('blog.index') }}">Blog</a></li>
@@ -395,39 +396,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Sticky Navigation
-    const headerBottom = document.querySelector('.header_bottom');
-    const headerTop = document.querySelector('.header-top');
-
-    function toggleStickyNav() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        if (scrollTop > 100) {
-            headerBottom.classList.add('sticky-nav');
-            document.body.classList.add('sticky-nav-active');
-            if (headerTop) {
-                headerTop.style.opacity = '0';
-                headerTop.style.transition = 'opacity 0.3s ease';
-            }
-        } else {
-            headerBottom.classList.remove('sticky-nav');
-            document.body.classList.remove('sticky-nav-active');
-            if (headerTop) {
-                headerTop.style.display = '';
-                setTimeout(() => { headerTop.style.opacity = '1'; }, 10);
-            }
-        }
-    }
-
-    // Initial check
-    toggleStickyNav();
-    // Listen to scroll and resize
-    window.addEventListener('scroll', toggleStickyNav);
-    window.addEventListener('resize', toggleStickyNav);
-
     // Close mobile menu when clicking outside
     document.addEventListener('click', function(event) {
         const mainMenu = document.querySelector('.main-menu');
-        if (!event.target.closest('.navbar-toggler') &&
+        if (mainMenu && !event.target.closest('.navbar-toggler') &&
             !event.target.closest('.main-menu') &&
             mainMenu.classList.contains('show')) {
             mainMenu.classList.remove('show');

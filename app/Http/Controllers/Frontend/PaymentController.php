@@ -77,17 +77,26 @@ class PaymentController extends Controller
             try {
                 // Ensure transaction hasn't already been processed
                 if ($transaction->status === 'SUCCESS') {
-                     return redirect()->route('home');
+                    return redirect()->route('home');
                 }
 
                 DB::beginTransaction();
 
                 $order = Order::with('items.product')->findOrFail($transaction->order_id);
-                
+
                 // Re-verify stock before confirming the order
                 foreach ($order->items as $item) {
-                    if (!$item->product || $item->quantity > $item->product->stock_quantity) {
-                        throw new Exception("Insufficient stock for one or more items: " . ($item->product->name ?? 'Unknown item'));
+                    if ($item->combo_pack_id) {
+                        $combo = \App\Models\ComboPack::find($item->combo_pack_id);
+                        if (!$combo || $item->quantity > $combo->stock_quantity) {
+                            if (!$combo || $combo->is_combo_only || $item->quantity > $combo->stock_quantity) {
+                                throw new Exception("Insufficient stock for combo: " . ($combo->name ?? 'Unknown item'));
+                            }
+                        }
+                    } else {
+                        if (!$item->product || $item->quantity > $item->product->stock_quantity) {
+                            throw new Exception("Insufficient stock for product: " . ($item->product->name ?? 'Unknown item'));
+                        }
                     }
                 }
 
@@ -97,8 +106,24 @@ class PaymentController extends Controller
                 ]);
 
                 foreach ($order->items as $item) {
-                    // Reduce stock
-                    Product::where('id', $item->product_id)->decrement('stock_quantity', $item->quantity);
+                    if ($item->combo_pack_id) {
+                        $combo = \App\Models\ComboPack::find($item->combo_pack_id);
+                        if ($combo) {
+                            if ($combo->is_combo_only) {
+                                // Combo-only: Subtract from the combo_packs table
+                                $combo->decrement('stock_quantity', $item->quantity);
+                            } else {
+                                // Standard combo: Subtract from the constituent products
+                                $comboProducts = \App\Models\ComboPackProduct::where('combo_pack_id', $combo->id)->first();
+                                if ($comboProducts && $comboProducts->product_ids) {
+                                    $this->subtractConstituentStock($comboProducts->product_ids, $item->quantity);
+                                }
+                            }
+                        }
+                    } else {
+                        // Regular product stock subtraction
+                        Product::where('id', $item->product_id)->decrement('stock_quantity', $item->quantity);
+                    }
                 }
 
                 $transaction->update([
@@ -111,7 +136,8 @@ class PaymentController extends Controller
                 try {
                     Cart::where('user_id', $transaction->user_id)->delete();
                     session()->forget('shipping_address');
-                } catch (Exception $e) { }
+                } catch (Exception $e) {
+                }
 
                 return redirect()->route('checkout.confirmation', $order->id)->with('success', 'Payment successful and Order placed!');
 
@@ -123,5 +149,32 @@ class PaymentController extends Controller
         }
 
         return redirect()->route('home');
+    }
+    /**
+     * Helper to subtract stock for constituent products/combos recursively
+     */
+    private function subtractConstituentStock(array $productIds, int $orderQuantity)
+    {
+        foreach ($productIds as $id) {
+            if (str_starts_with($id, 'p_')) {
+                // Regular product: Subtract stock
+                $realId = str_replace('p_', '', $id);
+                \App\Models\Product::where('id', $realId)->decrement('stock_quantity', $orderQuantity);
+            } elseif (str_starts_with($id, 'c_')) {
+                // Nested combo: Recursive subtraction or combo stock decrement
+                $realId = str_replace('c_', '', $id);
+                $nestedCombo = \App\Models\ComboPack::find($realId);
+                if ($nestedCombo) {
+                    if ($nestedCombo->is_combo_only) {
+                        $nestedCombo->decrement('stock_quantity', $orderQuantity);
+                    } else {
+                        $nestedComboProducts = \App\Models\ComboPackProduct::where('combo_pack_id', $nestedCombo->id)->first();
+                        if ($nestedComboProducts && $nestedComboProducts->product_ids) {
+                            $this->subtractConstituentStock($nestedComboProducts->product_ids, $orderQuantity);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
