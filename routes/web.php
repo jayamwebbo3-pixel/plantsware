@@ -72,6 +72,9 @@ Route::prefix('wishlist')->name('wishlist.')->controller(CartController::class)-
     Route::get('/', 'wishlist')->name('index');
     Route::post('/add/{product}', 'addToWishlist')->name('add');
     Route::delete('/remove/{product}', 'removeFromWishlist')->name('remove');
+    Route::post('/add-combo/{combo}', 'addToWishlistCombo')->name('add_combo');
+    Route::post('/remove-combo/{combo}', 'removeFromWishlistCombo')->name('remove_combo');
+
 });
 
 // ================= CHECKOUT (AUTH REQUIRED) =================
@@ -105,8 +108,6 @@ Route::get('combo-packs/{slug}', [App\Http\Controllers\Frontend\ComboPackControl
 
 // Cart & Wishlist for Combo Packs
 Route::post('/cart/add-combo/{combo}', [App\Http\Controllers\Frontend\CartController::class, 'addCombo'])->name('cart.add_combo');
-Route::post('/wishlist/add-combo/{combo}', [App\Http\Controllers\Frontend\CartController::class, 'addToWishlistCombo'])->name('wishlist.add_combo');
-Route::post('/wishlist/remove-combo/{combo}', [App\Http\Controllers\Frontend\CartController::class, 'removeFromWishlistCombo'])->name('wishlist.remove_combo');
 
 // ================= USER DASHBOARD =================
 

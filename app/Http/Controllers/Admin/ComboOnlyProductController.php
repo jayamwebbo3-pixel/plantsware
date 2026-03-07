@@ -7,9 +7,17 @@ use App\Models\ComboOnlyProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageService;
 
 class ComboOnlyProductController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     public function index(Request $request)
     {
         $query = ComboOnlyProduct::latest();
@@ -44,6 +52,7 @@ class ComboOnlyProductController extends Controller
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('combo-only-products', 'public');
+            $this->imageService->applyWatermark($imagePath);
         }
 
         ComboOnlyProduct::create([
@@ -82,6 +91,7 @@ class ComboOnlyProductController extends Controller
                 Storage::disk('public')->delete($product->image);
             }
             $product->image = $request->file('image')->store('combo-only-products', 'public');
+            $this->imageService->applyWatermark($product->image);
         }
 
         $product->update([

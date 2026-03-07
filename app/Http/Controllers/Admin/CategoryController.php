@@ -16,8 +16,8 @@ class CategoryController extends Controller
         $perPage = request('per_page', 20);
 
         $categories = Category::when($search, function ($query) use ($search) {
-                return $query->where('name', 'like', "%{$search}%");
-            })
+            return $query->where('name', 'like', "%{$search}%");
+        })
             ->orderBy(
                 request('sort', 'sort_order'),
                 request('direction', 'asc')
@@ -45,7 +45,7 @@ class CategoryController extends Controller
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
-        
+
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('categories', 'public');
         }
@@ -72,7 +72,7 @@ class CategoryController extends Controller
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
-        
+
         if ($request->hasFile('image')) {
             if ($category->image) {
                 Storage::disk('public')->delete($category->image);

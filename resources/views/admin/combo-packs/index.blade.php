@@ -62,7 +62,7 @@
                                 @forelse($comboPacks as $combo)
                                     <tr>
                                         <td class="ps-4">
-                                            @php $imgs = json_decode($combo->image) @endphp
+                                            @php $imgs = $combo->images @endphp
                                             <div class="composite-preview">
                                                 @foreach(array_slice($imgs ?? [], 0, 2) as $img)
                                                     <img src="{{ asset('storage/' . $img) }}" class="rounded shadow-xs border composite-img" style="z-index: {{ 2 - $loop->index }}; left: {{ $loop->index * 15 }}px;">
@@ -268,12 +268,15 @@
                 document.getElementById('form-section').style.display = 'block';
 
                 document.getElementById('form-title').innerHTML = '<i class="fas fa-layer-group text-primary me-1"></i> Create Product Combo';
-                document.getElementById('item-selection-grid').innerHTML = `
-                    <div class="text-center py-5 text-muted">
-                        <i class="fas fa-search-plus fa-2x mb-3"></i>
-                        <p>Select category or use search to find products across all categories.</p>
-                        <button type="button" class="btn btn-sm btn-outline-dark mt-2" onclick="fetchFilteredItems(true)">Load All products</button>
-                    </div>`;
+                const body = document.getElementById('item-selection-body');
+                if (body) {
+                    body.innerHTML = `
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-search-plus fa-2x mb-3"></i>
+                            <p>Select category or use search to find products across all categories.</p>
+                            <button type="button" class="btn btn-sm btn-outline-dark mt-2" onclick="fetchFilteredItems(true)">Load All products</button>
+                        </div>`;
+                }
             }
 
             function hideForm() {
@@ -492,8 +495,7 @@
 
             document.getElementById('subcategory_id').addEventListener('change', () => fetchFilteredItems(false));
             document.getElementById('item_search').addEventListener('input', () => {
-                const isComboOnlyMode = document.getElementById('action_type').value === 'combo_only';
-                fetchFilteredItems(isComboOnlyMode);
+                fetchFilteredItems(false);
             });
         </script>
     @endpush

@@ -133,25 +133,20 @@
                                     <div class="card-img-container">
                                         <a href="{{ route('combo_packs.frontend_show', $combo->slug) }}" class="w-100 h-100">
                                             @php
-                                                $images = json_decode($combo->image);
+                                                $images = $combo->images;
                                             @endphp
 
-                                            @if(!is_array($images))
-                                                <img src="{{ $combo->image ? asset('storage/' . $combo->image) : asset('assets/images/product/default.jpg') }}" 
-                                                     alt="{{ $combo->name }}" class="single-combo-img">
-                                            @else
-                                                <div class="dual-image-wrapper">
-                                                    @if(count($images) >= 2)
-                                                        <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $combo->name }} 1">
-                                                        <span class="image-plus-sign">+</span>
-                                                        <img src="{{ asset('storage/' . $images[1]) }}" alt="{{ $combo->name }} 2">
-                                                    @elseif(count($images) == 1)
-                                                        <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $combo->name }}" class="single-combo-img">
-                                                    @else
-                                                        <img src="{{ asset('assets/images/product/default.jpg') }}" alt="{{ $combo->name }}" class="single-combo-img">
-                                                    @endif
-                                                </div>
-                                            @endif
+                                            <div class="dual-image-wrapper">
+                                                @if(count($images) >= 2)
+                                                    <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $combo->name }} 1">
+                                                    <span class="image-plus-sign">+</span>
+                                                    <img src="{{ asset('storage/' . $images[1]) }}" alt="{{ $combo->name }} 2">
+                                                @elseif(count($images) == 1)
+                                                    <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $combo->name }}" class="single-combo-img">
+                                                @else
+                                                    <img src="{{ asset('assets/images/product/default.jpg') }}" alt="{{ $combo->name }}" class="single-combo-img">
+                                                @endif
+                                            </div>
                                         </a>
                                         @php
                                             $discount = 0;

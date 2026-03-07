@@ -32,6 +32,49 @@ class ComboPack extends Model
     }
 
     /**
+     * Get dynamic images from constituent products/combo-only items
+     */
+    public function getImagesAttribute()
+    {
+        $comboProduct = $this->comboProduct;
+        if (!$comboProduct || !$comboProduct->product_ids) {
+            return [];
+        }
+
+        $images = [];
+        foreach ($comboProduct->product_ids as $id) {
+            if (count($images) >= 4)
+                break; // Limit to 4 for performance/UI
+
+            if (str_starts_with($id, 'p_')) {
+                $p = Product::find(str_replace('p_', '', $id));
+                if ($p && $p->image)
+                    $images[] = $p->image;
+            } elseif (str_starts_with($id, 'co_')) {
+                $co = ComboOnlyProduct::find(str_replace('co_', '', $id));
+                if ($co && $co->image)
+                    $images[] = $co->image;
+            } elseif (str_starts_with($id, 'c_')) {
+                $c = self::find(str_replace('c_', '', $id));
+                if ($c) {
+                    $nestedImgs = $c->images;
+                    if (!empty($nestedImgs))
+                        $images[] = $nestedImgs[0];
+                }
+            }
+        }
+        return array_values(array_unique($images));
+    }
+
+    /**
+     * Compatibility accessor for single image field
+     */
+    public function getImageAttribute()
+    {
+        return json_encode(array_slice($this->images, 0, 2));
+    }
+
+    /**
      * Dynamic Stock Quantity Accessor
      * Calculates minimum stock across all constituent items.
      */

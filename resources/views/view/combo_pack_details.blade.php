@@ -22,44 +22,38 @@
             <div class="col-md-6 mb-4">
                 <div class="card border-0 shadow-sm rounded-lg overflow-hidden" style="min-height: 400px; display: flex; align-items: center; justify-content: center; background: #fdfdfd;">
                     @php
-                        $images = is_string($comboPack->image) ? json_decode($comboPack->image, true) : $comboPack->image;
+                        $images = $comboPack->images;
                     @endphp
 
-                    @if(!is_array($images))
-                        <img src="{{ $comboPack->image ? asset('storage/' . $comboPack->image) : asset('assets/images/product/default.jpg') }}" 
-                             class="img-fluid p-4" style="object-fit: cover; max-height: 400px;"
-                             alt="{{ $comboPack->name }}">
-                    @else
-                        <div class="dual-image-wrapper p-4 d-flex align-items-center justify-content-center w-100 h-100">
-                            @if(count($images) >= 2)
-                                {{-- First product image (links to product page) --}}
-                                @if(!empty($productLinks[0]))
-                                    <a href="{{ $productLinks[0] }}" title="View Product" class="text-decoration-none position-relative combo-img-link">
-                                        <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $comboPack->name }} 1" class="img-fluid rounded shadow-sm" style="width: 100%; max-width: 200px; max-height: 350px; object-fit: contain;">
-                                        <span class="combo-img-hint">View Product &rarr;</span>
-                                    </a>
-                                @else
-                                    <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $comboPack->name }} 1" class="img-fluid rounded shadow-sm" style="max-width: 200px; max-height: 350px; object-fit: contain;">
-                                @endif
-
-                                <span class="image-plus-sign mx-3 fs-1 fw-bold" style="color: #72a420;">+</span>
-
-                                {{-- Second product image (links to product page) --}}
-                                @if(!empty($productLinks[1]))
-                                    <a href="{{ $productLinks[1] }}" title="View Product" class="text-decoration-none position-relative combo-img-link">
-                                        <img src="{{ asset('storage/' . $images[1]) }}" alt="{{ $comboPack->name }} 2" class="img-fluid rounded shadow-sm" style="width: 100%; max-width: 200px; max-height: 350px; object-fit: contain;">
-                                        <span class="combo-img-hint">View Product &rarr;</span>
-                                    </a>
-                                @else
-                                    <img src="{{ asset('storage/' . $images[1]) }}" alt="{{ $comboPack->name }} 2" class="img-fluid rounded shadow-sm" style="max-width: 200px; max-height: 350px; object-fit: contain;">
-                                @endif
-                            @elseif(count($images) == 1)
-                                <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $comboPack->name }}" class="img-fluid rounded" style="max-height: 400px; object-fit: contain;">
+                    <div class="dual-image-wrapper p-4 d-flex align-items-center justify-content-center w-100 h-100">
+                        @if(count($images) >= 2)
+                            {{-- First product image (links to product page) --}}
+                            @if(!empty($productLinks[0]))
+                                <a href="{{ $productLinks[0] }}" title="View Product" class="text-decoration-none position-relative combo-img-link">
+                                    <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $comboPack->name }} 1" class="img-fluid rounded shadow-sm" style="width: 100%; max-width: 200px; max-height: 350px; object-fit: contain;">
+                                    <span class="combo-img-hint">View Product &rarr;</span>
+                                </a>
                             @else
-                                <img src="{{ asset('assets/images/product/default.jpg') }}" alt="{{ $comboPack->name }}" class="img-fluid p-4">
+                                <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $comboPack->name }} 1" class="img-fluid rounded shadow-sm" style="max-width: 200px; max-height: 350px; object-fit: contain;">
                             @endif
-                        </div>
-                    @endif
+
+                            <span class="image-plus-sign mx-3 fs-1 fw-bold" style="color: #72a420;">+</span>
+
+                            {{-- Second product image (links to product page) --}}
+                            @if(!empty($productLinks[1]))
+                                <a href="{{ $productLinks[1] }}" title="View Product" class="text-decoration-none position-relative combo-img-link">
+                                    <img src="{{ asset('storage/' . $images[1]) }}" alt="{{ $comboPack->name }} 2" class="img-fluid rounded shadow-sm" style="width: 100%; max-width: 200px; max-height: 350px; object-fit: contain;">
+                                    <span class="combo-img-hint">View Product &rarr;</span>
+                                </a>
+                            @else
+                                <img src="{{ asset('storage/' . $images[1]) }}" alt="{{ $comboPack->name }} 2" class="img-fluid rounded shadow-sm" style="max-width: 200px; max-height: 350px; object-fit: contain;">
+                            @endif
+                        @elseif(count($images) == 1)
+                            <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $comboPack->name }}" class="img-fluid rounded" style="max-height: 400px; object-fit: contain;">
+                        @else
+                            <img src="{{ asset('assets/images/product/default.jpg') }}" alt="{{ $comboPack->name }}" class="img-fluid p-4">
+                        @endif
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">

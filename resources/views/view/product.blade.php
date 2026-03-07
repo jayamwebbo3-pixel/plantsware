@@ -31,7 +31,7 @@
                 <div class="col-lg-6">
                     <div class="product-page-gallery">
                         <div class="product-page-gallery-main position-relative">
-                            <img id="mainProductImage" src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}" class="w-100">
+                            <img id="mainProductImage" src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}" class="w-100" style="object-fit: contain;">
                             @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="product-page-badge-sale">
                                     -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
@@ -160,10 +160,10 @@
                                 <a href="{{ route('product.show', $relatedProduct->slug) }}">
                                     <img src="{{ $relatedProduct->image ? asset('storage/' . $relatedProduct->image) : asset('assets/images/product/product1.jpg') }}"
                                          alt="{{ $relatedProduct->name }}"
-                                         class="product-image main-image w-100 h-100 object-fit-cover">
+                                         class="product-image main-image w-100 h-100 object-fit-contain">
                                     <img src="{{ $relatedProduct->image ? asset('storage/' . $relatedProduct->image) : asset('assets/images/product/product1.jpg') }}"
                                          alt="{{ $relatedProduct->name }}"
-                                         class="product-image hover-image w-100 h-100 object-fit-cover">
+                                         class="product-image hover-image w-100 h-100 object-fit-contain">
                                     @if($relatedProduct->sale_price && $relatedProduct->sale_price > 0 && $relatedProduct->sale_price < $relatedProduct->price)
                                         <span class="discount-badge">{{ round((($relatedProduct->price - $relatedProduct->sale_price) / $relatedProduct->price) * 100) }}% OFF</span>
                                     @endif
