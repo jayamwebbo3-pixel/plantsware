@@ -58,7 +58,27 @@
             </div>
             <div class="col-md-6">
                 <div class="product-page-info">
-                    <h1 class="product-page-title mb-3">{{ $comboPack->name }}</h1>
+                    <h1 class="product-page-title mb-1">{{ $comboPack->name }}</h1>
+                    
+                    <!-- Dynamic Rating -->
+                    @if(($comboPack->total_reviews ?? 0) > 0 && ($comboPack->avg_rating ?? 0) > 0)
+                    <div class="product-page-rating mb-2">
+                        <div class="product-page-stars d-inline" style="color: #ffc107;">
+                            @php $avg = $comboPack->avg_rating ?? 0; @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <= floor($avg))
+                                    <i class="fas fa-star"></i>
+                                @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
+                                    <i class="fas fa-star-half-alt"></i>
+                                @else
+                                    <i class="far fa-star text-muted"></i>
+                                @endif
+                            @endfor
+                        </div>
+                        <span class="product-page-rating-text ms-2 fw-bold" style="color: #333;">{{ number_format($avg, 1) }}</span>
+                        <span class="product-page-reviews-count text-muted ms-1">({{ $comboPack->total_reviews ?? 0 }} Reviews)</span>
+                    </div>
+                    @endif
                     
                     <div class="product-page-price mb-4">
                         <span class="product-page-current-price">₹{{ number_format($comboPack->offer_price, 2) }}</span>
@@ -120,10 +140,10 @@
                         Add to Wishlist
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
 </section>
+
+
+
 
 <!-- Related Products Section -->
 <section class="related-products py-5 bg-light">

@@ -86,17 +86,19 @@ class PaymentController extends Controller
 
                 // Re-verify stock before confirming the order
                 foreach ($order->items as $item) {
+                    $stock = 0;
+                    $name = '';
                     if ($item->combo_pack_id) {
                         $combo = \App\Models\ComboPack::find($item->combo_pack_id);
-                        if (!$combo || $item->quantity > $combo->stock_quantity) {
-                            if (!$combo || $combo->is_combo_only || $item->quantity > $combo->stock_quantity) {
-                                throw new Exception("Insufficient stock for combo: " . ($combo->name ?? 'Unknown item'));
-                            }
-                        }
+                        $stock = $combo ? $combo->stock_quantity : 0;
+                        $name = $combo ? $combo->name : 'Unknown Combo';
                     } else {
-                        if (!$item->product || $item->quantity > $item->product->stock_quantity) {
-                            throw new Exception("Insufficient stock for product: " . ($item->product->name ?? 'Unknown item'));
-                        }
+                        $stock = $item->product ? $item->product->stock_quantity : 0;
+                        $name = $item->product ? $item->product->name : 'Unknown Product';
+                    }
+
+                    if ($item->quantity > $stock) {
+                        throw new Exception("Insufficient stock for: " . $name);
                     }
                 }
 
@@ -160,6 +162,10 @@ class PaymentController extends Controller
                 // Regular product: Subtract stock
                 $realId = str_replace('p_', '', $id);
                 \App\Models\Product::where('id', $realId)->decrement('stock_quantity', $orderQuantity);
+            } elseif (str_starts_with($id, 'co_')) {
+                // Combo only product: Subtract stock
+                $realId = str_replace('co_', '', $id);
+                \App\Models\ComboOnlyProduct::where('id', $realId)->decrement('stock_quantity', $orderQuantity);
             } elseif (str_starts_with($id, 'c_')) {
                 // Nested combo: Recursive subtraction or combo stock decrement
                 $realId = str_replace('c_', '', $id);

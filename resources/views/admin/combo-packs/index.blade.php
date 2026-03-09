@@ -55,6 +55,7 @@
                                     <th>Pricing</th>
                                     <th>Stock</th>
                                     <th>Status</th>
+                                    <th>Rating</th>
                                     <th class="text-end pe-4">Actions</th>
                                 </tr>
                             </thead>
@@ -116,6 +117,15 @@
                                             <div class="form-check form-switch p-0 m-0">
                                                 <input class="form-check-input ms-0 status-toggle" type="checkbox" data-id="{{ $combo->id }}" {{ $combo->is_active ? 'checked' : '' }}>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('admin.reviews.index') }}?combo_pack_id={{ $combo->id }}" class="text-decoration-none">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="text-warning me-1"><i class="fas fa-star"></i></span>
+                                                    <strong>{{ number_format($combo->avg_rating, 1) }}</strong>
+                                                    <small class="text-muted ms-1">({{ $combo->total_reviews }})</small>
+                                                </div>
+                                            </a>
                                         </td>
                                         <td class="text-end pe-4">
                                             <button class="btn btn-sm btn-outline-primary border-0" onclick="editCombo({{ $combo->id }})"><i class="fas fa-edit"></i></button>
@@ -192,6 +202,12 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Description</label>
+                                    <textarea name="description" class="form-control" rows="3" placeholder="Enter combo description"></textarea>
+                                </div>
+
 
 
 
@@ -310,6 +326,11 @@
                         form.querySelector('[name="name"]').value = combo.name || '';
                         form.querySelector('[name="offer_price"]').value = combo.offer_price || '';
                         form.querySelector('[name="total_price"]').value = combo.total_price || '';
+                        if (form.querySelector('[name="description"]')) {
+                            form.querySelector('[name="description"]').value = combo.description || '';
+                        }
+
+                        // Hide rating fields on edit
 
                         // Populate prices map for calculation
                         Object.assign(productPrices, prices);

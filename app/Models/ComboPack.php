@@ -16,6 +16,8 @@ class ComboPack extends Model
         'offer_price',
         'image',
         'is_active',
+        'avg_rating',
+        'total_reviews',
     ];
 
     protected $casts = [
@@ -80,6 +82,10 @@ class ComboPack extends Model
      */
     public function getStockQuantityAttribute()
     {
+        if ($this->is_combo_only) {
+            return (int) $this->attributes['stock_quantity'];
+        }
+
         $comboProduct = $this->comboProduct;
         if (!$comboProduct || !$comboProduct->product_ids) {
             return 0;

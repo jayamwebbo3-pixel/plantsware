@@ -58,16 +58,25 @@
                 <div class="col-lg-6">
                     <div class="product-page-info">
                         <h1>{{ $product->name }}</h1>
-                        <!-- Rating (Static for now) -->
+                        <!-- Dynamic Rating -->
+                        @if(($product->total_reviews ?? 0) > 0 && ($product->avg_rating ?? 0) > 0)
                         <div class="product-page-rating mb-3">
-                            <div class="product-page-stars d-inline">
+                            <div class="product-page-stars d-inline" style="color: #ffc107;">
+                                @php $avg = $product->avg_rating ?? 0; @endphp
                                 @for($i = 1; $i <= 5; $i++)
-                                    <i class="fas fa-star {{ $i <= 4 ? 'text-warning' : 'text-muted' }}"></i>
+                                    @if($i <= floor($avg))
+                                        <i class="fas fa-star"></i>
+                                    @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
+                                        <i class="fas fa-star-half-alt"></i>
+                                    @else
+                                        <i class="far fa-star text-muted"></i>
+                                    @endif
                                 @endfor
                             </div>
-                            <span class="product-page-rating-text ms-2">4.8</span>
-                            <span class="product-page-reviews-count">(324 reviews)</span>
+                            <span class="product-page-rating-text ms-2 fw-bold" style="color: #333;">{{ number_format($avg, 1) }}</span>
+                            <span class="product-page-reviews-count text-muted ms-1">({{ $product->total_reviews ?? 0 }} Reviews)</span>
                         </div>
+                        @endif
                         <!-- Price -->
                         <div class="product-page-price mb-4">
                             @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
@@ -210,6 +219,8 @@
         </div>
     </div>
 </section>
+
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

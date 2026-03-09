@@ -12,10 +12,10 @@ class UserDashboardController extends Controller
         $user = Auth::user();
 
         return view('view.userdashboard', [
-            'user'      => $user,
+            'user' => $user,
             'addresses' => $user->addresses,
-            'orders'    => $user->orders()->latest()->get(),
-            'wishlist'  => $user->wishlist()->with('product')->get(),
+            'orders' => $user->orders()->latest()->get(),
+            'wishlist' => $user->wishlist()->with('product')->get(),
         ]);
     }
 
@@ -50,6 +50,41 @@ class UserDashboardController extends Controller
         ]);
 
         return back()->with('success', 'Return request submitted successfully.');
+    }
+
+    public function getOrderItems($id)
+    {
+        $user = Auth::user();
+        $order = $user->orders()->with('items')->findOrFail($id);
+
+        return response()->json([
+            'items' => $order->items->map(function ($item) use ($user, $order) {
+                $review = \App\Models\ProductReview::where('user_id', $user->id)
+                    ->where('order_id', $order->id)
+                    ->where(function($query) use ($item) {
+                        if ($item->product_id) {
+                            $query->where('product_id', $item->product_id);
+                        } else {
+                            $query->where('combo_pack_id', $item->combo_pack_id);
+                        }
+                    })->first();
+
+                $isEditable = true;
+                if ($review) {
+                    $isEditable = $review->updated_at->diffInDays(now()) <= 30;
+                }
+
+                return [
+                    'id' => $item->id,
+                    'name' => $item->product_name,
+                    'product_id' => $item->product_id,
+                    'combo_pack_id' => $item->combo_pack_id,
+                    'existing_rating' => $review ? $review->rating : null,
+                    'existing_review' => $review ? $review->review : null,
+                    'is_editable' => $isEditable,
+                ];
+            })
+        ]);
     }
 }
 

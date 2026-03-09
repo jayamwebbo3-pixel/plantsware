@@ -115,6 +115,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
     Route::post('/user/order/{id}/cancel', [UserDashboardController::class, 'cancelOrder'])->name('user.order.cancel');
     Route::post('/user/order/{id}/return', [UserDashboardController::class, 'returnOrder'])->name('user.order.return');
+
+    // Review Routes
+    Route::get('/user/order/{id}/items', [UserDashboardController::class, 'getOrderItems'])->name('user.order.items');
+    Route::post('/user/review/store', [App\Http\Controllers\Frontend\ProductReviewController::class, 'store'])->name('user.review.store');
 });
 
 // ======================================================
@@ -229,5 +233,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::delete('/{id}', [ComboOnlyProductController::class, 'destroy'])->name('destroy');
             Route::patch('/{id}/status', [ComboOnlyProductController::class, 'toggleStatus'])->name('status');
         });
+
+        // Review Management
+        Route::get('/reviews', [App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
+        Route::post('/reviews/{id}/toggle', [App\Http\Controllers\Admin\ReviewController::class, 'toggleApproval'])->name('reviews.toggle');
+        Route::delete('/reviews/{id}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
 });

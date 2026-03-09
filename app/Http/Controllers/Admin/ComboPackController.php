@@ -38,6 +38,7 @@ class ComboPackController extends Controller
             'offer_price' => 'required|numeric|min:0',
             'total_price' => 'required|numeric|min:0',
             'product_ids' => 'required|array|min:1',
+            'description' => 'nullable|string',
         ]);
 
         try {
@@ -46,6 +47,7 @@ class ComboPackController extends Controller
             $comboPack->slug = $this->generateSlug($validated['name']);
             $comboPack->total_price = $validated['total_price'];
             $comboPack->offer_price = $validated['offer_price'];
+            $comboPack->description = $validated['description'] ?? null;
 
             $images = [];
             $categoryIds = [];
@@ -138,12 +140,14 @@ class ComboPackController extends Controller
             'offer_price' => 'required|numeric|min:0',
             'total_price' => 'required|numeric|min:0',
             'product_ids' => 'required|array|min:1',
+            'description' => 'nullable|string',
         ]);
 
         try {
             $combo->name = $validated['name'];
             $combo->total_price = $validated['total_price'];
             $combo->offer_price = $validated['offer_price'];
+            $combo->description = $validated['description'] ?? $combo->description;
 
             $images = [];
             $categoryIds = [];
