@@ -57,6 +57,7 @@ class CartController extends Controller
     protected function addToCart(Request $request, $item, $type)
     {
         $quantity = max(1, (int) $request->input('quantity', 1));
+        $options  = $request->input('options');
         $itemId = $item->id;
         $name = $item->name;
         $stock = $item->stock_quantity;
@@ -67,13 +68,20 @@ class CartController extends Controller
         }
 
         $query = Cart::current();
-        if ($type === 'product') {
-            $query->where('product_id', $itemId);
-        } else {
-            $query->where('combo_pack_id', $itemId);
-        }
 
-        $existingItem = $query->first();
+if ($type === 'product') {
+    $query->where('product_id', $itemId);
+
+    if ($options) {
+        $query->where('options', $options);
+    } else {
+        $query->whereNull('options');
+    }
+} else {
+    $query->where('combo_pack_id', $itemId);
+}
+
+$existingItem = $query->first();
         $currentQuantity = $existingItem ? $existingItem->quantity : 0;
         $newTotalQuantity = $currentQuantity + $quantity;
 
@@ -92,6 +100,7 @@ class CartController extends Controller
                 'product_id' => $type === 'product' ? $itemId : null,
                 'combo_pack_id' => $type === 'combo' ? $itemId : null,
                 'quantity' => $quantity,
+                'options'     => $options,
             ]);
         }
 

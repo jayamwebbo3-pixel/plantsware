@@ -79,7 +79,26 @@ class ProductController extends Controller
             'meta_title' => 'nullable|string',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
+            'size' => 'nullable|array',
+            'size.*' => 'string',
+            'shape' => 'nullable|string|in:Circular,Rectangular,Square',
+            'material' => 'nullable|string|in:HDPE,Fabric,Non-woven',
+            'color' => 'nullable|string|max:50',
+            'gsm' => 'nullable|integer|min:0',
+            'has_handles' => 'boolean',
+            'uv_treated' => 'boolean',
+            'shade_percentage' => 'nullable|string|max:50',
+            'width_meters' => 'nullable|numeric|min:0',
+            'length_meters' => 'nullable|numeric|min:0',
+            'pack_quantity' => 'integer|min:1',
+            'warranty_months' => 'nullable|integer|min:0',
         ]);
+
+        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_active'] = $request->boolean('is_active', true); // Default true if not in form
+        $validated['has_handles'] = $request->boolean('has_handles');
+        $validated['uv_treated'] = $request->boolean('uv_treated');
+        $validated['size'] = $request->has('size') ? implode(', ', $request->input('size')) : null;
 
         $validated['slug'] = Str::slug($validated['name']);
 
@@ -137,7 +156,8 @@ class ProductController extends Controller
             'meta_title' => 'nullable|string',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
-            'size' => 'nullable|string|max:50',
+            'size' => 'nullable|array',
+            'size.*' => 'string',
             'shape' => 'nullable|string|in:Circular,Rectangular,Square',  // Enforce options
             'material' => 'nullable|string|in:HDPE,Fabric,Non-woven',
             'color' => 'nullable|string|max:50',
@@ -150,6 +170,12 @@ class ProductController extends Controller
             'pack_quantity' => 'integer|min:1',
             'warranty_months' => 'nullable|integer|min:0',
         ]);
+
+        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_active'] = $request->boolean('is_active', $product->is_active);
+        $validated['has_handles'] = $request->boolean('has_handles');
+        $validated['uv_treated'] = $request->boolean('uv_treated');
+        $validated['size'] = $request->has('size') ? implode(', ', $request->input('size')) : null;
 
         $validated['slug'] = Str::slug($validated['name']);
 

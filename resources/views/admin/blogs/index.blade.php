@@ -1,4 +1,4 @@
-@extends('admin.layout')   {{-- Change to your actual admin layout --}}
+@extends('admin.layout')   
 
 @section('content')
     <div class="container-fluid">

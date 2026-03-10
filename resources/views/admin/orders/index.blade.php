@@ -245,7 +245,24 @@
                         @forelse($orders as $order)
                         <tr>
                             <td>{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}</td>
-                            <td><strong>{{ $order->order_number }}</strong></td>
+                            <td>
+                                <strong>{{ $order->order_number }}</strong>
+                                <div class="mt-2 small text-muted">
+                                    <ul class="list-unstyled mb-0">
+                                        @foreach($order->items as $item)
+                                            <li>
+                                                • {{ $item->product_name }} (x{{ $item->quantity }})
+                                                @if($item->options)
+                                                    @php $options = json_decode($item->options, true); @endphp
+                                                    @if(isset($options['size']))
+                                                        <br><span class="ms-2">- Size: {{ $options['size'] }}</span>
+                                                    @endif
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </td>
                             <td>{{ $order->user?->name ?? 'Guest' }}</td>
                             <td>
                                 {{ $order->shipping_address['phone'] ?? ($order->user?->phone ?? 'N/A') }}

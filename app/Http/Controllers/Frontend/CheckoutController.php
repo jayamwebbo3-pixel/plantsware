@@ -170,6 +170,7 @@ class CheckoutController extends Controller
                 'price' => $price,
                 'quantity' => $item->quantity,
                 'total' => $price * $item->quantity,
+                'options' => $item->options,
             ];
         }
 
@@ -196,6 +197,7 @@ class CheckoutController extends Controller
                 'price' => $item['price'],
                 'quantity' => $item['quantity'],
                 'total' => $item['total'],
+                'options' => $item['options'],
             ]);
         }
 

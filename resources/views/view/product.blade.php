@@ -90,41 +90,55 @@
                         <p class="product-page-description mb-4">
                             {{ $product->description ? $product->description : ($product->short_description ? $product->short_description : 'No description available.') }}
                         </p>
-                        <!-- Quantity Selector -->
-                        <div class="product-page-quantity-selector d-flex align-items-center mb-4">
-                            <label class="product-page-qty-label me-3 fw-bold" for="quantityInput">Quantity:</label>
-                            <div class="product-page-qty-control d-flex align-items-center border rounded">
-                                <button type="button" class="product-page-qty-btn border-0 bg-transparent px-3" onclick="updateQty(-1)" type="button">−</button>
-                                <input type="number" id="quantityInput" name="quantity" class="product-page-qty-input border-0 text-center" value="1" min="1" readonly>
-                                <button type="button" class="product-page-qty-btn border-0 bg-transparent px-3" onclick="updateQty(1)" type="button">+</button>
-                            </div>
-                        </div>
-                        <!-- Action Buttons -->
-                        <div class="product-page-action-buttons d-flex gap-3 mb-4">
-                            <!-- Add to Cart Form -->
-                            @if($product->stock_quantity > 0)
-                                <form action="{{ route('cart.add', $product) }}" method="POST" class="d-inline" id="buyNowForm">
-                                    @csrf
-                                    <input type="hidden" name="quantity" id="buyNowQuantity" value="1">
-                                    <input type="hidden" name="buy_now" value="1">
-                                    <button type="submit" class="product-page-btn-add-cart btn btn-lg btn-success d-flex align-items-center gap-2">
+                        <!-- Attributes Selector -->
+                        @if($product->size)
+                            @php
+                                $sizes = array_map('trim', explode(',', $product->size));
+                            @endphp
+                            @if(count($sizes) > 0)
+                                <div class="product-page-attributes mb-4">
+                                    <label class="fw-bold mb-2">Select Size:</label>
+                                    <div class="d-flex flex-wrap gap-2" id="sizeSelectorContainer">
+                                        @foreach($sizes as $index => $size)
+                                            <input type="radio" class="btn-check" name="size" id="size-{{ $index }}" value="{{ $size }}" autocomplete="off" form="mainCartForm" {{ $index === 0 ? 'checked' : '' }} required>
+                                            <label class="btn btn-outline-success" for="size-{{ $index }}">{{ $size }}</label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+
+                        <!-- Quantity Selector and Action Buttons inside Single Form -->
+                        @if($product->stock_quantity > 0)
+                            <form action="{{ route('cart.add', $product) }}" method="POST" id="mainCartForm">
+                                @csrf
+                                <div class="product-page-quantity-selector d-flex align-items-center mb-4">
+                                    <label class="product-page-qty-label me-3 fw-bold" for="quantityInput">Quantity:</label>
+                                    <div class="product-page-qty-control d-flex align-items-center border rounded">
+                                        <button type="button" class="product-page-qty-btn border-0 bg-transparent px-3" onclick="updateQty(-1)" type="button">−</button>
+                                        <input type="number" id="quantityInput" name="quantity" class="product-page-qty-input border-0 text-center" value="1" min="1" readonly>
+                                        <button type="button" class="product-page-qty-btn border-0 bg-transparent px-3" onclick="updateQty(1)" type="button">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="product-page-action-buttons d-flex gap-3 mb-4">
+                                    <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn btn-lg btn-success d-flex align-items-center gap-2">
                                         <i class="fas fa-bolt"></i>
                                         Buy Now
                                     </button>
-                                </form>
-                                <form action="{{ route('cart.add', $product) }}" method="POST" class="d-inline" id="addToCartForm">
-                                    @csrf
-                                    <input type="hidden" name="quantity" id="cartQuantity" value="1">
                                     <button type="submit" class="product-page-btn-add-cart btn btn-lg btn-primary d-flex align-items-center gap-2">
                                         <i class="fas fa-shopping-bag"></i>
                                         Add to Cart
                                     </button>
-                                </form>
-                            @else
+                                </div>
+                            </form>
+                        @else
+                            <div class="product-page-action-buttons mb-4">
                                 <button class="product-page-btn-add-cart btn btn-lg btn-secondary d-flex align-items-center gap-2" style="cursor: not-allowed;" disabled>
                                     Out of Stock
                                 </button>
-                            @endif
+                            </div>
+                        @endif
                             <!-- Wishlist Form -->
                             <form action="{{ route('wishlist.add', $product) }}" method="POST" class="d-inline">
                                 @csrf

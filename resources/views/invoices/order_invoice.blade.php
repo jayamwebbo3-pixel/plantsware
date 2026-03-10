@@ -191,7 +191,15 @@
         <tbody>
             @foreach($order_items as $item)
                 <tr>
-                    <td>{{ $item->product_name ?? $item->name }}</td>
+                    <td>
+                        {{ $item->product_name ?? $item->name }}
+                        @if($item->options)
+                            @php $options = json_decode($item->options, true); @endphp
+                            @if(isset($options['size']))
+                                <br><span style="font-size: 11px; color: #777;">Size: {{ $options['size'] }}</span>
+                            @endif
+                        @endif
+                    </td>
                     <td class="right">₹{{ number_format($item->price, 2) }}</td>
                     <td class="center">{{ $item->quantity }}</td>
                     <td class="right">₹{{ number_format($item->quantity * $item->price, 2) }}</td>
