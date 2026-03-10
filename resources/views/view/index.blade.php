@@ -7,29 +7,29 @@
             <!-- Carousel -->
             <div class="plant-categories-carousel" id="plantCategoriesCarousel">
                 @forelse($categories as $category)
-                <div class="plant-category-item">
-                    <a href="{{ route('category.show', $category->slug ?? $category->id) }}" class="plant-category-card">
-                        <div class="category-image-container">
-                            @if($category->badge_type)
-                                <span class="category-badge badge-{{ $category->badge_type }}">{{ \Illuminate\Support\Str::upper($category->badge_type) }}</span>
-                            @endif
-                            <div class="plant-category-image">
-                                @if($category->image)
-                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}">
-                                @else
-                                    <img src="{{ asset('assets/images/category-placeholder.jpg') }}" alt="{{ $category->name }}">
+                    <div class="plant-category-item">
+                        <a href="{{ route('category.show', $category->slug ?? $category->id) }}" class="plant-category-card">
+                            <div class="category-image-container">
+                                @if($category->badge_type)
+                                    <span class="category-badge badge-{{ $category->badge_type }}">{{ \Illuminate\Support\Str::upper($category->badge_type) }}</span>
                                 @endif
+                                <div class="plant-category-image">
+                                    @if($category->image)
+                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}">
+                                    @else
+                                        <img src="{{ asset('assets/images/category-placeholder.jpg') }}" alt="{{ $category->name }}">
+                                    @endif
+                                </div>
                             </div>
-                        </div>
-                        <div class="plant-category-content">
-                            <h3 class="plant-category-name">{{ $category->name }}</h3>
-                        </div>
-                    </a>
-                </div>
+                            <div class="plant-category-content">
+                                <h3 class="plant-category-name">{{ $category->name }}</h3>
+                            </div>
+                        </a>
+                    </div>
                 @empty
-                <div class="plant-category-item">
-                    <p class="text-center w-100">No categories available</p>
-                </div>
+                    <div class="plant-category-item">
+                        <p class="text-center w-100">No categories available</p>
+                    </div>
                 @endforelse
             </div>
         </div>
@@ -42,37 +42,37 @@
         <div class="col-lg-12 col-md-12 main_slider">
             <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                 @if($sliders->count() > 0)
-                <ol class="carousel-indicators">
-                    @foreach($sliders as $index => $slider)
-                    <li data-target="#carouselExampleIndicators" data-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}"></li>
-                    @endforeach
-                </ol>
-                <div class="carousel-inner">
-                    @foreach($sliders as $index => $slider)
-                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                        <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}">
-                        <div class="carousel-caption container silder_text">
-                            @if($slider->subtitle)<p class="arrival">{{ $slider->subtitle }}</p>@endif
-                            @if($slider->title)<h5 class="headding">{{ $slider->title }}</h5>@endif
-                            @if($slider->button_link && $slider->button_text)<a href="{{ $slider->button_link }}" type="btn" class="shop-now">{{ $slider->button_text }}</a>@endif
-                        </div>
+                    <ol class="carousel-indicators">
+                        @foreach($sliders as $index => $slider)
+                            <li data-target="#carouselExampleIndicators" data-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}"></li>
+                        @endforeach
+                    </ol>
+                    <div class="carousel-inner">
+                        @foreach($sliders as $index => $slider)
+                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}">
+                                <div class="carousel-caption container silder_text">
+                                    @if($slider->subtitle)<p class="arrival">{{ $slider->subtitle }}</p>@endif
+                                    @if($slider->title)<h5 class="headding">{{ $slider->title }}</h5>@endif
+                                    @if($slider->button_link && $slider->button_text)<a href="{{ $slider->button_link }}" type="btn" class="shop-now">{{ $slider->button_text }}</a>@endif
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
-                    @endforeach
-                </div>
                 @else
-                <ol class="carousel-indicators">
-                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-                </ol>
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="{{ asset('uploads/img2/slider/11.png') }}" class="d-block w-100 img-fluid" alt="s1">
-                        <div class="carousel-caption container silder_text">
-                            <p class="arrival">Complete Care for Every Plant</p>
-                            <h5 class="headding">From Soil to<br>Bloom Naturally</h5>
-                            <a type="btn" class="shop-now">Shop Now</a>
+                    <ol class="carousel-indicators">
+                        <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                    </ol>
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="{{ asset('uploads/img2/slider/11.png') }}" class="d-block w-100 img-fluid" alt="s1">
+                            <div class="carousel-caption container silder_text">
+                                <p class="arrival">Complete Care for Every Plant</p>
+                                <h5 class="headding">From Soil to<br>Bloom Naturally</h5>
+                                <a type="btn" class="shop-now">Shop Now</a>
+                            </div>
                         </div>
                     </div>
-                </div>
                 @endif
                 <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button"
                     data-slide="prev"></a>
@@ -143,61 +143,62 @@
 
 {{-- Product Card Macro block --}}
 @php
-if (!function_exists('renderProductCard')) {
-    function renderProductCard($product) {
-        $imgSrc = $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg');
-        $slug = $product->slug ?? $product->id;
-        $price = number_format($product->price ?? 0, 2);
-        $salePrice = ($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price) ? number_format($product->sale_price, 2) : null;
-        $discount = $product->discount_percentage ?? null;
+    if (!function_exists('renderProductCard')) {
+        function renderProductCard($product)
+        {
+            $imgSrc = $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg');
+            $slug = $product->slug ?? $product->id;
+            $price = number_format($product->price ?? 0, 2);
+            $salePrice = ($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price) ? number_format($product->sale_price, 2) : null;
+            $discount = $product->discount_percentage ?? null;
 
-        return '
-        <div class="swiper-slide">
-            <div class="product-card">
-                <div class="product-image-container">
-                    <a href="'.route('product.show', $slug).'">
-                        <img src="'.$imgSrc.'" alt="'.$product->name.'" class="product-image main-image">
-                        <img src="'.$imgSrc.'" alt="'.$product->name.'" class="product-image hover-image">
-                        '.($salePrice && $discount > 0 ? '<span class="discount-badge">'.$discount.'% OFF</span>' : '').'
-                    </a>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">'.$product->name.'</h3>
-                    <div class="product-price">
-                        '.($salePrice 
-                            ? '<span class="original-price">₹'.$price.'</span><span class="current-price">₹'.$salePrice.'</span>' 
-                            : '<span class="current-price">₹'.$price.'</span>').'
-                    </div>
-                    <div class="product-actions">
-                        '.($product->stock_quantity > 0 ? '
-                        <form class="d-inline-block text-white" method="POST" action="'.route('cart.add', $product->id).'" style="display:inline;">
-                            '.csrf_field().'
-                            <input type="hidden" name="buy_now" value="1">
-                            <button type="submit" class="btn btn-primary" data-tooltip="Buy Now">
-                                <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
-                            </button>
-                        </form>
-                        <form class="add-to-cart-form d-inline-block text-white" method="POST" action="'.route('cart.add', $product->id).'" style="display:inline;">
-                            '.csrf_field().'
-                            <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
-                            </button>
-                        </form>' : '
-                        <button class="btn btn-secondary w-75" style="background-color: #6c757d; border-color: #6c757d; color: white; cursor: not-allowed;" disabled>
-                            <span class="btn-text">Out of Stock</span>
-                        </button>').'
-                        <form class="d-inline-block" method="POST" action="'.route('wishlist.add', $product->id).'" style="display:inline;">
-                            '.csrf_field().'
-                            <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
-                                <i class="far fa-heart"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>';
+            return '
+                            <div class="swiper-slide">
+                                <div class="product-card">
+                                    <div class="product-image-container">
+                                        <a href="' . route('product.show', $slug) . '">
+                                            <img src="' . $imgSrc . '" alt="' . $product->name . '" class="product-image main-image">
+                                            <img src="' . $imgSrc . '" alt="' . $product->name . '" class="product-image hover-image">
+                                            ' . ($salePrice && $discount > 0 ? '<span class="discount-badge">' . $discount . '% OFF</span>' : '') . '
+                                        </a>
+                                    </div>
+                                    <div class="product-info">
+                                        <h3 class="product-title">' . $product->name . '</h3>
+                                        <div class="product-price">
+                                            ' . ($salePrice
+                ? '<span class="original-price">₹' . $price . '</span><span class="current-price">₹' . $salePrice . '</span>'
+                : '<span class="current-price">₹' . $price . '</span>') . '
+                                        </div>
+                                        <div class="product-actions">
+                                            ' . ($product->stock_quantity > 0 ? '
+                                            <form class="d-inline-block text-white" method="POST" action="' . route('cart.add', $product->id) . '" style="display:inline;">
+                                                ' . csrf_field() . '
+                                                <input type="hidden" name="buy_now" value="1">
+                                                <button type="submit" class="btn btn-primary" data-tooltip="Buy Now">
+                                                    <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
+                                                </button>
+                                            </form>
+                                            <form class="add-to-cart-form d-inline-block text-white" method="POST" action="' . route('cart.add', $product->id) . '" style="display:inline;">
+                                                ' . csrf_field() . '
+                                                <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
+                                                    <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
+                                                </button>
+                                            </form>' : '
+                                            <button class="btn btn-secondary w-75" style="background-color: #6c757d; border-color: #6c757d; color: white; cursor: not-allowed;" disabled>
+                                                <span class="btn-text">Out of Stock</span>
+                                            </button>') . '
+                                            <form class="d-inline-block" method="POST" action="' . route('wishlist.add', $product->id) . '" style="display:inline;">
+                                                ' . csrf_field() . '
+                                                <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
+                                                    <i class="far fa-heart"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>';
+        }
     }
-}
 @endphp
 
 <!-- Section 1: New Arrivals -->
@@ -314,7 +315,8 @@ if (!function_exists('renderProductCard')) {
     <!-- Swiper -->
     <div class="swiper testimonial-swiper">
         <div class="swiper-wrapper">
-            @forelse($testimonials ?? [] as $testimonial)
+            @forelse(($testimonials ?? []) as $testimonial)
+                @php /** @var \App\Models\Testimonial $testimonial */ @endphp
                 <div class="swiper-slide">
                     <div class="review-card">
                         <div class="reviewer-info">
@@ -324,17 +326,12 @@ if (!function_exists('renderProductCard')) {
                                 <span>Verified Buyer</span>
                             </div>
                         </div>
-                        <div class="review-date">{{ $testimonial->created_at->format('m/d/y') }}</div>
-                        <div class="star-rating">
-                            @for($i=1; $i<=5; $i++)
-                                <i class="fas fa-star {{ $i <= ($testimonial->rating ?? 5) ? 'star' : 'text-muted' }}"></i>
-                            @endfor
-                        </div>
-                        @if($testimonial->title)
+                        <div class="review-date">{{ $testimonial->created_at ? $testimonial->created_at->format('m/d/y') : '' }}</div>
+                        @if(isset($testimonial->title) && $testimonial->title)
                             <h3 class="review-title">{{ $testimonial->title }}</h3>
                         @endif
                         <p class="review-content">
-                            {{ $testimonial->message }}
+                            {{ $testimonial->message ?? '' }}
                         </p>
                     </div>
                 </div>
@@ -386,51 +383,52 @@ if (!function_exists('renderProductCard')) {
         <div class="col-12">
             <div class="blog-grid">
                 <div class="row g-4">
-                    @forelse($blogs ?? [] as $blog)
-                    <div class="col-md-6 col-lg-4">
-                        <div class="blog-card">
-                            <div class="blog-card-image">
-                                @if($blog->image)
-                                    <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}">
-                                @else
-                                    <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="{{ $blog->title }}">
-                                @endif
-                                <span class="blog-card-category">{{ $blog->category->name ?? 'General' }}</span>
-                            </div>
-                            <div class="blog-card-content">
-                                <div class="blog-card-date">{{ $blog->created_at->format('M d, Y') }}</div>
-                                <h3 class="blog-card-title">{{ $blog->title }}</h3>
-                                <p class="blog-card-excerpt">
-                                    {{ \Illuminate\Support\Str::limit(strip_tags($blog->content), 100) }}
-                                </p>
-                                <div class="blog-card-footer">
-                                    <span class="blog-card-author">{{ $blog->author_name ?? 'Admin' }}</span>
-                                    <a href="#" class="read-more-link">Read →</a>
+                    @forelse(($blogs ?? []) as $blog)
+                        @php /** @var \App\Models\Blog $blog */ @endphp
+                        <div class="col-md-6 col-lg-4">
+                            <div class="blog-card">
+                                <div class="blog-card-image">
+                                    @if(isset($blog->image) && $blog->image)
+                                        <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}">
+                                    @else
+                                        <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="{{ $blog->title }}">
+                                    @endif
+                                    <span class="blog-card-category">{{ $blog->category->name ?? 'General' }}</span>
+                                </div>
+                                <div class="blog-card-content">
+                                    <div class="blog-card-date">{{ $blog->created_at ? $blog->created_at->format('M d, Y') : '' }}</div>
+                                    <h3 class="blog-card-title">{{ $blog->title }}</h3>
+                                    <p class="blog-card-excerpt">
+                                        {{ isset($blog->content) ? \Illuminate\Support\Str::limit(strip_tags($blog->content), 100) : '' }}
+                                    </p>
+                                    <div class="blog-card-footer">
+                                        <span class="blog-card-author">{{ $blog->author_name ?? 'Admin' }}</span>
+                                        <a href="#" class="read-more-link">Read →</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     @empty
-                    <!-- Default Blog Cards -->
-                    <div class="col-md-6 col-lg-4">
-                        <div class="blog-card">
-                            <div class="blog-card-image">
-                                <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="Indoor plant care">
-                                <span class="blog-card-category">Plant Care</span>
-                            </div>
-                            <div class="blog-card-content">
-                                <div class="blog-card-date">Nov 15, 2024</div>
-                                <h3 class="blog-card-title">10 Essential Tips to Keep Indoor Plants Healthy</h3>
-                                <p class="blog-card-excerpt">
-                                    Learn the fundamental watering, lighting, and soil requirements that help indoor plants grow stronger and greener.
-                                </p>
-                                <div class="blog-card-footer">
-                                    <span class="blog-card-author">Sophia Green</span>
-                                    <a href="#" class="read-more-link">Read →</a>
+                        <!-- Default Blog Cards -->
+                        <div class="col-md-6 col-lg-4">
+                            <div class="blog-card">
+                                <div class="blog-card-image">
+                                    <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="Indoor plant care">
+                                    <span class="blog-card-category">Plant Care</span>
+                                </div>
+                                <div class="blog-card-content">
+                                    <div class="blog-card-date">Nov 15, 2024</div>
+                                    <h3 class="blog-card-title">10 Essential Tips to Keep Indoor Plants Healthy</h3>
+                                    <p class="blog-card-excerpt">
+                                        Learn the fundamental watering, lighting, and soil requirements that help indoor plants grow stronger and greener.
+                                    </p>
+                                    <div class="blog-card-footer">
+                                        <span class="blog-card-author">Sophia Green</span>
+                                        <a href="#" class="read-more-link">Read →</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     @endforelse
                 </div>
             </div>

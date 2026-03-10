@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\ProductManagementController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ComboPackController;
+use App\Http\Controllers\Admin\ComboOnlyProductController;
 
 // ======================================================
 // ================= FRONTEND ROUTES =====================
@@ -71,6 +72,9 @@ Route::prefix('wishlist')->name('wishlist.')->controller(CartController::class)-
     Route::get('/', 'wishlist')->name('index');
     Route::post('/add/{product}', 'addToWishlist')->name('add');
     Route::delete('/remove/{product}', 'removeFromWishlist')->name('remove');
+    Route::post('/add-combo/{combo}', 'addToWishlistCombo')->name('add_combo');
+    Route::post('/remove-combo/{combo}', 'removeFromWishlistCombo')->name('remove_combo');
+
 });
 
 // ================= CHECKOUT (AUTH REQUIRED) =================
@@ -98,12 +102,23 @@ Route::middleware('auth')
         Route::post('/callback', 'callback')->name('callback');
     });
 
+// ================= COMBO PACK ROUTES =================
+Route::get('combo-packs', [App\Http\Controllers\Frontend\ComboPackController::class, 'index'])->name('combo_packs.frontend_index');
+Route::get('combo-packs/{slug}', [App\Http\Controllers\Frontend\ComboPackController::class, 'show'])->name('combo_packs.frontend_show');
+
+// Cart & Wishlist for Combo Packs
+Route::post('/cart/add-combo/{combo}', [App\Http\Controllers\Frontend\CartController::class, 'addCombo'])->name('cart.add_combo');
+
 // ================= USER DASHBOARD =================
 
 Route::middleware('auth')->group(function () {
     Route::get('/user/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
     Route::post('/user/order/{id}/cancel', [UserDashboardController::class, 'cancelOrder'])->name('user.order.cancel');
     Route::post('/user/order/{id}/return', [UserDashboardController::class, 'returnOrder'])->name('user.order.return');
+
+    // Review Routes
+    Route::get('/user/order/{id}/items', [UserDashboardController::class, 'getOrderItems'])->name('user.order.items');
+    Route::post('/user/review/store', [App\Http\Controllers\Frontend\ProductReviewController::class, 'store'])->name('user.review.store');
 });
 
 // ======================================================
@@ -208,5 +223,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('combo-packs/{id}', [ComboPackController::class, 'destroy'])->name('combo-packs.destroy');
         Route::patch('combo-packs/{combo}/status', [ComboPackController::class, 'updateStatus'])->name('combo-packs.update-status');
         Route::get('combo-packs/get-items', [ComboPackController::class, 'getItems'])->name('combo-packs.get-items');
+
+        // Combo Only Products
+        Route::prefix('combo-only-products')->name('combo-only-products.')->group(function () {
+            Route::get('/', [ComboOnlyProductController::class, 'index'])->name('index');
+            Route::post('/', [ComboOnlyProductController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [ComboOnlyProductController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [ComboOnlyProductController::class, 'update'])->name('update');
+            Route::delete('/{id}', [ComboOnlyProductController::class, 'destroy'])->name('destroy');
+            Route::patch('/{id}/status', [ComboOnlyProductController::class, 'toggleStatus'])->name('status');
+        });
+
+        // Review Management
+        Route::get('/reviews', [App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
+        Route::post('/reviews/{id}/toggle', [App\Http\Controllers\Admin\ReviewController::class, 'toggleApproval'])->name('reviews.toggle');
+        Route::delete('/reviews/{id}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
 });

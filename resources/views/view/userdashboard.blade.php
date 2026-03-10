@@ -188,39 +188,43 @@
                     <h2 class="section-title">Order History</h2>
                     <div class="order-items">
                         @forelse($orders as $order)
-                        <div class="order-item" onclick="window.location='{{ route('checkout.confirmation', $order->id) }}'" style="cursor: pointer;">
-                            <div class="order-image">
-                                <!-- Could render related product image if relationships exist, displaying a reliable icon fallback -->
-                                <i class="fas fa-box" style="font-size: 2rem; color: var(--primary-color);"></i>
-                            </div>
-                            <div class="order-info">
-                                <h4>Order {{ $order->order_number }}</h4>
-                                <p>Date: {{ $order->created_at->format('d M Y') }}</p>
+                            <div class="order-item" onclick="window.location='{{ route('checkout.confirmation', $order->id) }}'" style="cursor: pointer;">
+                                <div class="order-image">
+                                    <!-- Could render related product image if relationships exist, displaying a reliable icon fallback -->
+                                    <i class="fas fa-box" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                </div>
+                                <div class="order-info">
+                                    <h4>Order {{ $order->order_number }}</h4>
+                                    <p>Date: {{ $order->created_at->format('d M Y') }}</p>
 
-                                <span class="order-status {{ strtolower($order->status) }}" style="padding: 3px 8px; border-radius: 4px; color: white; background-color: {{ in_array(strtolower($order->status), ['cancelled', 'return_rejected']) ? '#dc3545' : (strtolower($order->status) === 'shipped' ? '#17a2b8' : (in_array(strtolower($order->status), ['delivered', 'completed']) ? '#28a745' : (strtolower($order->status) === 'returned' ? '#343a40' : '#ffc107'))) }};">
-                                    {{ ucfirst(str_replace('_', ' ', $order->status)) }}
-                                </span>
+                                    <span class="order-status {{ strtolower($order->status) }}" style="padding: 3px 8px; border-radius: 4px; color: white; background-color: {{ in_array(strtolower($order->status), ['cancelled', 'return_rejected']) ? '#dc3545' : (strtolower($order->status) === 'shipped' ? '#17a2b8' : (in_array(strtolower($order->status), ['delivered', 'completed']) ? '#28a745' : (strtolower($order->status) === 'returned' ? '#343a40' : '#ffc107'))) }};">
+                                        {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                                    </span>
 
-                                @if(!in_array(strtolower($order->status), ['shipped', 'delivered', 'cancelled', 'returned', 'return_requested', 'return_rejected', 'completed']))
-                                    <form action="{{ route('user.order.cancel', $order->id) }}" method="POST" style="display:inline; margin-left:10px;" onclick="event.stopPropagation();" onsubmit="return confirm('Are you sure you want to cancel this order?');">
-                                        @csrf
-                                        <button type="submit" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid #dc3545; color: #dc3545; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Cancel</button>
-                                    </form>
-                                @endif
-                                
-                                @if(strtolower($order->status) === 'delivered' && $order->delivered_at && $order->delivered_at->diffInDays(now()) <= 3)
-                                    <form action="{{ route('user.order.return', $order->id) }}" method="POST" style="display:inline; margin-left:10px;" onclick="event.stopPropagation();" onsubmit="var reason = prompt('Please enter a reason for returning this order:'); if(reason) { this.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'reason\' value=\'' + reason + '\'>'); return true; } return false;">
-                                        @csrf
-                                        <button type="submit" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid #ffc107; color: #ffc107; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Request Return</button>
-                                    </form>
-                                @endif
+                                    @if(!in_array(strtolower($order->status), ['shipped', 'delivered', 'cancelled', 'returned', 'return_requested', 'return_rejected', 'completed']))
+                                        <form action="{{ route('user.order.cancel', $order->id) }}" method="POST" style="display:inline; margin-left:10px;" onclick="event.stopPropagation();" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                            @csrf
+                                            <button type="submit" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid #dc3545; color: #dc3545; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Cancel</button>
+                                        </form>
+                                    @endif
+
+                                    @if(strtolower($order->status) === 'delivered' && $order->delivered_at && $order->delivered_at->diffInDays(now()) <= 3)
+                                        <form action="{{ route('user.order.return', $order->id) }}" method="POST" style="display:inline; margin-left:10px;" onclick="event.stopPropagation();" onsubmit="var reason = prompt('Please enter a reason for returning this order:'); if(reason) { this.insertAdjacentHTML('beforeend', '<input type=\'hidden\' name=\'reason\' value=\'' + reason + '\'>'); return true; } return false;">
+                                            @csrf
+                                            <button type="submit" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid #ffc107; color: #ffc107; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Request Return</button>
+                                        </form>
+                                    @endif
+
+                                    @if(in_array(strtolower($order->status), ['delivered', 'completed']))
+                                        <button type="button" class="btn-review" onclick="event.stopPropagation(); openReviewModal({{ $order->id }}, '{{ $order->order_number }}')" style="background-color: var(--primary-color); border: none; color: white; border-radius: 4px; padding: 2px 8px; margin-left: 10px; cursor: pointer;">Review & Rating</button>
+                                    @endif
+                                </div>
+                                <div class="order-price">₹{{ number_format($order->total ?? 0, 2) }}</div>
                             </div>
-                            <div class="order-price">₹{{ number_format($order->total ?? 0, 2) }}</div>
-                        </div>
                         @empty
-                        <div style="padding: 20px; color: #666; font-style: italic;">
-                            You have no orders yet.
-                        </div>
+                            <div style="padding: 20px; color: #666; font-style: italic;">
+                                You have no orders yet.
+                            </div>
                         @endforelse
                     </div>
                 </div>
@@ -230,46 +234,46 @@
                     <h2 class="section-title">Wishlist</h2>
                     <div class="wishlist-grid">
                         @forelse($wishlist as $item)
-                        @if($item->product)
-                        <div class="product-card">
-                            <div class="product-image" style="position: relative;">
-                                @if($item->product->image)
-                                    <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" style="width: 100%; height: 200px; object-fit: cover;">
-                                @else
-                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $item->product->name }}" style="width: 100%; height: 200px; object-fit: cover;">
-                                @endif
-                                <form action="{{ route('wishlist.remove', $item->product->id) }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="wishlist-remove" title="Remove from wishlist" style="background: white; border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: red; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                            <div class="product-info" style="padding: 15px;">
-                                <div class="product-name" style="font-weight: 600; margin-bottom: 5px;">
-                                    <a href="{{ route('product.show', $item->product->slug) }}" style="text-decoration: none; color: inherit;">
-                                        {{ $item->product->name }}
-                                    </a>
+                            @if($item->product)
+                                <div class="product-card">
+                                    <div class="product-image" style="position: relative;">
+                                        @if($item->product->image)
+                                            <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" style="width: 100%; height: 200px; object-fit: cover;">
+                                        @else
+                                            <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $item->product->name }}" style="width: 100%; height: 200px; object-fit: cover;">
+                                        @endif
+                                        <form action="{{ route('wishlist.remove', $item->product->id) }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="wishlist-remove" title="Remove from wishlist" style="background: white; border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: red; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="product-info" style="padding: 15px;">
+                                        <div class="product-name" style="font-weight: 600; margin-bottom: 5px;">
+                                            <a href="{{ route('product.show', $item->product->slug) }}" style="text-decoration: none; color: inherit;">
+                                                {{ $item->product->name }}
+                                            </a>
+                                        </div>
+                                        @php
+                                            $dashPriceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
+                                                ? $item->product->sale_price
+                                                : $item->product->price;
+                                        @endphp
+                                        <div class="product-price" style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">₹{{ number_format($dashPriceToUse, 2) }}</div>
+
+                                        <form action="{{ route('cart.add', $item->product->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="add-to-cart-btn" style="width: 100%; padding: 8px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s;">Add to Cart</button>
+                                        </form>
+                                    </div>
                                 </div>
-                                @php
-                                    $dashPriceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                                        ? $item->product->sale_price 
-                                        : $item->product->price;
-                                @endphp
-                                <div class="product-price" style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">₹{{ number_format($dashPriceToUse, 2) }}</div>
-                                
-                                <form action="{{ route('cart.add', $item->product->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="add-to-cart-btn" style="width: 100%; padding: 8px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s;">Add to Cart</button>
-                                </form>
-                            </div>
-                        </div>
-                        @endif
+                            @endif
                         @empty
-                        <div style="grid-column: 1 / -1; padding: 20px; color: #666; font-style: italic;">
-                            Your wishlist is empty.
-                        </div>
+                            <div style="grid-column: 1 / -1; padding: 20px; color: #666; font-style: italic;">
+                                Your wishlist is empty.
+                            </div>
                         @endforelse
                     </div>
                 </div>
@@ -296,6 +300,72 @@
         </div>
     </div>
 </div>
+
+<!-- Review Modal -->
+<div id="reviewModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 5% auto; padding: 30px; border-radius: 12px; width: 50%; max-width: 600px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: var(--dark-color); font-weight: 700;">Rate & Review Order <span id="modalOrderNumber"></span></h3>
+            <span class="close-modal" onclick="closeReviewModal()" style="color: #666; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        </div>
+        
+        <form id="reviewForm" action="{{ route('user.review.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="order_id" id="modalOrderId">
+            
+            <div id="orderItemsList" style="margin-bottom: 20px; max-height: 300px; overflow-y: auto; padding-right: 10px;">
+                <!-- Order items will be loaded here via JS -->
+                <p style="text-align: center; color: #888;">Loading items...</p>
+            </div>
+
+            <div style="text-align: right;">
+                <button type="button" class="btn-secondary" onclick="closeReviewModal()" style="margin-right: 10px; padding: 10px 20px; border-radius: 8px;">Cancel</button>
+                <button type="submit" class="btn-primary" style="padding: 10px 20px; border-radius: 8px;">Submit Review</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 5px;
+        margin-top: 5px;
+    }
+    .star-rating input { display: none; }
+    .star-rating label {
+        color: #ddd;
+        font-size: 24px;
+        padding: 0;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: #ffc107;
+    }
+    .star-rating.readonly label {
+        cursor: default;
+    }
+    .star-rating.readonly label:hover,
+    .star-rating.readonly label:hover ~ label {
+        color: #ddd;
+    }
+    .star-rating.readonly input:checked ~ label {
+        color: #ffc107;
+    }
+    .order-item-review {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #eee;
+    }
+    .order-item-review h5 { margin: 0 0 10px 0; font-size: 1rem; color: #333; }
+</style>
 
 
 <script>
@@ -338,6 +408,85 @@
     }
 
 
+
+    // Review Modal Functions
+    function openReviewModal(orderId, orderNumber) {
+        document.getElementById('modalOrderNumber').innerText = '#' + orderNumber;
+        document.getElementById('modalOrderId').value = orderId;
+        document.getElementById('reviewModal').style.display = 'block';
+        
+        // Fetch order items (this would ideally be an API call, but for simplicity we'll fetch from a route)
+        const itemsList = document.getElementById('orderItemsList');
+        itemsList.innerHTML = '<p style="text-align: center; color: #888;">Loading items...</p>';
+        
+        fetch(`/user/order/${orderId}/items`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.items && data.items.length > 0) {
+                    let html = '';
+                    data.items.forEach((item, index) => {
+                        const uniqueId = `item_${item.id}`;
+                        const isCombo = item.combo_pack_id ? true : false;
+                        const itemId = isCombo ? item.combo_pack_id : item.product_id;
+                        const itemType = isCombo ? 'combo' : 'product';
+                        
+                        const existingRating = item.existing_rating;
+                        const existingReview = item.existing_review || '';
+
+                        const isEditable = item.is_editable;
+
+                        html += `
+                            <div class="order-item-review" style="${!isEditable ? 'opacity: 0.8;' : ''}">
+                                <h5>${item.name}</h5>
+                                <input type="hidden" name="items[${index}][id]" value="${itemId}">
+                                <input type="hidden" name="items[${index}][type]" value="${itemType}">
+                                
+                                <div class="form-group">
+                                    <label class="form-label" style="font-size: 0.85rem;">Rating * ${!isEditable ? '<span class="text-danger small">(Editing limit expired)</span>' : ''}</label>
+                                    <div class="star-rating ${!isEditable ? 'readonly' : ''}">
+                                        <input type="radio" id="star5_${index}" name="items[${index}][rating]" value="5" required ${existingRating == 5 ? 'checked' : ''} ${!isEditable ? 'disabled' : ''} />
+                                        <label for="star5_${index}" title="5 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" id="star4_${index}" name="items[${index}][rating]" value="4" ${existingRating == 4 ? 'checked' : ''} ${!isEditable ? 'disabled' : ''} />
+                                        <label for="star4_${index}" title="4 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" id="star3_${index}" name="items[${index}][rating]" value="3" ${existingRating == 3 ? 'checked' : ''} ${!isEditable ? 'disabled' : ''} />
+                                        <label for="star3_${index}" title="3 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" id="star2_${index}" name="items[${index}][rating]" value="2" ${existingRating == 2 ? 'checked' : ''} ${!isEditable ? 'disabled' : ''} />
+                                        <label for="star2_${index}" title="2 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" id="star1_${index}" name="items[${index}][rating]" value="1" ${existingRating == 1 ? 'checked' : ''} ${!isEditable ? 'disabled' : ''} />
+                                        <label for="star1_${index}" title="1 star"><i class="fas fa-star"></i></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <label class="form-label" style="font-size: 0.85rem;">Review (Optional)</label>
+                                    <textarea name="items[${index}][review]" class="form-control" placeholder="Write your experience..." rows="2" ${!isEditable ? 'disabled' : ''}>${existingReview}</textarea>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    itemsList.innerHTML = html;
+                } else {
+                    itemsList.innerHTML = '<p style="text-align: center; color: #888;">No items found for this order.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching items:', error);
+                itemsList.innerHTML = '<p style="text-align: center; color: #dc3545;">Error loading items. Please try again.</p>';
+            });
+    }
+
+    function closeReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+        document.getElementById('reviewForm').reset();
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('reviewModal');
+        if (event.target == modal) {
+            closeReviewModal();
+        }
+    }
 
     // Add to Cart
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {

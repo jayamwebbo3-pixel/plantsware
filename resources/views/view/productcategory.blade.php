@@ -159,39 +159,6 @@
                         </div>
                     </div>
 
-                    <!-- Customer Ratings -->
-                    <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Customer Ratings</h3>
-                        <div class="filter-options">
-                            <div class="filter-item">
-                                <input type="radio" name="rating" id="rating-4" class="filter-radio" value="4">
-                                <label for="rating-4" class="filter-label">
-                                    <span class="stars">
-                                        ★★★★☆ & above
-                                    </span>
-                                    <span class="filter-count">(20)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="radio" name="rating" id="rating-3" class="filter-radio" value="3">
-                                <label for="rating-3" class="filter-label">
-                                    <span class="stars">
-                                        ★★★☆☆ & above
-                                    </span>
-                                    <span class="filter-count">(30)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="radio" name="rating" id="rating-2" class="filter-radio" value="2">
-                                <label for="rating-2" class="filter-label">
-                                    <span class="stars">
-                                        ★★☆☆☆ & above
-                                    </span>
-                                    <span class="filter-count">(40)</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Availability -->
                     <div class="filter-section active mb-3">
@@ -244,10 +211,6 @@
                             <div class="filter-item">
                                 <input type="radio" name="sort" id="sort-discount" class="filter-radio" value="discount" {{ request('sort') == 'discount' ? 'checked' : '' }}>
                                 <label for="sort-discount" class="filter-label">Discount</label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-rating" class="filter-radio" value="rating" {{ request('sort') == 'rating' ? 'checked' : '' }}>
-                                <label for="sort-rating" class="filter-label">Customer Rating</label>
                             </div>
                         </div>
                     </div>
@@ -343,75 +306,75 @@
                     <div class="products-grid row g-3" id="products-container">
                         @if(isset($products))
                             @forelse($products as $product)
-                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
-                                <div class="product-card">
-                                    <div class="product-image-container">
-                                        <a href="{{ route('product.show', $product->slug) }}">
-                                            @if($product->image)
-                                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                                    class="product-image main-image">
-                                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                                    class="product-image hover-image">
-                                            @else
-                                                <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
-                                                    class="product-image main-image">
-                                                <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
-                                                    class="product-image hover-image">
-                                            @endif
-                                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price && $product->discount_percentage > 0)
-                                                <span class="discount-badge">{{ $product->discount_percentage }}% OFF</span>
-                                            @endif
-                                        </a>
-                                    </div>
-                                    <div class="product-info">
-                                        <h3 class="product-title">{{ $product->name }}</h3>
-                                        <div class="product-price">
-                                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                                <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
-                                                <span class="current-price">₹{{ number_format($product->sale_price, 2) }}</span>
-                                            @else
-                                                <span class="current-price">₹{{ number_format($product->price, 2) }}</span>
-                                            @endif
+                                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
+                                    <div class="product-card">
+                                        <div class="product-image-container">
+                                            <a href="{{ route('product.show', $product->slug) }}">
+                                                @if($product->image)
+                                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                                                        class="product-image main-image">
+                                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                                                        class="product-image hover-image">
+                                                @else
+                                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
+                                                        class="product-image main-image">
+                                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
+                                                        class="product-image hover-image">
+                                                @endif
+                                                @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price && $product->discount_percentage > 0)
+                                                    <span class="discount-badge">{{ $product->discount_percentage }}% OFF</span>
+                                                @endif
+                                            </a>
                                         </div>
-                                        <div class="product-actions">
-                                            @if($product->stock_quantity > 0)
-                                                <form class="d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                        <div class="product-info">
+                                            <h3 class="product-title">{{ $product->name }}</h3>
+                                            <div class="product-price">
+                                                @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
+                                                    <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
+                                                    <span class="current-price">₹{{ number_format($product->sale_price, 2) }}</span>
+                                                @else
+                                                    <span class="current-price">₹{{ number_format($product->price, 2) }}</span>
+                                                @endif
+                                            </div>
+                                            <div class="product-actions">
+                                                @if($product->stock_quantity > 0)
+                                                    <form class="d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                                        @csrf
+                                                        <input type="hidden" name="buy_now" value="1">
+                                                        <button class="btn btn-primary" data-tooltip="Buy Now" type="submit">
+                                                            <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
+                                                            <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <button class="btn btn-secondary w-75" style="background-color: #6c757d; border-color: #6c757d; color: white; cursor: not-allowed;" disabled>
+                                                        <span class="btn-text">Out of Stock</span>
+                                                    </button>
+                                                @endif
+                                                <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
                                                     @csrf
-                                                    <input type="hidden" name="buy_now" value="1">
-                                                    <button class="btn btn-primary" data-tooltip="Buy Now" type="submit">
-                                                        <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
+                                                    <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
+                                                        <i class="far fa-heart"></i>
                                                     </button>
                                                 </form>
-                                                <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                                        <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
-                                                    </button>
-                                                </form>
-                                            @else
-                                                <button class="btn btn-secondary w-75" style="background-color: #6c757d; border-color: #6c757d; color: white; cursor: not-allowed;" disabled>
-                                                    <span class="btn-text">Out of Stock</span>
-                                                </button>
-                                            @endif
-                                            <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
-                                                @csrf
-                                                <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
-                                                    <i class="far fa-heart"></i>
-                                                </button>
-                                            </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                             @empty
-                            <div class="col-12">
-                                <p class="text-center">No products found in this category.</p>
-                            </div>
+                                <div class="col-12">
+                                    <p class="text-center">No products found in this category.</p>
+                                </div>
                             @endforelse
                             @if(isset($products) && method_exists($products, 'links'))
-                            <div class="col-12 mt-4 text-center">
-                                {{ $products->links('pagination::bootstrap-5') }}
-                            </div>
+                                <div class="col-12 mt-4 text-center">
+                                    {{ $products->links('pagination::bootstrap-5') }}
+                                </div>
                             @endif
                         @endif
 

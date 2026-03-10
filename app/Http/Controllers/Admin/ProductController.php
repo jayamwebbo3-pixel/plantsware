@@ -9,9 +9,17 @@ use App\Models\Subcategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageService;
 
 class ProductController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     public function index()
     {
         $search = request('search');
@@ -19,8 +27,8 @@ class ProductController extends Controller
 
         $products = Product::with(['category', 'subcategory'])
             ->when($search, function ($query) use ($search) {
-                 return $query->where('name', 'like', "%{$search}%")
-                              ->orWhere('sku', 'like', "%{$search}%");
+                return $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
             })
             ->orderBy(
                 request('sort', 'sort_order'),
@@ -28,7 +36,7 @@ class ProductController extends Controller
             )
             ->paginate($perPage)
             ->appends(request()->query());
-            
+
         return view('admin.products-management.products', compact('products'));
     }
 
@@ -36,7 +44,7 @@ class ProductController extends Controller
     {
         $categories = Category::where('is_active', true)->get();
         $subcategories = Subcategory::where('is_active', true)->get();
-        
+
         $selectedSubcategoryId = $request->query('subcategory_id');
         $selectedCategoryId = null;
 
@@ -47,7 +55,7 @@ class ProductController extends Controller
             }
         }
 
-        return view('admin.products.create',  compact('categories', 'subcategories', 'selectedCategoryId', 'selectedSubcategoryId'));
+        return view('admin.products.create', compact('categories', 'subcategories', 'selectedCategoryId', 'selectedSubcategoryId'));
     }
 
     public function store(Request $request)
@@ -93,15 +101,18 @@ class ProductController extends Controller
         $validated['size'] = $request->has('size') ? implode(', ', $request->input('size')) : null;
 
         $validated['slug'] = Str::slug($validated['name']);
-        
+
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('products', 'public');
+            $this->imageService->applyWatermark($validated['image']);
         }
 
         if ($request->hasFile('gallery_images')) {
             $galleryPaths = [];
             foreach ($request->file('gallery_images') as $image) {
-                $galleryPaths[] = $image->store('products/gallery', 'public');
+                $path = $image->store('products/gallery', 'public');
+                $this->imageService->applyWatermark($path);
+                $galleryPaths[] = $path;
             }
             $validated['gallery_images'] = $galleryPaths;
         }
@@ -118,7 +129,7 @@ class ProductController extends Controller
     {
         $categories = Category::where('is_active', true)->orderBy('sort_order')->get();
         // Get subcategories - filter by product's category if set, otherwise show all
-        $subcategories = $product->category_id 
+        $subcategories = $product->category_id
             ? Subcategory::where('category_id', $product->category_id)->where('is_active', true)->orderBy('sort_order')->get()
             : Subcategory::where('is_active', true)->orderBy('sort_order')->get();
         return view('admin.products.edit', compact('product', 'categories', 'subcategories'));
@@ -167,12 +178,13 @@ class ProductController extends Controller
         $validated['size'] = $request->has('size') ? implode(', ', $request->input('size')) : null;
 
         $validated['slug'] = Str::slug($validated['name']);
-        
+
         if ($request->hasFile('image')) {
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
             $validated['image'] = $request->file('image')->store('products', 'public');
+            $this->imageService->applyWatermark($validated['image']);
         }
 
         if ($request->hasFile('gallery_images')) {
@@ -183,7 +195,9 @@ class ProductController extends Controller
             }
             $galleryPaths = [];
             foreach ($request->file('gallery_images') as $image) {
-                $galleryPaths[] = $image->store('products/gallery', 'public');
+                $path = $image->store('products/gallery', 'public');
+                $this->imageService->applyWatermark($path);
+                $galleryPaths[] = $path;
             }
             $validated['gallery_images'] = $galleryPaths;
         }
@@ -194,26 +208,26 @@ class ProductController extends Controller
     }
 
     public function destroy(Product $product)
-{
-    // Optional: Check if product exists (extra safety)
-    if (!$product->exists) {
-        return redirect()->route('admin.products.management') // or 'admin.products.index'
-            ->with('error', 'Product not found.');
-    }
-
-    if ($product->image) {
-        Storage::disk('public')->delete($product->image);
-    }
-    if ($product->gallery_images) {
-        foreach ($product->gallery_images as $image) {
-            Storage::disk('public')->delete($image);
+    {
+        // Optional: Check if product exists (extra safety)
+        if (!$product->exists) {
+            return redirect()->route('admin.products.management') // or 'admin.products.index'
+                ->with('error', 'Product not found.');
         }
+
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+        if ($product->gallery_images) {
+            foreach ($product->gallery_images as $image) {
+                Storage::disk('public')->delete($image);
+            }
+        }
+
+        $product->delete();
+
+        // Redirect to a safe list page (hierarchical or flat)
+        return redirect()->route('admin.products.management') // Main categories page
+            ->with('success', 'Product deleted successfully');
     }
-
-    $product->delete();
-
-    // Redirect to a safe list page (hierarchical or flat)
-    return redirect()->route('admin.products.management') // Main categories page
-        ->with('success', 'Product deleted successfully');
-}
 }

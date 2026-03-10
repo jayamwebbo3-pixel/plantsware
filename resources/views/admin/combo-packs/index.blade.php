@@ -12,17 +12,16 @@
                 <h4 class="mb-0">Combo Packs</h4>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
-                        <!-- <li class="breadcrumb-item"><a href="#">Admin</a></li>
-                        <li class="breadcrumb-item active">Combo Packs</li> -->
+                        <li class="breadcrumb-item active text-muted small">Combo Management</li>
                     </ol>
                 </nav>
             </div>
             <div class="d-flex gap-2">
-                <button class="btn btn-success fw-bold" onclick="showForm('combo_only')">
-                    <i class="fas fa-plus me-1"></i> Add Combo Only
-                </button>
-                <button class="btn btn-primary fw-bold" onclick="showForm('standard')">
-                    <i class="fas fa-layer-group me-1"></i> Add Standard Combo
+                <a href="{{ route('admin.combo-only-products.index') }}" class="btn btn-outline-success fw-bold">
+                    <i class="fas fa-list me-1"></i> Manage Combo Only
+                </a>
+                <button class="btn btn-primary fw-bold" onclick="showForm()">
+                    <i class="fas fa-layer-group me-1"></i> Add from Product
                 </button>
             </div>
         </div>
@@ -53,10 +52,10 @@
                                 <tr>
                                     <th class="ps-4">Preview</th>
                                     <th>Name</th>
-                                    <th>Category</th>
                                     <th>Pricing</th>
-                                    <th>Type</th>
+                                    <th>Stock</th>
                                     <th>Status</th>
+                                    <th>Rating</th>
                                     <th class="text-end pe-4">Actions</th>
                                 </tr>
                             </thead>
@@ -64,47 +63,69 @@
                                 @forelse($comboPacks as $combo)
                                     <tr>
                                         <td class="ps-4">
-                                            @if($combo->is_combo_only)
-                                                <img src="{{ asset('storage/' . $combo->image) }}" class="rounded border" width="50" height="50" style="object-fit: cover;">
-                                            @else
-                                                @php $imgs = json_decode($combo->image) @endphp
-                                                <div class="composite-preview">
-                                                    @foreach(array_slice($imgs ?? [], 0, 2) as $img)
-                                                        <img src="{{ asset('storage/' . $img) }}" class="rounded shadow-xs border composite-img" style="z-index: {{ 2 - $loop->index }}; left: {{ $loop->index * 15 }}px;">
-                                                    @endforeach
-                                                </div>
-                                            @endif
+                                            @php $imgs = $combo->images @endphp
+                                            <div class="composite-preview">
+                                                @foreach(array_slice($imgs ?? [], 0, 2) as $img)
+                                                    <img src="{{ asset('storage/' . $img) }}" class="rounded shadow-xs border composite-img" style="z-index: {{ 2 - $loop->index }}; left: {{ $loop->index * 15 }}px;">
+                                                @endforeach
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="fw-bold">{{ $combo->name }}</div>
                                             <small class="text-muted">{{ $combo->slug }}</small>
                                         </td>
-                                        <td>
-                                            @php 
-                                                                                                                                                                                                                                                                                                                        $catIds = is_array($combo->category_id) ? $combo->category_id : ($combo->category_id ? [$combo->category_id] : []);
-                                                $names = $allCategories->whereIn('id', $catIds)->pluck('name')->implode(', ');
-                                            @endphp
-                                            @if($names)
-                                                <span class="badge bg-light text-dark border" title="{{ $names }}">{{ Str::limit($names, 25) }}</span>
-                                            @else
-                                                <span class="text-muted small">None</span>
-                                            @endif
-                                        </td>
+
                                         <td>
                                             <div class="text-success fw-bold">₹{{ number_format($combo->offer_price, 2) }}</div>
                                             <del class="text-muted x-small">₹{{ number_format($combo->total_price, 2) }}</del>
                                         </td>
                                         <td>
-                                            @if($combo->is_combo_only)
-                                                <span class="badge bg-success-subtle text-success border border-success">Combo Only</span>
+                                            @php
+                                                $productStocks = [];
+                                                if ($combo->comboProduct && $combo->comboProduct->product_ids) {
+                                                    foreach ($combo->comboProduct->product_ids as $pid) {
+                                                        if (str_starts_with($pid, 'p_')) {
+                                                            $realId = str_replace('p_', '', $pid);
+                                                            $prod = \App\Models\Product::find($realId);
+                                                            $productStocks[] = $prod ? $prod->stock_quantity : 0;
+                                                        } elseif (str_starts_with($pid, 'c_')) {
+                                                            $realId = str_replace('c_', '', $pid);
+                                                            $nested = \App\Models\ComboPack::find($realId);
+                                                            $productStocks[] = $nested ? $nested->stock_quantity : 0;
+                                                        } elseif (str_starts_with($pid, 'co_')) {
+                                                            $realId = str_replace('co_', '', $pid);
+                                                            $coCombo = \App\Models\ComboOnlyProduct::find($realId);
+                                                            $productStocks[] = $coCombo ? $coCombo->stock_quantity : 0;
+                                                        }
+                                                    }
+                                                }
+                                            @endphp
+                                            @if(count($productStocks) > 0)
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    @foreach($productStocks as $qty)
+                                                        <span class="badge {{ $qty > 0 ? 'bg-success-subtle text-success border border-success' : 'bg-danger-subtle text-danger border border-danger' }}">
+                                                            {{ $qty }}
+                                                        </span>
+                                                    @endforeach
+                                                </div>
                                             @else
-                                                <span class="badge bg-primary-subtle text-primary border border-primary">Standard</span>
+                                                <span class="text-muted small">N/A</span>
                                             @endif
                                         </td>
+
                                         <td>
                                             <div class="form-check form-switch p-0 m-0">
                                                 <input class="form-check-input ms-0 status-toggle" type="checkbox" data-id="{{ $combo->id }}" {{ $combo->is_active ? 'checked' : '' }}>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('admin.reviews.index') }}?combo_pack_id={{ $combo->id }}" class="text-decoration-none">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="text-warning me-1"><i class="fas fa-star"></i></span>
+                                                    <strong>{{ number_format($combo->avg_rating, 1) }}</strong>
+                                                    <small class="text-muted ms-1">({{ $combo->total_reviews }})</small>
+                                                </div>
+                                            </a>
                                         </td>
                                         <td class="text-end pe-4">
                                             <button class="btn btn-sm btn-outline-primary border-0" onclick="editCombo({{ $combo->id }})"><i class="fas fa-edit"></i></button>
@@ -138,7 +159,6 @@
                     <form action="{{ route('admin.combo-packs.store') }}" method="POST" enctype="multipart/form-data" id="comboForm">
                         @csrf
                         <div id="method_field"></div>
-                        <input type="hidden" name="action_type" id="action_type">
 
                         <div class="row g-4">
                             <div class="col-lg-5 mx-auto" id="left-form-col">
@@ -183,56 +203,14 @@
                                     </div>
                                 </div>
 
-                                <div id="image_upload_section" class="mb-3">
-                                    <label class="form-label fw-bold">Upload Image</label>
-                                    <div id="current-image-container" class="mb-2" style="display: none;">
-                                        <div class="d-flex align-items-center gap-2 border rounded p-2 bg-light">
-                                            <img id="current-image-display" src="" class="rounded border shadow-sm" width="60" height="60" style="object-fit: cover;">
-                                            <span class="small text-muted">Currently saved image</span>
-                                        </div>
-                                    </div>
-                                    <input type="file" name="image" id="image_input" class="form-control" accept="image/*">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Description</label>
+                                    <textarea name="description" class="form-control" rows="3" placeholder="Enter combo description"></textarea>
                                 </div>
 
-                                <div class="accordion mb-4" id="advancedDetailsAccordion">
-                                    <div class="accordion-item border-0 shadow-sm rounded">
-                                        <h2 class="accordion-header" id="headingAdvanced">
-                                            <button class="accordion-button collapsed rounded fw-bold bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
-                                                Advanced Product Details
-                                            </button>
-                                        </h2>
-                                        <div id="collapseAdvanced" class="accordion-collapse collapse" aria-labelledby="headingAdvanced">
-                                            <div class="accordion-body">
-                                                <div class="row g-3">
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold">SKU</label>
-                                                        <input type="text" name="sku" class="form-control" placeholder="Unique identifier">
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold">Stock Quantity</label>
-                                                        <input type="number" name="stock_quantity" class="form-control" value="0" min="0">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <label class="form-label fw-bold">Short Description</label>
-                                                        <textarea name="short_description" class="form-control" rows="2" placeholder="Brief summary..."></textarea>
-                                                    </div>
-                                                    <div class="col-12">
-                                                        <label class="form-label fw-bold">Meta Title</label>
-                                                        <input type="text" name="meta_title" class="form-control" placeholder="SEO Title">
-                                                    </div>
-                                                    <div class="col-12">
-                                                        <label class="form-label fw-bold">Meta Keywords</label>
-                                                        <input type="text" name="meta_keywords" class="form-control" placeholder="comma, separated, keywords">
-                                                    </div>
-                                                    <div class="col-12">
-                                                        <label class="form-label fw-bold">Meta Description</label>
-                                                        <textarea name="meta_description" class="form-control" rows="2" placeholder="SEO Description..."></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
+
+
 
                                 <button type="submit" class="btn btn-primary btn-lg w-100 mt-2 fw-bold shadow-sm">
                                     <i class="fas fa-save me-1"></i> SAVE COMBO
@@ -240,18 +218,42 @@
                             </div>
 
                         <div class="col-lg-7" id="right-selection-col">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <label class="form-label fw-bold mb-0">Selection List</label>
-                                    <input type="text" id="item_search" class="form-control form-control-sm w-50" placeholder="Search items...">
-                                </div>
-                                <div id="item-selection-grid" class="border rounded p-3 bg-light overflow-auto" style="height: 400px;">
-                                    <div class="text-center py-5 text-muted">
-                                        <i class="fas fa-info-circle mb-2 fa-2x"></i>
-                                        <p id="selection-hint">Please select category to load items.</p>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="form-label fw-bold mb-0">Select Items</label>
+                                        <input type="text" id="item_search" class="form-control form-control-sm w-50" placeholder="Search items...">
+                                    </div>
+                                    <div class="btn-group btn-group-sm w-100 mb-2" role="group">
+                                        <input type="radio" class="btn-check" name="item_type_filter" id="type_p" value="p" checked onchange="filterGridByType()">
+                                        <label class="btn btn-outline-secondary" for="type_p">Products</label>
+
+                                        <input type="radio" class="btn-check" name="item_type_filter" id="type_co" value="co" onchange="filterGridByType()">
+                                        <label class="btn btn-outline-secondary" for="type_co">Combo Only</label>
                                     </div>
                                 </div>
-                                <div class="mt-2 text-end">
+                                <div id="item-selection-table" class="border rounded bg-white overflow-auto" style="height: 400px;">
+                                    <table class="table table-sm table-hover align-middle mb-0">
+                                        <thead class="table-light sticky-top">
+                                            <tr>
+                                                <th class="ps-3" style="width: 40px;"></th>
+                                                <th>Preview</th>
+                                                <th>Item Name</th>
+                                                <th>Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="item-selection-body">
+                                            <tr>
+                                                <td colspan="4" class="text-center py-5 text-muted">
+                                                    <i class="fas fa-search mb-2 fa-2x"></i>
+                                                    <p>Search or select category to load items</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-2 d-flex justify-content-between align-items-center">
                                     <span class="badge bg-dark rounded-pill" id="selected_count">0 items selected</span>
+                                    <button type="button" class="btn btn-sm btn-link text-primary p-0" onclick="fetchFilteredItems(true)">Load All</button>
                                 </div>
                             </div>
                         </div>
@@ -277,47 +279,14 @@
             let selectedProductIds = new Set();
             let productPrices = {}; // ID -> Price mapping for calculation
 
-            function showForm(type) {
+            function showForm() {
                 document.getElementById('list-section').style.display = 'none';
                 document.getElementById('form-section').style.display = 'block';
-                document.getElementById('action_type').value = type;
 
-                const catBlock = document.getElementById('categorization_block');
-                const totalPriceField = document.getElementById('total_price');
-                const totalPriceLabel = document.getElementById('total_price_label');
-                const uploadSection = document.getElementById('image_upload_section');
-                const imgInput = document.getElementById('image_input');
-                const leftCol = document.getElementById('left-form-col');
-                const rightCol = document.getElementById('right-selection-col');
-                const advancedDetails = document.getElementById('advancedDetailsAccordion');
-
-                if (type === 'combo_only') {
-                    document.getElementById('form-title').innerHTML = '<i class="fas fa-star text-success me-1"></i> Create Combo Only product';
-                    catBlock.style.display = 'none';
-                    totalPriceField.removeAttribute('readonly');
-                    totalPriceField.classList.remove('bg-light');
-                    totalPriceLabel.innerText = "Total Price (Editable)";
-                    uploadSection.style.display = 'block';
-                    imgInput.setAttribute('required', 'required');
-
-                    // Simplified UI: Single column
-                    leftCol.classList.replace('col-lg-5', 'col-lg-8');
-                    rightCol.style.display = 'none';
-                    advancedDetails.style.display = 'block';
-                } else {
-                    document.getElementById('form-title').innerHTML = '<i class="fas fa-layer-group text-primary me-1"></i> Create Standard Combo bundle';
-                    catBlock.style.display = 'flex';
-                    totalPriceField.setAttribute('readonly', 'readonly');
-                    totalPriceField.classList.add('bg-light');
-                    totalPriceLabel.innerText = "Total Price (Calculated)";
-                    uploadSection.style.display = 'none';
-                    imgInput.removeAttribute('required');
-
-                    // Revert UI: Two columns
-                    leftCol.classList.replace('col-lg-8', 'col-lg-5');
-                    rightCol.style.display = 'block';
-                    advancedDetails.style.display = 'none';
-                    document.getElementById('item-selection-grid').innerHTML = `
+                document.getElementById('form-title').innerHTML = '<i class="fas fa-layer-group text-primary me-1"></i> Create Product Combo';
+                const body = document.getElementById('item-selection-body');
+                if (body) {
+                    body.innerHTML = `
                         <div class="text-center py-5 text-muted">
                             <i class="fas fa-search-plus fa-2x mb-3"></i>
                             <p>Select category or use search to find products across all categories.</p>
@@ -333,8 +302,6 @@
                 document.getElementById('comboForm').action = "{{ route('admin.combo-packs.store') }}";
                 document.getElementById('method_field').innerHTML = '';
                 document.getElementById('form-title').innerText = 'Create Combo';
-                document.getElementById('current-image-container').style.display = 'none';
-                document.getElementById('current-image-display').src = '';
 
                 selectedProductIds.clear();
                 productPrices = {};
@@ -349,7 +316,7 @@
                         const combo = data.combo;
                         const prices = data.item_prices;
 
-                        showForm(combo.is_combo_only ? 'combo_only' : 'standard');
+                        showForm();
 
                         document.getElementById('form-title').innerText = 'Edit Combo: ' + combo.name;
                         document.getElementById('comboForm').action = `{{ url('admin/combo-packs') }}/${id}`;
@@ -359,66 +326,41 @@
                         form.querySelector('[name="name"]').value = combo.name || '';
                         form.querySelector('[name="offer_price"]').value = combo.offer_price || '';
                         form.querySelector('[name="total_price"]').value = combo.total_price || '';
+                        if (form.querySelector('[name="description"]')) {
+                            form.querySelector('[name="description"]').value = combo.description || '';
+                        }
 
-                        // Populate Advanced Details
-                        form.querySelector('[name="sku"]').value = combo.sku || '';
-                        form.querySelector('[name="stock_quantity"]').value = combo.stock_quantity || 0;
-                        form.querySelector('[name="short_description"]').value = combo.short_description || '';
-                        form.querySelector('[name="meta_title"]').value = combo.meta_title || '';
-                        form.querySelector('[name="meta_description"]').value = combo.meta_description || '';
-                        form.querySelector('[name="meta_keywords"]').value = combo.meta_keywords || '';
+                        // Hide rating fields on edit
 
                         // Populate prices map for calculation
                         Object.assign(productPrices, prices);
 
-                        // Image Preview
-                        const previewContainer = document.getElementById('current-image-container');
-                        const previewImg = document.getElementById('current-image-display');
-                        const imgInput = document.getElementById('image_input');
+                        const catId = Array.isArray(combo.category_id) && combo.category_id.length > 0 ? combo.category_id[0] : (combo.category_id || '');
+                        const subId = Array.isArray(combo.subcategory_id) && combo.subcategory_id.length > 0 ? combo.subcategory_id[0] : (combo.subcategory_id || '');
 
-                        if (combo.image) {
-                            previewContainer.style.display = 'block';
-                            imgInput.removeAttribute('required'); // Remove required if it already has an image
-                            let displayPath = combo.image;
-                            if (!combo.is_combo_only) {
-                                try {
-                                    const imgs = JSON.parse(combo.image);
-                                    if(Array.isArray(imgs) && imgs.length > 0) displayPath = imgs[0];
-                                } catch(e) { console.error("Error parsing images:", e); }
-                            }
-                            previewImg.src = `{{ asset('storage') }}/${displayPath}`;
-                        } else {
-                            previewContainer.style.display = 'none';
+                        form.querySelector('[name="category_id"]').value = catId;
+
+                        // Pre-load selected IDs
+                        selectedProductIds.clear();
+                        if(combo.combo_product && combo.combo_product.product_ids) {
+                            combo.combo_product.product_ids.forEach(id => selectedProductIds.add(String(id)));
+                            syncSelectedToInputs();
                         }
 
-                        if (!combo.is_combo_only) {
-                            const catId = Array.isArray(combo.category_id) && combo.category_id.length > 0 ? combo.category_id[0] : (combo.category_id || '');
-                            const subId = Array.isArray(combo.subcategory_id) && combo.subcategory_id.length > 0 ? combo.subcategory_id[0] : (combo.subcategory_id || '');
-
-                            form.querySelector('[name="category_id"]').value = catId;
-
-                            // Pre-load selected IDs
-                            selectedProductIds.clear();
-                            if(combo.combo_product && combo.combo_product.product_ids) {
-                                combo.combo_product.product_ids.forEach(id => selectedProductIds.add(String(id)));
-                                syncSelectedToInputs();
-                            }
-
-                            // Load subcategories then set value and load items
-                            const subSelect = document.getElementById('subcategory_id');
-                            if (catId) {
-                                fetch(`{{ url('admin/categories') }}/${catId}/subcategories_json`)
-                                    .then(r => r.json())
-                                    .then(subs => {
-                                        subSelect.innerHTML = '<option value="">Select Subcategory</option>';
-                                        subs.forEach(sub => {
-                                            subSelect.innerHTML += `<option value="${sub.id}" ${sub.id == subId ? 'selected' : ''}>${sub.name}</option>`;
-                                        });
-                                        fetchFilteredItems(false);
+                        // Load subcategories then set value and load items
+                        const subSelect = document.getElementById('subcategory_id');
+                        if (catId) {
+                            fetch(`{{ url('admin/categories') }}/${catId}/subcategories_json`)
+                                .then(r => r.json())
+                                .then(subs => {
+                                    subSelect.innerHTML = '<option value="">Select Subcategory</option>';
+                                    subs.forEach(sub => {
+                                        subSelect.innerHTML += `<option value="${sub.id}" ${sub.id == subId ? 'selected' : ''}>${sub.name}</option>`;
                                     });
-                            } else {
-                                fetchFilteredItems(true);
-                            }
+                                    fetchFilteredItems(false);
+                                });
+                        } else {
+                            fetchFilteredItems(true);
                         }
                     });
             }
@@ -472,9 +414,7 @@
                     if (productPrices[id]) total += parseFloat(productPrices[id]);
                 });
 
-                if (document.getElementById('action_type').value === 'standard') {
-                    document.getElementById('total_price').value = total.toFixed(2);
-                }
+                document.getElementById('total_price').value = total.toFixed(2);
                 document.getElementById('selected_count').innerText = count + " items selected";
             }
 
@@ -482,12 +422,13 @@
                 const catId = global ? '' : document.getElementById('category_id').value;
                 const subId = global ? '' : document.getElementById('subcategory_id').value;
                 const search = document.getElementById('item_search').value;
-                const grid = document.getElementById('item-selection-grid');
+                const typeFilter = document.querySelector('input[name="item_type_filter"]:checked').value;
+                const body = document.getElementById('item-selection-body');
 
                 // Allow fetching if search is present even without category
                 if (!global && !search && (!catId || !subId)) return;
 
-                grid.innerHTML = '<div class="text-center py-5"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
+                body.innerHTML = '<tr><td colspan="4" class="text-center py-5"><div class="spinner-border spinner-border-sm text-primary"></div></td></tr>';
 
                 let url = `{{ route('admin.combo-packs.get-items') }}?search=${search}`;
                 if (!global && (catId || subId)) url += `&category_id=${catId}&subcategory_id=${subId}`;
@@ -495,54 +436,68 @@
                 fetch(url)
                     .then(res => res.json())
                     .then(data => {
-                        let html = '<div class="row g-2">';
-                        const items = [...data.products.map(p => ({...p, type: 'p'})), ...data.combos.map(c => ({...c, type: 'c'}))];
+                        let items = [
+                            ...data.products.map(p => ({...p, type: 'p'})), 
+                            ...data.combo_only_items.map(co => ({...co, type: 'co'}))
+                        ];
 
+                        // Filter by type
+                        if (typeFilter === 'p') {
+                            items = items.filter(i => i.type === 'p');
+                        } else if (typeFilter === 'co') {
+                            items = items.filter(i => i.type === 'co');
+                        }
+
+                        let html = '';
                         items.forEach(item => {
-                            const price = item.type === 'p' ? (item.sale_price ?? item.price) : item.offer_price;
+                            const price = item.type === 'p' ? (item.sale_price ?? item.price) : (item.type === 'c' ? item.offer_price : item.price);
                             const id = `${item.type}_${item.id}`;
+                            const isChecked = selectedProductIds.has(String(id)) ? 'checked' : '';
 
-                            // Save price for global calculation
                             productPrices[id] = price;
 
-                            const isChecked = selectedProductIds.has(String(id)) ? 'checked' : '';
-                            const isSelectedClass = selectedProductIds.has(String(id)) ? 'selected' : '';
-
                             html += `
-                                <div class="col-md-6">
-                                    <div class="form-check item-box p-2 mb-0 h-100 ${isSelectedClass}">
-                                        <input class="form-check-input item-checkbox d-none" type="checkbox" value="${id}" data-price="${price}" id="check_${id}" ${isChecked}>
-                                        <label class="form-check-label w-100 cursor-pointer" for="check_${id}">
-                                            <div class="d-flex align-items-center">
-                                                <img src="{{ asset('storage') }}/${item.image}" class="rounded me-2" width="35" height="35" style="object-fit: cover;">
-                                                <div class="text-truncate">
-                                                    <div class="small fw-bold text-dark">${item.name}</div>
-                                                    <div class="text-primary x-small">₹${price}</div>
-                                                </div>
-                                            </div>
+                                <tr class="item-row ${isChecked ? 'table-primary' : ''}">
+                                    <td class="ps-3">
+                                        <input class="form-check-input item-checkbox" type="checkbox" value="${id}" data-price="${price}" id="check_${id}" ${isChecked}>
+                                    </td>
+                                    <td>
+                                        <img src="{{ asset('storage') }}/${item.image}" class="rounded border" width="40" height="40" style="object-fit: cover;">
+                                    </td>
+                                    <td>
+                                        <label class="d-block cursor-pointer mb-0" for="check_${id}">
+                                            <div class="fw-bold text-dark">${item.name}</div>
+                                            <small class="text-muted">${item.type === 'p' ? 'Product' : 'Combo Only'}</small>
                                         </label>
-                                    </div>
-                                </div>`;
+                                    </td>
+                                    <td>
+                                        <span class="text-success fw-bold">₹${price}</span>
+                                    </td>
+                                </tr>`;
                         });
-                        grid.innerHTML = html + '</div>';
-                        if(items.length === 0) grid.innerHTML = '<div class="text-center py-5 text-muted">No items found.</div>';
 
-                        // Attach listeners to newly created checkboxes
-                        grid.querySelectorAll('.item-checkbox').forEach(cb => {
+                        body.innerHTML = html;
+                        if(items.length === 0) body.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted">No items found.</td></tr>';
+
+                        // Attach listeners
+                        body.querySelectorAll('.item-checkbox').forEach(cb => {
                             cb.addEventListener('change', function() {
                                 if (this.checked) {
                                     selectedProductIds.add(String(this.value));
                                 } else {
                                     selectedProductIds.delete(String(this.value));
                                 }
-                                this.closest('.item-box').classList.toggle('selected', this.checked);
+                                this.closest('tr').classList.toggle('table-primary', this.checked);
                                 syncSelectedToInputs();
                                 updateSummary();
                             });
                         });
-
                         updateSummary();
                     });
+            }
+
+            function filterGridByType() {
+                fetchFilteredItems(false);
             }
 
             // Handlers
@@ -561,8 +516,7 @@
 
             document.getElementById('subcategory_id').addEventListener('change', () => fetchFilteredItems(false));
             document.getElementById('item_search').addEventListener('input', () => {
-                const isComboOnlyMode = document.getElementById('action_type').value === 'combo_only';
-                fetchFilteredItems(isComboOnlyMode);
+                fetchFilteredItems(false);
             });
         </script>
     @endpush

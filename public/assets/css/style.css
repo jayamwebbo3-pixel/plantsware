@@ -440,13 +440,12 @@ select {
 
 .main-menu li a {
     color: #ffffff !important;
-    font-size: 16px;
-    /* text-transform: uppercase; */
-    transition: all 0.5s;
-    font-weight: normal;
-    padding: 20px;
-    line-height: 30px !important;
+    font-size: 15px;
+    transition: all 0.3s;
+    padding: 15px 10px;
+    line-height: normal !important;
     font-weight: 500;
+    display: block;
 }
 
 ul.all-page-drop li a {
@@ -640,20 +639,49 @@ ul.all-page-drop li a {
 /*menu*/
 
 .header_bottom {
-    padding: 13px 10%;
+    padding: 0 5%;
     background-color: #6EA820;
-    box-shadow: 0px 12px 8px -12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
-    box-sizing: border-box;
-    z-index: 9;
+    z-index: 1001; /* Higher than sticky top */
     position: relative;
 }
 
+.main-menu {
+    display: grid !important;
+    grid-template-columns: repeat(5, auto);
+    grid-template-rows: auto auto;
+    width: 100%;
+    margin: 0;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
 .main-menu li {
-    display: inline-block;
-    margin-right: 50px;
+    display: block;
+    margin-right: 0;
     color: #fff;
     position: relative;
+    white-space: nowrap;
+}
+
+/* Row 2 Positioning */
+.main-menu li:nth-child(7), /* About Plantsware */
+.main-menu li:nth-child(8)  /* Blog */ {
+    grid-row: 2;
+    margin-top: 5px;
+}
+
+/* Force specific column alignment for row 2 */
+.main-menu li:nth-child(7) {
+    grid-column: 1;
+    justify-self: start;
+}
+
+.main-menu li:nth-child(8) {
+    grid-column: 5;
+    justify-self: end;
 }
 
 .main-menu>li .dropdown-menu {
@@ -8532,73 +8560,3 @@ body.sticky-nav-active {
 }
 
 
-/*15.12.2025*/
-/* Add to your existing CSS */
-
-
-@media (min-width: 991px) and (max-width: 1168px){
-    .main-menu li a {
-        color: #ffffff !important;
-        font-size: 16px;
-        text-transform: uppercase;
-        transition: all 0.5s;
-        font-weight: normal;
-        padding: 8px !important;
-        line-height: 30px !important;
-        font-weight: 400 !important;
-    }
-    
-    .main-menu li a {
-        color: #4f4f4f;
-        font-size: 11px !important;
-    }
-}
-
-@media (min-width: 1200px) and (max-width: 1291px){
-    .main-menu li a {
-    color: #ffffff !important;
-    font-size: 16px;
-    /* text-transform: uppercase; */
-    transition: all 0.5s;
-    font-weight: normal;
-    padding: 10px !important;
-    line-height: 30px !important;
-    font-weight: 500;
-}
-}
-
-@media (min-width: 1408px) and (max-width: 1459px){
-    .main-menu li a {
-    color: #ffffff !important;
-    font-size: 16px;
-    /* text-transform: uppercase; */
-    transition: all 0.5s;
-    font-weight: normal;
-    padding: 10px !important;
-    line-height: 30px !important;
-    font-weight: 500;
-}
-}
-
-@media (min-width: 1200px) and (max-width: 1245px){
-.head-right ul li {
-    display: inline-block;
-    position: relative;
-    cursor: pointer;
-    padding: 8px 0;
-    vertical-align: top;
-    margin-left: 0px;
-}
-}
-
-@media (min-width: 991px) and (max-width: 1159px) {
-    .navbar .d-flex.align-items-stretch.w-100 {
-        max-width: 420px;
-    }
-}
-
-/*@media (min-width: 1024px) and (max-width: 1064px) {*/
-/*    .navbar .d-flex.align-items-stretch.w-100 {*/
-/*        max-width: 320px;*/
-/*    }*/
-/*}*/

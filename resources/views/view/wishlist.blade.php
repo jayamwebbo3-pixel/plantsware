@@ -45,55 +45,103 @@
                                 </thead>
                                 <tbody class="wishlist-items" id="wishlistItems">
                                     @foreach($wishlistItems as $index => $item)
-                                        @if(isset($item->product))
-                                        <tr class="pro-gl-content" id="wishlistItem_{{ $item->id }}">
-                                            <td scope="row"><span>{{ $index + 1 }}</span></td>
-                                            <td>
-                                                <img class="prod-img" 
-                                                     src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('assets/images/product/product1.jpg') }}" 
-                                                     alt="{{ $item->product->name }}" 
-                                                     style="width: 80px; height: 80px; object-fit: cover;">
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('product.show', $item->product->slug) }}" class="text-decoration-none text-dark">
-                                                    <strong>{{ $item->product->name }}</strong>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                @php
-                                                    $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                                                        ? $item->product->sale_price 
-                                                        : $item->product->price;
-                                                @endphp
-                                                <span class="text-success fw-bold">₹{{ number_format($priceToUse, 2) }}</span>
-                                            </td>
-                                            <td>
-                                                @if($item->product->stock_quantity > 0)
-                                                    <span class="badge bg-success">In Stock</span>
-                                                @else
-                                                    <span class="badge bg-danger">Out of Stock</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <div class="tbl-btn d-flex gap-2">
-                                                    @if($item->product->stock_quantity > 0)
-                                                        <form action="{{ route('cart.add', $item->product->id) }}" method="POST" class="d-inline">
-                                                            @csrf
-                                                            <input type="hidden" name="quantity" value="1">
-                                                            <button type="submit" class="gi-btn-2 add-to-cart" title="Add To Cart">
-                                                                <i class="fas fa-shopping-cart" aria-hidden="true"></i>
-                                                            </button>
-                                                        </form>
+                                        @php
+                                            $isCombo = (bool) $item->combo_pack_id;
+                                            $p = $isCombo ? $item->comboPack : $item->product;
+                                        @endphp
+                                        @if($p)
+                                            <tr class="pro-gl-content" id="wishlistItem_{{ $item->id }}">
+                                                <td scope="row"><span>{{ $index + 1 }}</span></td>
+                                                <td style="min-width: 90px; vertical-align: middle; text-align: center;">
+                                                    <div class="wishlist-img-wrapper d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px; background: #fdfdfd; border-radius: 8px; overflow: hidden; position: relative;">
+                                                        @php
+                                                            $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+                                                        @endphp
+
+                                                        @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
+                                                            <div class="wishlist-dual-image d-flex align-items-center justify-content-center w-100 h-100 p-1">
+                                                                <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}" style="width: 42%; height: auto; object-fit: contain;">
+                                                                <span style="font-size: 10px; font-weight: bold; color: #72a420; margin: 0 2px;">+</span>
+                                                                <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}" style="width: 42%; height: auto; object-fit: contain;">
+                                                            </div>
+                                                        @else
+                                                            @php
+                                                                $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
+                                                            @endphp
+                                                            <img class="prod-img" 
+                                                                 src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}" 
+                                                                 alt="{{ $p->name }}" 
+                                                                 style="width: 100%; height: 100%; object-fit: cover;">
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @if($isCombo)
+                                                        <a href="{{ route('combo_packs.frontend_show', $p->slug) }}" class="text-decoration-none text-dark">
+                                                            <strong>{{ $p->name }} <span class="badge badge-danger">COMBO</span></strong>
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('product.show', $p->slug) }}" class="text-decoration-none text-dark">
+                                                            <strong>{{ $p->name }}</strong>
+                                                        </a>
                                                     @endif
-                                                    
-                                                    <button type="button" class="gi-btn-1 gi-remove-wish btn" 
-                                                            onclick="removeFromWishlist({{ $item->product->id }})" 
-                                                            title="Remove From List">
-                                                        ×
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        if ($isCombo) {
+                                                            $priceToUse = $p->offer_price;
+                                                        } else {
+                                                            $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
+                                                                ? $p->sale_price
+                                                                : $p->price;
+                                                        }
+                                                    @endphp
+                                                    <span class="text-success fw-bold">₹{{ number_format($priceToUse, 2) }}</span>
+                                                </td>
+                                                <td>
+                                                    @if($p->stock_quantity > 0)
+                                                        <span class="badge bg-success">In Stock</span>
+                                                    @else
+                                                        <span class="badge bg-danger">Out of Stock</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <div class="tbl-btn d-flex gap-2">
+                                                        @if($p->stock_quantity > 0)
+                                                            @if($isCombo)
+                                                                <form action="{{ route('cart.add_combo', $p->id) }}" method="POST" class="d-inline">
+                                                                    @csrf
+                                                                    <button type="submit" class="gi-btn-2 add-to-cart" title="Add To Cart">
+                                                                        <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @else
+                                                                <form action="{{ route('cart.add', $p->id) }}" method="POST" class="d-inline">
+                                                                    @csrf
+                                                                    <input type="hidden" name="quantity" value="1">
+                                                                    <button type="submit" class="gi-btn-2 add-to-cart" title="Add To Cart">
+                                                                        <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        @endif
+
+                                                        @if($isCombo)
+                                                            <button type="button" class="gi-btn-1 gi-remove-wish btn" 
+                                                                    onclick="removeFromWishlistCombo({{ $p->id }})" 
+                                                                    title="Remove From List">
+                                                                ×
+                                                            </button>
+                                                        @else
+                                                            <button type="button" class="gi-btn-1 gi-remove-wish btn" 
+                                                                    onclick="removeFromWishlist({{ $p->id }})" 
+                                                                    title="Remove From List">
+                                                                ×
+                                                            </button>
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         @endif
                                     @endforeach
                                 </tbody>
@@ -130,67 +178,67 @@
 </div>
 
 @if($wishlistItems->count() > 0)
-<section class="bg-white-section">
-    <div class="container-fluid px-4">
-        <div class="section-title">
-            <h2>Related Products</h2>
-            <div class="title-link">
-                <a href="{{ route('products.index') }}">More <i class="fas fa-chevron-right"></i></a>
+    <section class="bg-white-section">
+        <div class="container-fluid px-4">
+            <div class="section-title">
+                <h2>Related Products</h2>
+                <div class="title-link">
+                    <a href="{{ route('products.index') }}">More <i class="fas fa-chevron-right"></i></a>
+                </div>
             </div>
-        </div>
 
-        <div class="swiper product-swiper">
-            <div class="swiper-wrapper">
-                <!-- You can add dynamic related products here -->
-                <!-- For now, keeping the static ones -->
-                @foreach($wishlistItems->take(10) as $item)
-                    @if(isset($item->product))
-                    <div class="swiper-slide">
-                        <div class="product-card">
-                            <div class="product-image-container">
-                                <a href="{{ route('product.show', $item->product->slug) }}">
-                                    <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('assets/images/product/product1.jpg') }}" 
-                                         alt="{{ $item->product->name }}" class="product-image main-image">
-                                    <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('assets/images/product/product1.jpg') }}" 
-                                         alt="{{ $item->product->name }}" class="product-image hover-image">
-                                </a>
-                            </div>
-                            <div class="product-info">
-                                <h3 class="product-title">{{ $item->product->name }}</h3>
-                                <div class="product-price">
-                                    @php
-                                        $relatedPriceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                                            ? $item->product->sale_price 
-                                            : $item->product->price;
-                                    @endphp
-                                    <span class="current-price">₹{{ number_format($relatedPriceToUse, 2) }}</span>
+            <div class="swiper product-swiper">
+                <div class="swiper-wrapper">
+                    <!-- You can add dynamic related products here -->
+                    <!-- For now, keeping the static ones -->
+                    @foreach($wishlistItems->take(10) as $item)
+                        @if(isset($item->product))
+                            <div class="swiper-slide">
+                                <div class="product-card">
+                                    <div class="product-image-container">
+                                        <a href="{{ route('product.show', $item->product->slug) }}">
+                                            <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('assets/images/product/product1.jpg') }}" 
+                                                 alt="{{ $item->product->name }}" class="product-image main-image">
+                                            <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('assets/images/product/product1.jpg') }}" 
+                                                 alt="{{ $item->product->name }}" class="product-image hover-image">
+                                        </a>
+                                    </div>
+                                    <div class="product-info">
+                                        <h3 class="product-title">{{ $item->product->name }}</h3>
+                                        <div class="product-price">
+                                            @php
+                                                $relatedPriceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
+                                                    ? $item->product->sale_price
+                                                    : $item->product->price;
+                                            @endphp
+                                            <span class="current-price">₹{{ number_format($relatedPriceToUse, 2) }}</span>
+                                        </div>
+                                        <div class="product-actions">
+                                            <form action="{{ route('cart.add', $item->product->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
+                                                    <span class="btn-text">Add to Cart</span>
+                                                    <i class="btn-icon fas fa-shopping-cart"></i>
+                                                </button>
+                                            </form>
+                                            <button type="button" class="btn btn-wishlist" 
+                                                    onclick="removeFromWishlist({{ $item->product->id }})" 
+                                                    data-tooltip="Remove from Wishlist">
+                                                <i class="fas fa-heart text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="product-actions">
-                                    <form action="{{ route('cart.add', $item->product->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                            <span class="btn-text">Add to Cart</span>
-                                            <i class="btn-icon fas fa-shopping-cart"></i>
-                                        </button>
-                                    </form>
-                                    <button type="button" class="btn btn-wishlist" 
-                                            onclick="removeFromWishlist({{ $item->product->id }})" 
-                                            data-tooltip="Remove from Wishlist">
-                                        <i class="fas fa-heart text-danger"></i>
-                                    </button>
-                                </div>
                             </div>
-                        </div>
-                    </div>
-                    @endif
-                @endforeach
+                        @endif
+                    @endforeach
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
             </div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
         </div>
-    </div>
-</section>
+    </section>
 @endif
 
 <!-- Wishlist JavaScript -->
@@ -213,13 +261,21 @@ function getCsrfToken() {
 
 // Remove from wishlist with AJAX
 async function removeFromWishlist(productId) {
+    handleRemoveFromWishlist(`${baseUrl}/wishlist/remove/${productId}`);
+}
+
+async function removeFromWishlistCombo(comboId) {
+    handleRemoveFromWishlist(`${baseUrl}/wishlist/remove-combo/${comboId}`);
+}
+
+async function handleRemoveFromWishlist(url) {
     if (!confirm('Are you sure you want to remove this item from your wishlist?')) {
         return;
     }
     
     try {
-        const response = await fetch(`${baseUrl}/wishlist/remove/${productId}`, {
-            method: 'DELETE',
+        const response = await fetch(url, {
+            method: 'POST', // Changed from DELETE to POST because the new route is POST
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': getCsrfToken(),
@@ -231,41 +287,14 @@ async function removeFromWishlist(productId) {
         const data = await response.json();
         
         if (data.success) {
-            // Find and remove the row with animation
+            // Reload the page is simpler given the complex table structure and potential serial changes
+            window.location.reload();
+            return;
+            /* 
+            // Original logic for animation
             const rows = document.querySelectorAll('.pro-gl-content');
-            rows.forEach(row => {
-                const removeBtn = row.querySelector('.gi-remove-wish');
-                if (removeBtn && removeBtn.getAttribute('onclick')?.includes(productId)) {
-                    // Add removal animation
-                    row.style.transition = 'all 0.3s ease';
-                    row.style.opacity = '0.5';
-                    row.style.transform = 'translateX(20px)';
-                    
-                    setTimeout(() => {
-                        row.remove();
-                        
-                        // Update serial numbers
-                        updateSerialNumbers();
-                        
-                        // Update wishlist count in header
-                        if (data.wishlist_count !== undefined) {
-                            updateWishlistCount(data.wishlist_count);
-                        }
-                        
-                        // Check if wishlist is empty
-                        const wishlistItems = document.getElementById('wishlistItems');
-                        if (wishlistItems && wishlistItems.children.length === 0) {
-                            showEmptyWishlist();
-                        }
-                        
-                        showToast(data.message || 'Removed from wishlist!', 'success');
-                    }, 300);
-                }
-            });
-            
-            // Also update wishlist buttons in related products
-            updateRelatedProductWishlistButtons(productId);
-            
+            ...
+            */
         } else {
             showToast(data.message || 'Failed to remove from wishlist', 'error');
         }

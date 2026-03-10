@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ComboPack;
 use App\Models\ComboPackProduct;
+use App\Models\ComboOnlyProduct;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -36,99 +37,66 @@ class ComboPackController extends Controller
             'subcategory_id' => 'nullable|exists:subcategories,id',
             'offer_price' => 'required|numeric|min:0',
             'total_price' => 'required|numeric|min:0',
-            'product_ids' => 'required_if:action_type,standard|array',
-            'action_type' => 'required|in:standard,combo_only',
-            'image' => 'nullable|image|max:2048',
-            'sku' => 'nullable|string|max:255|unique:combo_packs,sku',
-            'stock_quantity' => 'nullable|integer|min:0',
-            'short_description' => 'nullable|string',
-            'meta_title' => 'nullable|string|max:255',
-            'meta_description' => 'nullable|string',
-            'meta_keywords' => 'nullable|string',
+            'product_ids' => 'required|array|min:1',
+            'description' => 'nullable|string',
         ]);
 
         try {
             $comboPack = new ComboPack();
             $comboPack->name = $validated['name'];
-            $comboPack->slug = Str::slug($validated['name']);
-            $comboPack->category_id = $validated['category_id'] ?? null;
-            $comboPack->subcategory_id = $validated['subcategory_id'] ?? null;
+            $comboPack->slug = $this->generateSlug($validated['name']);
             $comboPack->total_price = $validated['total_price'];
             $comboPack->offer_price = $validated['offer_price'];
-            $comboPack->is_combo_only = ($validated['action_type'] === 'combo_only');
+            $comboPack->description = $validated['description'] ?? null;
 
-            $comboPack->sku = $validated['sku'] ?? null;
-            $comboPack->stock_quantity = $validated['stock_quantity'] ?? 0;
-            $comboPack->short_description = $validated['short_description'] ?? null;
-            $comboPack->meta_title = $validated['meta_title'] ?? null;
-            $comboPack->meta_description = $validated['meta_description'] ?? null;
-            $comboPack->meta_keywords = $validated['meta_keywords'] ?? null;
+            $images = [];
+            $categoryIds = [];
+            $subcategoryIds = [];
 
-            if ($comboPack->is_combo_only) {
-                if ($request->hasFile('image')) {
-                    $comboPack->image = $request->file('image')->store('combo_packs', 'public');
-                } else {
-                    return redirect()->back()->withErrors(['image' => 'Image is required for Combo Only products.'])->withInput();
-                }
-                $comboPack->category_id = isset($validated['category_id']) ? [$validated['category_id']] : [];
-                $comboPack->subcategory_id = isset($validated['subcategory_id']) ? [$validated['subcategory_id']] : [];
-            } else {
-                $images = [];
-                $categoryIds = [];
-                $subcategoryIds = [];
-                $productIds = $validated['product_ids'] ?? [];
-
-                foreach ($productIds as $identifier) {
-                    if (str_starts_with($identifier, 'p_')) {
-                        $p = Product::find(str_replace('p_', '', $identifier));
-                        if ($p) {
-                            if ($p->image && count($images) < 2)
-                                $images[] = $p->image;
-                            if ($p->category_id)
-                                $categoryIds[] = (string) $p->category_id;
-                            if ($p->subcategory_id)
-                                $subcategoryIds[] = (string) $p->subcategory_id;
+            foreach ($validated['product_ids'] as $identifier) {
+                if (str_starts_with($identifier, 'p_')) {
+                    $p = Product::find(str_replace('p_', '', $identifier));
+                    if ($p) {
+                        if ($p->image && count($images) < 2)
+                            $images[] = $p->image;
+                        if ($p->category_id)
+                            $categoryIds[] = (string) $p->category_id;
+                        if ($p->subcategory_id)
+                            $subcategoryIds[] = (string) $p->subcategory_id;
+                    }
+                } elseif (str_starts_with($identifier, 'c_')) {
+                    $c = ComboPack::find(str_replace('c_', '', $identifier));
+                    if ($c) {
+                        $c_img = json_decode($c->image);
+                        $imgArr = is_array($c_img) ? $c_img : ($c->image ? [$c->image] : []);
+                        foreach ($imgArr as $img) {
+                            if (count($images) < 2)
+                                $images[] = $img;
                         }
-                    } elseif (str_starts_with($identifier, 'c_')) {
-                        $c = ComboPack::find(str_replace('c_', '', $identifier));
-                        if ($c) {
-                            // Extract images
-                            $c_img = json_decode($c->image);
-                            if (is_array($c_img)) {
-                                if (count($images) < 2)
-                                    $images = array_merge($images, $c_img);
-                            } else if ($c->image) {
-                                if (count($images) < 2)
-                                    $images[] = $c->image;
-                            }
-                            // Extract categories
-                            if (is_array($c->category_id))
-                                $categoryIds = array_merge($categoryIds, $c->category_id);
-                            elseif ($c->category_id)
-                                $categoryIds[] = (string) $c->category_id;
-
-                            if (is_array($c->subcategory_id))
-                                $subcategoryIds = array_merge($subcategoryIds, $c->subcategory_id);
-                            elseif ($c->subcategory_id)
-                                $subcategoryIds[] = (string) $c->subcategory_id;
-                        }
+                        if (is_array($c->category_id))
+                            $categoryIds = array_merge($categoryIds, $c->category_id);
+                        if (is_array($c->subcategory_id))
+                            $subcategoryIds = array_merge($subcategoryIds, $c->subcategory_id);
+                    }
+                } elseif (str_starts_with($identifier, 'co_')) {
+                    $co = ComboOnlyProduct::find(str_replace('co_', '', $identifier));
+                    if ($co && $co->image && count($images) < 2) {
+                        $images[] = $co->image;
                     }
                 }
-                $comboPack->image = json_encode(array_slice($images, 0, 2));
-                $comboPack->category_id = array_values(array_unique($categoryIds));
-                $comboPack->subcategory_id = array_values(array_unique($subcategoryIds));
             }
 
+            $comboPack->image = json_encode(array_slice($images, 0, 2));
+            $comboPack->category_id = array_values(array_unique($categoryIds));
+            $comboPack->subcategory_id = array_values(array_unique($subcategoryIds));
             $comboPack->save();
 
-            if (!empty($validated['product_ids'])) {
-                ComboPackProduct::create([
-                    'combo_pack_id' => $comboPack->id,
-                    'product_ids' => $validated['product_ids'],
-                ]);
-            }
+            ComboPackProduct::create([
+                'combo_pack_id' => $comboPack->id,
+                'product_ids' => $validated['product_ids'],
+            ]);
 
-            return redirect()->route('admin.combo-packs.index')->with('success', 'Combo Pack created successfully');
+            return redirect()->route('admin.combo-packs.index')->with('success', 'Standard Combo Pack created successfully');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error saving combo pack: ' . $e->getMessage())->withInput();
         }
@@ -138,7 +106,6 @@ class ComboPackController extends Controller
     {
         $combo->load('comboProduct');
 
-        // Fetch prices for selected items to support JS calculation
         $itemData = [];
         if ($combo->comboProduct && $combo->comboProduct->product_ids) {
             foreach ($combo->comboProduct->product_ids as $id) {
@@ -150,6 +117,10 @@ class ComboPackController extends Controller
                     $c = ComboPack::find(str_replace('c_', '', $id));
                     if ($c)
                         $itemData[$id] = $c->offer_price;
+                } elseif (str_starts_with($id, 'co_')) {
+                    $co = ComboOnlyProduct::find(str_replace('co_', '', $id));
+                    if ($co)
+                        $itemData[$id] = $co->price;
                 }
             }
         }
@@ -162,115 +133,75 @@ class ComboPackController extends Controller
 
     public function update(Request $request, ComboPack $combo)
     {
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
             'subcategory_id' => 'nullable|exists:subcategories,id',
             'offer_price' => 'required|numeric|min:0',
             'total_price' => 'required|numeric|min:0',
-            'product_ids' => 'required_if:action_type,standard|array',
-            'action_type' => 'required|in:standard,combo_only',
-            'image' => 'nullable|image|max:2048',
-            'sku' => 'nullable|string|max:255|unique:combo_packs,sku,' . $combo->id,
-            'stock_quantity' => 'nullable|integer|min:0',
-            'short_description' => 'nullable|string',
-            'meta_title' => 'nullable|string|max:255',
-            'meta_description' => 'nullable|string',
-            'meta_keywords' => 'nullable|string',
+            'product_ids' => 'required|array|min:1',
+            'description' => 'nullable|string',
         ]);
-
-        if ($validator->fails()) {
-            \Log::error('Validation failed for update. Errors: ', $validator->errors()->toArray());
-            \Log::error('Request data: ', $request->all());
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-        $validated = $validator->validated();
 
         try {
             $combo->name = $validated['name'];
-            $combo->slug = Str::slug($validated['name']);
-            $combo->category_id = $validated['category_id'] ?? null;
-            $combo->subcategory_id = $validated['subcategory_id'] ?? null;
             $combo->total_price = $validated['total_price'];
             $combo->offer_price = $validated['offer_price'];
-            $combo->is_combo_only = ($validated['action_type'] === 'combo_only');
+            $combo->description = $validated['description'] ?? $combo->description;
 
-            $combo->sku = $validated['sku'] ?? null;
-            $combo->stock_quantity = $validated['stock_quantity'] ?? 0;
-            $combo->short_description = $validated['short_description'] ?? null;
-            $combo->meta_title = $validated['meta_title'] ?? null;
-            $combo->meta_description = $validated['meta_description'] ?? null;
-            $combo->meta_keywords = $validated['meta_keywords'] ?? null;
+            $images = [];
+            $categoryIds = [];
+            $subcategoryIds = [];
 
-            if ($combo->is_combo_only) {
-                if ($request->hasFile('image')) {
-                    $combo->image = $request->file('image')->store('combo_packs', 'public');
-                }
-                $combo->category_id = isset($validated['category_id']) ? [$validated['category_id']] : [];
-                $combo->subcategory_id = isset($validated['subcategory_id']) ? [$validated['subcategory_id']] : [];
-            } else {
-                $images = [];
-                $categoryIds = [];
-                $subcategoryIds = [];
-                $productIds = $validated['product_ids'] ?? [];
-
-                foreach ($productIds as $identifier) {
-                    if (str_starts_with($identifier, 'p_')) {
-                        $p = Product::find(str_replace('p_', '', $identifier));
-                        if ($p) {
-                            if ($p->image && count($images) < 2)
-                                $images[] = $p->image;
-                            if ($p->category_id)
-                                $categoryIds[] = (string) $p->category_id;
-                            if ($p->subcategory_id)
-                                $subcategoryIds[] = (string) $p->subcategory_id;
+            foreach ($validated['product_ids'] as $identifier) {
+                if (str_starts_with($identifier, 'p_')) {
+                    $p = Product::find(str_replace('p_', '', $identifier));
+                    if ($p) {
+                        if ($p->image && count($images) < 2)
+                            $images[] = $p->image;
+                        if ($p->category_id)
+                            $categoryIds[] = (string) $p->category_id;
+                        if ($p->subcategory_id)
+                            $subcategoryIds[] = (string) $p->subcategory_id;
+                    }
+                } elseif (str_starts_with($identifier, 'c_')) {
+                    $c = ComboPack::find(str_replace('c_', '', $identifier));
+                    if ($c) {
+                        $c_img = json_decode($c->image);
+                        $imgArr = is_array($c_img) ? $c_img : ($c->image ? [$c->image] : []);
+                        foreach ($imgArr as $img) {
+                            if (count($images) < 2)
+                                $images[] = $img;
                         }
-                    } elseif (str_starts_with($identifier, 'c_')) {
-                        $c = ComboPack::find(str_replace('c_', '', $identifier));
-                        if ($c) {
-                            // Extract images
-                            $c_img = json_decode($c->image);
-                            if (is_array($c_img)) {
-                                if (count($images) < 2)
-                                    $images = array_merge($images, $c_img);
-                            } else if ($c->image) {
-                                if (count($images) < 2)
-                                    $images[] = $c->image;
-                            }
-                            // Extract categories
-                            if (is_array($c->category_id))
-                                $categoryIds = array_merge($categoryIds, $c->category_id);
-                            elseif ($c->category_id)
-                                $categoryIds[] = (string) $c->category_id;
-
-                            if (is_array($c->subcategory_id))
-                                $subcategoryIds = array_merge($subcategoryIds, $c->subcategory_id);
-                            elseif ($c->subcategory_id)
-                                $subcategoryIds[] = (string) $c->subcategory_id;
-                        }
+                        if (is_array($c->category_id))
+                            $categoryIds = array_merge($categoryIds, $c->category_id);
+                        if (is_array($c->subcategory_id))
+                            $subcategoryIds = array_merge($subcategoryIds, $c->subcategory_id);
+                    }
+                } elseif (str_starts_with($identifier, 'co_')) {
+                    $co = ComboOnlyProduct::find(str_replace('co_', '', $identifier));
+                    if ($co && $co->image && count($images) < 2) {
+                        $images[] = $co->image;
                     }
                 }
-                if (!empty($images)) {
-                    $combo->image = json_encode(array_slice($images, 0, 2));
-                }
-                $combo->category_id = array_values(array_unique($categoryIds));
-                $combo->subcategory_id = array_values(array_unique($subcategoryIds));
             }
 
+            if (!empty($images)) {
+                $combo->image = json_encode(array_slice($images, 0, 2));
+            }
+            $combo->category_id = array_values(array_unique($categoryIds));
+            $combo->subcategory_id = array_values(array_unique($subcategoryIds));
             $combo->save();
 
-            // Sync products
             ComboPackProduct::where('combo_pack_id', $combo->id)->delete();
-            if (!empty($validated['product_ids'])) {
-                ComboPackProduct::create([
-                    'combo_pack_id' => $combo->id,
-                    'product_ids' => $validated['product_ids'],
-                ]);
-            }
+            ComboPackProduct::create([
+                'combo_pack_id' => $combo->id,
+                'product_ids' => $validated['product_ids'],
+            ]);
 
             return redirect()->route('admin.combo-packs.index')->with('success', 'Combo Pack updated successfully');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error updating combo pack: ' . $e->getMessage())->withInput();
+            return redirect()->back()->with('error', 'Error updating: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -284,44 +215,59 @@ class ComboPackController extends Controller
     public function destroy($id)
     {
         try {
-            $combo = ComboPack::findOrFail($id);
-            $combo->delete();
+            ComboPack::findOrFail($id)->delete();
             return redirect()->back()->with('success', 'Combo Pack deleted successfully');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error deleting combo pack');
         }
     }
 
+    /**
+     * Returns products AND combo-only products for the item selector.
+     * Products use p_ prefix, standard combos use c_, combo-only use co_.
+     */
     public function getItems(Request $request)
     {
         $categoryId = $request->category_id;
         $subcategoryId = $request->subcategory_id;
         $search = $request->search;
 
-        $productsQuery = Product::query();
-        $combosQuery = ComboPack::where('is_combo_only', true);
-
-        if ($categoryId) {
+        // Regular products
+        $productsQuery = Product::query()->where('is_active', true);
+        if ($categoryId)
             $productsQuery->where('category_id', $categoryId);
-            $combosQuery->whereJsonContains('category_id', $categoryId);
-        }
-
-        if ($subcategoryId) {
+        if ($subcategoryId)
             $productsQuery->where('subcategory_id', $subcategoryId);
-            $combosQuery->whereJsonContains('subcategory_id', $subcategoryId);
-        }
-
-        if ($search) {
+        if ($search)
             $productsQuery->where('name', 'LIKE', "%{$search}%");
-            $combosQuery->where('name', 'LIKE', "%{$search}%");
-        }
-
         $products = $productsQuery->select('id', 'name', 'price', 'sale_price', 'image')->get();
-        $combos = $combosQuery->select('id', 'name', 'offer_price', 'image')->get();
+
+        // Combo-only products (replacing combo-only from combo_packs)
+        $comboOnlyQuery = ComboOnlyProduct::where('is_active', true);
+        if ($search)
+            $comboOnlyQuery->where('name', 'LIKE', "%{$search}%");
+        $comboOnlyProducts = $comboOnlyQuery->select('id', 'name', 'price', 'image')->get()
+            ->map(fn($co) => [
+                'id' => $co->id,
+                'name' => $co->name . ' [Combo Only]',
+                'price' => $co->price,
+                'image' => $co->image,
+            ]);
 
         return response()->json([
             'products' => $products,
-            'combos' => $combos
+            'combo_only_items' => $comboOnlyProducts,
         ]);
+    }
+
+    private function generateSlug(string $name): string
+    {
+        $slug = Str::slug($name);
+        $counter = 1;
+        $base = $slug;
+        while (ComboPack::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $counter++;
+        }
+        return $slug;
     }
 }

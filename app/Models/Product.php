@@ -26,18 +26,20 @@ class Product extends Model
         'meta_description',
         'meta_keywords',
         'sort_order',
-        'size', 
-        'shape', 
-        'material', 
-        'color', 
+        'size',
+        'shape',
+        'material',
+        'color',
         'gsm',
         'has_handles',
         'uv_treated',
         'shade_percentage',
         'width_meters',
         'length_meters',
-        'pack_quantity', 
+        'pack_quantity',
         'warranty_months',
+        'avg_rating',
+        'total_reviews',
     ];
     protected $casts = [
         'price' => 'decimal:2',
@@ -68,7 +70,7 @@ class Product extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order', 'asc')
-                     ->orderBy('name', 'asc');
+            ->orderBy('name', 'asc');
     }
 
     /**
@@ -95,17 +97,17 @@ class Product extends Model
         return 0;
     }
     public function cartItems()
-{
-    return $this->hasMany(Cart::class);
-}
-public function wishlistedBy()
-{
-    return $this->hasMany(Wishlist::class);
-}
+    {
+        return $this->hasMany(Cart::class);
+    }
+    public function wishlistedBy()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
 
-public function isWishlisted()
-{
-    return auth()->check() && auth()->user()->inWishlist($this);
-}
+    public function isWishlisted()
+    {
+        return auth()->check() && auth()->user()->inWishlist($this);
+    }
 }
 

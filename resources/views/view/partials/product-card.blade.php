@@ -2,9 +2,9 @@
     <div class="product-image-container position-relative">
         <a href="{{ route('product.show', $product->slug) }}">
             <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}"
-                 alt="{{ $product->name }}" class="product-image main-image w-100 h-100 object-fit-cover">
+                 alt="{{ $product->name }}" class="product-image main-image w-100 h-100 object-fit-contain">
             <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}"
-                 alt="{{ $product->name }}" class="product-image hover-image w-100 h-100 object-fit-cover">
+                 alt="{{ $product->name }}" class="product-image hover-image w-100 h-100 object-fit-contain">
             @if($product->sale_price && $product->sale_price < $product->price)
                 <span class="discount-badge">
                     {{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF

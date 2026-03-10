@@ -16,13 +16,19 @@ class CartController extends Controller
      */
     public function index()
     {
-        $cartItems = Cart::current()->with('product')->get();
+        $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
 
         $subtotal = $cartItems->sum(function ($item) {
-            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                ? $item->product->sale_price 
-                : $item->product->price;
-            return $priceToUse * $item->quantity;
+            if ($item->combo_pack_id) {
+                return ($item->comboPack->offer_price ?? 0) * $item->quantity;
+            }
+            if ($item->product_id) {
+                $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
+                    ? $item->product->sale_price
+                    : $item->product->price;
+                return $priceToUse * $item->quantity;
+            }
+            return 0;
         });
 
         $total = $subtotal;
@@ -32,10 +38,23 @@ class CartController extends Controller
         return view('view.cart', compact('cartItems', 'subtotal', 'total'));
     }
 
-    /**
-     * Add product to cart
-     */
     public function add(Request $request, Product $product)
+    {
+        return $this->addToCart($request, $product, 'product');
+    }
+
+    /**
+     * Add combo pack to cart
+     */
+    public function addCombo(Request $request, \App\Models\ComboPack $combo)
+    {
+        return $this->addToCart($request, $combo, 'combo');
+    }
+
+    /**
+     * Internal helper for adding to cart
+     */
+    protected function addToCart(Request $request, $item, $type)
     {
         $quantity = max(1, (int) $request->input('quantity', 1));
         $size = $request->input('size');
@@ -49,30 +68,30 @@ class CartController extends Controller
                 ], 400);
             }
             return back()->with('error', "Only {$product->stock_quantity} item(s) left in stock!");
+        $itemId = $item->id;
+        $name = $item->name;
+        $stock = $item->stock_quantity;
+
+        if ($stock < $quantity) {
+            $msg = "Only {$stock} item(s) left in stock!";
+            return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : back()->with('error', $msg);
         }
 
-        // Find existing item with the same product ID AND same options (size)
-        // For NULL options, we need whereNull
-        $existingItemQuery = Cart::current()->where('product_id', $product->id);
-        if ($options) {
-            $existingItemQuery->where('options', $options);
+        $query = Cart::current();
+        if ($type === 'product') {
+            $query->where('product_id', $itemId);
         } else {
-            $existingItemQuery->whereNull('options');
+            $query->where('combo_pack_id', $itemId);
         }
-        $existingItem = $existingItemQuery->first();
 
+        $existingItem = Cart::current()->where('product_id', $product->id)->first();
         $currentQuantity = $existingItem ? $existingItem->quantity : 0;
         $newTotalQuantity = $currentQuantity + $quantity;
 
-        if ($newTotalQuantity > $product->stock_quantity) {
-            $canAdd = $product->stock_quantity - $currentQuantity;
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "You can only add {$canAdd} more item(s) of this product."
-                ], 400);
-            }
-            return back()->with('error', "You can only add {$canAdd} more item(s) of this product.");
+        if ($newTotalQuantity > $stock) {
+            $canAdd = $stock - $currentQuantity;
+            $msg = "You can only add {$canAdd} more item(s) of this item.";
+            return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : back()->with('error', $msg);
         }
 
         if ($existingItem) {
@@ -83,25 +102,25 @@ class CartController extends Controller
                 'session_id'  => Auth::check() ? null : session()->getId(),
                 'product_id'  => $product->id,
                 'quantity'    => $quantity,
-                'options'     => $options,
             ]);
         }
 
         $this->updateSessionCounts();
 
         $cartCount = Cart::current()->sum('quantity') ?? 0;
-        $cartItems = Cart::current()->with('product')->get();
-        $subtotal = $cartItems->sum(function ($item) {
-            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                ? $item->product->sale_price 
-                : $item->product->price;
-            return $priceToUse * $item->quantity;
+        $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
+        $subtotal = $cartItems->sum(function ($ci) {
+            if ($ci->combo_pack_id)
+                return ($ci->comboPack->offer_price ?? 0) * $ci->quantity;
+            $p = $ci->product;
+            $price = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price) ? $p->sale_price : $p->price;
+            return $price * $ci->quantity;
         });
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => "{$quantity} × {$product->name} added to cart!",
+                'message' => "{$quantity} × {$name} added to cart!",
                 'cart_count' => $cartCount,
                 'subtotal' => number_format($subtotal, 2),
                 'total' => number_format($subtotal, 2)
@@ -109,10 +128,10 @@ class CartController extends Controller
         }
 
         if ($request->input('buy_now')) {
-            return redirect()->route('checkout.address')->with('success', "{$quantity} × {$product->name} added to cart! Proceeding to checkout.");
+            return redirect()->route('checkout.address')->with('success', "{$quantity} × {$name} added to cart! Proceeding to checkout.");
         }
 
-        return back()->with('success', "{$quantity} × {$product->name} added to cart!");
+        return back()->with('success', "{$quantity} × {$name} added to cart!");
     }
 
     /**
@@ -126,34 +145,41 @@ class CartController extends Controller
         $quantity = max(1, (int) $request->input('quantity'));
 
         if (!$cartItem->relationLoaded('product')) {
-            $cartItem->load('product');
+            $cartItem->load(['product', 'comboPack']);
         }
 
-        if ($quantity > $cartItem->product->stock_quantity) {
+        $stock = $cartItem->combo_pack_id ? $cartItem->comboPack->stock_quantity : $cartItem->product->stock_quantity;
+
+        if ($quantity > $stock) {
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Only {$cartItem->product->stock_quantity} item(s) available."
+                    'message' => "Only {$stock} item(s) available."
                 ], 400);
             }
-            return back()->with('error', "Only {$cartItem->product->stock_quantity} item(s) available.");
+            return back()->with('error', "Only {$stock} item(s) available.");
         }
 
         $cartItem->update(['quantity' => $quantity]);
         $this->updateSessionCounts();
 
         $cartCount = Cart::current()->sum('quantity') ?? 0;
-        $cartItems = Cart::current()->with('product')->get();
-        $subtotal = $cartItems->sum(function ($item) {
-            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                ? $item->product->sale_price 
-                : $item->product->price;
-            return $priceToUse * $item->quantity;
+        $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
+        $subtotal = $cartItems->sum(function ($ci) {
+            if ($ci->combo_pack_id)
+                return ($ci->comboPack->offer_price ?? 0) * $ci->quantity;
+            $p = $ci->product;
+            $price = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price) ? $p->sale_price : $p->price;
+            return $price * $ci->quantity;
         });
-        
-        $priceToUseForItem = ($cartItem->product->sale_price && $cartItem->product->sale_price > 0 && $cartItem->product->sale_price < $cartItem->product->price) 
-            ? $cartItem->product->sale_price 
-            : $cartItem->product->price;
+
+        if ($cartItem->combo_pack_id) {
+            $priceToUseForItem = $cartItem->comboPack->offer_price;
+        } else {
+            $priceToUseForItem = ($cartItem->product->sale_price && $cartItem->product->sale_price > 0 && $cartItem->product->sale_price < $cartItem->product->price)
+                ? $cartItem->product->sale_price
+                : $cartItem->product->price;
+        }
         $itemTotal = $priceToUseForItem * $quantity;
 
         if ($request->ajax()) {
@@ -185,12 +211,13 @@ class CartController extends Controller
         $this->updateSessionCounts();
 
         $cartCount = Cart::current()->sum('quantity') ?? 0;
-        $cartItems = Cart::current()->with('product')->get();
-        $subtotal = $cartItems->sum(function ($item) {
-            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                ? $item->product->sale_price 
-                : $item->product->price;
-            return $priceToUse * $item->quantity;
+        $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
+        $subtotal = $cartItems->sum(function ($ci) {
+            if ($ci->combo_pack_id)
+                return ($ci->comboPack->offer_price ?? 0) * $ci->quantity;
+            $p = $ci->product;
+            $price = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price) ? $p->sale_price : $p->price;
+            return $price * $ci->quantity;
         });
 
         if ($request->ajax()) {
@@ -236,90 +263,104 @@ class CartController extends Controller
      * Add to wishlist (requires login)
      */
     /**
- * Add to wishlist (requires login)
- */
-public function addToWishlist(Request $request, Product $product)
-{
-    if (!Auth::check()) {
+     * Add to wishlist (requires login)
+     */
+    public function addToWishlist(Request $request, Product $product)
+    {
+        return $this->handleAddToWishlist($request, $product, 'product');
+    }
+
+    public function addToWishlistCombo(Request $request, \App\Models\ComboPack $combo)
+    {
+        return $this->handleAddToWishlist($request, $combo, 'combo');
+    }
+
+    protected function handleAddToWishlist(Request $request, $item, $type)
+    {
+        if (!Auth::check()) {
+            $msg = 'Please login to add items to your wishlist.';
+            return $request->ajax() ? response()->json(['success' => false, 'message' => $msg, 'login_url' => route('login')], 401) : back()->with('error', $msg);
+        }
+
+        Wishlist::firstOrCreate([
+            'user_id' => Auth::id(),
+            'product_id' => $type === 'product' ? $item->id : null,
+            'combo_pack_id' => $type === 'combo' ? $item->id : null,
+        ]);
+
+        $this->updateSessionCounts();
+        $wishlistCount = Auth::user()->wishlist()->count() ?? 0;
+
         if ($request->ajax()) {
             return response()->json([
-                'success' => false,
-                'message' => 'Please login to add items to your wishlist.',
-                'login_url' => route('login')
-            ], 401);
+                'success' => true,
+                'message' => "{$item->name} added to wishlist!",
+                'wishlist_count' => $wishlistCount
+            ]);
         }
-        return back()->with('error', 'Please login to add items to your wishlist.');
+
+        return back()->with('success', "{$item->name} added to wishlist!");
     }
 
-    Wishlist::firstOrCreate([
-        'user_id' => Auth::id(),
-        'product_id' => $product->id,
-    ]);
-
-    $this->updateSessionCounts();
-    $wishlistCount = Auth::user()->wishlist()->count() ?? 0;
-
-    if ($request->ajax()) {
-        return response()->json([
-            'success' => true,
-            'message' => "{$product->name} added to wishlist!",
-            'wishlist_count' => $wishlistCount
-        ]);
+    /**
+     * Remove from wishlist
+     */
+    public function removeFromWishlist(Request $request, Product $product)
+    {
+        return $this->handleRemoveFromWishlist($request, $product, 'product');
     }
 
-    return back()->with('success', "{$product->name} added to wishlist!");
-}
+    public function removeFromWishlistCombo(Request $request, \App\Models\ComboPack $combo)
+    {
+        return $this->handleRemoveFromWishlist($request, $combo, 'combo');
+    }
 
-/**
- * Remove from wishlist
- */
-public function removeFromWishlist(Request $request, Product $product)
-{
-    if (!Auth::check()) {
+    protected function handleRemoveFromWishlist(Request $request, $item, $type)
+    {
+        if (!Auth::check()) {
+            $msg = 'Please login to manage wishlist.';
+            return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 401) : back()->with('error', $msg);
+        }
+
+        $query = Wishlist::where('user_id', Auth::id());
+        if ($type === 'product') {
+            $query->where('product_id', $item->id);
+        } else {
+            $query->where('combo_pack_id', $item->id);
+        }
+        $query->delete();
+
+        $this->updateSessionCounts();
+        $wishlistCount = Auth::user()->wishlist()->count() ?? 0;
+
         if ($request->ajax()) {
             return response()->json([
-                'success' => false,
-                'message' => 'Please login to manage wishlist.'
-            ], 401);
+                'success' => true,
+                'message' => 'Removed from wishlist.',
+                'wishlist_count' => $wishlistCount
+            ]);
         }
-        return back()->with('error', 'Please login to manage wishlist.');
+
+        return back()->with('success', 'Removed from wishlist.');
     }
-
-    Wishlist::where('user_id', Auth::id())
-        ->where('product_id', $product->id)
-        ->delete();
-
-    $this->updateSessionCounts();
-    $wishlistCount = Auth::user()->wishlist()->count() ?? 0;
-
-    if ($request->ajax()) {
-        return response()->json([
-            'success' => true,
-            'message' => 'Removed from wishlist.',
-            'wishlist_count' => $wishlistCount
-        ]);
-    }
-
-    return back()->with('success', 'Removed from wishlist.');
-}
 
     /**
      * Show wishlist page
      */
     /**
- * Show wishlist page
- */
-public function wishlist()
-{
-    $wishlistItems = Auth::check()
-        ? Auth::user()->wishlist()->with('product')->get()
-        : collect();
+     * Show wishlist page
+     */
+    public function wishlist()
+    {
+        $wishlistItems = Auth::check()
+            ? Auth::user()->wishlist()->with(['product', 'comboPack'])->get()
+            : collect();
 
-    // Update session counts for consistency
-    $this->updateSessionCounts();
+        // Update session counts for consistency
+        $this->updateSessionCounts();
 
-    return view('view.wishlist', compact('wishlistItems'));
-}
+        return view('view.wishlist', compact('wishlistItems'));
+    }
 
     /**
      * Helper: Authorize that the cart item belongs to current user/session
