@@ -22,31 +22,31 @@
         <h1 class="cart-title">Shopping Cart</h1>
 
         @if(isset($cartItems) && $cartItems->count() > 0)
-            <div class="row" id="cartContent">
-                <!-- CART ITEMS -->
-                <div class="col-lg-8">
-                    <div class="cart-items-wrapper" id="cartItemsWrapper">
-                        @foreach($cartItems as $item)
-                        @if(isset($item->product))
-                        <div class="cart-item" id="cartItem_{{ $item->id }}">
-                            <div class="item-image">
-                                <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('assets/images/product/product1.jpg') }}" 
-                                     alt="{{ $item->product->name }}">
+        <div class="row" id="cartContent">
+            <!-- CART ITEMS -->
+            <div class="col-lg-8">
+                <div class="cart-items-wrapper" id="cartItemsWrapper">
+                    @foreach($cartItems as $item)
+                    @if(isset($item->product))
+                    <div class="cart-item" id="cartItem_{{ $item->id }}">
+                        <div class="item-image">
+                            <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('assets/images/product/product1.jpg') }}"
+                                alt="{{ $item->product->name }}">
+                        </div>
+                        <div class="item-details">
+                            <h3 class="item-name">{{ $item->product->name }}</h3>
+                            @if($item->options)
+                            @php $options = json_decode($item->options, true); @endphp
+                            @if(isset($options['size']))
+                            <div class="item-attributes text-muted mb-2" style="font-size: 0.9rem;">
+                                <strong>Size:</strong> {{ $options['size'] }}
                             </div>
-                            <div class="item-details">
-                                <h3 class="item-name">{{ $item->product->name }}</h3>
-                                @if($item->options)
-                                    @php $options = json_decode($item->options, true); @endphp
-                                    @if(isset($options['size']))
-                                        <div class="item-attributes text-muted mb-2" style="font-size: 0.9rem;">
-                                            <strong>Size:</strong> {{ $options['size'] }}
-                                        </div>
-                                    @endif
-                                @endif
-                                @php
-                                    $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
-                                        ? $item->product->sale_price 
-                                        : $item->product->price;
+                            @endif
+                            @endif
+                            @php
+                            $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
+                                ? $item->product->sale_price
+                                : $item->product->price;
                                 @endphp
                                 <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
                                 <div class="item-total" id="itemTotal_{{ $item->id }}">
@@ -55,124 +55,124 @@
                                 <div class="quantity-controls">
                                     <span class="qty-label">Quantity:</span>
                                     <div class="qty-input-group">
-                                        <button type="button" class="qty-btn decrement" 
-                                                data-item-id="{{ $item->id }}">−</button>
-                                        <input type="number" id="quantity_{{ $item->id }}" 
-                                               value="{{ $item->quantity }}" min="1" 
-                                               class="qty-input" readonly>
-                                        <button type="button" class="qty-btn increment" 
-                                                data-item-id="{{ $item->id }}">+</button>
-                            @php
-                                $isCombo = (bool) $item->combo_pack_id;
-                                $p = $isCombo ? $item->comboPack : $item->product;
-                            @endphp
-                            @if($p)
-                                <div class="cart-item" id="cartItem_{{ $item->id }}">
-                                    <div class="item-image position-relative d-flex align-items-center justify-content-center" style="background: #fdfdfd; border-radius: 8px; overflow: hidden; width: 80px; height: 80px;">
+                                        <button type="button" class="qty-btn decrement"
+                                            data-item-id="{{ $item->id }}">−</button>
+                                        <input type="number" id="quantity_{{ $item->id }}"
+                                            value="{{ $item->quantity }}" min="1"
+                                            class="qty-input" readonly>
+                                        <button type="button" class="qty-btn increment"
+                                            data-item-id="{{ $item->id }}">+</button>
                                         @php
-                                            $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+                                        $isCombo = (bool) $item->combo_pack_id;
+                                        $p = $isCombo ? $item->comboPack : $item->product;
                                         @endphp
+                                        @if($p)
+                                        <div class="cart-item" id="cartItem_{{ $item->id }}">
+                                            <div class="item-image position-relative d-flex align-items-center justify-content-center" style="background: #fdfdfd; border-radius: 8px; overflow: hidden; width: 80px; height: 80px;">
+                                                @php
+                                                $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+                                                @endphp
 
-                                        @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
-                                            <div class="cart-dual-image d-flex align-items-center justify-content-center w-100 h-100 p-1">
-                                                <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
-                                                <span style="font-size: 12px; font-weight: bold; color: #72a420; margin: 0 2px;">+</span>
-                                                <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
-                                            </div>
-                                        @else
-                                            @php
+                                                @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
+                                                <div class="cart-dual-image d-flex align-items-center justify-content-center w-100 h-100 p-1">
+                                                    <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
+                                                    <span style="font-size: 12px; font-weight: bold; color: #72a420; margin: 0 2px;">+</span>
+                                                    <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
+                                                </div>
+                                                @else
+                                                @php
                                                 $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
-                                            @endphp
-                                            <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}" 
-                                                 alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                                        @endif
+                                                @endphp
+                                                <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}"
+                                                    alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                                @endif
 
-                                        @if($isCombo)
-                                            <span class="badge badge-danger position-absolute" style="top:2px; left:2px; font-size: 8px; padding: 2px 4px;">COMBO</span>
-                                        @endif
-                                    </div>
-                                    <div class="item-details">
-                                        <h3 class="item-name">{{ $p->name }}</h3>
-                                        @php
-                                            if ($isCombo) {
+                                                @if($isCombo)
+                                                <span class="badge badge-danger position-absolute" style="top:2px; left:2px; font-size: 8px; padding: 2px 4px;">COMBO</span>
+                                                @endif
+                                            </div>
+                                            <div class="item-details">
+                                                <h3 class="item-name">{{ $p->name }}</h3>
+                                                @php
+                                                if ($isCombo) {
                                                 $priceToUse = $p->offer_price;
-                                            } else {
+                                                } else {
                                                 $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
                                                     ? $p->sale_price
                                                     : $p->price;
-                                            }
-                                        @endphp
-                                        <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
-                                        <div class="item-total" id="itemTotal_{{ $item->id }}">
-                                            ₹{{ number_format($priceToUse * $item->quantity, 2) }}
-                                        </div>
-                                        <div class="quantity-controls">
-                                            <span class="qty-label">Quantity:</span>
-                                            <div class="qty-input-group">
-                                                <button type="button" class="qty-btn decrement" 
-                                                        data-item-id="{{ $item->id }}">−</button>
-                                                <input type="number" id="quantity_{{ $item->id }}" 
-                                                       value="{{ $item->quantity }}" min="1" 
-                                                       class="qty-input" readonly>
-                                                <button type="button" class="qty-btn increment" 
-                                                        data-item-id="{{ $item->id }}">+</button>
+                                                    }
+                                                    @endphp
+                                                    <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
+                                                    <div class="item-total" id="itemTotal_{{ $item->id }}">
+                                                        ₹{{ number_format($priceToUse * $item->quantity, 2) }}
+                                                    </div>
+                                                    <div class="quantity-controls">
+                                                        <span class="qty-label">Quantity:</span>
+                                                        <div class="qty-input-group">
+                                                            <button type="button" class="qty-btn decrement"
+                                                                data-item-id="{{ $item->id }}">−</button>
+                                                            <input type="number" id="quantity_{{ $item->id }}"
+                                                                value="{{ $item->quantity }}" min="1"
+                                                                class="qty-input" readonly>
+                                                            <button type="button" class="qty-btn increment"
+                                                                data-item-id="{{ $item->id }}">+</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-actions">
+                                                        <button type="button" class="action-btn remove"
+                                                            data-item-id="{{ $item->id }}">
+                                                            <i class="fas fa-trash-alt"></i> Remove
+                                                        </button>
+                                                    </div>
                                             </div>
                                         </div>
-                                        <div class="item-actions">
-                                            <button type="button" class="action-btn remove" 
-                                                    data-item-id="{{ $item->id }}">
-                                                <i class="fas fa-trash-alt"></i> Remove
-                                            </button>
-                                        </div>
+                                        @endif
+                                        @endforeach
                                     </div>
                                 </div>
-                            @endif
-                        @endforeach
-                    </div>
-                </div>
 
-                <!-- CART SUMMARY -->
-                <div class="col-lg-4">
-                    <div class="cart-summary">
-                        <h2 class="summary-title">Order Summary</h2>
-                        <div class="summary-row">
-                            <span>Subtotal:</span>
-                            <span class="summary-amount" id="cartSubtotal">₹{{ number_format($subtotal ?? 0, 2) }}</span>
+                                <!-- CART SUMMARY -->
+                                <div class="col-lg-4">
+                                    <div class="cart-summary">
+                                        <h2 class="summary-title">Order Summary</h2>
+                                        <div class="summary-row">
+                                            <span>Subtotal:</span>
+                                            <span class="summary-amount" id="cartSubtotal">₹{{ number_format($subtotal ?? 0, 2) }}</span>
+                                        </div>
+                                        <div class="summary-row">
+                                            <span>Shipping:</span>
+                                            <span class="summary-amount">Free</span>
+                                        </div>
+                                        <div class="summary-row">
+                                            <span>Tax:</span>
+                                            <span class="summary-amount">₹0.00</span>
+                                        </div>
+                                        <div class="summary-row">
+                                            <span>Discount:</span>
+                                            <span class="summary-amount" style="color: var(--primary-color);">-₹0.00</span>
+                                        </div>
+                                        <div class="summary-row total">
+                                            <span>Total:</span>
+                                            <span class="summary-amount total" id="cartTotal">₹{{ number_format($total ?? $subtotal ?? 0, 2) }}</span>
+                                        </div>
+                                        <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">Proceed to Checkout</button>
+                                        <button type="button" class="continue-shopping-btn" onclick="window.location='{{ route('home') }}'">Continue Shopping</button>
+                                        <button type="button" class="clear-cart-btn btn btn-outline-danger w-100 mt-3"
+                                            onclick="clearCart()">
+                                            <i class="fas fa-trash"></i> Clear Cart
+                                        </button>
+                                    </div>
+                                </div>
                         </div>
-                        <div class="summary-row">
-                            <span>Shipping:</span>
-                            <span class="summary-amount">Free</span>
+                        @else
+                        <div class="text-center py-5" style="min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                            <h3 class="mb-4" style="color: #666;">Your cart is empty</h3>
+                            <a href="{{ route('home') }}" class="btn btn-primary mt-3" style="background-color: var(--primary-color); border: none; padding: 12px 30px; font-size: 16px;">
+                                Start Shopping
+                            </a>
                         </div>
-                        <div class="summary-row">
-                            <span>Tax:</span>
-                            <span class="summary-amount">₹0.00</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Discount:</span>
-                            <span class="summary-amount" style="color: var(--primary-color);">-₹0.00</span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>Total:</span>
-                            <span class="summary-amount total" id="cartTotal">₹{{ number_format($total ?? $subtotal ?? 0, 2) }}</span>
-                        </div>
-                        <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">Proceed to Checkout</button>
-                        <button type="button" class="continue-shopping-btn" onclick="window.location='{{ route('home') }}'">Continue Shopping</button>
-                        <button type="button" class="clear-cart-btn btn btn-outline-danger w-100 mt-3" 
-                                onclick="clearCart()">
-                            <i class="fas fa-trash"></i> Clear Cart
-                        </button>
+                        @endif
                     </div>
-                </div>
-            </div>
-        @else
-            <div class="text-center py-5" style="min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                <h3 class="mb-4" style="color: #666;">Your cart is empty</h3>
-                <a href="{{ route('home') }}" class="btn btn-primary mt-3" style="background-color: var(--primary-color); border: none; padding: 12px 30px; font-size: 16px;">
-                    Start Shopping
-                </a>
-            </div>
-        @endif
-    </div>
 </main>
 
 <script>
@@ -211,58 +211,58 @@
         input.disabled = true;
 
         fetch(`${baseUrl}/cart/update/${itemId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                quantity: newQuantity
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    quantity: newQuantity
+                })
             })
-        })
-        .then(async response => {
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                throw new Error(data.message || `HTTP error! status: ${response.status}`);
-            }
-            return data;
-        })
-        .then(data => {
-            if (data.success) {
-                input.value = data.quantity;
-                // Update item total
-                const itemTotalEl = document.getElementById(`itemTotal_${itemId}`);
-                if (itemTotalEl && data.item_total) {
-                    itemTotalEl.textContent = `₹${parseFloat(data.item_total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            .then(async response => {
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.message || `HTTP error! status: ${response.status}`);
                 }
-                // Update cart totals
-                if (data.subtotal) {
-                    document.getElementById('cartSubtotal').textContent =
-                        `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                return data;
+            })
+            .then(data => {
+                if (data.success) {
+                    input.value = data.quantity;
+                    // Update item total
+                    const itemTotalEl = document.getElementById(`itemTotal_${itemId}`);
+                    if (itemTotalEl && data.item_total) {
+                        itemTotalEl.textContent = `₹${parseFloat(data.item_total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                    }
+                    // Update cart totals
+                    if (data.subtotal) {
+                        document.getElementById('cartSubtotal').textContent =
+                            `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                    }
+                    if (data.total) {
+                        document.getElementById('cartTotal').textContent =
+                            `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                    }
+                    // Update cart count if present
+                    const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
+                    cartCountEls.forEach(el => {
+                        if (data.cart_count !== undefined) el.textContent = data.cart_count;
+                    });
+                    showMessage(data.message || 'Quantity updated!', 'success');
+                } else {
+                    showMessage(data.message || 'Update failed', 'error');
                 }
-                if (data.total) {
-                    document.getElementById('cartTotal').textContent =
-                        `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                }
-                // Update cart count if present
-                const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
-                cartCountEls.forEach(el => {
-                    if (data.cart_count !== undefined) el.textContent = data.cart_count;
-                });
-                showMessage(data.message || 'Quantity updated!', 'success');
-            } else {
-                showMessage(data.message || 'Update failed', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage(error.message || 'Failed to update quantity. Please try again.', 'error');
-        })
-        .finally(() => {
-            input.disabled = false;
-        });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage(error.message || 'Failed to update quantity. Please try again.', 'error');
+            })
+            .finally(() => {
+                input.disabled = false;
+            });
     }
 
     // Remove item function
@@ -272,62 +272,62 @@
         }
         console.log('Removing item:', itemId);
         fetch(`${baseUrl}/cart/remove/${itemId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(async response => {
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                throw new Error(data.message || `HTTP error! status: ${response.status}`);
-            }
-            return data;
-        })
-        .then(data => {
-            if (data.success) {
-                const cartItem = document.getElementById(`cartItem_${itemId}`);
-                if (cartItem) {
-                    cartItem.style.transition = 'opacity 0.3s';
-                    cartItem.style.opacity = '0';
-                    setTimeout(() => {
-                        cartItem.remove();
-                        // Update cart totals
-                        if (data.subtotal) {
-                            document.getElementById('cartSubtotal').textContent =
-                                `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                        }
-                        if (data.total) {
-                            document.getElementById('cartTotal').textContent =
-                                `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                        }
-                        const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
-                        cartCountEls.forEach(el => {
-                            if (data.cart_count !== undefined) el.textContent = data.cart_count;
-                        });
-                        // Check if cart is empty
-                        const cartItemsWrapper = document.getElementById('cartItemsWrapper');
-                        // Or fallback: count remaining .cart-item
-                        if (
-                            (cartItemsWrapper && cartItemsWrapper.children.length === 0)
-                            || !document.querySelector('.cart-item')
-                        ) {
-                            showEmptyCart();
-                        }
-                        showMessage(data.message || 'Item removed!', 'success');
-                    }, 300);
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
-            } else {
-                showMessage(data.message || 'Failed to remove item', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage(error.message || 'Failed to remove item. Please try again.', 'error');
-        });
+            })
+            .then(async response => {
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                }
+                return data;
+            })
+            .then(data => {
+                if (data.success) {
+                    const cartItem = document.getElementById(`cartItem_${itemId}`);
+                    if (cartItem) {
+                        cartItem.style.transition = 'opacity 0.3s';
+                        cartItem.style.opacity = '0';
+                        setTimeout(() => {
+                            cartItem.remove();
+                            // Update cart totals
+                            if (data.subtotal) {
+                                document.getElementById('cartSubtotal').textContent =
+                                    `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                            }
+                            if (data.total) {
+                                document.getElementById('cartTotal').textContent =
+                                    `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                            }
+                            const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
+                            cartCountEls.forEach(el => {
+                                if (data.cart_count !== undefined) el.textContent = data.cart_count;
+                            });
+                            // Check if cart is empty
+                            const cartItemsWrapper = document.getElementById('cartItemsWrapper');
+                            // Or fallback: count remaining .cart-item
+                            if (
+                                (cartItemsWrapper && cartItemsWrapper.children.length === 0) ||
+                                !document.querySelector('.cart-item')
+                            ) {
+                                showEmptyCart();
+                            }
+                            showMessage(data.message || 'Item removed!', 'success');
+                        }, 300);
+                    }
+                } else {
+                    showMessage(data.message || 'Failed to remove item', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage(error.message || 'Failed to remove item. Please try again.', 'error');
+            });
     }
 
     // Clear cart function
@@ -337,58 +337,58 @@
         }
         console.log('Clearing cart...');
         fetch(`${baseUrl}/cart/clear`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(async response => {
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                throw new Error(data.message || `HTTP error! status: ${response.status}`);
-            }
-            return data;
-        })
-        .then(data => {
-            if (data.success) {
-                // Animate and remove all items
-                const cartItems = document.querySelectorAll('.cart-item');
-                cartItems.forEach((item, index) => {
-                    item.style.transition = 'opacity 0.3s';
-                    item.style.opacity = '0';
-                    setTimeout(() => {
-                        item.remove();
-                    }, index * 100);
-                });
-                setTimeout(() => {
-                    // Update totals
-                    if (data.subtotal) {
-                        document.getElementById('cartSubtotal').textContent =
-                            `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                    }
-                    if (data.total) {
-                        document.getElementById('cartTotal').textContent =
-                            `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                    }
-                    // Update cart count
-                    const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
-                    cartCountEls.forEach(el => {
-                        if (data.cart_count !== undefined) el.textContent = data.cart_count;
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(async response => {
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                }
+                return data;
+            })
+            .then(data => {
+                if (data.success) {
+                    // Animate and remove all items
+                    const cartItems = document.querySelectorAll('.cart-item');
+                    cartItems.forEach((item, index) => {
+                        item.style.transition = 'opacity 0.3s';
+                        item.style.opacity = '0';
+                        setTimeout(() => {
+                            item.remove();
+                        }, index * 100);
                     });
-                    showEmptyCart();
-                    showMessage(data.message || 'Cart cleared!', 'success');
-                }, cartItems.length * 100);
-            } else {
-                showMessage(data.message || 'Failed to clear cart', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage(error.message || 'Failed to clear cart. Please try again.', 'error');
-        });
+                    setTimeout(() => {
+                        // Update totals
+                        if (data.subtotal) {
+                            document.getElementById('cartSubtotal').textContent =
+                                `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                        }
+                        if (data.total) {
+                            document.getElementById('cartTotal').textContent =
+                                `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                        }
+                        // Update cart count
+                        const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
+                        cartCountEls.forEach(el => {
+                            if (data.cart_count !== undefined) el.textContent = data.cart_count;
+                        });
+                        showEmptyCart();
+                        showMessage(data.message || 'Cart cleared!', 'success');
+                    }, cartItems.length * 100);
+                } else {
+                    showMessage(data.message || 'Failed to clear cart', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage(error.message || 'Failed to clear cart. Please try again.', 'error');
+            });
     }
 
     // Show empty cart message
@@ -545,29 +545,32 @@
     };
 </script>
 <style>
-.toast-message {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #2ecc71;
-    color: white;
-    padding: 15px 20px;
-    border-radius: 8px;
-    z-index: 9999;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    animation: slideIn 0.3s ease;
-}
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
+    .toast-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #2ecc71;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: slideIn 0.3s ease;
     }
-    to {
-        transform: translateX(0);
-        opacity: 1;
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
-}
-/* Additional cart styles can go here */
+
+    /* Additional cart styles can go here */
 </style>
 
 @include('view.layout.footer')

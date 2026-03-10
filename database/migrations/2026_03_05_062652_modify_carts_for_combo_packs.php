@@ -12,12 +12,15 @@ return new class extends Migration {
     {
         Schema::disableForeignKeyConstraints();
         Schema::table('carts', function (Blueprint $table) {
-            $table->dropUnique('carts_user_id_session_id_product_id_unique');
-            $table->dropIndex('carts_product_id_foreign');
+            // Check if the unique index exists before trying to drop it, or just omit if we know it was already dropped
+            // Since we've verified it's already dropped by a previous migration, we'll remove it.
+            // $table->dropUnique('carts_user_id_session_id_product_id_unique');
+
+            $table->dropForeign(['product_id']);
             $table->unsignedBigInteger('product_id')->nullable()->change();
             $table->foreignId('combo_pack_id')->nullable()->constrained('combo_packs')->onDelete('cascade');
             $table->unique(['user_id', 'session_id', 'product_id', 'combo_pack_id'], 'carts_unique_items_idx');
-            $table->index('product_id', 'carts_product_id_foreign');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
         Schema::enableForeignKeyConstraints();
     }

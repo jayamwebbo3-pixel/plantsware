@@ -84,7 +84,17 @@ class CartController extends Controller
             $query->where('combo_pack_id', $itemId);
         }
 
-        $existingItem = Cart::current()->where('product_id', $product->id)->first();
+        $existingItem = $query->first();
+        // Find existing item with the same product ID AND same options (size)
+        // For NULL options, we need whereNull
+        $existingItemQuery = Cart::current()->where('product_id', $product->id);
+        if ($options) {
+            $existingItemQuery->where('options', $options);
+        } else {
+            $existingItemQuery->whereNull('options');
+        }
+        $existingItem = $existingItemQuery->first();
+
         $currentQuantity = $existingItem ? $existingItem->quantity : 0;
         $newTotalQuantity = $currentQuantity + $quantity;
 
@@ -98,10 +108,16 @@ class CartController extends Controller
             $existingItem->increment('quantity', $quantity);
         } else {
             Cart::create([
+                'user_id' => Auth::id(),
+                'session_id' => Auth::check() ? null : session()->getId(),
+                'product_id' => $type === 'product' ? $itemId : null,
+                'combo_pack_id' => $type === 'combo' ? $itemId : null,
+                'quantity' => $quantity,
                 'user_id'     => Auth::id(),
                 'session_id'  => Auth::check() ? null : session()->getId(),
                 'product_id'  => $product->id,
                 'quantity'    => $quantity,
+                'options'     => $options,
             ]);
         }
 
