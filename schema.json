@@ -1,0 +1,6 @@
+[
+    {
+        "Table": "carts",
+        "Create Table": "CREATE TABLE `carts` (\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n  `user_id` bigint(20) unsigned DEFAULT NULL,\n  `session_id` varchar(255) DEFAULT NULL,\n  `product_id` bigint(20) unsigned NOT NULL,\n  `quantity` int(11) NOT NULL DEFAULT 1,\n  `options` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`options`)),\n  `created_at` timestamp NULL DEFAULT NULL,\n  `updated_at` timestamp NULL DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `carts_user_id_session_id_product_id_unique` (`user_id`,`session_id`,`product_id`),\n  KEY `carts_product_id_foreign` (`product_id`),\n  CONSTRAINT `carts_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,\n  CONSTRAINT `carts_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    }
+]

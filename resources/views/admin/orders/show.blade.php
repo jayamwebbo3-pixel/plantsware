@@ -32,7 +32,13 @@
                                 @if($item->product_image)
                                     <img src="{{ asset('storage/' . $item->product_image) }}" style="width:50px; height:50px; object-fit:cover;" class="me-2">
                                 @endif
-                                {{ $item->product_name }}
+                                <span>{{ $item->product_name }}</span>
+                                @if($item->options)
+                                    @php $options = json_decode($item->options, true); @endphp
+                                    @if(isset($options['size']))
+                                        <div class="text-muted small mt-1">Size: {{ $options['size'] }}</div>
+                                    @endif
+                                @endif
                             </td>
                             <td>{{ $item->quantity }}</td>
                             <td>₹{{ number_format($item->price, 2) }}</td>

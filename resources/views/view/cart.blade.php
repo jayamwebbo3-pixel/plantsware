@@ -35,6 +35,14 @@
                             </div>
                             <div class="item-details">
                                 <h3 class="item-name">{{ $item->product->name }}</h3>
+                                @if($item->options)
+                                    @php $options = json_decode($item->options, true); @endphp
+                                    @if(isset($options['size']))
+                                        <div class="item-attributes text-muted mb-2" style="font-size: 0.9rem;">
+                                            <strong>Size:</strong> {{ $options['size'] }}
+                                        </div>
+                                    @endif
+                                @endif
                                 @php
                                     $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price) 
                                         ? $item->product->sale_price 

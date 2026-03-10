@@ -38,6 +38,8 @@ class CartController extends Controller
     public function add(Request $request, Product $product)
     {
         $quantity = max(1, (int) $request->input('quantity', 1));
+        $size = $request->input('size');
+        $options = $size ? json_encode(['size' => $size]) : null;
 
         if ($product->stock_quantity < $quantity) {
             if ($request->ajax()) {
@@ -49,7 +51,16 @@ class CartController extends Controller
             return back()->with('error', "Only {$product->stock_quantity} item(s) left in stock!");
         }
 
-        $existingItem = Cart::current()->where('product_id', $product->id)->first();
+        // Find existing item with the same product ID AND same options (size)
+        // For NULL options, we need whereNull
+        $existingItemQuery = Cart::current()->where('product_id', $product->id);
+        if ($options) {
+            $existingItemQuery->where('options', $options);
+        } else {
+            $existingItemQuery->whereNull('options');
+        }
+        $existingItem = $existingItemQuery->first();
+
         $currentQuantity = $existingItem ? $existingItem->quantity : 0;
         $newTotalQuantity = $currentQuantity + $quantity;
 
@@ -72,6 +83,7 @@ class CartController extends Controller
                 'session_id'  => Auth::check() ? null : session()->getId(),
                 'product_id'  => $product->id,
                 'quantity'    => $quantity,
+                'options'     => $options,
             ]);
         }
 

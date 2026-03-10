@@ -106,8 +106,48 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="size" class="form-label">Size</label>
-                                <input type="text" class="form-control" id="size" name="size" value="{{ old('size', $product->size) }}" placeholder="e.g., 12x12 inch or 10 Gallon">
+                                <label class="form-label">Size</label>
+                                <div id="size-checkboxes">
+                                    <!-- Default state: if Circular, show only inch options; if Rectangular, show Gallon -->
+                                    @php
+                                        $selectedShape = old('shape', $product->shape ?? 'Circular');
+                                        
+                                        // $product->size could be a string '6x6 Inch, 9x9 Inch'
+                                        $savedSizes = $product->size ? array_map('trim', explode(',', $product->size)) : [];
+                                        $selectedSizes = old('size', $savedSizes);
+                                        
+                                        if (!is_array($selectedSizes)) {
+                                            $selectedSizes = $selectedSizes ? (array)$selectedSizes : [];
+                                        }
+                                        $circularSizes = ['6x6 Inch','9x9 Inch','12x12 Inch','12x15 Inch','15x12 Inch','15x15 Inch','18x6 Inch',
+                                                            '18x9 Inch','18x18 Inch', '24x6 Inch', '24x24 Inch',];
+                                        $rectangularSizes = ['18x12x12 Inch', '18x12x9 Inch','24x12x9 Inch','24x12x12 Inch','24x24x12 Inch','24x24x18 Inch',];
+                                    @endphp
+
+                                    <div id="circular-sizes" style="{{ $selectedShape === 'Circular' ? '' : 'display:none;' }}">
+                                        @foreach($circularSizes as $size)
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" id="size-circular-{{ $loop->index }}" value="{{ $size }}" {{ in_array($size, $selectedSizes) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="size-circular-{{ $loop->index }}">
+                                                    {{ $size }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div id="rectangular-sizes" style="{{ $selectedShape === 'Rectangular' ? '' : 'display:none;' }}">
+                                        @foreach($rectangularSizes as $size)
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="size[]" id="size-rectangular-{{ $loop->index }}" value="{{ $size }}" {{ in_array($size, $selectedSizes) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="size-rectangular-{{ $loop->index }}">
+                                                    {{ $size }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div id="square-sizes" style="{{ $selectedShape === 'Square' ? '' : 'display:none;' }}">
+                                        <div class="text-muted">No sizes defined for Square.</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -133,6 +173,20 @@
                             </div>
                         </div>
                     </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            function toggleSizeCheckboxes() {
+                                var shape = document.getElementById('shape').value;
+                                document.getElementById('circular-sizes').style.display = (shape === 'Circular') ? '' : 'none';
+                                document.getElementById('rectangular-sizes').style.display = (shape === 'Rectangular') ? '' : 'none';
+                                document.getElementById('square-sizes').style.display = (shape === 'Square') ? '' : 'none';
+                            }
+                            document.getElementById('shape').addEventListener('change', toggleSizeCheckboxes);
+
+                            // Initial call, in case of page reload with validation error
+                            toggleSizeCheckboxes();
+                        });
+                    </script>
 
                     <div class="row">
                         <div class="col-md-4">
