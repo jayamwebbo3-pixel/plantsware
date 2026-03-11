@@ -19,16 +19,7 @@ class CartController extends Controller
         $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
 
         $subtotal = $cartItems->sum(function ($item) {
-            if ($item->combo_pack_id) {
-                return ($item->comboPack->offer_price ?? 0) * $item->quantity;
-            }
-            if ($item->product_id) {
-                $priceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
-                    ? $item->product->sale_price
-                    : $item->product->price;
-                return $priceToUse * $item->quantity;
-            }
-            return 0;
+            return $item->calculated_price * $item->quantity;
         });
 
         $total = $subtotal;
@@ -116,11 +107,7 @@ $existingItem = $query->first();
         $cartCount = Cart::current()->sum('quantity') ?? 0;
         $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
         $subtotal = $cartItems->sum(function ($ci) {
-            if ($ci->combo_pack_id)
-                return ($ci->comboPack->offer_price ?? 0) * $ci->quantity;
-            $p = $ci->product;
-            $price = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price) ? $p->sale_price : $p->price;
-            return $price * $ci->quantity;
+            return $ci->calculated_price * $ci->quantity;
         });
 
         if ($request->ajax()) {
@@ -172,19 +159,13 @@ $existingItem = $query->first();
         $cartCount = Cart::current()->sum('quantity') ?? 0;
         $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
         $subtotal = $cartItems->sum(function ($ci) {
-            if ($ci->combo_pack_id)
-                return ($ci->comboPack->offer_price ?? 0) * $ci->quantity;
-            $p = $ci->product;
-            $price = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price) ? $p->sale_price : $p->price;
-            return $price * $ci->quantity;
+            return $ci->calculated_price * $ci->quantity;
         });
 
         if ($cartItem->combo_pack_id) {
             $priceToUseForItem = $cartItem->comboPack->offer_price;
         } else {
-            $priceToUseForItem = ($cartItem->product->sale_price && $cartItem->product->sale_price > 0 && $cartItem->product->sale_price < $cartItem->product->price)
-                ? $cartItem->product->sale_price
-                : $cartItem->product->price;
+            $priceToUseForItem = $cartItem->calculated_price;
         }
         $itemTotal = $priceToUseForItem * $quantity;
 
@@ -219,11 +200,7 @@ $existingItem = $query->first();
         $cartCount = Cart::current()->sum('quantity') ?? 0;
         $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
         $subtotal = $cartItems->sum(function ($ci) {
-            if ($ci->combo_pack_id)
-                return ($ci->comboPack->offer_price ?? 0) * $ci->quantity;
-            $p = $ci->product;
-            $price = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price) ? $p->sale_price : $p->price;
-            return $price * $ci->quantity;
+            return $ci->calculated_price * $ci->quantity;
         });
 
         if ($request->ajax()) {

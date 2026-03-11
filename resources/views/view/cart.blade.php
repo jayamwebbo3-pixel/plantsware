@@ -67,13 +67,7 @@
                                             @endif
                                         @endif
                                         @php
-                                            if ($isCombo) {
-                                                $priceToUse = $p->offer_price;
-                                            } else {
-                                                $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
-                                                    ? $p->sale_price
-                                                    : $p->price;
-                                            }
+                                            $priceToUse = $item->calculated_price;
                                         @endphp
                                         <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
                                         <div class="item-total" id="itemTotal_{{ $item->id }}">

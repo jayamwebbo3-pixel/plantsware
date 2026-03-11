@@ -95,14 +95,7 @@ class CheckoutController extends Controller
         }
 
         $subtotal = $cartItems->sum(function ($item) {
-            if ($item->combo_pack_id) {
-                return ($item->comboPack->offer_price ?? 0) * $item->quantity;
-            }
-            $p = $item->product;
-            $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
-                ? $p->sale_price
-                : $p->price;
-            return $priceToUse * $item->quantity;
+            return $item->calculated_price * $item->quantity;
         });
         $shipping = 0; // Fixed or calculate
         $tax = 0; // Fixed or calculate
@@ -136,14 +129,7 @@ class CheckoutController extends Controller
         }
 
         $subtotal = $cartItems->sum(function ($item) {
-            if ($item->combo_pack_id) {
-                return ($item->comboPack->offer_price ?? 0) * $item->quantity;
-            }
-            $p = $item->product;
-            $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
-                ? $p->sale_price
-                : $p->price;
-            return $priceToUse * $item->quantity;
+            return $item->calculated_price * $item->quantity;
         });
         $shipping = 0;
         $tax = 0;
@@ -151,13 +137,8 @@ class CheckoutController extends Controller
 
         $checkoutItems = [];
         foreach ($cartItems as $item) {
-            if ($item->combo_pack_id) {
-                $p = $item->comboPack;
-                $price = $p->offer_price;
-            } else {
-                $p = $item->product;
-                $price = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price) ? $p->sale_price : $p->price;
-            }
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            $price = $item->calculated_price;
 
             $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
             $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : (is_string($p->image) ? $p->image : null);

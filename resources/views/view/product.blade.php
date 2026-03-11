@@ -93,18 +93,65 @@
                         <!-- Attributes Selector -->
                         @if($product->size)
                             @php
-                                $sizes = array_map('trim', explode(',', $product->size));
+                                $sizeData = [];
+                                $isJsonSizes = false;
+                                $rawSize = $product->size;
+                                if ($rawSize) {
+                                    $decoded = json_decode($rawSize, true);
+                                    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                        $isJsonSizes = true;
+                                        $sizeData = $decoded;
+                                    } else {
+                                        $parts = array_map('trim', explode(',', $rawSize));
+                                        foreach($parts as $p) {
+                                            if($p) $sizeData[$p] = null;
+                                        }
+                                    }
+                                }
                             @endphp
-                            @if(count($sizes) > 0)
+                            @if(count($sizeData) > 0)
                                 <div class="product-page-attributes mb-4">
                                     <label class="fw-bold mb-2">Select Size:</label>
                                     <div class="d-flex flex-wrap gap-2" id="sizeSelectorContainer">
-                                        @foreach($sizes as $index => $size)
-                                            <input type="radio" class="btn-check" name="size" id="size-{{ $index }}" value="{{ $size }}" autocomplete="off" form="mainCartForm" {{ $index === 0 ? 'checked' : '' }} required>
-                                            <label class="btn btn-outline-success" for="size-{{ $index }}">{{ $size }}</label>
+                                        @php $loopIndex = 0; @endphp
+                                        @foreach($sizeData as $sizeName => $sizePrice)
+                                            <input type="radio" class="btn-check size-radio" name="size" id="size-{{ $loopIndex }}" value="{{ $sizeName }}" autocomplete="off" form="mainCartForm" {{ $loopIndex === 0 ? 'checked' : '' }} required data-price="{{ $sizePrice ?? '' }}" onchange="updateProductPrice(this)">
+                                            <label class="btn btn-outline-success" for="size-{{ $loopIndex }}">
+                                                {{ $sizeName }} 
+                                                @if($sizePrice) <small>(₹{{ $sizePrice }})</small> @endif
+                                            </label>
+                                            @php $loopIndex++; @endphp
                                         @endforeach
                                     </div>
                                 </div>
+                                <script>
+                                    function updateProductPrice(radio) {
+                                        let newPrice = radio.getAttribute('data-price');
+                                        let currentPriceEl = document.querySelector('.product-page-current-price');
+                                        let originalPriceEl = document.querySelector('.product-page-original-price');
+                                        
+                                        if (newPrice && parseFloat(newPrice) > 0) {
+                                            if(currentPriceEl) currentPriceEl.innerText = '₹' + parseFloat(newPrice).toFixed(2);
+                                            if(originalPriceEl) originalPriceEl.style.display = 'none';
+                                        } else {
+                                            // Restore default prices
+                                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
+                                                if(currentPriceEl) currentPriceEl.innerText = '₹{{ number_format($product->sale_price, 2) }}';
+                                                if(originalPriceEl) {
+                                                    originalPriceEl.style.display = 'inline';
+                                                    originalPriceEl.innerText = '₹{{ number_format($product->price, 2) }}';
+                                                }
+                                            @else
+                                                if(currentPriceEl) currentPriceEl.innerText = '₹{{ number_format($product->price, 2) }}';
+                                                if(originalPriceEl) originalPriceEl.style.display = 'none';
+                                            @endif
+                                        }
+                                    }
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        let firstRadio = document.querySelector('.size-radio:checked');
+                                        if(firstRadio) updateProductPrice(firstRadio);
+                                    });
+                                </script>
                             @endif
                         @endif
 

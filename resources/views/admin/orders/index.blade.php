@@ -39,6 +39,17 @@
         color: #fff !important;
         border-color: #a48cff !important;
     }
+    .order-status-btn.status-confirmed {
+        border-color: #46cbfbff;
+        color: #5799c2ff;
+        background: #e8f7ffff;
+    }
+    .order-status-btn.status-confirmed.active,
+    .order-status-btn.status-confirmed:focus {
+        background: #46cbfbff !important;
+        color: #fff !important;
+        border-color: #46cbfbff !important;
+    }
 
     .order-status-btn.status-shipped {
         border-color: #42a5f5;
@@ -99,10 +110,10 @@
                             <h4 class="mb-0">{{ $stats['total'] ?? 0 }}</h4>
                             <small class="text-muted">Total Orders</small>
                         </div>
-                        <div class="col-lg-2 col-md-4 col-6 mb-3">
+                        <!-- <div class="col-lg-2 col-md-4 col-6 mb-3">
                             <h4 class="mb-0 text-warning">{{ $stats['pending'] ?? 0 }}</h4>
                             <small class="text-muted">Pending</small>
-                        </div>
+                        </div> -->
                         <div class="col-lg-2 col-md-4 col-6 mb-3">
                             <h4 class="mb-0 text-success">{{ $stats['confirmed'] ?? 0 }}</h4>
                             <small class="text-muted">Confirmed</small>
@@ -144,7 +155,7 @@
 
     <!-- Main Card -->
     <div class="card shadow-sm">
-        <div class="card-header bg-white border-0 py-3">
+        <!-- <div class="card-header bg-white border-0 py-3">
             <ul class="nav nav-tabs card-header-tabs">
                 <li class="nav-item">
                     <a class="nav-link {{ request('customized') ? '' : 'active' }}" href="{{ route('admin.orders.index', array_merge(request()->except('customized'))) }}">
@@ -155,27 +166,27 @@
                     <a class="nav-link {{ request('customized') ? 'active' : '' }}" href="{{ route('admin.orders.index', array_merge(request()->all(), ['customized' => 1])) }}">
                         Customized Orders
                     </a>
-                </li>
+                </li> 
             </ul>
-        </div>
+        </div> -->
 
         <div class="card-body">
             <!-- Action Buttons & Filters -->
             <div class="row mb-3 align-items-center">
-                <div class="col-md-3">
-                    <!--
+                <!-- <div class="col-md-3">
+                    
                         In a real implementation, this button should submit a form to trigger a payment status update,
                         likely opening a modal to select the order(s) and new payment status.
-                    -->
-                    <button type="button" class="btn btn-warning btn-sm" disabled title="Select orders to change payment status">Change Payment Status</button>
-                </div>
-                <div class="col-md-6 text-center">
                     
-                    <div class="d-inline-flex flex-wrap" role="group">
+                    <button type="button" class="btn btn-warning btn-sm" disabled title="Select orders to change payment status">Change Payment Status</button>
+                </div> -->
+                <div class="col-md-9 text-center">
+                    
+                    <div class="d-inline-flex flex-nowrap" role="group">
                         @php
                             $statuses = [
                                 '' => ['label' => 'All', 'class' => 'status-all'],
-                                'confirmed' => ['label' => 'Confirmed', 'class' => 'status-processing'],
+                                'confirmed' => ['label' => 'Confirmed', 'class' => 'status-confirmed'],
                                 'processing' => ['label' => 'Processing', 'class' => 'status-processing'],
                                 'shipped' => ['label' => 'Shipped', 'class' => 'status-shipped'],
                                 'delivered' => ['label' => 'Delivered', 'class' => 'status-delivered'],
@@ -228,48 +239,77 @@
             <!-- Orders Table -->
             <div class="table-responsive">
                 <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-light">
+                    <thead class="table-light text-nowrap">
                         <tr>
-                            <th>SL NO</th>
+                            <th>SI.NO</th>
+                            <th>IMAGE</th>
                             <th>ORDER ID</th>
+                            <th>ORDER TIME</th>
+                            <th>PRODUCT</th>
+                            <th>QTY</th>
+                            <th>PRICE</th>
                             <th>USER NAME</th>
                             <th>MOBILE NO</th>
                             <th>ADDRESS</th>
                             <th>PAYMENT STATUS</th>
                             <th>ORDER STATUS</th>
-                            <th>TOTAL AMOUNT</th>
                             <th>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($orders as $order)
+                        @php $itemCount = count($order->items) ?: 1; @endphp
+                        @foreach($order->items as $index => $item)
                         <tr>
-                            <td>{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}</td>
-                            <td>
-                                <strong>{{ $order->order_number }}</strong>
-                                <div class="mt-2 small text-muted">
-                                    <ul class="list-unstyled mb-0">
-                                        @foreach($order->items as $item)
-                                            <li>
-                                                • {{ $item->product_name }} (x{{ $item->quantity }})
-                                                @if($item->options)
-                                                    @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
-                                                    @if(is_array($options) && isset($options['size']))
-                                                        <br><span class="ms-2">- Size: {{ $options['size'] }}</span>
-                                                    @elseif(is_string($options) && !empty($options))
-                                                        <br><span class="ms-2">- Size: {{ $options }}</span>
-                                                    @endif
-                                                @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
+                            @if($index === 0)
+                            <td rowspan="{{ $itemCount }}" class="align-middle">{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->parent->iteration }}</td>
+                            @endif
+                            <td class="align-middle text-center">
+                                @php
+                                    $img = $item->product_image;
+                                    $imgData = is_string($img) ? json_decode($img, true) : $img;
+                                    $firstImg = is_array($imgData) ? $imgData[0] : $img;
+                                @endphp
+                                @if($firstImg)
+                                     <img src="{{ asset('storage/' . $firstImg) }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                @else
+                                     <img src="{{ asset('assets/images/product/product1.jpg') }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                @endif
                             </td>
-                            <td>{{ $order->user?->name ?? 'Guest' }}</td>
-                            <td>
+                            @if($index === 0)
+                            <td rowspan="{{ $itemCount }}" class="align-middle">
+                                <strong>{{ $order->order_number }}</strong>
+                            </td>
+                            <td rowspan="{{ $itemCount }}" class="align-middle small">
+                                {{ $order->created_at->format('d M Y, h:i A') }}
+                            </td>
+                            @endif
+                            <td class="align-middle small">
+                                @if($item->product && !$item->combo_pack_id)
+                                    <a href="{{ route('product.show', $item->product->slug ?? '') }}" target="_blank" class="text-decoration-none fw-bold" style="color:#2ea25a;">{{ $item->product_name }}</a>
+                                @elseif($item->comboPack)
+                                    <a href="{{ route('combo_packs.frontend_show', $item->comboPack->slug ?? '') }}" target="_blank" class="text-decoration-none fw-bold" style="color:#2ea25a;">{{ $item->product_name }}</a> <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">COMBO</span>
+                                @else
+                                    <span class="fw-bold">{{ $item->product_name }}</span>
+                                @endif
+                                
+                                @if($item->options)
+                                    @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
+                                    @if(is_array($options) && isset($options['size']))
+                                        <br><small class="text-muted">Size: {{ $options['size'] }}</small>
+                                    @elseif(is_string($options) && !empty($options))
+                                        <br><small class="text-muted">Size: {{ $options }}</small>
+                                    @endif
+                                @endif
+                            </td>
+                            <td class="align-middle text-center">{{ $item->quantity }}</td>
+                            <td class="align-middle">₹{{ number_format($item->price, 2) }}</td>
+                            @if($index === 0)
+                            <td rowspan="{{ $itemCount }}" class="align-middle">{{ $order->user?->name ?? 'Guest' }}</td>
+                            <td rowspan="{{ $itemCount }}" class="align-middle">
                                 {{ $order->shipping_address['phone'] ?? ($order->user?->phone ?? 'N/A') }}
                             </td>
-                            <td class="small">
+                            <td rowspan="{{ $itemCount }}" class="align-middle small">
                                 {{ $order->shipping_address['address'] ?? 'N/A' }}
                                 @if(!empty($order->shipping_address['address']))<br>@endif
                                 {{ $order->shipping_address['city'] ?? '' }}
@@ -277,7 +317,7 @@
                                 {{ $order->shipping_address['state'] ?? '' }}
                                 @if(!empty($order->shipping_address['pincode'])) - {{ $order->shipping_address['pincode'] }}@endif
                             </td>
-                            <td>
+                            <td rowspan="{{ $itemCount }}" class="align-middle">
                                 @php
                                     $paymentStatus = $order->payment_status;
                                     $paymentBadge = [
@@ -290,8 +330,9 @@
                                 <span class="badge {{ $paymentBadge }}">
                                     {{ ucfirst(str_replace('_', ' ', $paymentStatus)) }}
                                 </span>
+                                <div class="mt-2 text-muted small fw-bold">Total: ₹{{ number_format($order->total, 2) }}</div>
                             </td>
-                            <td>
+                            <td rowspan="{{ $itemCount }}" class="align-middle">
                                 @php
                                     if (method_exists($order, 'getStatusBadgeClass')) {
                                         $badgeClass = $order->getStatusBadgeClass();
@@ -312,24 +353,99 @@
                                     {{ ucfirst(str_replace('_', ' ', $order->status)) }}
                                 </span>
                             </td>
-                            <td>₹{{ number_format($order->total, 2) }}</td>
-                            <td>
-                                <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-info" title="View Order">
-                                    <i class="fas fa-eye"></i> View
+                            <td rowspan="{{ $itemCount }}" class="align-middle">
+                                <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-info mb-1" title="View Order">
+                                    <i class="fas fa-eye"></i>
                                 </a>
                                 @if($order->payment_status === 'paid' || $order->payment_status === 'refunded')
-                                    <a href="{{ route('admin.orders.invoice', $order) }}" class="btn btn-sm btn-success" target="_blank" title="View Invoice">
-                                        <i class="fas fa-file-invoice"></i> Invoice
+                                    <a href="{{ route('admin.orders.invoice', $order) }}" class="btn btn-sm btn-success mb-1" target="_blank" title="View Invoice">
+                                        <i class="fas fa-file-invoice"></i>
                                     </a>
                                 @endif
-                                @if($order->status == 'processing')
-                                    <a href="#" class="btn btn-sm btn-primary" disabled title="Ship order (not implemented)">Ship</a>
+                                <!-- @if($order->status == 'processing')
+                                    <a href="#" class="btn btn-sm btn-primary mb-1" disabled title="Ship order (not implemented)"><i class="fas fa-shipping-fast"></i></a>
+                                @endif -->
+                            </td>
+                            @endif
+                        </tr>
+                        @endforeach
+                        
+                        {{-- Fallback for any orders somehow missing items entirely --}}
+                        @if($itemCount === 0)
+                        <tr>
+                            <td class="align-middle">{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}</td>
+                            <td class="align-middle text-center">-</td>
+                            <td class="align-middle"><strong>{{ $order->order_number }}</strong></td>
+                            <td class="align-middle small">{{ $order->created_at->format('d M Y, h:i A') }}</td>
+                            <td class="align-middle">-</td>
+                            <td class="align-middle text-center">-</td>
+                            <td class="align-middle">-</td>
+                            <td class="align-middle">{{ $order->user?->name ?? 'Guest' }}</td>
+                            <td class="align-middle">
+                                {{ $order->shipping_address['phone'] ?? ($order->user?->phone ?? 'N/A') }}
+                            </td>
+                            <td class="align-middle small">
+                                {{ $order->shipping_address['address'] ?? 'N/A' }}
+                                @if(!empty($order->shipping_address['address']))<br>@endif
+                                {{ $order->shipping_address['city'] ?? '' }}
+                                @if(!empty($order->shipping_address['city'])),@endif
+                                {{ $order->shipping_address['state'] ?? '' }}
+                                @if(!empty($order->shipping_address['pincode'])) - {{ $order->shipping_address['pincode'] }}@endif
+                            </td>
+                            <td class="align-middle">
+                                @php
+                                    $paymentStatus = $order->payment_status;
+                                    $paymentBadge = [
+                                        'paid' => 'bg-success',
+                                        'pending' => 'bg-warning text-dark',
+                                        'failed' => 'bg-danger',
+                                        'refunded' => 'bg-info text-dark'
+                                    ][$paymentStatus] ?? 'bg-secondary';
+                                @endphp
+                                <span class="badge {{ $paymentBadge }}">
+                                    {{ ucfirst(str_replace('_', ' ', $paymentStatus)) }}
+                                </span>
+                                <div class="mt-2 text-muted small fw-bold">Total: ₹{{ number_format($order->total, 2) }}</div>
+                            </td>
+                            <td class="align-middle">
+                                @php
+                                    if (method_exists($order, 'getStatusBadgeClass')) {
+                                        $badgeClass = $order->getStatusBadgeClass();
+                                    } else {
+                                        $statusColor = [
+                                            'pending' => 'bg-warning text-dark',
+                                            'confirmed' => 'bg-success text-white',
+                                            'processing' => 'bg-info text-dark',
+                                            'shipped' => 'bg-primary',
+                                            'delivered' => 'bg-success',
+                                            'cancelled' => 'bg-danger',
+                                            'returned' => 'bg-secondary'
+                                        ][$order->status] ?? 'bg-secondary';
+                                        $badgeClass = $statusColor;
+                                    }
+                                @endphp
+                                <span class="badge {{ $badgeClass }}">
+                                    {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                                </span>
+                            </td>
+                            <td class="align-middle">
+                                <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-info mb-1" title="View Order">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                @if($order->payment_status === 'paid' || $order->payment_status === 'refunded')
+                                    <a href="{{ route('admin.orders.invoice', $order) }}" class="btn btn-sm btn-success mb-1" target="_blank" title="View Invoice">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </a>
                                 @endif
+                                <!-- @if($order->status == 'processing')
+                                    <a href="#" class="btn btn-sm btn-primary mb-1" disabled title="Ship order (not implemented)"><i class="fas fa-shipping-fast"></i></a>
+                                @endif -->
                             </td>
                         </tr>
+                        @endif
                         @empty
                         <tr>
-                            <td colspan="9" class="text-center py-5 text-muted">
+                            <td colspan="13" class="text-center py-5 text-muted">
                                 No orders found.
                             </td>
                         </tr>

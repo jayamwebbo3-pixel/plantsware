@@ -32,4 +32,28 @@ class Cart extends Model
 
         return $query->where('session_id', session()->getId());
     }
+
+    public function getCalculatedPriceAttribute()
+    {
+        if ($this->combo_pack_id) {
+            return $this->comboPack->offer_price ?? 0;
+        }
+
+        $p = $this->product;
+        if (!$p) return 0;
+
+        $price = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price) ? $p->sale_price : $p->price;
+
+        if ($this->options) {
+            $optionsObj = json_decode($this->options, true);
+            if (isset($optionsObj['size']) && $p->size) {
+                $sizesObj = json_decode($p->size, true);
+                if (is_array($sizesObj) && isset($sizesObj[$optionsObj['size']]) && $sizesObj[$optionsObj['size']] > 0) {
+                    $price = $sizesObj[$optionsObj['size']];
+                }
+            }
+        }
+
+        return $price;
+    }
 }

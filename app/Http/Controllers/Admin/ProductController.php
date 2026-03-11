@@ -79,8 +79,7 @@ class ProductController extends Controller
             'meta_title' => 'nullable|string',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
-            'size' => 'nullable|array',
-            'size.*' => 'string',
+            'sizes' => 'nullable|array',
             'shape' => 'nullable|string|in:Circular,Rectangular,Square',
             'material' => 'nullable|string|in:HDPE,Fabric,Non-woven',
             'color' => 'nullable|string|max:50',
@@ -98,7 +97,16 @@ class ProductController extends Controller
         $validated['is_active'] = $request->boolean('is_active', true); // Default true if not in form
         $validated['has_handles'] = $request->boolean('has_handles');
         $validated['uv_treated'] = $request->boolean('uv_treated');
-        $validated['size'] = $request->has('size') ? implode(', ', $request->input('size')) : null;
+        
+        $validatedSizes = [];
+        if ($request->has('sizes') && is_array($request->input('sizes'))) {
+            foreach ($request->input('sizes') as $sizeKey => $sizeData) {
+                if (!empty($sizeData['checked'])) {
+                    $validatedSizes[$sizeKey] = $sizeData['price'] ?? null;
+                }
+            }
+        }
+        $validated['size'] = !empty($validatedSizes) ? json_encode($validatedSizes) : null;
 
         $validated['slug'] = Str::slug($validated['name']);
 
@@ -156,8 +164,7 @@ class ProductController extends Controller
             'meta_title' => 'nullable|string',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
-            'size' => 'nullable|array',
-            'size.*' => 'string',
+            'sizes' => 'nullable|array',
             'shape' => 'nullable|string|in:Circular,Rectangular,Square',  // Enforce options
             'material' => 'nullable|string|in:HDPE,Fabric,Non-woven',
             'color' => 'nullable|string|max:50',
@@ -175,7 +182,16 @@ class ProductController extends Controller
         $validated['is_active'] = $request->boolean('is_active', $product->is_active);
         $validated['has_handles'] = $request->boolean('has_handles');
         $validated['uv_treated'] = $request->boolean('uv_treated');
-        $validated['size'] = $request->has('size') ? implode(', ', $request->input('size')) : null;
+        
+        $validatedSizes = [];
+        if ($request->has('sizes') && is_array($request->input('sizes'))) {
+            foreach ($request->input('sizes') as $sizeKey => $sizeData) {
+                if (!empty($sizeData['checked'])) {
+                    $validatedSizes[$sizeKey] = $sizeData['price'] ?? null;
+                }
+            }
+        }
+        $validated['size'] = !empty($validatedSizes) ? json_encode($validatedSizes) : null;
 
         $validated['slug'] = Str::slug($validated['name']);
 
