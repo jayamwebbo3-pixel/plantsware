@@ -141,65 +141,7 @@
 </div>
 <!-- services end -->
 
-{{-- Product Card Macro block --}}
-@php
-    if (!function_exists('renderProductCard')) {
-        function renderProductCard($product)
-        {
-            $imgSrc = $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg');
-            $slug = $product->slug ?? $product->id;
-            $price = number_format($product->price ?? 0, 2);
-            $salePrice = ($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price) ? number_format($product->sale_price, 2) : null;
-            $discount = $product->discount_percentage ?? null;
 
-            return '
-                            <div class="swiper-slide">
-                                <div class="product-card">
-                                    <div class="product-image-container">
-                                        <a href="' . route('product.show', $slug) . '">
-                                            <img src="' . $imgSrc . '" alt="' . $product->name . '" class="product-image main-image">
-                                            <img src="' . $imgSrc . '" alt="' . $product->name . '" class="product-image hover-image">
-                                            ' . ($salePrice && $discount > 0 ? '<span class="discount-badge">' . $discount . '% OFF</span>' : '') . '
-                                        </a>
-                                    </div>
-                                    <div class="product-info">
-                                        <h3 class="product-title">' . $product->name . '</h3>
-                                        <div class="product-price">
-                                            ' . ($salePrice
-                ? '<span class="original-price">₹' . $price . '</span><span class="current-price">₹' . $salePrice . '</span>'
-                : '<span class="current-price">₹' . $price . '</span>') . '
-                                        </div>
-                                        <div class="product-actions">
-                                            ' . ($product->stock_quantity > 0 ? '
-                                            <form class="d-inline-block text-white" method="POST" action="' . route('cart.add', $product->id) . '" style="display:inline;">
-                                                ' . csrf_field() . '
-                                                <input type="hidden" name="buy_now" value="1">
-                                                <button type="submit" class="btn btn-primary" data-tooltip="Buy Now">
-                                                    <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
-                                                </button>
-                                            </form>
-                                            <form class="add-to-cart-form d-inline-block text-white" method="POST" action="' . route('cart.add', $product->id) . '" style="display:inline;">
-                                                ' . csrf_field() . '
-                                                <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                                    <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
-                                                </button>
-                                            </form>' : '
-                                            <button class="btn btn-secondary w-75" style="background-color: #6c757d; border-color: #6c757d; color: white; cursor: not-allowed;" disabled>
-                                                <span class="btn-text">Out of Stock</span>
-                                            </button>') . '
-                                            <form class="d-inline-block" method="POST" action="' . route('wishlist.add', $product->id) . '" style="display:inline;">
-                                                ' . csrf_field() . '
-                                                <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
-                                                    <i class="far fa-heart"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>';
-        }
-    }
-@endphp
 
 <!-- Section 1: New Arrivals -->
 <section class="bg-white-section">
@@ -214,7 +156,9 @@
         <div class="swiper product-swiper">
             <div class="swiper-wrapper">
                 @forelse($newArrivals as $product)
-                    {!! renderProductCard($product) !!}
+                    <div class="swiper-slide">
+                        @include('view.partials.product-card', ['product' => $product])
+                    </div>
                 @empty
                     <div class="swiper-slide"><p class="text-center w-100">No products found</p></div>
                 @endforelse
@@ -238,7 +182,9 @@
         <div class="swiper product-swiper">
             <div class="swiper-wrapper">
                 @forelse($gardenProducts as $product)
-                    {!! renderProductCard($product) !!}
+                    <div class="swiper-slide">
+                        @include('view.partials.product-card', ['product' => $product])
+                    </div>
                 @empty
                     <div class="swiper-slide"><p class="text-center w-100">No products found</p></div>
                 @endforelse
@@ -270,7 +216,9 @@
         <div class="swiper product-swiper">
             <div class="swiper-wrapper">
                 @forelse($aquariumProducts as $product)
-                    {!! renderProductCard($product) !!}
+                    <div class="swiper-slide">
+                        @include('view.partials.product-card', ['product' => $product])
+                    </div>
                 @empty
                     <div class="swiper-slide"><p class="text-center w-100">No products found</p></div>
                 @endforelse
@@ -294,7 +242,9 @@
         <div class="swiper product-swiper">
             <div class="swiper-wrapper">
                 @forelse($naturalProducts as $product)
-                    {!! renderProductCard($product) !!}
+                    <div class="swiper-slide">
+                        @include('view.partials.product-card', ['product' => $product])
+                    </div>
                 @empty
                     <div class="swiper-slide"><p class="text-center w-100">No products found</p></div>
                 @endforelse

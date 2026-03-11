@@ -96,11 +96,11 @@
                                                                 : $p->price;
                                                         }
                                                     @endphp
-                                                    <span class="text-success fw-bold">₹{{ number_format($priceToUse, 2) }}</span>
+                                                    <span class="text-brand-success fw-bold">₹{{ number_format($priceToUse, 2) }}</span>
                                                 </td>
                                                 <td>
                                                     @if($p->stock_quantity > 0)
-                                                        <span class="badge bg-success">In Stock</span>
+                                                        <span class="badge bg-brand-success">In Stock</span>
                                                     @else
                                                         <span class="badge bg-danger">Out of Stock</span>
                                                     @endif
@@ -194,42 +194,7 @@
                     @foreach($wishlistItems->take(10) as $item)
                         @if(isset($item->product))
                             <div class="swiper-slide">
-                                <div class="product-card">
-                                    <div class="product-image-container">
-                                        <a href="{{ route('product.show', $item->product->slug) }}">
-                                            <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('assets/images/product/product1.jpg') }}" 
-                                                 alt="{{ $item->product->name }}" class="product-image main-image">
-                                            <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : asset('assets/images/product/product1.jpg') }}" 
-                                                 alt="{{ $item->product->name }}" class="product-image hover-image">
-                                        </a>
-                                    </div>
-                                    <div class="product-info">
-                                        <h3 class="product-title">{{ $item->product->name }}</h3>
-                                        <div class="product-price">
-                                            @php
-                                                $relatedPriceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
-                                                    ? $item->product->sale_price
-                                                    : $item->product->price;
-                                            @endphp
-                                            <span class="current-price">₹{{ number_format($relatedPriceToUse, 2) }}</span>
-                                        </div>
-                                        <div class="product-actions">
-                                            <form action="{{ route('cart.add', $item->product->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="quantity" value="1">
-                                                <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                                    <span class="btn-text">Add to Cart</span>
-                                                    <i class="btn-icon fas fa-shopping-cart"></i>
-                                                </button>
-                                            </form>
-                                            <button type="button" class="btn btn-wishlist" 
-                                                    onclick="removeFromWishlist({{ $item->product->id }})" 
-                                                    data-tooltip="Remove from Wishlist">
-                                                <i class="fas fa-heart text-danger"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                @include('view.partials.product-card', ['product' => $item->product, 'isWishlistPage' => true])
                             </div>
                         @endif
                     @endforeach
@@ -275,7 +240,7 @@ async function handleRemoveFromWishlist(url) {
     
     try {
         const response = await fetch(url, {
-            method: 'POST', // Changed from DELETE to POST because the new route is POST
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': getCsrfToken(),
@@ -575,33 +540,61 @@ style.textContent = `
     }
     
     .gi-btn-2 {
-        background: #28a745;
+        background: #72a420;
         color: white;
         border: none;
-        padding: 8px 12px;
-        border-radius: 4px;
+        width: 45px !important;
+        height: 45px !important;
+        min-width: 45px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
         cursor: pointer;
         transition: all 0.3s;
+        box-shadow: 0 4px 10px rgba(114, 164, 32, 0.3);
+        flex: none;
+        padding: 0;
     }
     
     .gi-btn-2:hover {
-        background: #218838;
-        transform: scale(1.05);
+        background: #5d861a;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(114, 164, 32, 0.4);
     }
     
     .gi-btn-1 {
-        background: #dc3545;
+        background: #ff7675;
         color: white;
         border: none;
-        padding: 8px 12px;
-        border-radius: 4px;
+        width: 45px !important;
+        height: 45px !important;
+        min-width: 45px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        border-radius: 12px;
         cursor: pointer;
         transition: all 0.3s;
+        box-shadow: 0 4px 10px rgba(255, 118, 117, 0.3);
+        flex: none;
+        padding: 0;
     }
     
     .gi-btn-1:hover {
-        background: #c82333;
-        transform: scale(1.05);
+        background: #ee5253;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(255, 118, 117, 0.4);
+    }
+    
+    .text-brand-success {
+        color: #72a420 !important;
+    }
+    
+    .bg-brand-success {
+        background-color: #72a420 !important;
+        color: white !important;
     }
     
     .tbl-btn {

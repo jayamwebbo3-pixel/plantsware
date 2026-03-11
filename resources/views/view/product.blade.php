@@ -60,22 +60,22 @@
                         <h1>{{ $product->name }}</h1>
                         <!-- Dynamic Rating -->
                         @if(($product->total_reviews ?? 0) > 0 && ($product->avg_rating ?? 0) > 0)
-                        <div class="product-page-rating mb-3">
-                            <div class="product-page-stars d-inline" style="color: #ffc107;">
-                                @php $avg = $product->avg_rating ?? 0; @endphp
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($i <= floor($avg))
-                                        <i class="fas fa-star"></i>
-                                    @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
-                                        <i class="fas fa-star-half-alt"></i>
-                                    @else
-                                        <i class="far fa-star text-muted"></i>
-                                    @endif
-                                @endfor
+                            <div class="product-page-rating mb-3">
+                                <div class="product-page-stars d-inline" style="color: #ffc107;">
+                                    @php $avg = $product->avg_rating ?? 0; @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= floor($avg))
+                                            <i class="fas fa-star"></i>
+                                        @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
+                                            <i class="fas fa-star-half-alt"></i>
+                                        @else
+                                            <i class="far fa-star text-muted"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+                                <span class="product-page-rating-text ms-2 fw-bold" style="color: #333;">{{ number_format($avg, 1) }}</span>
+                                <span class="product-page-reviews-count text-muted ms-1">({{ $product->total_reviews ?? 0 }} Reviews)</span>
                             </div>
-                            <span class="product-page-rating-text ms-2 fw-bold" style="color: #333;">{{ number_format($avg, 1) }}</span>
-                            <span class="product-page-reviews-count text-muted ms-1">({{ $product->total_reviews ?? 0 }} Reviews)</span>
-                        </div>
                         @endif
                         <!-- Price -->
                         <div class="product-page-price mb-4">
@@ -178,49 +178,7 @@
             <div class="swiper-wrapper">
                 @forelse($relatedProducts as $relatedProduct)
                     <div class="swiper-slide">
-                        <div class="product-card h-100 d-flex flex-column">
-                            <div class="product-image-container position-relative">
-                                <a href="{{ route('product.show', $relatedProduct->slug) }}">
-                                    <img src="{{ $relatedProduct->image ? asset('storage/' . $relatedProduct->image) : asset('assets/images/product/product1.jpg') }}"
-                                         alt="{{ $relatedProduct->name }}"
-                                         class="product-image main-image w-100 h-100 object-fit-contain">
-                                    <img src="{{ $relatedProduct->image ? asset('storage/' . $relatedProduct->image) : asset('assets/images/product/product1.jpg') }}"
-                                         alt="{{ $relatedProduct->name }}"
-                                         class="product-image hover-image w-100 h-100 object-fit-contain">
-                                    @if($relatedProduct->sale_price && $relatedProduct->sale_price > 0 && $relatedProduct->sale_price < $relatedProduct->price)
-                                        <span class="discount-badge">{{ round((($relatedProduct->price - $relatedProduct->sale_price) / $relatedProduct->price) * 100) }}% OFF</span>
-                                    @endif
-                                </a>
-                            </div>
-                            <div class="product-info mt-3 flex-grow-1 d-flex flex-column">
-                                <h3 class="product-title">{{ $relatedProduct->name }}</h3>
-                                <div class="product-price mt-auto">
-                                    @if($relatedProduct->sale_price && $relatedProduct->sale_price > 0 && $relatedProduct->sale_price < $relatedProduct->price)
-                                        <span class="original-price">₹{{ number_format($relatedProduct->price, 2) }}</span>
-                                        <span class="current-price ms-2">₹{{ number_format($relatedProduct->sale_price, 2) }}</span>
-                                    @else
-                                        <span class="current-price">₹{{ number_format($relatedProduct->price, 2) }}</span>
-                                    @endif
-                                </div>
-                                <div class="product-actions mt-3 d-flex gap-2">
-                                    @if($relatedProduct->stock_quantity > 0)
-                                        <form action="{{ route('cart.add', $relatedProduct) }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn btn-sm btn-primary flex-fill">Add to Cart</button>
-                                        </form>
-                                    @else
-                                        <button class="btn btn-sm btn-secondary flex-fill" style="cursor: not-allowed;" disabled>Out of Stock</button>
-                                    @endif
-                                    <form action="{{ route('wishlist.add', $relatedProduct) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="far fa-heart"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+                        @include('view.partials.product-card', ['product' => $relatedProduct])
                     </div>
                 @empty
                     <div class="swiper-slide text-center py-5">

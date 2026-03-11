@@ -62,22 +62,22 @@
                     
                     <!-- Dynamic Rating -->
                     @if(($comboPack->total_reviews ?? 0) > 0 && ($comboPack->avg_rating ?? 0) > 0)
-                    <div class="product-page-rating mb-2">
-                        <div class="product-page-stars d-inline" style="color: #ffc107;">
-                            @php $avg = $comboPack->avg_rating ?? 0; @endphp
-                            @for($i = 1; $i <= 5; $i++)
-                                @if($i <= floor($avg))
-                                    <i class="fas fa-star"></i>
-                                @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
-                                    <i class="fas fa-star-half-alt"></i>
-                                @else
-                                    <i class="far fa-star text-muted"></i>
-                                @endif
-                            @endfor
+                        <div class="product-page-rating mb-2">
+                            <div class="product-page-stars d-inline" style="color: #ffc107;">
+                                @php $avg = $comboPack->avg_rating ?? 0; @endphp
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= floor($avg))
+                                        <i class="fas fa-star"></i>
+                                    @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
+                                        <i class="fas fa-star-half-alt"></i>
+                                    @else
+                                        <i class="far fa-star text-muted"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <span class="product-page-rating-text ms-2 fw-bold" style="color: #333;">{{ number_format($avg, 1) }}</span>
+                            <span class="product-page-reviews-count text-muted ms-1">({{ $comboPack->total_reviews ?? 0 }} Reviews)</span>
                         </div>
-                        <span class="product-page-rating-text ms-2 fw-bold" style="color: #333;">{{ number_format($avg, 1) }}</span>
-                        <span class="product-page-reviews-count text-muted ms-1">({{ $comboPack->total_reviews ?? 0 }} Reviews)</span>
-                    </div>
                     @endif
                     
                     <div class="product-page-price mb-4">
@@ -164,24 +164,7 @@
             @endphp
             @foreach($relatedProducts as $product)
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                    <div class="product-custom-card border-0 shadow-sm h-100 bg-white" style="border-radius: 12px; overflow: hidden; transition: 0.3s;">
-                        <a href="{{ route('product.show', $product->slug) }}" class="text-decoration-none">
-                            <div class="position-relative" style="height: 250px; background: #f9f9f9; display: flex; align-items: center; justify-content: center; padding: 15px;">
-                                <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/default.jpg') }}" 
-                                     alt="{{ $product->name }}" 
-                                     style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                            </div>
-                            <div class="p-3">
-                                <h5 class="text-dark fw-bold mb-2 text-truncate">{{ $product->name }}</h5>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="text-success fw-bold fs-5">₹{{ number_format($product->sale_price ?? $product->price, 2) }}</span>
-                                    @if($product->sale_price < $product->price)
-                                        <del class="text-muted small">₹{{ number_format($product->price, 2) }}</del>
-                                    @endif
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                    @include('view.partials.product-card', ['product' => $product])
                 </div>
             @endforeach
         </div>

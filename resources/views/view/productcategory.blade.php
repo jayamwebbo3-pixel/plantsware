@@ -304,67 +304,9 @@
                     </div>
 
                     <div class="products-grid row g-3" id="products-container">
-                        @if(isset($products))
                             @forelse($products as $product)
                                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
-                                    <div class="product-card">
-                                        <div class="product-image-container">
-                                            <a href="{{ route('product.show', $product->slug) }}">
-                                                @if($product->image)
-                                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                                        class="product-image main-image">
-                                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                                        class="product-image hover-image">
-                                                @else
-                                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
-                                                        class="product-image main-image">
-                                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}"
-                                                        class="product-image hover-image">
-                                                @endif
-                                                @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price && $product->discount_percentage > 0)
-                                                    <span class="discount-badge">{{ $product->discount_percentage }}% OFF</span>
-                                                @endif
-                                            </a>
-                                        </div>
-                                        <div class="product-info">
-                                            <h3 class="product-title">{{ $product->name }}</h3>
-                                            <div class="product-price">
-                                                @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                                    <span class="original-price">₹{{ number_format($product->price, 2) }}</span>
-                                                    <span class="current-price">₹{{ number_format($product->sale_price, 2) }}</span>
-                                                @else
-                                                    <span class="current-price">₹{{ number_format($product->price, 2) }}</span>
-                                                @endif
-                                            </div>
-                                            <div class="product-actions">
-                                                @if($product->stock_quantity > 0)
-                                                    <form class="d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
-                                                        @csrf
-                                                        <input type="hidden" name="buy_now" value="1">
-                                                        <button class="btn btn-primary" data-tooltip="Buy Now" type="submit">
-                                                            <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
-                                                        </button>
-                                                    </form>
-                                                    <form class="add-to-cart-form d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-secondary" data-tooltip="Add to Cart">
-                                                            <span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i>
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <button class="btn btn-secondary w-75" style="background-color: #6c757d; border-color: #6c757d; color: white; cursor: not-allowed;" disabled>
-                                                        <span class="btn-text">Out of Stock</span>
-                                                    </button>
-                                                @endif
-                                                <form class="d-inline-block" method="POST" action="{{ route('wishlist.add', $product->id) }}">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-wishlist" data-tooltip="Wishlist">
-                                                        <i class="far fa-heart"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    @include('view.partials.product-card', ['product' => $product])
                                 </div>
                             @empty
                                 <div class="col-12">
@@ -376,7 +318,7 @@
                                     {{ $products->links('pagination::bootstrap-5') }}
                                 </div>
                             @endif
-                        @endif
+                        {{-- @endif --}}
 
                         <!-- Demo products for display if nothing found (optional, comment out for production) -->
                         <!--
