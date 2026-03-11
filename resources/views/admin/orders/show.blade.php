@@ -50,6 +50,14 @@
                                             @endif
                                         </div>
                                         {{ $item->product_name }}
+                                        @if($item->options)
+                                            @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
+                                            @if(is_array($options) && isset($options['size']))
+                                                <br><small class="text-muted">Size: {{ $options['size'] }}</small>
+                                            @elseif(is_string($options) && !empty($options))
+                                                <br><small class="text-muted">Size: {{ $options }}</small>
+                                            @endif
+                                        @endif
                                         @if($item->combo_pack_id)
                                             <span class="badge bg-danger ms-1">COMBO</span>
                                         @endif
