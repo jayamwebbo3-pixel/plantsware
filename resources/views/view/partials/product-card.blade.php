@@ -23,7 +23,7 @@
         <div class="product-price mb-3">
             @if($product->sale_price && $product->sale_price < $product->price)
                 <span class="original-price text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</span>
-                <span class="current-price ms-2 fw-bold text-primary">₹{{ number_format($product->sale_price, 2) }}</span>
+                <span class="current-price ms-2 fw-bold">₹{{ number_format($product->sale_price, 2) }}</span>
             @else
                 <span class="current-price fw-bold">₹{{ number_format($product->price, 2) }}</span>
             @endif
@@ -34,20 +34,76 @@
                 <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-fill">
                     @csrf
                     <input type="hidden" name="quantity" value="1">
-                    <button type="submit" class="btn btn-primary btn-sm w-100">
-                        <i class="fas fa-shopping-cart me-1"></i> Add to Cart
+                    <input type="hidden" name="buy_now" value="1">
+                    <button type="submit" class="btn btn-buy-now btn-sm w-100">
+                        Buy Now
+                    </button>
+                </form>
+                <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-fill">
+                    @csrf
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-add-cart btn-sm w-100">
+                        Add To Cart
                     </button>
                 </form>
             @else
                 <button class="btn btn-secondary btn-sm w-100" disabled>Out of Stock</button>
             @endif
 
-            <form action="{{ route('wishlist.add', $product) }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-outline-danger btn-sm">
-                    <i class="far fa-heart"></i>
+            @if(isset($isWishlistPage) && $isWishlistPage)
+                <button type="button" class="btn btn-wishlist-action btn-sm" onclick="removeFromWishlist({{ $product->id }})">
+                    <i class="fas fa-heart text-danger"></i>
                 </button>
-            </form>
+            @else
+                <form action="{{ route('wishlist.add', $product) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-wishlist-action btn-sm">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </form>
+            @endif
         </div>
+
+        <style>
+            .btn-buy-now {
+                background-color: #72a420 !important;
+                color: white !important;
+                border-radius: 8px !important;
+                border: none !important;
+                font-weight: 600 !important;
+                padding: 10px 16px !important;
+                font-size: 14px !important;
+                white-space: nowrap;
+            }
+            .btn-add-cart {
+                background-color: #e9ecef !important;
+                color: #212529 !important;
+                border-radius: 8px !important;
+                border: none !important;
+                font-weight: 600 !important;
+                padding: 10px 16px !important;
+                font-size: 14px !important;
+                white-space: nowrap;
+            }
+            .btn-wishlist-action {
+                background-color: white !important;
+                color: #6c757d !important;
+                border: 1px solid #dee2e6 !important;
+                border-radius: 8px !important;
+                padding: 10px 16px !important;
+                font-size: 14px !important;
+            }
+            .btn-wishlist-action:hover {
+                color: #dc3545 !important;
+                border-color: #dc3545 !important;
+            }
+            .product-actions {
+                display: flex;
+                align-items: center;
+            }
+            .current-price {
+                color: #72a420 !important;
+            }
+        </style>
     </div>
 </div>
