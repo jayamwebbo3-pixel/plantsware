@@ -57,7 +57,14 @@ class CartController extends Controller
     protected function addToCart(Request $request, $item, $type)
     {
         $quantity = max(1, (int) $request->input('quantity', 1));
-        $options  = $request->input('options');
+        
+        $optionsInput = $request->input('options') ?? $request->input('size');
+        $options = null;
+        if (is_string($optionsInput) && !is_object(json_decode($optionsInput))) {
+            $options = json_encode(['size' => $optionsInput]);
+        } elseif ($optionsInput) {
+            $options = is_string($optionsInput) ? $optionsInput : json_encode($optionsInput);
+        }
         $itemId = $item->id;
         $name = $item->name;
         $stock = $item->stock_quantity;

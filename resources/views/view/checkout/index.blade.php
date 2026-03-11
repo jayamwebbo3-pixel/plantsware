@@ -36,6 +36,14 @@
                                     @endif
                                 </div>
                                 {{ $p->name }}
+                                @if($item->options)
+                                    @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
+                                    @if(is_array($options) && isset($options['size']))
+                                        <br><small class="text-muted">Size: {{ $options['size'] }}</small>
+                                    @elseif(is_string($options) && !empty($options))
+                                        <br><small class="text-muted">Size: {{ $options }}</small>
+                                    @endif
+                                @endif
                                 @if($isCombo)
                                     <span class="badge badge-danger ms-2">COMBO</span>
                                 @endif

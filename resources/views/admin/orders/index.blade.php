@@ -253,9 +253,11 @@
                                             <li>
                                                 • {{ $item->product_name }} (x{{ $item->quantity }})
                                                 @if($item->options)
-                                                    @php $options = json_decode($item->options, true); @endphp
-                                                    @if(isset($options['size']))
+                                                    @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
+                                                    @if(is_array($options) && isset($options['size']))
                                                         <br><span class="ms-2">- Size: {{ $options['size'] }}</span>
+                                                    @elseif(is_string($options) && !empty($options))
+                                                        <br><span class="ms-2">- Size: {{ $options }}</span>
                                                     @endif
                                                 @endif
                                             </li>

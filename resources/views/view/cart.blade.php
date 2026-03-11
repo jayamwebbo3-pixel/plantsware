@@ -57,7 +57,15 @@
                                         @endif
                                     </div>
                                     <div class="item-details">
-                                        <h3 class="item-name">{{ $p->name }}</h3>
+                                        <h3 class="item-name mb-1">{{ $p->name }}</h3>
+                                        @if($item->options)
+                                            @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
+                                            @if(is_array($options) && isset($options['size']))
+                                                <div class="text-muted small mb-2">Size: {{ $options['size'] }}</div>
+                                            @elseif(is_string($options) && !empty($options))
+                                                <div class="text-muted small mb-2">Size: {{ $options }}</div>
+                                            @endif
+                                        @endif
                                         @php
                                             if ($isCombo) {
                                                 $priceToUse = $p->offer_price;
