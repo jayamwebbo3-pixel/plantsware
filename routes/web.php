@@ -169,6 +169,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('products', ProductController::class);
+        Route::patch('products/{product}/status', [ProductController::class, 'updateStatus'])
+            ->name('products.updateStatus');
         Route::resource('categories', CategoryController::class);
         Route::resource('subcategories', SubcategoryController::class);
         Route::resource('blogs', BlogController::class);

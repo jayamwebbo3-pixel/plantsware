@@ -207,6 +207,21 @@ class ProductController extends Controller
         return redirect()->route('admin.subcategories.products', $product->subcategory_id)->with('success', 'Product updated successfully');
     }
 
+    public function updateStatus(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'is_active' => 'required|boolean'
+        ]);
+
+        $product->update(['is_active' => $validated['is_active']]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product status updated successfully',
+            'is_active' => $product->is_active
+        ]);
+    }
+
     public function destroy(Product $product)
     {
         // Optional: Check if product exists (extra safety)
