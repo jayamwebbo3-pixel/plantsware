@@ -106,7 +106,15 @@
                                 <td><strong>{{ $product->name }}</strong></td>
                                 <td>{{ $product->category->name ?? 'N/A' }}</td>
                                 <td>{{ $product->subcategory->name ?? 'N/A' }}</td>
-                                <td>₹{{ number_format($product->price, 2) }}</td>
+                                <td>
+                                    @if($product->sale_price && $product->sale_price < $product->price)
+                                       
+                                        <span class="text-success">₹{{ number_format($product->sale_price, 2) }}</span><br>
+                                         <del class="text-muted small">₹{{ number_format($product->price, 2) }}</del>
+                                    @else
+                                        ₹{{ number_format($product->price, 2) }}
+                                    @endif
+                                </td>
                                 <td>
                                     <span class="badge {{ $product->stock_quantity > 0 ? 'bg-success' : 'bg-danger' }}">
                                         {{ $product->stock_quantity }}

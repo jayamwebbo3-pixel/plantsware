@@ -57,7 +57,7 @@ class ImageService
             $image->save($fullPath);
         } catch (\Exception $e) {
             // Log error or handle gracefully
-            \Log::error('Watermarking failed: ' . $e->getMessage());
+            // \Log::error('Watermarking failed: ' . $e->getMessage());
         }
     }
 }
