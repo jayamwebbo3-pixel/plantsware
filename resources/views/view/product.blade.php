@@ -31,6 +31,25 @@
                 <div class="col-lg-6">
                     <div class="product-page-gallery">
                         <div class="product-page-gallery-main position-relative">
+                            <div class="product-share-container">
+                                <button type="button" class="btn-share-toggle" id="shareToggle">
+                                    <i class="fa-solid fa-share-from-square"></i>
+                                </button>
+                                <div class="share-dropdown" id="shareDropdown">
+                                    <a href="https://wa.me/?text={{ urlencode($product->name . ' - ' . url()->current()) }}" target="_blank" class="share-item whatsapp">
+                                        <i class="fab fa-whatsapp"></i><span>WhatsApp</span>
+                                    </a>
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" target="_blank" class="share-item facebook">
+                                        <i class="fab fa-facebook-f"></i><span>Facebook</span>
+                                    </a>
+                                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->name) }}" target="_blank" class="share-item twitter">
+                                        <i class="fab fa-twitter"></i><span>Twitter</span>
+                                    </a>
+                                    <a href="https://www.instagram.com/" target="_blank" class="share-item instagram">
+                                        <i class="fab fa-instagram"></i><span>Instagram</span>
+                                    </a>
+                                </div>
+                            </div>
                             <img id="mainProductImage" src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}" class="w-100" style="object-fit: contain;">
                             @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="product-page-badge-sale">
@@ -56,8 +75,86 @@
                 </div>
                 <!-- Product Info -->
                 <div class="col-lg-6">
-                    <div class="product-page-info">
+                    <div class="product-page-info position-relative">
                         <h1>{{ $product->name }}</h1>
+
+                        <style>
+                            .product-share-container {
+                                position: absolute;
+                                top: 20px;
+                                right: 20px;
+                                z-index: 100;
+                            }
+                            .btn-share-toggle {
+                                background: #ffffff;
+                                color: #333;
+                                border: none;
+                                border-radius: 50%;
+                                width: 44px;
+                                height: 44px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 20px;
+                                cursor: pointer;
+                                box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+                                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                border: 1px solid rgba(0,0,0,0.05);
+                            }
+                            .btn-share-toggle:hover {
+                                background: #72a420;
+                                color: #fff;
+                                transform: translateY(-3px) scale(1.05);
+                                box-shadow: 0 12px 25px rgba(114, 164, 32, 0.3);
+                            }
+                            .share-dropdown {
+                                position: absolute;
+                                top: 55px;
+                                right: 0;
+                                background: #ffffff;
+                                border-radius: 12px;
+                                box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+                                padding: 12px;
+                                width: 180px;
+                                display: none;
+                                border: 1px solid #f0f0f0;
+                                animation: shareFadeIn 0.3s ease;
+                            }
+                            .share-dropdown.show {
+                                display: block;
+                            }
+                            .share-item {
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                padding: 10px 14px;
+                                border-radius: 8px;
+                                text-decoration: none !important;
+                                color: #2d3436;
+                                transition: all 0.2s ease;
+                                font-size: 14px;
+                                font-weight: 500;
+                            }
+                            .share-item:hover {
+                                background: #f8f9fa;
+                                transform: translateX(5px);
+                                color: #72a420;
+                            }
+                            .share-item i {
+                                font-size: 18px;
+                                width: 24px;
+                                text-align: center;
+                            }
+                            .share-item.whatsapp i { color: #25D366; }
+                            .share-item.facebook i { color: #1877F2; }
+                            .share-item.twitter i { color: #1DA1F2; }
+                            .share-item.instagram i { color: #E4405F; }
+
+                            @keyframes shareFadeIn {
+                                from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+                                to { opacity: 1; transform: translateY(0) scale(1); }
+                            }
+                        </style>
                         <!-- Dynamic Rating -->
                         @if(($product->total_reviews ?? 0) > 0 && ($product->avg_rating ?? 0) > 0)
                             <div class="product-page-rating mb-3">
@@ -219,7 +316,7 @@
     <div class="container-fluid px-4">
         <div class="section-title d-flex justify-content-between align-items-center mb-4">
             <h2>Related Products</h2>
-            <a href="{{ route('products.index') }}" class="title-link">More <i class="fas fa-chevron-right"></i></a>
+            <!-- <a href="{{ route('products.index') }}" class="title-link">More <i class="fas fa-chevron-right"></i></a> -->
         </div>
         <div class="swiper product-swiper">
             <div class="swiper-wrapper">
@@ -238,8 +335,6 @@
         </div>
     </div>
 </section>
-
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -266,6 +361,23 @@ document.addEventListener('DOMContentLoaded', function () {
         const buyNowInput = document.getElementById('buyNowQuantity');
         if(buyNowInput) buyNowInput.value = value;
     };
+
+    // Social Share Toggle
+    const shareToggle = document.getElementById('shareToggle');
+    const shareDropdown = document.getElementById('shareDropdown');
+    
+    if (shareToggle && shareDropdown) {
+        shareToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            shareDropdown.classList.toggle('show');
+        });
+        
+        document.addEventListener('click', function (e) {
+            if (!shareToggle.contains(e.target) && !shareDropdown.contains(e.target)) {
+                shareDropdown.classList.remove('show');
+            }
+        });
+    }
 });
 </script>
 
