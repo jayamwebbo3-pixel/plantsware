@@ -1,70 +1,70 @@
-<div class="product-card h-100 d-flex flex-column">
-    <div class="product-image-container position-relative">
+<div class="product-card">
+    <div class="product-image-container">
         <a href="{{ route('product.show', $product->slug) }}">
             <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}"
-                 alt="{{ $product->name }}" class="product-image main-image w-100 h-100 object-fit-contain">
+                alt="{{ $product->name }}" class="product-image main-image w-100 h-100 object-fit-contain">
             <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}"
-                 alt="{{ $product->name }}" class="product-image hover-image w-100 h-100 object-fit-contain">
+                alt="{{ $product->name }}" class="product-image hover-image w-100 h-100 object-fit-contain">
             @if($product->sale_price && $product->sale_price < $product->price)
                 <span class="discount-badge">
                     {{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
                 </span>
-            @endif
+                @endif
         </a>
     </div>
 
-    <div class="product-info mt-3 flex-grow-1 d-flex flex-column">
-        <h3 class="product-title mb-2">
+    <div class="product-info">
+        <h3 class="product-title">
             <a href="{{ route('product.show', $product->slug) }}" class="text-decoration-none text-dark">
                 {{ $product->name }}
             </a>
         </h3>
 
-        <div class="product-price mb-3">
+        <div class="product-price">
             @if($product->sale_price && $product->sale_price < $product->price)
                 <span class="original-price text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</span>
                 <span class="current-price ms-2 fw-bold">₹{{ number_format($product->sale_price, 2) }}</span>
-            @else
+                @else
                 <span class="current-price fw-bold">₹{{ number_format($product->price, 2) }}</span>
-            @endif
+                @endif
         </div>
 
-        <div class="product-actions mt-auto d-flex gap-2">
+        <div class="product-actions">
             @if($product->stock_quantity > 0)
-                <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-fill">
-                    @csrf
-                    <input type="hidden" name="quantity" value="1">
-                    <input type="hidden" name="buy_now" value="1">
-                    <button type="submit" class="btn btn-buy-now btn-sm w-100">
-                        Buy Now
-                    </button>
-                </form>
-                <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-fill">
-                    @csrf
-                    <input type="hidden" name="quantity" value="1">
-                    <button type="submit" class="btn btn-add-cart btn-sm w-100">
-                        Add To Cart
-                    </button>
-                </form>
+            <form action="{{ route('cart.add', $product) }}" method="POST" class="d-flex w-100">
+                @csrf
+                <input type="hidden" name="quantity" value="1">
+                <input type="hidden" name="buy_now" value="1">
+                <button type="submit" class="btn btn-primary">
+                    Buy Now
+                </button>
+            </form>
+            <form action="{{ route('cart.add', $product) }}" method="POST" class="d-flex w-100">
+                @csrf
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" class="btn btn-secondary">
+                    Add To Cart
+                </button>
+            </form>
             @else
-                <button class="btn btn-secondary btn-sm w-100" disabled>Out of Stock</button>
+            <button class="btn btn-secondary" disabled>Out of Stock</button>
             @endif
 
             @if(isset($isWishlistPage) && $isWishlistPage)
-                <button type="button" class="btn btn-wishlist-action btn-sm" onclick="removeFromWishlist({{ $product->id }})">
-                    <i class="fas fa-heart text-danger"></i>
-                </button>
+            <button type="button" class="btn btn-wishlist" onclick="removeFromWishlist({{ $product->id }})">
+                <i class="fas fa-heart text-danger"></i>
+            </button>
             @else
-                <form action="{{ route('wishlist.add', $product) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-wishlist-action btn-sm">
-                        <i class="far fa-heart"></i>
-                    </button>
-                </form>
+            <form action="{{ route('wishlist.add', $product) }}" method="POST" class="d-flex w-100">
+                @csrf
+                <button type="submit" class="btn btn-wishlist">
+                    <i class="far fa-heart"></i>
+                </button>
+            </form>
             @endif
         </div>
 
-        <style>
+        <!-- <style>
             .btn-buy-now {
                 background-color: #72a420 !important;
                 color: white !important;
@@ -104,6 +104,6 @@
             .current-price {
                 color: #72a420 !important;
             }
-        </style>
+        </style> -->
     </div>
 </div>

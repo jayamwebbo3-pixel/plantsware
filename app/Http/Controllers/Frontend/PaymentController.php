@@ -82,7 +82,7 @@ class PaymentController extends Controller
 
                 DB::beginTransaction();
 
-                $order = Order::with('items.product')->findOrFail($transaction->order_id);
+                $order = Order::with(['items.product', 'user'])->findOrFail($transaction->order_id);
 
                 // Re-verify stock before confirming the order
                 foreach ($order->items as $item) {
@@ -139,6 +139,14 @@ class PaymentController extends Controller
                     Cart::where('user_id', $transaction->user_id)->delete();
                     session()->forget('shipping_address');
                 } catch (Exception $e) {
+                }
+
+                \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderConfirmation($order));
+                
+                // Also send to Admin
+                $headerFooter = \App\Models\HeaderFooter::first();
+                if(!empty($headerFooter->email)) {
+                    \Illuminate\Support\Facades\Mail::to($headerFooter->email)->send(new \App\Mail\OrderConfirmation($order));
                 }
 
                 return redirect()->route('checkout.confirmation', $order->id)->with('success', 'Payment successful and Order placed!');
