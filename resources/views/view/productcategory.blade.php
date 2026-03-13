@@ -19,262 +19,222 @@
         <div class="row">
             <!-- Side Menu for Categories with Filters -->
             <div class="col-lg-3 col-md-4 mb-4">
-                <form id="filter-form" action="{{ url()->current() }}" method="GET" class="side-menu bg-white rounded shadow-sm p-3 sticky-top" style="top: 20px; z-index: 1; border: 1px solid #ddd;">
-                    <h2 class="side-menu-title mb-3">Filters</h2>
-                    
-                    <!-- Price Range Filter -->
+                <form id="filter-form" action="{{ url()->current() }}" method="GET"
+                      class="side-menu bg-white rounded shadow-sm p-3 sticky-top"
+                      style="top: 20px; z-index: 1; border: 1px solid #ddd;">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="side-menu-title mb-0">Filters</h2>
+                        @if(request()->except(['page']))
+                            <a href="{{ url()->current() }}" class="text-danger text-decoration-none" style="font-size:13px;">
+                                <i class="fas fa-times-circle me-1"></i>Clear All
+                            </a>
+                        @endif
+                    </div>
+
+                    {{-- ── Price Range (Slider) ────────────────────────────────── --}}
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Price Range
-                            <span class="price-range-value" id="display-price-range">₹0 - ₹{{ request('price_max', 5000) }}</span>
+                            <span class="price-range-value text-primary" id="display-price-range">₹{{ request('price_max', 10000) }}</span>
                         </h3>
-                        <div class="filter-options d-flex align-items-center">
-                            <input type="range" name="price_max" class="form-range flex-grow-1 me-2" min="0" max="10000" step="100" id="price-max" value="{{ request('price_max', 5000) }}" style="width: 100%;">
-                        </div>
-                    </div>
-                    
-                    <!-- Discount Filter -->
-                    <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Discount</h3>
                         <div class="filter-options">
-                            <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-all" class="filter-radio" value="all" {{ request('discount', 'all') == 'all' ? 'checked' : '' }}>
-                                <label for="discount-all" class="filter-label">
-                                    All Discounts
-                                    <span class="filter-count">(45)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-50" class="filter-radio" value="50" {{ request('discount') == '50' ? 'checked' : '' }}>
-                                <label for="discount-50" class="filter-label">
-                                    50% and above
-                                    <span class="filter-count">(8)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-30" class="filter-radio" value="30-50" {{ request('discount') == '30-50' ? 'checked' : '' }}>
-                                <label for="discount-30" class="filter-label">
-                                    30% - 50%
-                                    <span class="filter-count">(12)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-10" class="filter-radio" value="10-30" {{ request('discount') == '10-30' ? 'checked' : '' }}>
-                                <label for="discount-10" class="filter-label">
-                                    10% - 30%
-                                    <span class="filter-count">(18)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-below10" class="filter-radio" value="below10" {{ request('discount') == 'below10' ? 'checked' : '' }}>
-                                <label for="discount-below10" class="filter-label">
-                                    Below 10%
-                                    <span class="filter-count">(7)</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Weight Filter -->
-                    <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Weight</h3>
-                        <div class="filter-options">
-                            <div class="filter-item">
-                                <input type="checkbox" id="weight-100g" class="filter-checkbox" value="100g">
-                                <label for="weight-100g" class="filter-label">
-                                    Up to 100g
-                                    <span class="filter-count">(6)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="weight-500g" class="filter-checkbox" value="500g">
-                                <label for="weight-500g" class="filter-label">
-                                    100g - 500g
-                                    <span class="filter-count">(12)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="weight-1kg" class="filter-checkbox" value="1kg">
-                                <label for="weight-1kg" class="filter-label">
-                                    500g - 1kg
-                                    <span class="filter-count">(15)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="weight-5kg" class="filter-checkbox" value="5kg">
-                                <label for="weight-5kg" class="filter-label">
-                                    1kg - 5kg
-                                    <span class="filter-count">(8)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="weight-above5kg" class="filter-checkbox" value="above5kg">
-                                <label for="weight-above5kg" class="filter-label">
-                                    Above 5kg
-                                    <span class="filter-count">(4)</span>
-                                </label>
+                            <input type="range" name="price_max" id="price-range-slider" class="form-range" 
+                                   min="0" max="10000" step="100" value="{{ request('price_max', 10000) }}" style="width: 100%;">
+                            <div class="d-flex justify-content-between text-muted mt-1" style="font-size: 11px;">
+                                <span>₹0</span>
+                                <span>₹10,000+</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Brand Filter -->
+                    {{-- ── Discount ─────────────────────────────────────────── --}}
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Brand</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Discount
+                        </h3>
                         <div class="filter-options">
-                            <div class="filter-item">
-                                <input type="checkbox" id="brand-organic" class="filter-checkbox" value="Organic Harvest">
-                                <label for="brand-organic" class="filter-label">
-                                    Organic Harvest
-                                    <span class="filter-count">(10)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="brand-garden" class="filter-checkbox" value="Garden Pro">
-                                <label for="brand-garden" class="filter-label">
-                                    Garden Pro
-                                    <span class="filter-count">(8)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="brand-green" class="filter-checkbox" value="Green Thumb">
-                                <label for="brand-green" class="filter-label">
-                                    Green Thumb
-                                    <span class="filter-count">(12)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="brand-natural" class="filter-checkbox" value="Natural Growth">
-                                <label for="brand-natural" class="filter-label">
-                                    Natural Growth
-                                    <span class="filter-count">(6)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="brand-premium" class="filter-checkbox" value="Premium Plant">
-                                <label for="brand-premium" class="filter-label">
-                                    Premium Plant
-                                    <span class="filter-count">(9)</span>
-                                </label>
-                            </div>
+                            @php
+                                $discountOptions = [
+                                    'all'     => 'All Products',
+                                    '50'      => '50% and above',
+                                    '30-50'   => '30% – 50%',
+                                    '10-30'   => '10% – 30%',
+                                    'below10' => 'Below 10%',
+                                ];
+                            @endphp
+                            @foreach($discountOptions as $val => $label)
+                                @php $cnt = $filterCounts['discount'][$val] ?? 0; @endphp
+                                @if($cnt > 0)
+                                <div class="filter-item">
+                                    <input type="radio" name="discount" id="discount-{{ $val }}"
+                                           class="filter-radio" value="{{ $val }}"
+                                           {{ request('discount', 'all') == $val ? 'checked' : '' }}>
+                                    <label for="discount-{{ $val }}" class="filter-label">
+                                        {{ $label }}
+                                        <span class="filter-count">({{ $cnt }})</span>
+                                    </label>
+                                </div>
+                                @endif
+                            @endforeach
                         </div>
                     </div>
 
-
-                    <!-- Availability -->
+                    {{-- ── Availability ─────────────────────────────────────── --}}
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Availability</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Availability
+                        </h3>
                         <div class="filter-options">
-                            <div class="filter-item">
-                                <input type="checkbox" name="availability[]" id="in-stock" class="filter-checkbox" value="in-stock" {{ is_array(request('availability')) && in_array('in-stock', request('availability')) ? 'checked' : (!request()->has('availability') ? 'checked' : '') }}>
-                                <label for="in-stock" class="filter-label">
-                                    In Stock
-                                    <span class="filter-count">(40)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" name="availability[]" id="out-of-stock" class="filter-checkbox" value="out-of-stock" {{ is_array(request('availability')) && in_array('out-of-stock', request('availability')) ? 'checked' : '' }}>
-                                <label for="out-of-stock" class="filter-label">
-                                    Out of Stock
-                                    <span class="filter-count">(5)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="fast-delivery" class="filter-checkbox" value="fast-delivery">
-                                <label for="fast-delivery" class="filter-label">
-                                    Fast Delivery
-                                    <span class="filter-count">(25)</span>
-                                </label>
-                            </div>
+                            @php
+                                $availOptions = [
+                                    'in-stock'     => 'In Stock',
+                                    'out-of-stock' => 'Out of Stock',
+                                ];
+                            @endphp
+                            @foreach($availOptions as $val => $label)
+                                @php $cnt = $filterCounts['availability'][$val] ?? 0; @endphp
+                                <div class="filter-item">
+                                    <input type="checkbox" name="availability[]" id="avail-{{ $val }}"
+                                           class="filter-checkbox" value="{{ $val }}"
+                                           {{ is_array(request('availability')) && in_array($val, request('availability')) ? 'checked' : '' }}>
+                                    <label for="avail-{{ $val }}" class="filter-label">
+                                        {{ $label }}
+                                        <span class="filter-count">({{ $cnt }})</span>
+                                    </label>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
 
-                    <!-- Sort By -->
+                    {{-- ── Shape ────────────────────────────────────────────── --}}
+                    @php $shapeTotal = array_sum($filterCounts['shape'] ?? []); @endphp
+                    @if($shapeTotal > 0)
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Sort By</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Shape
+                        </h3>
                         <div class="filter-options">
+                            @foreach($filterCounts['shape'] as $val => $cnt)
+                                @if($cnt > 0)
+                                <div class="filter-item">
+                                    <input type="radio" name="shape" id="shape-{{ Str::slug($val) }}"
+                                           class="filter-radio" value="{{ $val }}"
+                                           {{ request('shape') == $val ? 'checked' : '' }}>
+                                    <label for="shape-{{ Str::slug($val) }}" class="filter-label">
+                                        {{ $val }}
+                                        <span class="filter-count">({{ $cnt }})</span>
+                                    </label>
+                                </div>
+                                @endif
+                            @endforeach
+                            @if(request('shape'))
+                                <div class="filter-item mt-1">
+                                    <input type="radio" name="shape" id="shape-all" class="filter-radio" value="">
+                                    <label for="shape-all" class="filter-label text-muted">All Shapes</label>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- ── Material ─────────────────────────────────────────── --}}
+                    @php $matTotal = array_sum($filterCounts['material'] ?? []); @endphp
+                    @if($matTotal > 0)
+                    <div class="filter-section active mb-3">
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Material
+                        </h3>
+                        <div class="filter-options">
+                            @foreach($filterCounts['material'] as $val => $cnt)
+                                @if($cnt > 0)
+                                <div class="filter-item">
+                                    <input type="checkbox" name="material[]" id="mat-{{ Str::slug($val) }}"
+                                           class="filter-checkbox" value="{{ $val }}"
+                                           {{ is_array(request('material')) && in_array($val, request('material')) ? 'checked' : '' }}>
+                                    <label for="mat-{{ Str::slug($val) }}" class="filter-label">
+                                        {{ $val }}
+                                        <span class="filter-count">({{ $cnt }})</span>
+                                    </label>
+                                </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- ── Weight ───────────────────────────────────────────── --}}
+                    @php $weightTotal = array_sum($filterCounts['weight'] ?? []); @endphp
+                    @if($weightTotal > 0)
+                    <div class="filter-section active mb-3">
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Weight
+                        </h3>
+                        <div class="filter-options">
+                            @php
+                                $weightOptions = [
+                                    'under0.5' => 'Under 500g',
+                                    '0.5to1'   => '500g – 1 kg',
+                                    '1to3'     => '1 kg – 3 kg',
+                                    'above3'   => 'Above 3 kg',
+                                ];
+                            @endphp
+                            @foreach($weightOptions as $val => $label)
+                                @php $cnt = $filterCounts['weight'][$val] ?? 0; @endphp
+                                @if($cnt > 0)
+                                <div class="filter-item">
+                                    <input type="radio" name="weight_range" id="weight-{{ $val }}"
+                                           class="filter-radio" value="{{ $val }}"
+                                           {{ request('weight_range') == $val ? 'checked' : '' }}>
+                                    <label for="weight-{{ $val }}" class="filter-label">
+                                        {{ $label }}
+                                        <span class="filter-count">({{ $cnt }})</span>
+                                    </label>
+                                </div>
+                                @endif
+                            @endforeach
+                            @if(request('weight_range'))
+                                <div class="filter-item mt-1">
+                                    <input type="radio" name="weight_range" id="weight-all" class="filter-radio" value="">
+                                    <label for="weight-all" class="filter-label text-muted">All Weights</label>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- ── Sort By ──────────────────────────────────────────── --}}
+                    <div class="filter-section active mb-3">
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Sort By
+                        </h3>
+                        <div class="filter-options">
+                            @php
+                                $sortOptions = [
+                                    'popularity' => 'Popularity',
+                                    'price-low'  => 'Price: Low to High',
+                                    'price-high' => 'Price: High to Low',
+                                    'newest'     => 'Newest First',
+                                    'discount'   => 'Best Discount',
+                                ];
+                            @endphp
+                            @foreach($sortOptions as $val => $label)
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-popular" class="filter-radio" value="popularity" {{ request('sort', 'popularity') == 'popularity' ? 'checked' : '' }}>
-                                <label for="sort-popular" class="filter-label">Popularity</label>
+                                <input type="radio" name="sort" id="sort-{{ $val }}"
+                                       class="filter-radio" value="{{ $val }}"
+                                       {{ request('sort', 'popularity') == $val ? 'checked' : '' }}>
+                                <label for="sort-{{ $val }}" class="filter-label">{{ $label }}</label>
                             </div>
-                            <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-price-low" class="filter-radio" value="price-low" {{ request('sort') == 'price-low' ? 'checked' : '' }}>
-                                <label for="sort-price-low" class="filter-label">Price: Low to High</label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-price-high" class="filter-radio" value="price-high" {{ request('sort') == 'price-high' ? 'checked' : '' }}>
-                                <label for="sort-price-high" class="filter-label">Price: High to Low</label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-new" class="filter-radio" value="newest" {{ request('sort') == 'newest' ? 'checked' : '' }}>
-                                <label for="sort-new" class="filter-label">Newest First</label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-discount" class="filter-radio" value="discount" {{ request('sort') == 'discount' ? 'checked' : '' }}>
-                                <label for="sort-discount" class="filter-label">Discount</label>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
 
-                    <!-- Value Filter (Best Value, Premium, etc.) -->
-                    <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Value</h3>
-                        <div class="filter-options">
-                            <div class="filter-item">
-                                <input type="checkbox" id="value-best" class="filter-checkbox" value="best">
-                                <label for="value-best" class="filter-label">
-                                    Best Value
-                                    <span class="filter-count">(15)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="value-premium" class="filter-checkbox" value="premium">
-                                <label for="value-premium" class="filter-label">
-                                    Premium
-                                    <span class="filter-count">(10)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="value-budget" class="filter-checkbox" value="budget">
-                                <label for="value-budget" class="filter-label">
-                                    Budget Friendly
-                                    <span class="filter-count">(20)</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Delivery Options -->
-                    <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Delivery Options</h3>
-                        <div class="filter-options">
-                            <div class="filter-item">
-                                <input type="checkbox" id="delivery-free" class="filter-checkbox" value="free-delivery">
-                                <label for="delivery-free" class="filter-label">
-                                    Free Delivery
-                                    <span class="filter-count">(35)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="delivery-same-day" class="filter-checkbox" value="same-day">
-                                <label for="delivery-same-day" class="filter-label">
-                                    Same Day Delivery
-                                    <span class="filter-count">(12)</span>
-                                </label>
-                            </div>
-                            <div class="filter-item">
-                                <input type="checkbox" id="delivery-next-day" class="filter-checkbox" value="next-day">
-                                <label for="delivery-next-day" class="filter-label">
-                                    Next Day Delivery
-                                    <span class="filter-count">(28)</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Filter Actions -->
+                    {{-- ── Actions ─────────────────────────────────────────── --}}
                     <div class="filter-actions d-flex gap-2 mt-3">
-                        <button class="btn-filter btn-apply flex-fill" id="apply-filters" type="submit">Apply Filters</button>
-                        <a href="{{ url()->current() }}" class="btn-filter btn-reset flex-fill text-center text-decoration-none" style="display:flex; justify-content:center; align-items:center;">Reset All</a>
+                        <button class="btn-filter btn-apply flex-fill" type="submit">Apply Filters</button>
+                        <a href="{{ url()->current() }}"
+                           class="btn-filter btn-reset flex-fill text-center text-decoration-none"
+                           style="display:flex; justify-content:center; align-items:center;">Reset All</a>
                     </div>
                 </form>
             </div>
@@ -318,38 +278,8 @@
                                     {{ $products->links('pagination::bootstrap-5') }}
                                 </div>
                             @endif
-                        {{-- @endif --}}
-
-                        <!-- Demo products for display if nothing found (optional, comment out for production) -->
-                        <!--
-                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
-                            <div class="product-card">
-                                <div class="product-image-container">
-                                    <a href="#">
-                                        <img src="{{ asset('assets/images/product/product2.jpg') }}" alt="vermiculite" class="product-image main-image">
-                                        <img src="{{ asset('assets/images/product/product2.jpg') }}" alt="vermiculite" class="product-image hover-image">
-                                    </a>
-                                </div>
-                                <div class="product-info">
-                                    <h3 class="product-title">Vermiculite</h3>
-                                    <div class="product-price"><span class="current-price">₹699.00</span></div>
-                                    <div class="product-actions">
-                                        <form class="d-inline-block" method="POST" action="{{ route('cart.add', $product->id) }}">
-                                            @csrf
-                                            <input type="hidden" name="buy_now" value="1">
-                                            <button class="btn btn-primary" data-tooltip="Buy Now" type="submit">
-                                                <span class="btn-text">Buy Now</span><i class="btn-icon fas fa-shopping-bag"></i>
-                                            </button>
-                                        </form>
-                                        <button class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button>
-                                        <button class="btn btn-wishlist" data-tooltip="Wishlist"><i class="far fa-heart"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        -->
-                        <!-- Remove static demo product cards from final code -->
                     </div>
+
                 </div>
             </div>
         </div>
@@ -358,13 +288,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Price Range Display Sync
-    const priceInput = document.getElementById('price-max');
+    // Price Range Slider Sync
+    const priceSlider = document.getElementById('price-range-slider');
     const displayPriceRange = document.getElementById('display-price-range');
-    let minPrice = 0;
-    if(priceInput) {
-        priceInput.addEventListener('input', function() {
-            displayPriceRange.textContent = `₹${minPrice} - ₹${priceInput.value}`;
+    if(priceSlider && displayPriceRange) {
+        priceSlider.addEventListener('input', function() {
+            displayPriceRange.textContent = `₹${this.value}`;
         });
     }
 

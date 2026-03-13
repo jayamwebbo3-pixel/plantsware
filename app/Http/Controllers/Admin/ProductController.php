@@ -205,20 +205,29 @@ class ProductController extends Controller
             $this->imageService->applyWatermark($validated['image']);
         }
 
-        if ($request->hasFile('gallery_images')) {
-            if ($product->gallery_images) {
-                foreach ($product->gallery_images as $oldImage) {
-                    Storage::disk('public')->delete($oldImage);
+        // Handle Gallery Images (Append new, Delete selected)
+        $currentGallery = $product->gallery_images ?? [];
+        
+        // 1. Delete selected images
+        if ($request->has('deleted_gallery_images')) {
+            foreach ($request->deleted_gallery_images as $path) {
+                if (($key = array_search($path, $currentGallery)) !== false) {
+                    Storage::disk('public')->delete($path);
+                    unset($currentGallery[$key]);
                 }
             }
-            $galleryPaths = [];
+            $currentGallery = array_values($currentGallery); // Re-index
+        }
+
+        // 2. Add new images
+        if ($request->hasFile('gallery_images')) {
             foreach ($request->file('gallery_images') as $image) {
                 $path = $image->store('products/gallery', 'public');
                 $this->imageService->applyWatermark($path);
-                $galleryPaths[] = $path;
+                $currentGallery[] = $path;
             }
-            $validated['gallery_images'] = $galleryPaths;
         }
+        $validated['gallery_images'] = $currentGallery;
 
         $product->update($validated);
 

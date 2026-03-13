@@ -400,38 +400,25 @@
                     reader.onload = function(e) {
                         const div = document.createElement('div');
                         div.className = 'position-relative d-inline-block m-1';
-
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = 'img-thumbnail border-secondary';
-                        img.style.width = '80px';
-                        img.style.height = '80px';
-                        img.style.objectFit = 'cover';
-
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle';
-                        btn.style.padding = '0';
-                        btn.style.width = '20px';
-                        btn.style.height = '20px';
-                        btn.style.lineHeight = '18px';
-                        btn.style.fontSize = '12px';
-                        btn.style.transform = 'translate(30%, -30%)';
-                        btn.innerHTML = '&times;';
-                        btn.onclick = function(event) {
-                            event.preventDefault();
-                            selectedFiles.splice(index, 1); // Remove from array
-                            updateInputFiles();             // Update DataTransfer and input
-                            updateGalleryPreview();         // Re-render
-                        };
-
-                        div.appendChild(img);
-                        div.appendChild(btn);
+                        div.innerHTML = `
+                            <img src="${e.target.result}" class="img-thumbnail border-success" style="width: 80px; height: 80px; object-fit: cover;">
+                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle" 
+                                    style="width: 20px; height: 20px; padding: 0; transform: translate(30%, -30%);"
+                                    onclick="removeNewImage(${index})">
+                                &times;
+                            </button>
+                        `;
                         galleryPreviewContainer.appendChild(div);
                     }
                     reader.readAsDataURL(file);
                 });
             }
+
+            window.removeNewImage = function(index) {
+                selectedFiles.splice(index, 1);
+                updateInputFiles();
+                updateGalleryPreview();
+            };
 
             function updateInputFiles() {
                 const dataTransfer = new DataTransfer();

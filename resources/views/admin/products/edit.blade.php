@@ -341,10 +341,30 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label">Current Gallery Images</label>
+                        <div id="existingGalleryContainer" class="d-flex flex-wrap gap-2 mb-2">
+                            @if($product->gallery_images && count($product->gallery_images) > 0)
+                                @foreach($product->gallery_images as $index => $imagePath)
+                                    <div class="position-relative d-inline-block existing-gallery-item" data-path="{{ $imagePath }}">
+                                        <img src="{{ asset('storage/' . $imagePath) }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle remove-existing-gallery" 
+                                                style="width: 20px; height: 20px; padding: 0; transform: translate(30%, -30%);"
+                                                onclick="removeExistingImage(this, '{{ $imagePath }}')">
+                                            &times;
+                                        </button>
+                                    </div>
+                                @endforeach
+                            @else
+                                <p class="text-muted small">No gallery images uploaded yet.</p>
+                            @endif
+                        </div>
+                        {{-- Hidden input to store paths of images to be deleted --}}
+                        <div id="deletedImagesContainer"></div>
+
                         <label for="gallery_images" class="form-label">Add More Gallery Images</label>
                         <input type="file" class="form-control" id="gallery_images" name="gallery_images[]" accept="image/*" multiple>
                         <div id="galleryPreviewContainer" class="d-flex flex-wrap mt-2"></div>
-                        <small class="text-muted">Hold Ctrl/Cmd to select multiple. Existing gallery images remain unless deleted separately.</small>
+                        <small class="text-muted">Hold Ctrl/Cmd to select multiple. These will be added to your current gallery.</small>
                     </div>
 
                     <div class="mb-3">
@@ -400,17 +420,30 @@
                 populateSubcategories(this.value);
             });
 
-            // Gallery Images Preview and Removal
+            // --- Gallery Management ---
             const galleryInput = document.getElementById('gallery_images');
             const galleryPreviewContainer = document.getElementById('galleryPreviewContainer');
+            const deletedImagesContainer = document.getElementById('deletedImagesContainer');
             let selectedFiles = [];
 
+            // 1. Handle Existing Gallery Deletion
+            window.removeExistingImage = function(btn, path) {
+                if (confirm('Mark this image for deletion? It will be removed when you save.')) {
+                    // Hide the UI element
+                    btn.closest('.existing-gallery-item').classList.add('d-none');
+                    // Add to deleted images list
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'deleted_gallery_images[]';
+                    input.value = path;
+                    deletedImagesContainer.appendChild(input);
+                }
+            };
+
+            // 2. Handle New Gallery Upload Previews
             if (galleryInput) {
                 galleryInput.addEventListener('change', function(e) {
-                    // When new files are selected, append them to our existing selectedFiles array
                     const newFiles = Array.from(e.target.files);
-
-                    // Optional: prevent duplicate files based on name and size
                     newFiles.forEach(newFile => {
                         const exists = selectedFiles.some(existingFile => 
                             existingFile.name === newFile.name && existingFile.size === newFile.size
@@ -419,7 +452,6 @@
                             selectedFiles.push(newFile);
                         }
                     });
-
                     updateInputFiles();
                     updateGalleryPreview();
                 });
@@ -432,38 +464,26 @@
                     reader.onload = function(e) {
                         const div = document.createElement('div');
                         div.className = 'position-relative d-inline-block m-1';
-
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = 'img-thumbnail border-secondary';
-                        img.style.width = '80px';
-                        img.style.height = '80px';
-                        img.style.objectFit = 'cover';
-
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.className = 'btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle';
-                        btn.style.padding = '0';
-                        btn.style.width = '20px';
-                        btn.style.height = '20px';
-                        btn.style.lineHeight = '18px';
-                        btn.style.fontSize = '12px';
-                        btn.style.transform = 'translate(30%, -30%)';
-                        btn.innerHTML = '&times;';
-                        btn.onclick = function(event) {
-                            event.preventDefault();
-                            selectedFiles.splice(index, 1); // Remove from array
-                            updateInputFiles();             // Update DataTransfer and input
-                            updateGalleryPreview();         // Re-render
-                        };
-
-                        div.appendChild(img);
-                        div.appendChild(btn);
+                        div.innerHTML = `
+                            <img src="${e.target.result}" class="img-thumbnail border-success" style="width: 80px; height: 80px; object-fit: cover;">
+                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle" 
+                                    style="width: 20px; height: 20px; padding: 0; transform: translate(30%, -30%);"
+                                    onclick="removeNewImage(${index})">
+                                &times;
+                            </button>
+                            <small class="d-block text-center text-success" style="font-size: 10px;">New</small>
+                        `;
                         galleryPreviewContainer.appendChild(div);
                     }
                     reader.readAsDataURL(file);
                 });
             }
+
+            window.removeNewImage = function(index) {
+                selectedFiles.splice(index, 1);
+                updateInputFiles();
+                updateGalleryPreview();
+            };
 
             function updateInputFiles() {
                 const dataTransfer = new DataTransfer();
