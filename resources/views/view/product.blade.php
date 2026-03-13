@@ -11,10 +11,10 @@
                     </li>
                     <li class="d-inline-block font-weight-bolder mx-2">/</li>
                     @if($product->category)
-                        <li class="d-inline-block font-weight-bolder">
-                            <a href="{{ route('category.show', $product->category->slug) }}" class="text-decoration-none">{{ $product->category->name }}</a>
-                        </li>
-                        <li class="d-inline-block font-weight-bolder mx-2">/</li>
+                    <li class="d-inline-block font-weight-bolder">
+                        <a href="{{ route('category.show', $product->category->slug) }}" class="text-decoration-none">{{ $product->category->name }}</a>
+                    </li>
+                    <li class="d-inline-block font-weight-bolder mx-2">/</li>
                     @endif
                     <li class="d-inline-block font-weight-bolder">{{ $product->name }}</li>
                 </ul>
@@ -50,12 +50,20 @@
                                     </a>
                                 </div>
                             </div>
-                            <img id="mainProductImage" src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}" alt="{{ $product->name }}" class="w-100" style="object-fit: contain;">
+                            {{-- Circular in-place zoom glass --}}
+                            <div id="zoomContainer" style="position:relative; display:block; cursor:crosshair; user-select:none;">
+                                <img id="mainProductImage"
+                                    src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}"
+                                    alt="{{ $product->name }}"
+                                    class="w-100"
+                                    style="object-fit:contain; display:block; border-radius:6px;">
+                                <div id="zoomGlass"></div>
+                            </div>
                             @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="product-page-badge-sale">
                                     -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
                                 </span>
-                            @endif
+                                @endif
                         </div>
                         <div class="product-page-gallery-thumbs mt-3 d-flex flex-wrap gap-2 justify-content-center">
                             <!-- Main Image Thumbnail -->
@@ -64,11 +72,11 @@
                             </div>
                             <!-- Gallery Images -->
                             @if(!empty($product->gallery_images) && count($product->gallery_images) > 0)
-                                @foreach($product->gallery_images as $galleryImage)
-                                    <div class="product-page-thumb" data-src="{{ asset('storage/' . $galleryImage) }}">
-                                        <img src="{{ asset('storage/' . $galleryImage) }}" alt="{{ $product->name }}">
-                                    </div>
-                                @endforeach
+                            @foreach($product->gallery_images as $galleryImage)
+                            <div class="product-page-thumb" data-src="{{ asset('storage/' . $galleryImage) }}">
+                                <img src="{{ asset('storage/' . $galleryImage) }}" alt="{{ $product->name }}">
+                            </div>
+                            @endforeach
                             @endif
                         </div>
                     </div>
@@ -85,6 +93,7 @@
                                 right: 20px;
                                 z-index: 100;
                             }
+
                             .btn-share-toggle {
                                 background: #ffffff;
                                 color: #333;
@@ -97,32 +106,36 @@
                                 justify-content: center;
                                 font-size: 20px;
                                 cursor: pointer;
-                                box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+                                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
                                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                                border: 1px solid rgba(0,0,0,0.05);
+                                border: 1px solid rgba(0, 0, 0, 0.05);
                             }
+
                             .btn-share-toggle:hover {
                                 background: #72a420;
                                 color: #fff;
                                 transform: translateY(-3px) scale(1.05);
                                 box-shadow: 0 12px 25px rgba(114, 164, 32, 0.3);
                             }
+
                             .share-dropdown {
                                 position: absolute;
                                 top: 55px;
                                 right: 0;
                                 background: #ffffff;
                                 border-radius: 12px;
-                                box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+                                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
                                 padding: 12px;
                                 width: 180px;
                                 display: none;
                                 border: 1px solid #f0f0f0;
                                 animation: shareFadeIn 0.3s ease;
                             }
+
                             .share-dropdown.show {
                                 display: block;
                             }
+
                             .share-item {
                                 display: flex;
                                 align-items: center;
@@ -135,53 +148,74 @@
                                 font-size: 14px;
                                 font-weight: 500;
                             }
+
                             .share-item:hover {
                                 background: #f8f9fa;
                                 transform: translateX(5px);
                                 color: #72a420;
                             }
+
                             .share-item i {
                                 font-size: 18px;
                                 width: 24px;
                                 text-align: center;
                             }
-                            .share-item.whatsapp i { color: #25D366; }
-                            .share-item.facebook i { color: #1877F2; }
-                            .share-item.twitter i { color: #1DA1F2; }
-                            .share-item.instagram i { color: #E4405F; }
+
+                            .share-item.whatsapp i {
+                                color: #25D366;
+                            }
+
+                            .share-item.facebook i {
+                                color: #1877F2;
+                            }
+
+                            .share-item.twitter i {
+                                color: #1DA1F2;
+                            }
+
+                            .share-item.instagram i {
+                                color: #E4405F;
+                            }
 
                             @keyframes shareFadeIn {
-                                from { opacity: 0; transform: translateY(-12px) scale(0.95); }
-                                to { opacity: 1; transform: translateY(0) scale(1); }
+                                from {
+                                    opacity: 0;
+                                    transform: translateY(-12px) scale(0.95);
+                                }
+
+                                to {
+                                    opacity: 1;
+                                    transform: translateY(0) scale(1);
+                                }
                             }
                         </style>
                         <!-- Dynamic Rating -->
                         @if(($product->total_reviews ?? 0) > 0 && ($product->avg_rating ?? 0) > 0)
-                            <div class="product-page-rating mb-3">
-                                <div class="product-page-stars d-inline" style="color: #ffc107;">
-                                    @php $avg = $product->avg_rating ?? 0; @endphp
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= floor($avg))
-                                            <i class="fas fa-star"></i>
-                                        @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
-                                            <i class="fas fa-star-half-alt"></i>
-                                        @else
-                                            <i class="far fa-star text-muted"></i>
-                                        @endif
+                        <div class="product-page-rating mb-3">
+                            <div class="product-page-stars d-inline" style="color: #ffc107;">
+                                @php $avg = $product->avg_rating ?? 0; @endphp
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <=floor($avg))
+                                    <i class="fas fa-star"></i>
+                                    @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
+                                    <i class="fas fa-star-half-alt"></i>
+                                    @else
+                                    <i class="far fa-star text-muted"></i>
+                                    @endif
                                     @endfor
-                                </div>
-                                <span class="product-page-rating-text ms-2 fw-bold" style="color: #333;">{{ number_format($avg, 1) }}</span>
-                                <span class="product-page-reviews-count text-muted ms-1">({{ $product->total_reviews ?? 0 }} Reviews)</span>
                             </div>
+                            <span class="product-page-rating-text ms-2 fw-bold" style="color: #333;">{{ number_format($avg, 1) }}</span>
+                            <span class="product-page-reviews-count text-muted ms-1">({{ $product->total_reviews ?? 0 }} Reviews)</span>
+                        </div>
                         @endif
                         <!-- Price -->
                         <div class="product-page-price mb-4">
                             @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="product-page-current-price h3">₹{{ number_format($product->sale_price, 2) }}</span>
                                 <span class="product-page-original-price ms-3 text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</span>
-                            @else
+                                @else
                                 <span class="product-page-current-price h3">₹{{ number_format($product->price, 2) }}</span>
-                            @endif
+                                @endif
                         </div>
                         <!-- Description -->
                         <p class="product-page-description mb-4">
@@ -189,126 +223,126 @@
                         </p>
                         <!-- Attributes Selector -->
                         @if($product->size)
-                            @php
-                                $sizeData = [];
-                                $isJsonSizes = false;
-                                $rawSize = $product->size;
-                                if ($rawSize) {
-                                    $decoded = json_decode($rawSize, true);
-                                    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                        $isJsonSizes = true;
-                                        $sizeData = $decoded;
-                                    } else {
-                                        $parts = array_map('trim', explode(',', $rawSize));
-                                        foreach($parts as $p) {
-                                            if($p) $sizeData[$p] = null;
-                                        }
+                        @php
+                        $sizeData = [];
+                        $isJsonSizes = false;
+                        $rawSize = $product->size;
+                        if ($rawSize) {
+                        $decoded = json_decode($rawSize, true);
+                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                        $isJsonSizes = true;
+                        $sizeData = $decoded;
+                        } else {
+                        $parts = array_map('trim', explode(',', $rawSize));
+                        foreach($parts as $p) {
+                        if($p) $sizeData[$p] = null;
+                        }
+                        }
+                        }
+                        @endphp
+                        @if(count($sizeData) > 0)
+                        <div class="product-page-attributes mb-4">
+                            <label class="fw-bold mb-2">Select Size:</label>
+                            <div class="d-flex flex-wrap gap-2" id="sizeSelectorContainer">
+                                @php $loopIndex = 0; @endphp
+                                @foreach($sizeData as $sizeName => $sizePrice)
+                                <input type="radio" class="btn-check size-radio" name="size" id="size-{{ $loopIndex }}" value="{{ $sizeName }}" autocomplete="off" form="mainCartForm" {{ $loopIndex === 0 ? 'checked' : '' }} required data-price="{{ $sizePrice ?? '' }}" onchange="updateProductPrice(this)">
+                                <label class="btn btn-outline-success" for="size-{{ $loopIndex }}">
+                                    {{ $sizeName }}
+                                    @if($sizePrice) <small>(₹{{ $sizePrice }})</small> @endif
+                                </label>
+                                @php $loopIndex++; @endphp
+                                @endforeach
+                            </div>
+                        </div>
+                        <script>
+                            function updateProductPrice(radio) {
+                                let newPrice = radio.getAttribute('data-price');
+                                let currentPriceEl = document.querySelector('.product-page-current-price');
+                                let originalPriceEl = document.querySelector('.product-page-original-price');
+
+                                if (newPrice && parseFloat(newPrice) > 0) {
+                                    if (currentPriceEl) currentPriceEl.innerText = '₹' + parseFloat(newPrice).toFixed(2);
+                                    if (originalPriceEl) originalPriceEl.style.display = 'none';
+                                } else {
+                                    // Restore default prices
+                                    @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
+                                    if (currentPriceEl) currentPriceEl.innerText = '₹{{ number_format($product->sale_price, 2) }}';
+                                    if (originalPriceEl) {
+                                        originalPriceEl.style.display = 'inline';
+                                        originalPriceEl.innerText = '₹{{ number_format($product->price, 2) }}';
                                     }
+                                    @else
+                                    if (currentPriceEl) currentPriceEl.innerText = '₹{{ number_format($product->price, 2) }}';
+                                    if (originalPriceEl) originalPriceEl.style.display = 'none';
+                                    @endif
                                 }
-                            @endphp
-                            @if(count($sizeData) > 0)
-                                <div class="product-page-attributes mb-4">
-                                    <label class="fw-bold mb-2">Select Size:</label>
-                                    <div class="d-flex flex-wrap gap-2" id="sizeSelectorContainer">
-                                        @php $loopIndex = 0; @endphp
-                                        @foreach($sizeData as $sizeName => $sizePrice)
-                                            <input type="radio" class="btn-check size-radio" name="size" id="size-{{ $loopIndex }}" value="{{ $sizeName }}" autocomplete="off" form="mainCartForm" {{ $loopIndex === 0 ? 'checked' : '' }} required data-price="{{ $sizePrice ?? '' }}" onchange="updateProductPrice(this)">
-                                            <label class="btn btn-outline-success" for="size-{{ $loopIndex }}">
-                                                {{ $sizeName }} 
-                                                @if($sizePrice) <small>(₹{{ $sizePrice }})</small> @endif
-                                            </label>
-                                            @php $loopIndex++; @endphp
-                                        @endforeach
-                                    </div>
-                                </div>
-                                <script>
-                                    function updateProductPrice(radio) {
-                                        let newPrice = radio.getAttribute('data-price');
-                                        let currentPriceEl = document.querySelector('.product-page-current-price');
-                                        let originalPriceEl = document.querySelector('.product-page-original-price');
-                                        
-                                        if (newPrice && parseFloat(newPrice) > 0) {
-                                            if(currentPriceEl) currentPriceEl.innerText = '₹' + parseFloat(newPrice).toFixed(2);
-                                            if(originalPriceEl) originalPriceEl.style.display = 'none';
-                                        } else {
-                                            // Restore default prices
-                                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                                if(currentPriceEl) currentPriceEl.innerText = '₹{{ number_format($product->sale_price, 2) }}';
-                                                if(originalPriceEl) {
-                                                    originalPriceEl.style.display = 'inline';
-                                                    originalPriceEl.innerText = '₹{{ number_format($product->price, 2) }}';
-                                                }
-                                            @else
-                                                if(currentPriceEl) currentPriceEl.innerText = '₹{{ number_format($product->price, 2) }}';
-                                                if(originalPriceEl) originalPriceEl.style.display = 'none';
-                                            @endif
-                                        }
-                                    }
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        let firstRadio = document.querySelector('.size-radio:checked');
-                                        if(firstRadio) updateProductPrice(firstRadio);
-                                    });
-                                </script>
-                            @endif
+                            }
+                            document.addEventListener('DOMContentLoaded', function() {
+                                let firstRadio = document.querySelector('.size-radio:checked');
+                                if (firstRadio) updateProductPrice(firstRadio);
+                            });
+                        </script>
+                        @endif
                         @endif
 
                         <!-- Quantity Selector and Action Buttons inside Single Form -->
                         @if($product->stock_quantity > 0)
-                            <form action="{{ route('cart.add', $product) }}" method="POST" id="mainCartForm">
-                                @csrf
-                                <div class="product-page-quantity-selector d-flex align-items-center mb-4">
-                                    <label class="product-page-qty-label me-3 fw-bold" for="quantityInput">Quantity:</label>
-                                    <div class="product-page-qty-control d-flex align-items-center border rounded">
-                                        <button type="button" class="product-page-qty-btn border-0 bg-transparent px-3" onclick="updateQty(-1)" type="button">−</button>
-                                        <input type="number" id="quantityInput" name="quantity" class="product-page-qty-input border-0 text-center" value="1" min="1" readonly>
-                                        <button type="button" class="product-page-qty-btn border-0 bg-transparent px-3" onclick="updateQty(1)" type="button">+</button>
-                                    </div>
+                        <form action="{{ route('cart.add', $product) }}" method="POST" id="mainCartForm">
+                            @csrf
+                            <div class="product-page-quantity-selector d-flex align-items-center mb-4">
+                                <label class="product-page-qty-label me-3 fw-bold" for="quantityInput">Quantity:</label>
+                                <div class="product-page-qty-control d-flex align-items-center border rounded">
+                                    <button type="button" class="product-page-qty-btn border-0 bg-transparent px-3" onclick="updateQty(-1)" type="button">−</button>
+                                    <input type="number" id="quantityInput" name="quantity" class="product-page-qty-input border-0 text-center" value="1" min="1" readonly>
+                                    <button type="button" class="product-page-qty-btn border-0 bg-transparent px-3" onclick="updateQty(1)" type="button">+</button>
                                 </div>
+                            </div>
 
-                                <div class="product-page-action-buttons d-flex gap-3 mb-4">
-                                    <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn btn-lg btn-success d-flex align-items-center gap-2">
-                                        <i class="fas fa-bolt"></i>
-                                        Buy Now
-                                    </button>
-                                    <button type="submit" class="product-page-btn-add-cart btn btn-lg btn-primary d-flex align-items-center gap-2">
-                                        <i class="fas fa-shopping-bag"></i>
-                                        Add to Cart
-                                    </button>
-                                </div>
-                            </form>
+                            <div class="product-page-action-buttons d-flex gap-3 mb-4">
+                                <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn btn-lg btn-success d-flex align-items-center gap-2">
+                                    <i class="fas fa-bolt"></i>
+                                    Buy Now
+                                </button>
+                                <button type="submit" class="product-page-btn-add-cart btn btn-lg btn-primary d-flex align-items-center gap-2">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </form>
                         @else
-                            <div class="product-page-action-buttons mb-4">
-                                <button class="product-page-btn-add-cart btn btn-lg btn-secondary d-flex align-items-center gap-2" style="cursor: not-allowed;" disabled>
-                                    Out of Stock
-                                </button>
-                            </div>
-                        @endif
-                            <!-- Wishlist Form -->
-                            <form action="{{ route('wishlist.add', $product) }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="product-page-btn-wishlist btn btn-lg btn-outline-danger d-flex align-items-center gap-2">
-                                    <i class="far fa-heart"></i>
-                                    Add to Wishlist
-                                </button>
-                            </form>
+                        <div class="product-page-action-buttons mb-4">
+                            <button class="product-page-btn-add-cart btn btn-lg btn-secondary d-flex align-items-center gap-2" style="cursor: not-allowed;" disabled>
+                                Out of Stock
+                            </button>
                         </div>
-                        <!-- Info Badges -->
-                        <div class="product-page-info-badges d-flex gap-4">
-                            <div class="product-page-info-badge d-flex align-items-center gap-2">
-                                <span class="product-page-badge-icon"><i class="fas fa-leaf text-success"></i></span>
-                                <span>100% Healthy Plant</span>
-                            </div>
-                            <div class="product-page-info-badge d-flex align-items-center gap-2">
-                                <span class="product-page-badge-icon"><i class="fas fa-shield-alt text-primary"></i></span>
-                                <span>30-Day Guarantee</span>
-                            </div>
+                        @endif
+                        <!-- Wishlist Form -->
+                        <form action="{{ route('wishlist.add', $product) }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="product-page-btn-wishlist btn btn-lg btn-outline-danger d-flex align-items-center gap-2">
+                                <i class="far fa-heart"></i>
+                                Add to Wishlist
+                            </button>
+                        </form>
+                    </div>
+                    <!-- Info Badges -->
+                    <div class="product-page-info-badges d-flex gap-4">
+                        <div class="product-page-info-badge d-flex align-items-center gap-2">
+                            <span class="product-page-badge-icon"><i class="fas fa-leaf text-success"></i></span>
+                            <span>100% Healthy Plant</span>
+                        </div>
+                        <div class="product-page-info-badge d-flex align-items-center gap-2">
+                            <span class="product-page-badge-icon"><i class="fas fa-shield-alt text-primary"></i></span>
+                            <span>30-Day Guarantee</span>
                         </div>
                     </div>
                 </div>
-                <!-- End Product Info -->
             </div>
+            <!-- End Product Info -->
         </div>
     </div>
+</div>
 </div>
 
 <!-- Related Products Section -->
@@ -321,13 +355,13 @@
         <div class="swiper product-swiper">
             <div class="swiper-wrapper">
                 @forelse($relatedProducts as $relatedProduct)
-                    <div class="swiper-slide">
-                        @include('view.partials.product-card', ['product' => $relatedProduct])
-                    </div>
+                <div class="swiper-slide">
+                    @include('view.partials.product-card', ['product' => $relatedProduct])
+                </div>
                 @empty
-                    <div class="swiper-slide text-center py-5">
-                        <p>No related products available</p>
-                    </div>
+                <div class="swiper-slide text-center py-5">
+                    <p>No related products available</p>
+                </div>
                 @endforelse
             </div>
             <div class="swiper-button-next"></div>
@@ -336,46 +370,190 @@
     </div>
 </section>
 
+<style>
+/* ─── Circular Zoom Glass ──────────────────────────────── */
+#zoomContainer {
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+}
+#zoomGlass {
+    display: none;
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.18), 0 8px 32px rgba(0,0,0,0.28);
+    background-repeat: no-repeat;
+    background-color: #fff;
+    pointer-events: none;
+    z-index: 50;
+    transform: translate(-50%, -50%);
+    cursor: none;
+}
+/* On mobile: tap to open lightbox */
+@media (max-width: 991px) {
+    #zoomGlass   { display: none !important; }
+    #zoomContainer { cursor: zoom-in; }
+}
+/* ─── Lightbox (mobile / click) ─────────────────────── */
+#zoomLightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+}
+#zoomLightbox.open { display: flex; }
+#zoomLightbox img {
+    max-width: 92vw;
+    max-height: 88vh;
+    border-radius: 8px;
+    object-fit: contain;
+    box-shadow: 0 12px 60px rgba(0,0,0,0.6);
+}
+#zoomLightbox .lb-close {
+    position: absolute;
+    top: 16px; right: 20px;
+    color: #fff;
+    font-size: 36px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.85;
+    font-weight: 300;
+    transition: opacity 0.2s;
+}
+#zoomLightbox .lb-close:hover { opacity: 1; }
+</style>
+
+{{-- Lightbox markup --}}
+<div id="zoomLightbox">
+    <span class="lb-close" id="lbClose">&times;</span>
+    <img id="lbImg" src="" alt="Product zoom">
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Gallery Thumbnail Click
-    document.querySelectorAll('.product-page-thumb').forEach(function(thumb) {
+
+    // ─── Gallery thumbnail click ──────────────────────────────
+    document.querySelectorAll('.product-page-thumb').forEach(function (thumb) {
         thumb.addEventListener('click', function () {
-            document.querySelectorAll('.product-page-thumb').forEach(function(t) {
-                t.classList.remove('active');
-            });
+            document.querySelectorAll('.product-page-thumb').forEach(function (t) { t.classList.remove('active'); });
             this.classList.add('active');
             var newSrc = this.getAttribute('data-src');
-            document.getElementById('mainProductImage').src = newSrc;
+            var img = document.getElementById('mainProductImage');
+            img.src = newSrc;
+            attachZoom(); // re‑bind zoom to new image
         });
     });
 
-    // Quantity Update
-    window.updateQty = function(change) {
+    // ─── Quantity update ─────────────────────────────────────
+    window.updateQty = function (change) {
         var input = document.getElementById('quantityInput');
-        var value = parseInt(input.value) || 1;
-        value = value + change;
-        if (value < 1) value = 1;
+        var value = Math.max(1, (parseInt(input.value) || 1) + change);
         input.value = value;
-        document.getElementById('cartQuantity').value = value;
-        const buyNowInput = document.getElementById('buyNowQuantity');
-        if(buyNowInput) buyNowInput.value = value;
+        var cartQty = document.getElementById('cartQuantity');
+        if (cartQty) cartQty.value = value;
+        var buyNow = document.getElementById('buyNowQuantity');
+        if (buyNow) buyNow.value = value;
     };
 
-    // Social Share Toggle
-    const shareToggle = document.getElementById('shareToggle');
-    const shareDropdown = document.getElementById('shareDropdown');
-    
+    // ─── Share toggle ────────────────────────────────────────
+    var shareToggle   = document.getElementById('shareToggle');
+    var shareDropdown = document.getElementById('shareDropdown');
     if (shareToggle && shareDropdown) {
         shareToggle.addEventListener('click', function (e) {
             e.stopPropagation();
             shareDropdown.classList.toggle('show');
         });
-        
         document.addEventListener('click', function (e) {
-            if (!shareToggle.contains(e.target) && !shareDropdown.contains(e.target)) {
+            if (!shareToggle.contains(e.target) && !shareDropdown.contains(e.target))
                 shareDropdown.classList.remove('show');
-            }
+        });
+    }
+
+    // ─── Circular magnifier ──────────────────────────────────
+    var ZOOM    = 3;          // magnification level
+    var glass   = document.getElementById('zoomGlass');
+    var container = document.getElementById('zoomContainer');
+    var mainImg = document.getElementById('mainProductImage');
+
+    function attachZoom() {
+        if (!glass || !container || !mainImg) return;
+
+        // Wait for image to be ready
+        var doAttach = function () {
+            var src = mainImg.src;
+            glass.style.backgroundImage = 'url("' + src + '")';
+
+            container.onmousemove = function (e) {
+                if (window.innerWidth < 992) return;
+
+                var rect = mainImg.getBoundingClientRect();
+                var contRect = container.getBoundingClientRect();
+
+                // Cursor position relative to image
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+
+                // Only activate when cursor is inside the rendered image
+                if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+                    glass.style.display = 'none';
+                    return;
+                }
+
+                // Position glass centered on cursor (relative to container)
+                var gx = (e.clientX - contRect.left);
+                var gy = (e.clientY - contRect.top);
+                glass.style.left = gx + 'px';
+                glass.style.top  = gy + 'px';
+                glass.style.display = 'block';
+
+                // Background size = rendered image size × ZOOM
+                var bgW = rect.width  * ZOOM;
+                var bgH = rect.height * ZOOM;
+                glass.style.backgroundSize = bgW + 'px ' + bgH + 'px';
+
+                // Offset image in glass so cursor-point corresponds to glass center
+                // x,y are relative to image top-left
+                var bx = x * ZOOM - glass.offsetWidth  / 2;
+                var by = y * ZOOM - glass.offsetHeight / 2;
+                glass.style.backgroundPosition = '-' + bx + 'px -' + by + 'px';
+            };
+
+            container.onmouseleave = function () {
+                glass.style.display = 'none';
+            };
+        };
+
+        if (mainImg.complete && mainImg.naturalWidth > 0) {
+            doAttach();
+        } else {
+            mainImg.addEventListener('load', doAttach, { once: true });
+        }
+    }
+
+    attachZoom();
+
+    // ─── Lightbox (desktop click OR mobile tap) ──────────────
+    var lightbox  = document.getElementById('zoomLightbox');
+    var lbImg     = document.getElementById('lbImg');
+    var lbClose   = document.getElementById('lbClose');
+
+    if (container && lightbox) {
+        container.addEventListener('click', function () {
+            lbImg.src = mainImg.src;
+            lightbox.classList.add('open');
+        });
+        [lbClose, lightbox].forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                if (e.target === lightbox || e.target === lbClose)
+                    lightbox.classList.remove('open');
+            });
         });
     }
 });
