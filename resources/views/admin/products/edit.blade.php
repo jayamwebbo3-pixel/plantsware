@@ -103,92 +103,122 @@
                     <hr class="my-5">
                     <h4 class="mb-4">Product Attributes</h4>
 
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label">Size</label>
-                                <div id="size-checkboxes">
-                                    <!-- Default state: if Circular, show only inch options; if Rectangular, show Gallon -->
-                                    @php
-                                        $selectedShape = old('shape', $product->shape ?? 'Circular');
-                                        
-                                        // Handle dynamically changing old and JSON formats
-                                        $savedSizeStr = $product->size;
-                                        $selectedSizes = [];
-                                        
-                                        if (!empty($savedSizeStr)) {
-                                            $decoded = json_decode($savedSizeStr, true);
-                                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                                $selectedSizes = $decoded; // {"6x6 Inch": "150", ...}
-                                            } else {
-                                                $parts = array_map('trim', explode(',', $savedSizeStr));
-                                                foreach($parts as $p) {
-                                                    if($p) $selectedSizes[$p] = null;
-                                                }
-                                            }
-                                        }
-                                        
-                                        // Overwrite with old input if validation failed
-                                        $oldSizes = old('sizes');
-                                        if (is_array($oldSizes)) {
-                                            $selectedSizes = [];
-                                            foreach($oldSizes as $s => $data) {
-                                                if (!empty($data['checked'])) {
-                                                    $selectedSizes[$s] = $data['price'] ?? null;
-                                                }
-                                            }
-                                        }
-                                        
-                                        $circularSizes = ['6x6 Inch','9x9 Inch','12x12 Inch','12x15 Inch','15x12 Inch','15x15 Inch','18x6 Inch',
-                                                            '18x9 Inch','18x18 Inch', '24x6 Inch', '24x24 Inch',];
-                                        $rectangularSizes = ['18x12x12 Inch', '18x12x9 Inch','24x12x9 Inch','24x12x12 Inch','24x24x12 Inch','24x24x18 Inch',];
-                                    @endphp
+                    <div class="row g-4">
+                        {{-- SIZE column --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Size &amp; Price</label>
+                            <div id="size-checkboxes">
+                                @php
+                                    $selectedShape = old('shape', $product->shape ?? 'Circular');
 
-                                    <div id="circular-sizes" style="{{ $selectedShape === 'Circular' ? '' : 'display:none;' }}">
-                                        @foreach($circularSizes as $index => $size)
-                                            @php 
-                                                $isChecked = array_key_exists($size, $selectedSizes); 
-                                                $priceVal = $isChecked ? $selectedSizes[$size] : '';
-                                            @endphp
-                                            <div class="d-flex align-items-center mb-2">
-                                                <div class="form-check mb-0 me-3" style="min-width: 120px;">
-                                                    <input class="form-check-input size-checkbox" type="checkbox" name="sizes[{{ $size }}][checked]" id="size-circular-{{ $index }}" value="1" {{ $isChecked ? 'checked' : '' }} onchange="const input = this.closest('.d-flex').querySelector('.size-price-input'); input.disabled = !this.checked; if(!this.checked) input.value='';">
-                                                    <label class="form-check-label" for="size-circular-{{ $index }}">{{ $size }}</label>
-                                                </div>
-                                                <div class="input-group input-group-sm" style="width: 150px;">
-                                                    <span class="input-group-text">₹</span>
-                                                    <input type="number" class="form-control size-price-input" name="sizes[{{ $size }}][price]" value="{{ $priceVal }}" placeholder="Price" step="0.01" {{ $isChecked ? '' : 'disabled' }}>
-                                                </div>
+                                    $savedSizeStr = $product->size;
+                                    $selectedSizes = [];
+
+                                    if (!empty($savedSizeStr)) {
+                                        $decoded = json_decode($savedSizeStr, true);
+                                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                            $selectedSizes = $decoded;
+                                        } else {
+                                            $parts = array_map('trim', explode(',', $savedSizeStr));
+                                            foreach ($parts as $p) {
+                                                if ($p) $selectedSizes[$p] = null;
+                                            }
+                                        }
+                                    }
+
+                                    // Overwrite with old input if validation failed
+                                    $oldSizes = old('sizes');
+                                    if (is_array($oldSizes)) {
+                                        $selectedSizes = [];
+                                        foreach ($oldSizes as $s => $data) {
+                                            if (!empty($data['checked'])) {
+                                                $selectedSizes[$s] = $data['price'] ?? null;
+                                            }
+                                        }
+                                    }
+
+                                    $circularSizes    = ['6x6 Inch','9x9 Inch','12x12 Inch','12x15 Inch','15x12 Inch','15x15 Inch',
+                                                         '18x6 Inch','18x9 Inch','18x18 Inch','24x6 Inch','24x24 Inch'];
+                                    $rectangularSizes = ['18x12x12 Inch','18x12x9 Inch','24x12x9 Inch','24x12x12 Inch','24x24x12 Inch','24x24x18 Inch'];
+                                @endphp
+
+                                {{-- Circular --}}
+                                <div id="circular-sizes" style="{{ $selectedShape === 'Circular' ? '' : 'display:none;' }}">
+                                    @foreach($circularSizes as $index => $size)
+                                        @php
+                                            // PHP converts spaces to underscores in form array keys
+                                            $phpKey    = str_replace(' ', '_', $size);
+                                            $isChecked = array_key_exists($phpKey, $selectedSizes)
+                                                         || array_key_exists($size, $selectedSizes);
+                                            $priceVal  = $isChecked
+                                                         ? ($selectedSizes[$phpKey] ?? $selectedSizes[$size] ?? '')
+                                                         : '';
+                                        @endphp
+                                        <div class="d-flex align-items-center mb-2 gap-3">
+                                            <div class="form-check mb-0" style="min-width: 130px;">
+                                                <input class="form-check-input size-checkbox" type="checkbox"
+                                                    name="sizes[{{ $size }}][checked]"
+                                                    id="size-circular-{{ $index }}"
+                                                    value="1" {{ $isChecked ? 'checked' : '' }}
+                                                    onchange="const inp = this.closest('.d-flex').querySelector('.size-price-input'); inp.disabled = !this.checked; if(!this.checked) inp.value='';">
+                                                <label class="form-check-label" for="size-circular-{{ $index }}">{{ $size }}</label>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                    <div id="rectangular-sizes" style="{{ $selectedShape === 'Rectangular' ? '' : 'display:none;' }}">
-                                        @foreach($rectangularSizes as $index => $size)
-                                            @php 
-                                                $isChecked = array_key_exists($size, $selectedSizes); 
-                                                $priceVal = $isChecked ? $selectedSizes[$size] : '';
-                                            @endphp
-                                            <div class="d-flex align-items-center mb-2">
-                                                <div class="form-check mb-0 me-3" style="min-width: 140px;">
-                                                    <input class="form-check-input size-checkbox" type="checkbox" name="sizes[{{ $size }}][checked]" id="size-rectangular-{{ $index }}" value="1" {{ $isChecked ? 'checked' : '' }} onchange="const input = this.closest('.d-flex').querySelector('.size-price-input'); input.disabled = !this.checked; if(!this.checked) input.value='';">
-                                                    <label class="form-check-label" for="size-rectangular-{{ $index }}">{{ $size }}</label>
-                                                </div>
-                                                <div class="input-group input-group-sm" style="width: 150px;">
-                                                    <span class="input-group-text">₹</span>
-                                                    <input type="number" class="form-control size-price-input" name="sizes[{{ $size }}][price]" value="{{ $priceVal }}" placeholder="Price" step="0.01" {{ $isChecked ? '' : 'disabled' }}>
-                                                </div>
+                                            <div class="input-group input-group-sm" style="max-width: 160px;">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="number" class="form-control size-price-input"
+                                                    name="sizes[{{ $size }}][price]"
+                                                    value="{{ $priceVal }}"
+                                                    placeholder="Enter price"
+                                                    step="0.01"
+                                                    {{ $isChecked ? '' : 'disabled' }}>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                    <div id="square-sizes" style="{{ $selectedShape === 'Square' ? '' : 'display:none;' }}">
-                                        <div class="text-muted">No sizes defined for Square.</div>
-                                    </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                {{-- Rectangular --}}
+                                <div id="rectangular-sizes" style="{{ $selectedShape === 'Rectangular' ? '' : 'display:none;' }}">
+                                    @foreach($rectangularSizes as $index => $size)
+                                        @php
+                                            $phpKey    = str_replace(' ', '_', $size);
+                                            $isChecked = array_key_exists($phpKey, $selectedSizes)
+                                                         || array_key_exists($size, $selectedSizes);
+                                            $priceVal  = $isChecked
+                                                         ? ($selectedSizes[$phpKey] ?? $selectedSizes[$size] ?? '')
+                                                         : '';
+                                        @endphp
+                                        <div class="d-flex align-items-center mb-2 gap-3">
+                                            <div class="form-check mb-0" style="min-width: 150px;">
+                                                <input class="form-check-input size-checkbox" type="checkbox"
+                                                    name="sizes[{{ $size }}][checked]"
+                                                    id="size-rectangular-{{ $index }}"
+                                                    value="1" {{ $isChecked ? 'checked' : '' }}
+                                                    onchange="const inp = this.closest('.d-flex').querySelector('.size-price-input'); inp.disabled = !this.checked; if(!this.checked) inp.value='';">
+                                                <label class="form-check-label" for="size-rectangular-{{ $index }}">{{ $size }}</label>
+                                            </div>
+                                            <div class="input-group input-group-sm" style="max-width: 160px;">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="number" class="form-control size-price-input"
+                                                    name="sizes[{{ $size }}][price]"
+                                                    value="{{ $priceVal }}"
+                                                    placeholder="Enter price"
+                                                    step="0.01"
+                                                    {{ $isChecked ? '' : 'disabled' }}>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                <div id="square-sizes" style="{{ $selectedShape === 'Square' ? '' : 'display:none;' }}">
+                                    <div class="text-muted">No sizes defined for Square.</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+
+                        {{-- Shape & Material column --}}
+                        <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="shape" class="form-label">Shape</label>
+                                <label for="shape" class="form-label fw-semibold">Shape</label>
                                 <select class="form-select" id="shape" name="shape">
                                     <option value="">Select Shape</option>
                                     <option value="Circular" {{ old('shape', $product->shape) == 'Circular' ? 'selected' : '' }}>Circular</option>
@@ -196,10 +226,8 @@
                                     {{-- <option value="Square" {{ old('shape', $product->shape) == 'Square' ? 'selected' : '' }}>Square</option> --}}
                                 </select>
                             </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="material" class="form-label">Material</label>
+                                <label for="material" class="form-label fw-semibold">Material</label>
                                 <select class="form-select" id="material" name="material">
                                     <option value="">Select Material</option>
                                     <option value="HDPE" {{ old('material', $product->material) == 'HDPE' ? 'selected' : '' }}>HDPE</option>
@@ -209,17 +237,16 @@
                             </div>
                         </div>
                     </div>
+
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {
                             function toggleSizeCheckboxes() {
                                 var shape = document.getElementById('shape').value;
-                                document.getElementById('circular-sizes').style.display = (shape === 'Circular') ? '' : 'none';
+                                document.getElementById('circular-sizes').style.display    = (shape === 'Circular')    ? '' : 'none';
                                 document.getElementById('rectangular-sizes').style.display = (shape === 'Rectangular') ? '' : 'none';
-                                document.getElementById('square-sizes').style.display = (shape === 'Square') ? '' : 'none';
+                                document.getElementById('square-sizes').style.display      = (shape === 'Square')      ? '' : 'none';
                             }
                             document.getElementById('shape').addEventListener('change', toggleSizeCheckboxes);
-
-                            // Initial call, in case of page reload with validation error
                             toggleSizeCheckboxes();
                         });
                     </script>
