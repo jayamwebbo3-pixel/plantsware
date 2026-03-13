@@ -40,6 +40,7 @@ class Product extends Model
         'warranty_months',
         'avg_rating',
         'total_reviews',
+        'weight',
     ];
     protected $casts = [
         'price' => 'decimal:2',

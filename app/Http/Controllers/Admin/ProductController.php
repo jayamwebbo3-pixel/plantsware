@@ -91,6 +91,7 @@ class ProductController extends Controller
             'length_meters' => 'nullable|numeric|min:0',
             'pack_quantity' => 'integer|min:1',
             'warranty_months' => 'nullable|integer|min:0',
+            'weight' => 'nullable|numeric|min:0',
         ]);
 
         $validated['is_featured'] = $request->boolean('is_featured');
@@ -176,6 +177,7 @@ class ProductController extends Controller
             'length_meters' => 'nullable|numeric|min:0',
             'pack_quantity' => 'integer|min:1',
             'warranty_months' => 'nullable|integer|min:0',
+            'weight' => 'nullable|numeric|min:0',
         ]);
 
         $validated['is_featured'] = $request->boolean('is_featured');
