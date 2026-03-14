@@ -2,15 +2,15 @@
 <html lang="en">
 
 <head>
-    <title>Plantly</title>
+    <title>{{ $headerFooter->home_meta_title ?? 'Plantly' }}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script>
         window.APP_URL = "{{ url('/') }}";
     </script>
-    
-    
+
+
     <!-- Blog sharing -->
     <!-- <meta property="og:title" content="{{ $blog->title ?? 'Plantly Blog' }}">-->
     <!--<meta property="og:description" content="{{ Str::limit(strip_tags($blog->excerpt ?? ''), 150) }}">-->
@@ -20,38 +20,38 @@
 
     <!--<meta name="twitter:card" content="summary_large_image">-->
 
-     <!-- Blog sharing end  -->
-     
-     <!--Blog sharing altered for img inclusion-->
-       @php
-        $blogImage = (isset($blog) && !empty($blog->image))
-            ? asset('storage/' . $blog->image)
-            : asset('assets/images/blog/default.jpg');
+    <!-- Blog sharing end  -->
 
-        $blogTitle = isset($blog)
-            ? $blog->title
-            : 'Plantly Blog';
+    <!--Blog sharing altered for img inclusion-->
+    @php
+    $blogImage = (isset($blog) && !empty($blog->image))
+    ? asset('storage/' . $blog->image)
+    : asset('assets/images/blog/default.jpg');
 
-        $blogDescription = isset($blog)
-            ? \Illuminate\Support\Str::limit(strip_tags($blog->excerpt ?? $blog->content), 150)
-            : 'Read the latest articles on Plantly';
+    $blogTitle = isset($blog)
+    ? $blog->title
+    : 'Plantly Blog';
 
-        $blogUrl = url()->current();
+    $blogDescription = isset($blog)
+    ? \Illuminate\Support\Str::limit(strip_tags($blog->excerpt ?? $blog->content), 150)
+    : 'Read the latest articles on Plantly';
+
+    $blogUrl = url()->current();
     @endphp
-    
+
     <meta property="og:site_name" content="Plantly">
     <meta property="og:title" content="{{ $blogTitle }}">
     <meta property="og:description" content="{{ $blogDescription }}">
     <meta property="og:image" content="{{ $blogImage }}">
     <meta property="og:url" content="{{ $blogUrl }}">
     <meta property="og:type" content="article">
-    
+
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $blogTitle }}">
     <meta name="twitter:description" content="{{ $blogDescription }}">
     <meta name="twitter:image" content="{{ $blogImage }}">
 
-     <!--end here-->
+    <!--end here-->
 
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/fav-icon.png') }}">
@@ -67,17 +67,78 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/media.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.css') }}">
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CDN Libraries -->
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+    <style>
+        .mega_menu {
+            position: static !important;
+        }
+
+        .mega_menu .dropdown-menu {
+            background-color: #76a713;
+            /* Primary green color */
+            border: none;
+            border-radius: 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            margin-top: 0;
+            padding: 30px 5% !important;
+            /* Align with header padding */
+        }
+
+        .mega_menu .h_title {
+            color: #fff !important;
+            font-weight: 800 !important;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3) !important;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            display: block;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .mega_menu .list-unstyled li a {
+            color: #fff !important;
+            padding: 6px 0;
+            display: block;
+            font-size: 13px;
+            transition: all 0.3s;
+            white-space: normal;
+            /* Allow product names to wrap if needed */
+        }
+
+        .mega_menu .list-unstyled li a:hover {
+            padding-left: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff !important;
+        }
+
+        .mega_menu .dropdown-menu .row {
+            margin: 0;
+            width: 100%;
+        }
+
+        @media (max-width: 991px) {
+            .mega_menu .dropdown-menu {
+                width: auto !important;
+                position: relative !important;
+                left: 0 !important;
+                right: 0 !important;
+                padding: 15px !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -90,11 +151,11 @@
                     <div class="col-lg-12 col-md-4 col-sm-4 topbar_left">
                         <ul>
                             <li class="text-center">
-                                <span class="fw-bold">Rooted in Nature, Grown with Love</span>
+                                <span class="fw-bold">{{ $headerFooter->header_title ?? 'Rooted in Nature, Grown with Love' }}</span>
                             </li>
                         </ul>
                     </div>
-                    
+
                     <!--
                     <div class="col-lg-7 col-md-8 col-sm-8 text-xs-right topbar_right text-right">
                         ...
@@ -160,14 +221,14 @@
                                         </span>
                                         <span class="dropdown-menu r_menu dropdown-menu-right">
                                             @auth
-                                                <a class="dropdown-item font-weight-bolderer" href="{{ url('user/dashboard') }}">Dashboard</a>
-                                                <form method="POST" action="{{ route('logout') }}">
-                                                    @csrf
-                                                    <button type="submit" class="dropdown-item font-weight-bolderer">Logout</button>
-                                                </form>
+                                            <a class="dropdown-item font-weight-bolderer" href="{{ url('user/dashboard') }}">Dashboard</a>
+                                            <form method="POST" action="{{ route('logout') }}">
+                                                @csrf
+                                                <button type="submit" class="dropdown-item font-weight-bolderer">Logout</button>
+                                            </form>
                                             @else
-                                                <a class="dropdown-item font-weight-bolderer" href="{{ url('login') }}">Login</a>
-                                                {{-- <a class="dropdown-item font-weight-bolderer" href="{{ url('register') }}">Register</a> --}}
+                                            <a class="dropdown-item font-weight-bolderer" href="{{ url('login') }}">Login</a>
+                                            {{-- <a class="dropdown-item font-weight-bolderer" href="{{ url('register') }}">Register</a> --}}
                                             @endauth
                                         </span>
                                     </li>
@@ -192,161 +253,108 @@
                             <button class="close-menu" id="closeMenu" aria-label="Close Menu">×</button>
                             <!-- Home -->
                             <li><a href="{{ url('/') }}">Home</a></li>
+
+                            @php
+                            $gardenCategory = $headerCategories->where('id', 4)->first();
+                            $aquariumCategory = $headerCategories->where('id', 5)->first();
+                            $naturalCategory = $headerCategories->where('id', 11)->first();
+                            @endphp
+
+                            <!-- Garden Products Dropdown -->
                             <li class="dropdown mega_menu m1 level-1 font-weight-bolderer">
-                                <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                                <a class="dropdown-toggle" href="{{ $gardenCategory ? route('category.show', $gardenCategory->slug) : '#' }}" role="button" data-toggle="dropdown" aria-expanded="false">
                                     Garden Products&nbsp;<span class="ml-1"><i class="fa fa-angle-down"></i></span>
                                 </a>
-                                <ul class="dropdown-menu w-100 p-3">
+                                <ul class="dropdown-menu p-3">
                                     <div class="row">
-                                        <!-- COLUMN 1: Soil & Amendments -->
+                                        @if($gardenCategory && $gardenCategory->subcategories->count() > 0)
+                                        @php $chunks = $gardenCategory->subcategories->chunk(ceil($gardenCategory->subcategories->count() / 3)); @endphp
+                                        @foreach($chunks as $chunk)
                                         <div class="col-lg-4 col-md-6">
                                             <ul class="list-unstyled">
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mb-2">Fertilizers & Soil Amendments</li>
-                                                <li><a href="#">Perlite</a></li>
-                                                <li><a href="#">Vermiculite</a></li>
-                                                <li><a href="#">Cocopeat</a></li>
-                                                <li><a href="#">Coco Husk</a></li>
-                                                <li><a href="#">LECA Clay Balls</a></li>
-                                                <li><a href="#">Vermicompost</a></li>
-                                                <li><a href="#">Charcoal</a></li>
-                                                <li><a href="#">Pine Bark</a></li>
-                                                <li><a href="#">Lime Powder</a></li>
-                                                <li><a href="#">Epsom Salt</a></li>
-                                                <li><a href="#">Rice Husk</a></li>
+                                                @foreach($chunk as $sub)
+                                                <li class="h_title text-uppercase">{{ $sub->name }}</li>
+                                                @foreach($sub->products as $product)
+                                                <li><a href="{{ route('product.show', $product->slug) }}">{{ $product->name }}</a></li>
+                                                @endforeach
+                                                <hr class="border-light opacity-25 my-2">
+                                                @endforeach
                                             </ul>
                                         </div>
-                                        <!-- COLUMN 2: Grow Bags -->
-                                        <div class="col-lg-4 col-md-6">
-                                            <ul class="list-unstyled">
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mb-2">Grow Bags – HDPE Circular</li>
-                                                <li><a href="#">6x6 Inch</a></li>
-                                                <li><a href="#">9x9 Inch</a></li>
-                                                <li><a href="#">12x12 Inch</a></li>
-                                                <li><a href="#">12x15 Inch</a></li>
-                                                <li><a href="#">15x12 Inch</a></li>
-                                                <li><a href="#">15x15 Inch</a></li>
-                                                <li><a href="#">18x6 Inch</a></li>
-                                                <li><a href="#">18x9 Inch</a></li>
-                                                <li><a href="#">18x18 Inch</a></li>
-                                                <li><a href="#">24x6 Inch</a></li>
-                                                <li><a href="#">24x24 Inch</a></li>
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mt-3 mb-2">Grow Bags – HDPE Rectangular</li>
-                                                <li><a href="#">18x12x12 Inch</a></li>
-                                                <li><a href="#">18x12x9 Inch</a></li>
-                                                <li><a href="#">24x12x9 Inch</a></li>
-                                                <li><a href="#">24x12x12 Inch</a></li>
-                                                <li><a href="#">24x24x12 Inch</a></li>
-                                                <li><a href="#">24x24x18 Inch</a></li>
-                                            </ul>
+                                        @endforeach
+                                        @else
+                                        <div class="col-12">
+                                            <p class="text-muted small">No subcategories available.</p>
                                         </div>
-                                        <!-- COLUMN 3: Tools, Nets, Pebbles, Toys, Drip Irrigation -->
-                                        <div class="col-lg-4 col-md-6">
-                                            <ul class="list-unstyled">
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mb-2">Shade & Nets</li>
-                                                <li><a href="#">30% Shade</a></li>
-                                                <li><a href="#">50% Shade</a></li>
-                                                <li><a href="#">75% Shade</a></li>
-                                                <li><a href="#">90% Shade</a></li>
-                                                <li><a href="#">Creeper Net</a></li>
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mt-3 mb-2">Tools</li>
-                                                <li><a href="#">Trowel</a></li>
-                                                <li><a href="#">Hand Fork</a></li>
-                                                <li><a href="#">Rake</a></li>
-                                                <li><a href="#">Hand Cultivator</a></li>
-                                                <li><a href="#">Hand Weeder</a></li>
-                                                <li><a href="#">Hedge Shear</a></li>
-                                                <li><a href="#">Pruning Shear</a></li>
-                                                <li><a href="#">Watering Can</a></li>
-                                                <li><a href="#">Pressure Sprayer</a></li>
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mt-3 mb-2">Pebbles</li>
-                                                <li><a href="#">Polished</a></li>
-                                                <li><a href="#">Unpolished</a></li>
-                                                <li><a href="#">Marble Chips</a></li>
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mt-3 mb-2">Toys</li>
-                                                <li><a href="#">Resin</a></li>
-                                                <li><a href="#">Plastic</a></li>
-                                                <li><a href="#">Wooden</a></li>
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mt-3 mb-2">Others</li>
-                                                <li><a href="#">Artificial Grass</a></li>
-                                                <li><a href="#">Drip Irrigation</a></li>
-                                            </ul>
-                                        </div>
+                                        @endif
                                     </div>
                                 </ul>
                             </li>
+
+                            <!-- Planted Aquarium Products Dropdown -->
                             <li class="dropdown mega_menu m1 level-1 font-weight-bolderer">
-                                <a class="dropdown-toggle" href="#" data-toggle="dropdown">
-                                    Planted Aquarium Products <span class="ml-1"><i class="fa fa-angle-down"></i></span>
+                                <a class="dropdown-toggle" href="{{ $aquariumCategory ? route('category.show', $aquariumCategory->slug) : '#' }}" role="button" data-toggle="dropdown" aria-expanded="false">
+                                    Planted Aquarium Products&nbsp;<span class="ml-1"><i class="fa fa-angle-down"></i></span>
                                 </a>
-                                <ul class="dropdown-menu w-100 p-3" style="min-width: 570px !important;">
+                                <ul class="dropdown-menu p-3">
                                     <div class="row">
+                                        @if($aquariumCategory && $aquariumCategory->subcategories->count() > 0)
+                                        @php $chunks = $aquariumCategory->subcategories->chunk(ceil($aquariumCategory->subcategories->count() / 2)); @endphp
+                                        @foreach($chunks as $chunk)
                                         <div class="col-lg-6">
                                             <ul class="list-unstyled">
-                                                <li><a href="#">Aqua Soil</a></li>
-                                                <li><a href="#">CO2 Kit</a></li>
-                                                <li><a href="#">Filter Media</a></li>
-                                                <li><a href="#">Filter</a></li>
+                                                @foreach($chunk as $sub)
+                                                <li class="h_title text-uppercase">{{ $sub->name }}</li>
+                                                @foreach($sub->products as $product)
+                                                <li><a href="{{ route('product.show', $product->slug) }}">{{ $product->name }}</a></li>
+                                                @endforeach
+                                                <hr class="border-light opacity-25 my-2">
+                                                @endforeach
                                             </ul>
                                         </div>
-                                        <div class="col-lg-6">
-                                            <ul class="list-unstyled">
-                                                <li><a href="#">Light</a></li>
-                                                <li><a href="#">Aqua Scaping Tools</a></li>
-                                                <li><a href="#">Aquarium Motor Pump</a></li>
-                                            </ul>
+                                        @endforeach
+                                        @else
+                                        <div class="col-12">
+                                            <p class="text-muted small">No subcategories available.</p>
                                         </div>
+                                        @endif
                                     </div>
                                 </ul>
                             </li>
+
+                            <!-- Natural Products Dropdown -->
                             <li class="dropdown mega_menu mega-menu-2 m1 level-1 font-weight-bolderer">
-                                <a class="dropdown-toggle" href="#" data-toggle="dropdown">
-                                    Natural Products <span class="ml-1"><i class="fa fa-angle-down"></i></span>
+                                <a class="dropdown-toggle" href="{{ $naturalCategory ? route('category.show', $naturalCategory->slug) : '#' }}" role="button" data-toggle="dropdown" aria-expanded="false">
+                                    Natural Products&nbsp;<span class="ml-1"><i class="fa fa-angle-down"></i></span>
                                 </a>
-                                <ul class="dropdown-menu w-100 p-3">
+                                <ul class="dropdown-menu p-3">
                                     <div class="row">
+                                        @if($naturalCategory && $naturalCategory->subcategories->count() > 0)
+                                        @php $chunks = $naturalCategory->subcategories->chunk(ceil($naturalCategory->subcategories->count() / 2)); @endphp
+                                        @foreach($chunks as $chunk)
                                         <div class="col-lg-6">
                                             <ul class="list-unstyled">
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mb-2">Palm Products</li>
-                                                <li><a href="#">Palm Jaggery</a></li>
-                                                <li><a href="#">Palm Sugar Candy</a></li>
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mt-3 mb-2">Sugar Products</li>
-                                                <li><a href="#">Sugarcane Jaggery</a></li>
-                                                <li><a href="#">Brown Sugar</a></li>
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mt-3 mb-2">Rice</li>
-                                                <li><a href="#">Karuppu Kavuni</a></li>
-                                                <li><a href="#">Mapillai Samba</a></li>
-                                                <li><a href="#">Bamboo Rice</a></li>
-                                                <li><a href="#">Seeraga Samba</a></li>
-                                                <li><a href="#">Poongar</a></li>
-                                                <li><a href="#">Thuyamalli</a></li>
+                                                @foreach($chunk as $sub)
+                                                <li class="h_title text-uppercase">{{ $sub->name }}</li>
+                                                @foreach($sub->products as $product)
+                                                <li><a href="{{ route('product.show', $product->slug) }}">{{ $product->name }}</a></li>
+                                                @endforeach
+                                                <hr class="border-light opacity-25 my-2">
+                                                @endforeach
                                             </ul>
                                         </div>
-                                        <div class="col-lg-6">
-                                            <ul class="list-unstyled">
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mb-2">Millet</li>
-                                                <li><a href="#">Finger Millet</a></li>
-                                                <li><a href="#">Pearl Millet</a></li>
-                                                <li><a href="#">Foxtail Millet</a></li>
-                                                <li><a href="#">Barnyard Millet</a></li>
-                                                <li><a href="#">Proso Millet</a></li>
-                                                <li><a href="#">Sorghum</a></li>
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mt-3 mb-2">Nuts</li>
-                                                <li><a href="#">Cashew</a></li>
-                                                <li><a href="#">Badam</a></li>
-                                                <li><a href="#">Pista</a></li>
-                                                <li class="h_title text-uppercase font-weight-bolder border-bottom mt-3 mb-2">Seeds</li>
-                                                <li><a href="#">Sunflower</a></li>
-                                                <li><a href="#">Cucumber</a></li>
-                                                <li><a href="#">Watermelon</a></li>
-                                                <li><a href="#">Pumpkin</a></li>
-                                            </ul>
+                                        @endforeach
+                                        @else
+                                        <div class="col-12">
+                                            <p class="text-muted small">No subcategories available.</p>
                                         </div>
+                                        @endif
                                     </div>
                                 </ul>
                             </li>
+
                             <li><a href="{{ route('combo_packs.frontend_index') }}">Combo Packs</a></li>
                             <li><a href="{{ url('about') }}">About Plantsware</a></li>
-                            <!--<li><a href="{{ url('blog-categories') }}">Blog</a></li>-->
                             <li><a href="{{ route('blog.index') }}">Blog</a></li>
                         </ul>
                     </div>
@@ -355,57 +363,58 @@
         </div>
     </header>
     <!-- header area end -->
-    
+
     <div class="container-fluid mt-2">
         @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
         @endif
 
         @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
         @endif
     </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // TOGGLE MENU OPEN
-    const menuToggle = document.getElementById('menuToggle');
-    if (menuToggle) {
-        menuToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.querySelector(".main-menu").classList.add("show");
-        });
-    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // TOGGLE MENU OPEN
+            const menuToggle = document.getElementById('menuToggle');
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    document.querySelector(".main-menu").classList.add("show");
+                });
+            }
 
-    // TOGGLE MENU CLOSE
-    const closeMenu = document.getElementById('closeMenu');
-    if (closeMenu) {
-        closeMenu.addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.querySelector(".main-menu").classList.remove("show");
-        });
-    }
+            // TOGGLE MENU CLOSE
+            const closeMenu = document.getElementById('closeMenu');
+            if (closeMenu) {
+                closeMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    document.querySelector(".main-menu").classList.remove("show");
+                });
+            }
 
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const mainMenu = document.querySelector('.main-menu');
-        if (mainMenu && !event.target.closest('.navbar-toggler') &&
-            !event.target.closest('.main-menu') &&
-            mainMenu.classList.contains('show')) {
-            mainMenu.classList.remove('show');
-        }
-    });
-});
-</script>
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const mainMenu = document.querySelector('.main-menu');
+                if (mainMenu && !event.target.closest('.navbar-toggler') &&
+                    !event.target.closest('.main-menu') &&
+                    mainMenu.classList.contains('show')) {
+                    mainMenu.classList.remove('show');
+                }
+            });
+        });
+    </script>
 </body>
+
 </html>

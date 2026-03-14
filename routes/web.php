@@ -74,7 +74,6 @@ Route::prefix('wishlist')->name('wishlist.')->controller(CartController::class)-
     Route::delete('/remove/{product}', 'removeFromWishlist')->name('remove');
     Route::post('/add-combo/{combo}', 'addToWishlistCombo')->name('add_combo');
     Route::delete('/remove-combo/{combo}', 'removeFromWishlistCombo')->name('remove_combo');
-
 });
 
 // ================= CHECKOUT (AUTH REQUIRED) =================

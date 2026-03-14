@@ -2,15 +2,15 @@
 <footer class="footer">
     <div class="container">
         <div class="row">
-            <!-- First Column: About -->
             <div class="col-lg-3 col-md-6 mb-4">
                 <h5>About Us</h5>
-                <p>We are passionate about providing high-quality gardening products and solutions to help you create beautiful, thriving green spaces.</p>
+                <p>{{ $headerFooter->footer_content ?? 'We are passionate about providing high-quality gardening products and solutions to help you create beautiful, thriving green spaces.' }}</p>
                 <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    @if($headerFooter->facebook_link) <a href="{{ $headerFooter->facebook_link }}"><i class="fab fa-facebook-f"></i></a> @endif
+                    @if($headerFooter->twitter_link) <a href="{{ $headerFooter->twitter_link }}"><i class="fab fa-twitter"></i></a> @endif
+                    @if($headerFooter->insta_link) <a href="{{ $headerFooter->insta_link }}"><i class="fab fa-instagram"></i></a> @endif
+                    @if($headerFooter->linkedin_link) <a href="{{ $headerFooter->linkedin_link }}"><i class="fab fa-linkedin-in"></i></a> @endif
+                    @if($headerFooter->youtube_link) <a href="{{ $headerFooter->youtube_link }}"><i class="fab fa-youtube"></i></a> @endif
                 </div>
             </div>
 
@@ -18,11 +18,11 @@
             <div class="col-lg-3 col-md-6 mb-4">
                 <h5>Quick Links</h5>
                 <ul>
-                    <li><a href="">Home</a></li>
-                    <li><a href="">About Us</a></li>
-                    <li><a href="">Products</a></li>
-                    <li><a href="">Blog</a></li>
-                    <li><a href="">Contact</a></li>
+                    <li><a href="{{ route('home') }}">Home</a></li>
+                    <li><a href="{{ url('about') }}">About Us</a></li>
+                    <li><a href="{{ route('products.index') }}">Products</a></li>
+                    <li><a href="{{ route('blog.index') }}">Blog</a></li>
+                    <li><a href="{{ url('contact') }}">Contact</a></li>
                     <li><a href="{{ url('privacy-policy') }}">Privacy Policy</a></li>
                     <li><a href="{{ url('terms-conditions') }}">Terms & Conditions</a></li>
                     <li><a href="{{ url('refund-policy') }}">Refund Policy</a></li>
@@ -30,49 +30,48 @@
                 </ul>
             </div>
 
-            <!-- Third Column: Categories -->
             <div class="col-lg-3 col-md-6 mb-4">
                 <h5>Categories</h5>
                 <ul>
-                    <li><a href="shop.html">Flowering Plants</a></li>
-                    <li><a href="shop.html">Plant Seeds</a></li>
-                    <li><a href="shop.html">Lucky Plants</a></li>
-                    <li><a href="shop.html">Raisin Pots</a></li>
-                    <li><a href="shop.html">Live Plants</a></li>
-                    <li><a href="shop.html">Outdoor Plants</a></li>
+                    @foreach($headerCategories->take(6) as $category)
+                        <li><a href="{{ route('category.show', $category->slug) }}">{{ $category->name }}</a></li>
+                    @endforeach
                 </ul>
             </div>
 
-            <!-- Fourth Column: Address -->
             <div class="col-lg-3 col-md-6 mb-4">
-                <h5>Contact Info</h5>
+                <h5>{{ $headerFooter->footer_contact_title ?? 'Contact Info' }}</h5>
 
                 <div class="contact-info">
-
+                    @if($headerFooter->address)
                     <div class="contact-item">
                         <i class="fas fa-map-marker-alt mr-2"></i>
                         <div class="contact-text">
                             <strong>Address</strong>
-                            <p>Demo A - 2 Puffin Street, <br> Puffinville India, Surat</p>
+                            <p>{{ $headerFooter->address }}</p>
                         </div>
                     </div>
+                    @endif
 
+                    @if($headerFooter->mobile_no)
                     <div class="contact-item">
                         <i class="fas fa-phone-alt mr-2"></i>
                         <div class="contact-text">
                             <strong>Phone</strong>
-                            <p>+91 12345 67890</p>
+                            <p>{{ $headerFooter->mobile_no }}</p>
                         </div>
                     </div>
+                    @endif
 
+                    @if($headerFooter->email)
                     <div class="contact-item">
                         <i class="fas fa-envelope mr-2"></i>
                         <div class="contact-text">
                             <strong>Email</strong>
-                            <p>website@gmail.com</p>
+                            <p>{{ $headerFooter->email }}</p>
                         </div>
                     </div>
-
+                    @endif
                 </div>
             </div>
 

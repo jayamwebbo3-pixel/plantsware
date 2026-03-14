@@ -109,10 +109,10 @@ class ProductController extends Controller
                 'Non-woven' => (clone $base)->where('material', 'Non-woven')->count(),
             ],
             'weight' => [
-                'under0.5' => (clone $base)->whereNotNull('weight')->where('weight', '<', 0.5)->count(),
-                '0.5to1'   => (clone $base)->whereNotNull('weight')->whereBetween('weight', [0.5, 1])->count(),
-                '1to3'     => (clone $base)->whereNotNull('weight')->whereBetween('weight', [1.001, 3])->count(),
-                'above3'   => (clone $base)->whereNotNull('weight')->where('weight', '>', 3)->count(),
+                '0to1'   => (clone $base)->whereNotNull('weight')->whereBetween('weight', [0, 1])->count(),
+                '1to3'   => (clone $base)->whereNotNull('weight')->whereBetween('weight', [1.001, 3])->count(),
+                '3to5'   => (clone $base)->whereNotNull('weight')->whereBetween('weight', [3.001, 5])->count(),
+                'above5' => (clone $base)->whereNotNull('weight')->where('weight', '>', 5)->count(),
             ],
         ];
     }
@@ -127,11 +127,21 @@ class ProductController extends Controller
         // ── Price range (radio bands) ──────────────────────────────────
         if ($request->filled('price_range')) {
             switch ($request->price_range) {
-                case 'under500':   $query->whereRaw("$ep < 500");                              break;
-                case '500to1000':  $query->whereRaw("$ep >= 500 AND $ep < 1000");              break;
-                case '1000to3000': $query->whereRaw("$ep >= 1000 AND $ep < 3000");             break;
-                case '3000to5000': $query->whereRaw("$ep >= 3000 AND $ep < 5000");             break;
-                case 'above5000':  $query->whereRaw("$ep >= 5000");                            break;
+                case 'under500':
+                    $query->whereRaw("$ep < 500");
+                    break;
+                case '500to1000':
+                    $query->whereRaw("$ep >= 500 AND $ep < 1000");
+                    break;
+                case '1000to3000':
+                    $query->whereRaw("$ep >= 1000 AND $ep < 3000");
+                    break;
+                case '3000to5000':
+                    $query->whereRaw("$ep >= 3000 AND $ep < 5000");
+                    break;
+                case 'above5000':
+                    $query->whereRaw("$ep >= 5000");
+                    break;
             }
         } elseif ($request->filled('price_max')) {
             $query->whereRaw("$ep <= ?", [(float) $request->price_max]);
@@ -141,19 +151,23 @@ class ProductController extends Controller
         if ($request->filled('discount') && $request->discount !== 'all') {
             switch ($request->discount) {
                 case '50':
-                    $query->where('sale_price', '>', 0)->whereRaw('((price - sale_price) / price * 100) >= 50'); break;
+                    $query->where('sale_price', '>', 0)->whereRaw('((price - sale_price) / price * 100) >= 50');
+                    break;
                 case '30-50':
                     $query->where('sale_price', '>', 0)
-                          ->whereRaw('((price - sale_price) / price * 100) >= 30')
-                          ->whereRaw('((price - sale_price) / price * 100) < 50'); break;
+                        ->whereRaw('((price - sale_price) / price * 100) >= 30')
+                        ->whereRaw('((price - sale_price) / price * 100) < 50');
+                    break;
                 case '10-30':
                     $query->where('sale_price', '>', 0)
-                          ->whereRaw('((price - sale_price) / price * 100) >= 10')
-                          ->whereRaw('((price - sale_price) / price * 100) < 30'); break;
+                        ->whereRaw('((price - sale_price) / price * 100) >= 10')
+                        ->whereRaw('((price - sale_price) / price * 100) < 30');
+                    break;
                 case 'below10':
                     $query->where('sale_price', '>', 0)
-                          ->whereRaw('((price - sale_price) / price * 100) > 0')
-                          ->whereRaw('((price - sale_price) / price * 100) < 10'); break;
+                        ->whereRaw('((price - sale_price) / price * 100) > 0')
+                        ->whereRaw('((price - sale_price) / price * 100) < 10');
+                    break;
             }
         }
 
@@ -179,23 +193,44 @@ class ProductController extends Controller
         // ── Weight range ──────────────────────────────────────────────
         if ($request->filled('weight_range')) {
             switch ($request->weight_range) {
-                case 'under0.5': $query->whereNotNull('weight')->where('weight', '<', 0.5);          break;
-                case '0.5to1':   $query->whereNotNull('weight')->whereBetween('weight', [0.5, 1]);    break;
-                case '1to3':     $query->whereNotNull('weight')->whereBetween('weight', [1.001, 3]);  break;
-                case 'above3':   $query->whereNotNull('weight')->where('weight', '>', 3);             break;
+                case '0to1':
+                    $query->whereNotNull('weight')->whereBetween('weight', [0, 1]);
+                    break;
+                case '1to3':
+                    $query->whereNotNull('weight')->whereBetween('weight', [1.001, 3]);
+                    break;
+                case '3to5':
+                    $query->whereNotNull('weight')->whereBetween('weight', [3.001, 5]);
+                    break;
+                case 'above5':
+                    $query->whereNotNull('weight')->where('weight', '>', 5);
+                    break;
             }
         }
 
         // ── Sort ──────────────────────────────────────────────────────
         if ($request->filled('sort')) {
             switch ($request->sort) {
-                case 'price-low':  $query->orderByRaw("$ep ASC");                                            break;
-                case 'price-high': $query->orderByRaw("$ep DESC");                                           break;
-                case 'name-asc':   $query->orderBy('name', 'asc');                                           break;
-                case 'name-desc':  $query->orderBy('name', 'desc');                                          break;
-                case 'newest':     $query->orderBy('created_at', 'desc');                                    break;
-                case 'discount':   $query->orderByRaw('((price - COALESCE(NULLIF(sale_price,0), price)) / price * 100) DESC'); break;
-                default:           $query->orderBy('sort_order')->orderBy('created_at', 'desc');
+                case 'price-low':
+                    $query->orderByRaw("$ep ASC");
+                    break;
+                case 'price-high':
+                    $query->orderByRaw("$ep DESC");
+                    break;
+                case 'name-asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'name-desc':
+                    $query->orderBy('name', 'desc');
+                    break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'discount':
+                    $query->orderByRaw('((price - COALESCE(NULLIF(sale_price,0), price)) / price * 100) DESC');
+                    break;
+                default:
+                    $query->orderBy('sort_order')->orderBy('created_at', 'desc');
             }
         } else {
             $query->orderBy('sort_order')->orderBy('created_at', 'desc');
