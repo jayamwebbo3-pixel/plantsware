@@ -6131,13 +6131,13 @@ del {
     text-decoration: none;
     border-radius: 8px;
     transition: all 0.3s;
-    border-left: 3px solid transparent;
+    border: transparent;
 }
 
 .nav-link:hover {
-    background-color: var(--light-color);
-    color: var(--primary-color);
-    border-left-color: var(--primary-color);
+    background-color: var(--light-color) !important;
+    color: var(--primary-color) !important;
+    border-left: var(--primary-color) !important;
 }
 
 .nav-link.active {

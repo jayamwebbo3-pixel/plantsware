@@ -39,14 +39,28 @@ class UserDashboardController extends Controller
             return back()->with('error', 'Only delivered orders can be returned.');
         }
 
-        if (!$order->delivered_at || $order->delivered_at->diffInDays(now()) > 3) {
-            return back()->with('error', 'Return window (3 days) has expired.');
+        if (!$order->delivered_at || $order->delivered_at->diffInHours(now()) > 24) {
+            return back()->with('error', 'Return window (24 hours) has expired.');
+        }
+
+        $request->validate([
+            'reason' => 'required|string',
+            'images' => 'nullable|array',
+            'images.*' => 'image|max:2048'
+        ]);
+
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = $image->store('return_images', 'public');
+            }
         }
 
         $order->update([
             'status' => 'return_requested',
             'return_requested_at' => now(),
-            'return_reason' => $request->input('reason', 'User requested return')
+            'return_reason' => $request->reason,
+            'return_images' => $imagePaths
         ]);
 
         return back()->with('success', 'Return request submitted successfully.');
@@ -61,7 +75,7 @@ class UserDashboardController extends Controller
             'items' => $order->items->map(function ($item) use ($user, $order) {
                 $review = \App\Models\ProductReview::where('user_id', $user->id)
                     ->where('order_id', $order->id)
-                    ->where(function($query) use ($item) {
+                    ->where(function ($query) use ($item) {
                         if ($item->product_id) {
                             $query->where('product_id', $item->product_id);
                         } else {
@@ -87,4 +101,3 @@ class UserDashboardController extends Controller
         ]);
     }
 }
-

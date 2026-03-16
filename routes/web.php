@@ -157,8 +157,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // ---------- ADMIN AUTH (GUEST) ----------
     Route::middleware('guest:admin')->group(function () {
-        Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
-        Route::post('login', [AdminAuthController::class, 'login'])->name('login.post');
+        Route::get('/', [AdminAuthController::class, 'showLoginForm'])->name('login');
+        Route::post('/', [AdminAuthController::class, 'login'])->name('login.post');
     });
 
     // ---------- ADMIN PROTECTED ----------
