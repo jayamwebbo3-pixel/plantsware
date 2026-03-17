@@ -175,7 +175,7 @@
         <div class="section-title">
             <h2>Garden Products</h2>
             <div class="title-link">
-                <a href="{{ url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
+                <a href="{{ $gardenCategory ? route('category.show', $gardenCategory->slug) : url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
             </div>
         </div>
 
@@ -209,7 +209,7 @@
         <div class="section-title">
             <h2>Planted Aquarium Products</h2>
             <div class="title-link">
-                <a href="{{ url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
+                <a href="{{ $aquariumCategory ? route('category.show', $aquariumCategory->slug) : url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
             </div>
         </div>
 
@@ -235,7 +235,7 @@
         <div class="section-title">
             <h2>Natural Products</h2>
             <div class="title-link">
-                <a href="{{ url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
+                <a href="{{ $naturalCategory ? route('category.show', $naturalCategory->slug) : url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
             </div>
         </div>
 

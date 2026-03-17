@@ -56,9 +56,14 @@ class HomeController extends Controller
     // $blogs = Blog::active()->latest()->take(6)->get();
        $blogs = Blog::active()->latest()->take(3)->get();
 
+    $gardenCategory = Category::where('name', 'like', '%Garden%')->first();
+    $aquariumCategory = Category::where('name', 'like', '%Aquarium%')->first();
+    $naturalCategory = Category::where('name', 'like', '%Natural%')->first();
+
     return view('view.index', compact(
         'categories', 'sliders', 'newArrivals',
         'gardenProducts', 'aquariumProducts', 'naturalProducts',
+        'gardenCategory', 'aquariumCategory', 'naturalCategory',
         'testimonials', 'blogs'
     ));
 }

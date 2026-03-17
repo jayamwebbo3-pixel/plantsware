@@ -34,7 +34,7 @@
                 <h5>Categories</h5>
                 <ul>
                     @foreach($headerCategories->take(6) as $category)
-                        <li><a href="{{ route('category.show', $category->slug) }}">{{ $category->name }}</a></li>
+                    <li><a href="{{ route('category.show', $category->slug) }}">{{ $category->name }}</a></li>
                     @endforeach
                 </ul>
             </div>
@@ -120,6 +120,103 @@
 </footer>
 <!-- footer -->
 <!-- footer end -->
+<!-- Floating WhatsApp Button -->
+<a href="https://wa.me/919876543212?text=Hello! I have a question about your products." class="whatsapp-float shadow-lg" target="_blank">
+    <div class="whatsapp-message-container">
+        <div class="whatsapp-message">Chat with us</div>
+        <div class="whatsapp-message">Order and Enquiry</div>
+        <div class="whatsapp-message">Green World</div>
+    </div>
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<style>
+    .whatsapp-float {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background-color: #25d366;
+        color: #FFF;
+        border-radius: 50px;
+        text-align: center;
+        font-size: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        text-decoration: none !important;
+        transition: all 0.3s ease;
+        animation: pulse-whatsapp 2s infinite;
+    }
+
+    .whatsapp-float:hover {
+        background-color: #128c7e;
+        transform: scale(1.1);
+        color: #FFF;
+    }
+
+    .whatsapp-message-container {
+        position: absolute;
+        right: 80px;
+        background: #333;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        min-width: 160px; /* Stable width for longest message */
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: none;
+    }
+
+    .whatsapp-message {
+        position: absolute;
+        opacity: 0;
+        text-align: center;
+        width: 100%;
+        animation: fade-sequence 6s infinite ease-in-out;
+    }
+
+    /* Sequential timing: 2s per message in a 6s total cycle */
+    .whatsapp-message:nth-child(1) { animation-delay: 0s; }
+    .whatsapp-message:nth-child(2) { animation-delay: 2s; }
+    .whatsapp-message:nth-child(3) { animation-delay: 4s; }
+
+    @keyframes fade-sequence {
+        0% { opacity: 0; transform: translateY(10px); }
+        5% { opacity: 1; transform: translateY(0); }
+        28% { opacity: 1; transform: translateY(0); }
+        33% { opacity: 0; transform: translateY(-10px); }
+        100% { opacity: 0; }
+    }
+
+    @keyframes pulse-whatsapp {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+    }
+
+    @media (max-width: 768px) {
+        .whatsapp-float {
+            width: 50px;
+            height: 50px;
+            font-size: 28px;
+            bottom: 20px;
+            right: 20px;
+        }
+        .whatsapp-message-container { display: none; }
+    }
+</style>
+
 <!-- scroll -->
 <a href="#" id="scroll"></a>
 <!-- jquery-3.4.1 -->
@@ -270,12 +367,12 @@
 
 <!-- blog sharing section -->
 <script>
-function copyBlogLink() {
-    navigator.clipboard.writeText(window.location.href)
-        .then(() => {
-            alert('Blog link copied! You can paste it on Instagram.');
-        });
-}
+    function copyBlogLink() {
+        navigator.clipboard.writeText(window.location.href)
+            .then(() => {
+                alert('Blog link copied! You can paste it on Instagram.');
+            });
+    }
 </script>
 
 <!-- blog sharing section end  -->
