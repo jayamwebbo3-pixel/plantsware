@@ -235,8 +235,8 @@
     </div>
 </div>
 
-<div class="row g-4 mb-4">
-    <!-- Sales Analytic Chart Area -->
+<!-- <div class="row g-4 mb-4">
+    Sales Analytic Chart Area 
     <div class="col-md-12">
         <div class="modern-card">
             <div class="chart-header">
@@ -248,7 +248,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <div class="row g-4">
     <div class="col-md-12">

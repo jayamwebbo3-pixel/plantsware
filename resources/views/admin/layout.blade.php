@@ -61,7 +61,7 @@
                     </a>
 
                     <!-- Informative Pages Dropdown -->
-                    <a class="nav-link" data-bs-toggle="collapse" href="#informativePagesCollapse" role="button" aria-expanded="{{ request()->routeIs('admin.pages.*') ? 'true' : 'false' }}" aria-controls="informativePagesCollapse">
+                    <!-- <a class="nav-link" data-bs-toggle="collapse" href="#informativePagesCollapse" role="button" aria-expanded="{{ request()->routeIs('admin.pages.*') ? 'true' : 'false' }}" aria-controls="informativePagesCollapse">
                         <i class="fas fa-file-alt"></i> Informative Pages <i class="fas fa-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
                     </a>
                     <div class="collapse {{ request()->routeIs('admin.pages.*') ? 'show' : '' }}" id="informativePagesCollapse">
@@ -107,7 +107,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
 
                     {{-- <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
                         <i class="fas fa-box"></i> Products

@@ -12,7 +12,11 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        if (Auth::check() && !empty(Auth::user()->name)) {
+        if (Auth::check()) {
+            if (empty(Auth::user()->name) || Auth::user()->name === 'User') {
+                session()->put('step', 'set-name');
+                return view('view.login');
+            }
             return redirect()->route('user.dashboard');
         }
         return view('view.login');
@@ -33,6 +37,7 @@ class LoginController extends Controller
 
         if (!$user) {
             $user = \App\Models\User::create([
+                'name' => '',
                 'email' => $request->email,
                 'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16))
             ]);
@@ -82,16 +87,17 @@ class LoginController extends Controller
 
         $isNewUser = $request->input('is_new_user') === '1';
 
-        // Clear OTP after successful verification
+        // Clear OTP and mark email as verified
         $user->update([
             'otp' => null,
-            'otp_expires_at' => null
+            'otp_expires_at' => null,
+            'email_verified_at' => $user->email_verified_at ?? now()
         ]);
 
         Auth::login($user, true);
         request()->session()->regenerate();
 
-        if ($isNewUser || empty($user->name)) {
+        if ($isNewUser || empty($user->name) || $user->name === 'User') {
             return back()->with([
                 'success' => 'OTP verified. Please set your name.',
                 'step' => 'set-name'
@@ -112,6 +118,8 @@ class LoginController extends Controller
 
         $user = Auth::user();
         $user->update(['name' => $request->name]);
+
+        session()->forget(['step', 'email', 'is_new_user']);
 
         return redirect()->route('user.dashboard')->with('success', 'Profile updated successfully.');
     }

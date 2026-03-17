@@ -25,6 +25,7 @@ class User extends Authenticatable
         'pincode',
         'otp',
         'otp_expires_at',
+        'email_verified_at',
     ];
 
     /**
