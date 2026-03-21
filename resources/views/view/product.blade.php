@@ -228,16 +228,21 @@
                         $isJsonSizes = false;
                         $rawSize = $product->size;
                         if ($rawSize) {
-                        $decoded = json_decode($rawSize, true);
-                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                        $isJsonSizes = true;
-                        $sizeData = $decoded;
-                        } else {
-                        $parts = array_map('trim', explode(',', $rawSize));
-                        foreach($parts as $p) {
-                        if($p) $sizeData[$p] = null;
-                        }
-                        }
+                            if (is_array($rawSize)) {
+                                $isJsonSizes = true;
+                                $sizeData = $rawSize;
+                            } elseif (is_string($rawSize)) {
+                                $decoded = json_decode($rawSize, true);
+                                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                    $isJsonSizes = true;
+                                    $sizeData = $decoded;
+                                } else {
+                                    $parts = array_map('trim', explode(',', $rawSize));
+                                    foreach($parts as $p) {
+                                        if($p) $sizeData[$p] = null;
+                                    }
+                                }
+                            }
                         }
                         @endphp
                         @if(count($sizeData) > 0)

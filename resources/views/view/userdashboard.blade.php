@@ -89,95 +89,129 @@
 
                     <!-- Saved Addresses -->
                     <div id="saved-addresses" class="address-cards">
-                        <div class="address-card selected">
-                            <span class="address-badge">DEFAULT</span>
-                            <div class="address-name">Home</div>
-                            <div class="address-detail">123 Green Street</div>
-                            <div class="address-detail">Garden Lane, New Delhi 110001</div>
-                            <div class="address-detail">Delhi, India</div>
-                            <div class="address-phone">📱 +91 9876543210</div>
+                        @forelse($addresses as $address)
+                        <div class="address-card {{ $address->is_default ? 'selected' : '' }}">
+                            @if($address->is_default)
+                                <span class="address-badge">DEFAULT</span>
+                            @endif
+                            <div class="address-name">{{ $address->first_name }} {{ $address->last_name }}</div>
+                            @if($address->door_number)
+                                <div class="address-detail">{{ $address->door_number }}</div>
+                            @endif
+                            <div class="address-detail">{{ $address->street }}, {{ $address->city }} {{ $address->post_code }}</div>
+                            <div class="address-detail">{{ $address->district }} {{ $address->district ? ',' : '' }} {{ $address->state }}</div>
+                            <div class="address-phone">📱 {{ $address->phone_number }}</div>
                             <div class="address-actions">
-                                <button class="address-btn address-btn-edit">Edit</button>
-                                <button class="address-btn address-btn-delete">Delete</button>
+                                @if(!$address->is_default)
+                                <form action="{{ route('user.address.default', $address->id) }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="address-btn address-btn-edit" style="background-color: var(--primary-color); color: white; border: none;">Set Default</button>
+                                </form>
+                                @endif
+                                <button type="button" class="address-btn address-btn-edit" onclick="editAddress({{ json_encode($address) }})">Edit</button>
+                                <form action="{{ route('user.address.delete', $address->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this address?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="address-btn address-btn-delete">Delete</button>
+                                </form>
                             </div>
                         </div>
-
-                        <div class="address-card">
-                            <span class="address-badge" style="display: none;">DEFAULT</span>
-                            <div class="address-name">Office</div>
-                            <div class="address-detail">456 Business Plaza</div>
-                            <div class="address-detail">Tech Park, Bangalore 560001</div>
-                            <div class="address-detail">Karnataka, India</div>
-                            <div class="address-phone">📱 +91 9876543211</div>
-                            <div class="address-actions">
-                                <button class="address-btn address-btn-edit">Edit</button>
-                                <button class="address-btn address-btn-delete">Delete</button>
-                            </div>
+                        @empty
+                        <div style="padding: 20px; color: #666; font-style: italic;">
+                            No addresses saved yet.
                         </div>
+                        @endforelse
                     </div>
 
-                    <!-- Add New Address Form -->
+                    <!-- Add/Edit Address Form -->
                     <div id="new-address-form" style="display: none;">
-                        <h3 style="margin-bottom: 1.5rem; color: var(--dark-color); font-weight: 600;">Add New Address</h3>
-                        <form>
+                        <h3 id="address-form-title" style="margin-bottom: 1.5rem; color: var(--dark-color); font-weight: 600;">Add New Address</h3>
+                        <form id="address-form" action="{{ route('user.address.store') }}" method="POST">
+                            @csrf
+                            <div id="method-field"></div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">First Name *</label>
-                                    <input type="text" class="form-control" placeholder="Enter your first name">
+                                    <input type="text" name="first_name" id="first_name" class="form-control" placeholder="Enter your first name" required>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Last Name *</label>
-                                    <input type="text" class="form-control" placeholder="Enter your last name">
+                                    <input type="text" name="last_name" id="last_name" class="form-control" placeholder="Enter your last name" required>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Door Number</label>
-                                    <input type="text" class="form-control" placeholder="Door/Block No.">
+                                    <input type="text" name="door_number" id="door_number" class="form-control" placeholder="Door/Block No.">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Street</label>
-                                    <input type="text" class="form-control" placeholder="Street Name">
+                                    <input type="text" name="street" id="street" class="form-control" placeholder="Street Name">
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">District</label>
-                                    <input type="text" class="form-control" placeholder="District">
+                                    <input type="text" name="district" id="district" class="form-control" placeholder="District">
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">State</label>
-                                    <select class="form-select">
-                                        <option>Select a State</option>
-                                        <option>Delhi</option>
-                                        <option>Karnataka</option>
-                                        <option>Maharashtra</option>
-                                        <option>Tamil Nadu</option>
+                                    <label class="form-label">State *</label>
+                                    <select name="state" id="state" class="form-select" required>
+                                        <option value="">Select a State</option>
+                                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                        <option value="Assam">Assam</option>
+                                        <option value="Bihar">Bihar</option>
+                                        <option value="Chhattisgarh">Chhattisgarh</option>
+                                        <option value="Goa">Goa</option>
+                                        <option value="Gujarat">Gujarat</option>
+                                        <option value="Haryana">Haryana</option>
+                                        <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                        <option value="Jharkhand">Jharkhand</option>
+                                        <option value="Karnataka">Karnataka</option>
+                                        <option value="Kerala">Kerala</option>
+                                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                        <option value="Maharashtra">Maharashtra</option>
+                                        <option value="Manipur">Manipur</option>
+                                        <option value="Meghalaya">Meghalaya</option>
+                                        <option value="Mizoram">Mizoram</option>
+                                        <option value="Nagaland">Nagaland</option>
+                                        <option value="Odisha">Odisha</option>
+                                        <option value="Punjab">Punjab</option>
+                                        <option value="Rajasthan">Rajasthan</option>
+                                        <option value="Sikkim">Sikkim</option>
+                                        <option value="Tamil Nadu">Tamil Nadu</option>
+                                        <option value="Telangana">Telangana</option>
+                                        <option value="Tripura">Tripura</option>
+                                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                        <option value="Uttarakhand">Uttarakhand</option>
+                                        <option value="West Bengal">West Bengal</option>
+                                        <option value="Delhi">Delhi</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">City *</label>
-                                    <input type="text" class="form-control" placeholder="City">
+                                    <input type="text" name="city" id="city" class="form-control" placeholder="City" required>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Post Code</label>
-                                    <input type="text" class="form-control" placeholder="Post Code" maxlength="6">
+                                    <label class="form-label">Post Code *</label>
+                                    <input type="text" name="post_code" id="post_code" class="form-control" placeholder="Post Code" maxlength="6" required>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Phone Number *</label>
-                                    <input type="tel" class="form-control" placeholder="Phone Number" maxlength="10">
+                                    <input type="tel" name="phone_number" id="phone_number" class="form-control" placeholder="Phone Number" maxlength="10" required>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Alternative Number</label>
-                                    <input type="tel" class="form-control" placeholder="Alternative Number" maxlength="10">
+                                    <input type="tel" name="alternative_number" id="alternative_number" class="form-control" placeholder="Alternative Number" maxlength="10">
                                 </div>
                             </div>
                             <div class="form-row">
-                                <button type="button" class="btn-primary">Add Address</button>
+                                <button type="submit" id="submit-btn" class="btn-primary">Add Address</button>
                                 <button type="button" class="btn-secondary" onclick="toggleAddressForm()">Cancel</button>
                             </div>
                         </form>
@@ -216,6 +250,8 @@
                                     @if(in_array(strtolower($order->status), ['delivered', 'completed']))
                                     <button type="button" class="btn-review" onclick="event.stopPropagation(); openReviewModal({{ $order->id }}, '{{ $order->order_number }}')" style="background-color: var(--primary-color); border: none; color: white; border-radius: 4px; padding: 2px 8px; margin-left: 10px; cursor: pointer;">Review & Rating</button>
                                     @endif
+
+                                    <a href="{{ route('user.order.invoice', $order->id) }}" class="btn-invoice" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); border-radius: 4px; padding: 2px 8px; margin-left: 10px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 0.85rem;">Invoice</a>
                             </div>
                             <div class="order-price">₹{{ number_format($order->total ?? 0, 2) }}</div>
                         </div>
@@ -547,8 +583,19 @@
     function toggleAddressForm() {
         const savedAddresses = document.getElementById('saved-addresses');
         const newAddressForm = document.getElementById('new-address-form');
+        const addressForm = document.getElementById('address-form');
+        const formTitle = document.getElementById('address-form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const methodField = document.getElementById('method-field');
 
         if (newAddressForm.style.display === 'none') {
+            // Switch to Add Address mode
+            addressForm.reset();
+            addressForm.action = "{{ route('user.address.store') }}";
+            formTitle.innerText = "Add New Address";
+            submitBtn.innerText = "Add Address";
+            methodField.innerHTML = "";
+            
             savedAddresses.style.display = 'none';
             newAddressForm.style.display = 'block';
             document.querySelectorAll('.tab-label').forEach((label, index) => {
@@ -563,6 +610,40 @@
                 else label.classList.remove('active');
             });
         }
+    }
+
+    function editAddress(address) {
+        const savedAddresses = document.getElementById('saved-addresses');
+        const newAddressForm = document.getElementById('new-address-form');
+        const addressForm = document.getElementById('address-form');
+        const formTitle = document.getElementById('address-form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const methodField = document.getElementById('method-field');
+
+        // Populate form
+        document.getElementById('first_name').value = address.first_name;
+        document.getElementById('last_name').value = address.last_name;
+        document.getElementById('door_number').value = address.door_number || '';
+        document.getElementById('street').value = address.street || '';
+        document.getElementById('district').value = address.district || '';
+        document.getElementById('state').value = address.state;
+        document.getElementById('city').value = address.city;
+        document.getElementById('post_code').value = address.post_code;
+        document.getElementById('phone_number').value = address.phone_number;
+        document.getElementById('alternative_number').value = address.alternative_number || '';
+
+        // Switch to Edit Address mode
+        addressForm.action = "{{ url('user/address') }}/" + address.id;
+        formTitle.innerText = "Edit Address";
+        submitBtn.innerText = "Update Address";
+        methodField.innerHTML = '<input type="hidden" name="_method" value="PUT">';
+
+        savedAddresses.style.display = 'none';
+        newAddressForm.style.display = 'block';
+        document.querySelectorAll('.tab-label').forEach((label, index) => {
+            if (index === 1) label.classList.add('active');
+            else label.classList.remove('active');
+        });
     }
 
 

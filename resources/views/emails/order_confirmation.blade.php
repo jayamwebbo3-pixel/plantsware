@@ -7,8 +7,8 @@
     <style>
         body { font-family: 'Rubik', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f7f6; }
         .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .header { background-color: #d6e4bfff; padding: 30px; text-align: center; color: #ffffff; }
-        .header img { max-width: 150px; margin-bottom: 15px; filter: brightness(0) invert(1); }
+        .header { background-color: #72a420; padding: 30px; text-align: center; color: #ffffff; }
+        .header img {background-color: #fff; border: 1px solid #bd1313ff; border-radius: 10px; max-width: 150px; margin-bottom: 15px; }
         .header h1 { margin: 0; font-size: 24px; font-weight: 700; }
         .content { padding: 30px; }
         .order-summary { background: #f9f9f9; padding: 20px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #eee; }
@@ -55,9 +55,13 @@
                         <tr>
                             <td>
                                 <strong>{{ $item->product_name }}</strong>
-                                @if($item->options)
+                                @php 
+                                    $itemOptions = $item->options;
+                                    if(is_string($itemOptions)) $itemOptions = json_decode($itemOptions, true);
+                                @endphp
+                                @if(is_array($itemOptions) && count($itemOptions) > 0)
                                 <div style="font-size: 12px; color: #777;">
-                                    @foreach($item->options as $key => $val)
+                                    @foreach($itemOptions as $key => $val)
                                         {{ ucfirst($key) }}: {{ $val }}
                                     @endforeach
                                 </div>
@@ -106,7 +110,7 @@
             </div>
 
             <div style="text-align: center;">
-                <a href="{{ route('user.dashboard') }}" class="btn">Track My Order</a>
+                <a href="{{ route('user.order.invoice', $order->id) }}" class="btn">Download Invoice</a>
             </div>
         </div>
 

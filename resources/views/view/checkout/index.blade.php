@@ -50,13 +50,7 @@
                             </td>
                             <td>{{ $item->quantity }}</td>
                             @php
-                                if ($isCombo) {
-                                    $priceToUse = $p->offer_price;
-                                } else {
-                                    $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
-                                        ? $p->sale_price
-                                        : $p->price;
-                                }
+                                $priceToUse = $item->calculated_price;
                             @endphp
                             <td>₹{{ number_format($priceToUse, 2) }}</td>
                             <td>₹{{ number_format($priceToUse * $item->quantity, 2) }}</td>

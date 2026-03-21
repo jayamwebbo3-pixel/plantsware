@@ -115,8 +115,8 @@ $existingItem = $query->first();
                 'success' => true,
                 'message' => "{$quantity} × {$name} added to cart!",
                 'cart_count' => $cartCount,
-                'subtotal' => number_format($subtotal, 2),
-                'total' => number_format($subtotal, 2)
+                'subtotal' => $subtotal,
+                'total' => $subtotal
             ]);
         }
 
@@ -174,9 +174,9 @@ $existingItem = $query->first();
                 'success' => true,
                 'message' => 'Quantity updated successfully!',
                 'cart_count' => $cartCount,
-                'subtotal' => number_format($subtotal, 2),
-                'total' => number_format($subtotal, 2),
-                'item_total' => number_format($itemTotal, 2),
+                'subtotal' => $subtotal,
+                'total' => $subtotal,
+                'item_total' => $itemTotal,
                 'quantity' => $quantity
             ]);
         }
@@ -208,8 +208,8 @@ $existingItem = $query->first();
                 'success' => true,
                 'message' => 'Item removed from cart.',
                 'cart_count' => $cartCount,
-                'subtotal' => number_format($subtotal, 2),
-                'total' => number_format($subtotal, 2),
+                'subtotal' => $subtotal,
+                'total' => $subtotal,
                 'item_id' => $itemId
             ]);
         }
@@ -234,8 +234,8 @@ $existingItem = $query->first();
                 'success' => true,
                 'message' => 'Cart cleared successfully!',
                 'cart_count' => $cartCount,
-                'subtotal' => '0.00',
-                'total' => '0.00'
+                'subtotal' => 0,
+                'total' => 0
             ]);
         }
 

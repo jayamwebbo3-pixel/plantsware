@@ -114,6 +114,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
     Route::post('/user/order/{id}/cancel', [UserDashboardController::class, 'cancelOrder'])->name('user.order.cancel');
     Route::post('/user/order/{id}/return', [UserDashboardController::class, 'returnOrder'])->name('user.order.return');
+    Route::get('/user/order/{order}/invoice', [UserDashboardController::class, 'downloadInvoice'])->name('user.order.invoice');
+    
+    // Address Routes
+    Route::post('/user/address', [UserDashboardController::class, 'storeAddress'])->name('user.address.store');
+    Route::put('/user/address/{id}', [UserDashboardController::class, 'updateAddress'])->name('user.address.update');
+    Route::post('/user/address/{id}/default', [UserDashboardController::class, 'setDefaultAddress'])->name('user.address.default');
+    Route::delete('/user/address/{id}', [UserDashboardController::class, 'deleteAddress'])->name('user.address.delete');
 
     // Review Routes
     Route::get('/user/order/{id}/items', [UserDashboardController::class, 'getOrderItems'])->name('user.order.items');

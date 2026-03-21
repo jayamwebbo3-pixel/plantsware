@@ -23,26 +23,30 @@ class CheckoutController extends Controller
 
         // Pre-fill address if user has one saved
         $savedAddress = [];
+        $userAddresses = collect();
 
         // Check if user is logged in and has address
         if (Auth::check()) {
             $user = Auth::user();
+            $userAddresses = $user->addresses;
 
-            // 'address' is cast to 'array' in User model, so Eloquent auto-decodes it
-            if (!empty($user->address) && is_array($user->address)) {
-                $savedAddress = $user->address;
-            }
-
-            // Fallback to individual user fields if no address array found
-            if (empty($savedAddress)) {
+            $defaultAddress = $user->addresses()->where('is_default', true)->first();
+            if ($defaultAddress) {
                 $savedAddress = [
-                    'name' => $user->name ?? '',
-                    'address' => $user->address_line1 ?? '',
-                    'city' => $user->city ?? '',
-                    'state' => $user->state ?? '',
-                    'pincode' => $user->pincode ?? $user->zip_code ?? '',
-                    'phone' => $user->phone ?? $user->mobile ?? '',
+                    'address_id' => $defaultAddress->id,
+                    'name' => $defaultAddress->first_name . ' ' . $defaultAddress->last_name,
+                    'address' => ($defaultAddress->door_number ? $defaultAddress->door_number . ', ' : '') . $defaultAddress->street,
+                    'city' => $defaultAddress->city,
+                    'state' => $defaultAddress->state,
+                    'pincode' => $defaultAddress->post_code,
+                    'phone' => $defaultAddress->phone_number,
                 ];
+            } else {
+                // FALLBACK if no addresses in user_addresses table yet
+                // 'address' is cast to 'array' in User model, so Eloquent auto-decodes it
+                if (!empty($user->address) && is_array($user->address)) {
+                    $savedAddress = $user->address;
+                }
             }
         }
 
@@ -51,13 +55,14 @@ class CheckoutController extends Controller
             $savedAddress = array_merge($savedAddress, session('shipping_address'));
         }
 
-        return view('view.checkout.address', compact('cartItems', 'savedAddress'));
+        return view('view.checkout.address', compact('cartItems', 'savedAddress', 'userAddresses'));
     }
 
     // Save address and redirect to checkout
     public function saveAddress(Request $request)
     {
         $validated = $request->validate([
+            'address_id' => 'nullable',
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
@@ -71,11 +76,47 @@ class CheckoutController extends Controller
 
         // Optionally save to user profile if logged in
         if (Auth::check()) {
-            Auth::user()->update([
+            $user = Auth::user();
+            
+            // Update legacy address field
+            $user->update([
                 'address' => json_encode($validated),
-                'name' => $validated['name'] ?? Auth::user()->name,
-                'phone' => $validated['phone'] ?? Auth::user()->phone,
+                'name' => $validated['name'] ?? $user->name,
+                'phone' => $validated['phone'] ?? $user->phone,
             ]);
+
+            // Save to new UserAddress table
+            $nameParts = explode(' ', $validated['name'], 2);
+            $firstName = $nameParts[0];
+            $lastName = $nameParts[1] ?? '';
+
+            if (!empty($validated['address_id'])) {
+                $user->addresses()->where('id', $validated['address_id'])->update([
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'street' => $validated['address'],
+                    'city' => $validated['city'],
+                    'state' => $validated['state'],
+                    'post_code' => $validated['pincode'],
+                    'phone_number' => $validated['phone'],
+                ]);
+            } else {
+                $user->addresses()->updateOrCreate(
+                    [
+                        'street' => $validated['address'],
+                        'city' => $validated['city'],
+                        'post_code' => $validated['pincode'],
+                        'phone_number' => $validated['phone'],
+                    ],
+                    [
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
+                        'state' => $validated['state'],
+                        // If no addresses yet, make this default
+                        'is_default' => $user->addresses()->count() === 0,
+                    ]
+                );
+            }
         }
 
         return redirect()->route('checkout.index')->with('success', 'Address saved successfully!');

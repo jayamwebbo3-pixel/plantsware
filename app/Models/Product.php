@@ -47,6 +47,7 @@ class Product extends Model
         'sale_price' => 'decimal:2',
         'stock_quantity' => 'integer',
         'gallery_images' => 'array',
+        'size' => 'array',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
         'sort_order' => 'integer',

@@ -45,9 +45,9 @@ class Cart extends Model
         $price = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price) ? $p->sale_price : $p->price;
 
         if ($this->options) {
-            $optionsObj = json_decode($this->options, true);
+            $optionsObj = is_string($this->options) ? json_decode($this->options, true) : $this->options;
             if (isset($optionsObj['size']) && $p->size) {
-                $sizesObj = json_decode($p->size, true);
+                $sizesObj = is_string($p->size) ? json_decode($p->size, true) : $p->size;
                 if (is_array($sizesObj) && isset($sizesObj[$optionsObj['size']]) && $sizesObj[$optionsObj['size']] > 0) {
                     $price = $sizesObj[$optionsObj['size']];
                 }
