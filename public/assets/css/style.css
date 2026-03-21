@@ -643,19 +643,19 @@ ul.all-page-drop li a {
     background-color: #6EA820;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
-    z-index: 1001; /* Higher than sticky top */
+    z-index: 1001;
+    /* Higher than sticky top */
     position: relative;
 }
 
 .main-menu {
-    display: grid !important;
-    grid-template-columns: repeat(5, auto);
-    grid-template-rows: auto auto;
+    display: flex !important;
     width: 100%;
     margin: 0;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     padding: 10px 0;
+    flex-wrap: nowrap;
 }
 
 .main-menu li {
@@ -666,34 +666,18 @@ ul.all-page-drop li a {
     white-space: nowrap;
 }
 
-/* Row 2 Positioning */
-.main-menu li:nth-child(7), /* About Plantsware */
-.main-menu li:nth-child(8)  /* Blog */ {
-    grid-row: 2;
-    margin-top: 5px;
-}
-
-/* Force specific column alignment for row 2 */
-.main-menu li:nth-child(7) {
-    grid-column: 1;
-    justify-self: start;
-}
-
-.main-menu li:nth-child(8) {
-    grid-column: 5;
-    justify-self: end;
-}
-
 .main-menu>li .dropdown-menu {
     right: auto;
     float: none;
     left: 0;
-    top: 30px;
+    top: 100%;
+    /* Better than fixed pixel to prevent gap/flickering */
+    margin-top: 0;
     opacity: 0;
     display: block !important;
     transform-origin: 0 0 0;
     transform: scale(1, 0);
-    transition: all 500ms ease 0s;
+    transition: all 300ms ease 0s;
     background-color: #6EA820;
 }
 
@@ -6073,7 +6057,7 @@ del {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     height: fit-content;
     position: sticky;
-    top: 100px;
+    top: 1px;
 }
 
 .user-info {
@@ -8558,5 +8542,3 @@ body.sticky-nav-active {
     }
 
 }
-
-

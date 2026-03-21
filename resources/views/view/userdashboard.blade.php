@@ -25,9 +25,9 @@
                     <div class="user-avatar">
                         <i class="fas fa-user"></i>
                     </div>
-                    <div>
+                    <div style="flex-grow: 1; min-width: 0; overflow: hidden;">
                         <div class="user-name">{{ auth()->user()->name }}</div>
-                        <div class="user-email">{{ auth()->user()->email }}</div>
+                        <div class="user-email" style="word-break: break-all; overflow-wrap: break-word; font-size: 0.78rem; color: #444; line-height: 1.3; display: block;" title="{{ auth()->user()->email }}">{{ auth()->user()->email }}</div>
                     </div>
                 </div>
 
@@ -89,7 +89,7 @@
 
                     <!-- Saved Addresses -->
                     <div id="saved-addresses" class="address-cards">
-                        <div class="address-card default">
+                        <div class="address-card selected">
                             <span class="address-badge">DEFAULT</span>
                             <div class="address-name">Home</div>
                             <div class="address-detail">123 Green Street</div>
@@ -103,6 +103,7 @@
                         </div>
 
                         <div class="address-card">
+                            <span class="address-badge" style="display: none;">DEFAULT</span>
                             <div class="address-name">Office</div>
                             <div class="address-detail">456 Business Plaza</div>
                             <div class="address-detail">Tech Park, Bangalore 560001</div>
@@ -405,6 +406,123 @@
         font-size: 1rem;
         color: #333;
     }
+
+    /* Address Selection Styles */
+    .address-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        align-items: stretch;
+    }
+
+    .address-card {
+        cursor: pointer;
+        transition: all 0.4s ease-in-out;
+        border: 2px solid #eaeaea; /* Standard light gray border */
+        border-radius: 8px; /* Smooth corners */
+        padding: 20px; /* Reliable content padding */
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+    }
+
+    .address-card .address-actions {
+        margin-top: auto; /* Pushes buttons to the bottom */
+        padding-top: 15px; /* Clean spacing */
+    }
+
+    .address-card:hover {
+        border-color: #c0c0c0;
+        transform: translateY(-2px); /* Smooth subtle lift transition */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); /* Soft drop shadow on hover */
+    }
+
+    .address-card.selected {
+        border-color: var(--primary-color, #76a713);
+        background-color: #f8fbf5;
+        box-shadow: 0 0 0 2px rgba(118, 167, 19, 0.2);
+    }
+    
+    /* Ensure the dot/radio look for selected state if needed */
+    .address-card.selected::after {
+        content: '\f058'; /* FontAwesome check-circle */
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: var(--primary-color, #76a713);
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 20px;
+    }
+
+    .address-badge {
+        display: inline-block;
+        padding: 4px 12px !important;
+        font-size: 10px !important;
+        width: fit-content !important;
+        border-radius: 50px; /* pill shape */
+        margin-bottom: 10px;
+        background-color: var(--primary-color, #76a713);
+        color: #fff;
+        line-height: 1;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Sidebar info styling - Perfected Vertical Alignment */
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 30px 15px;
+        background: #ffffff;
+        border-bottom: 2px solid #f8f8f8;
+        overflow: hidden;
+    }
+    
+    .user-avatar {
+        width: 75px;
+        height: 75px;
+        background: #f4f4f4;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        border: 4px solid #76a713; /* Use primary green */
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .user-avatar i {
+        font-size: 32px;
+        color: #76a713;
+    }
+    
+    .user-name {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+        width: 100%;
+        display: block;
+        line-height: 1.2;
+    }
+
+    .user-email {
+        word-break: break-all;
+        overflow-wrap: break-word;
+        font-size: 0.85rem !important;
+        color: #555 !important;
+        line-height: 1.4 !important;
+        display: block;
+        width: 100%;
+        font-weight: 500;
+        padding: 0 10px;
+    }
 </style>
 
 
@@ -554,6 +672,31 @@
         btn.addEventListener('click', () => {
             alert('Product added to cart!');
         });
+    });
+
+    // Address Selection UI implementation
+    document.addEventListener('DOMContentLoaded', function() {
+        const addressCards = document.querySelectorAll('.address-cards .address-card');
+        addressCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Ignore clicks on action buttons
+                if (e.target.closest('.address-actions') || e.target.closest('.address-btn')) return;
+                
+                // Remove selected class from all cards
+                addressCards.forEach(c => {
+                    c.classList.remove('selected', 'default');
+                    const badge = c.querySelector('.address-badge');
+                    if(badge) badge.style.display = 'none';
+                });
+                
+                // Add selected class to the clicked card
+                this.classList.add('selected', 'default');
+                const myBadge = this.querySelector('.address-badge');
+                if(myBadge) myBadge.style.display = 'inline-block';
+            });
+        });
+
+        // Initialize first address as selected logic has been completely removed as per request hook.
     });
 </script>
 
