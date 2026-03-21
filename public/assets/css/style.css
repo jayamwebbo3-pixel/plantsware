@@ -5466,18 +5466,19 @@ del {
 
 .login-page-right {
     padding: 3rem;
+    text-align: center;
 }
 
 .login-page-header {
-    text-align: center;
     margin-bottom: 2rem;
 }
 
 .login-page-title {
     font-family: var(--font-heading);
-    color: var(--secondary-color);
-    font-size: 2.2rem;
+    color: #436e1c;
+    font-size: 2.5rem;
     margin-bottom: 0.5rem;
+    font-weight: 600;
 }
 
 .login-page-subtitle {
@@ -5592,25 +5593,55 @@ del {
 .login-page-divider {
     text-align: center;
     position: relative;
-    margin: 2rem 0;
-    color: #6c757d;
+    margin: 2.5rem 0;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.login-page-divider::before {
+.login-page-divider::before,
+.login-page-divider::after {
     content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
+    flex: 1;
     height: 1px;
-    background: #e0e0e0;
+    background: #e2e8f0;
 }
 
 .login-page-divider-text {
     background: white;
-    padding: 0 1rem;
+    padding: 0 1.5rem;
     position: relative;
-    display: inline-block;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.continue-google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px;
+    background: white;
+    border: 2px solid #72a420;
+    border-radius: 12px;
+    color: #c0392b;
+    text-decoration: none !important;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.continue-google-btn:hover {
+    background: #fdfdfd;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(114, 164, 32, 0.15);
+}
+
+.google-icon {
+    color: #ea4335;
+    font-size: 1.2rem;
 }
 
 .login-page-social-buttons {
