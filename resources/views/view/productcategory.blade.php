@@ -36,7 +36,7 @@
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Price Range
-                            <span class="price-range-value text-primary" id="display-price-range">₹{{ request('price_max', 10000) }}</span>
+                            <span class="price-range-value text-success" style="color: #72a420 !important;" id="display-price-range">₹{{ request('price_max', 10000) }}</span>
                         </h3>
                         <div class="filter-options">
                             <input type="range" name="price_max" id="price-range-slider" class="form-range"

@@ -117,17 +117,22 @@
                                 @php
                                     $selectedShape = old('shape', $product->shape ?? 'Circular');
 
-                                    $savedSizeStr = $product->size;
+                                    $savedSize = $product->size;
                                     $selectedSizes = [];
 
-                                    if (!empty($savedSizeStr)) {
-                                        $decoded = json_decode($savedSizeStr, true);
-                                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                            $selectedSizes = $decoded;
+                                    if (!empty($savedSize)) {
+                                        if (is_array($savedSize)) {
+                                            $selectedSizes = $savedSize;
                                         } else {
-                                            $parts = array_map('trim', explode(',', $savedSizeStr));
-                                            foreach ($parts as $p) {
-                                                if ($p) $selectedSizes[$p] = null;
+                                            $decoded = json_decode($savedSize, true);
+                                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                                $selectedSizes = $decoded;
+                                            } else {
+                                                // Fallback for comma separated strings
+                                                $parts = array_map('trim', explode(',', $savedSize));
+                                                foreach ($parts as $p) {
+                                                    if ($p) $selectedSizes[$p] = null;
+                                                }
                                             }
                                         }
                                     }

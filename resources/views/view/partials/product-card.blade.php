@@ -29,81 +29,44 @@
                 @endif
         </div>
 
-        <div class="product-actions">
+        <div class="product-actions mt-3 d-flex align-items-stretch gap-2">
             @if($product->stock_quantity > 0)
-            <form action="{{ route('cart.add', $product) }}" method="POST" class="d-flex w-100">
+            <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex">
                 @csrf
                 <input type="hidden" name="quantity" value="1">
                 <input type="hidden" name="buy_now" value="1">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100">
                     Buy Now
                 </button>
             </form>
-            <form action="{{ route('cart.add', $product) }}" method="POST" class="d-flex w-100">
+            <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex">
                 @csrf
                 <input type="hidden" name="quantity" value="1">
-                <button type="submit" class="btn btn-secondary">
+                <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100">
                     Add To Cart
                 </button>
             </form>
             @else
-            <button class="btn btn-secondary" disabled>Out of Stock</button>
+            <div class="flex-grow-1 d-flex">
+                <button class="btn btn-secondary w-100 h-100" disabled>Out of Stock</button>
+            </div>
             @endif
 
-            @if(isset($isWishlistPage) && $isWishlistPage)
-            <button type="button" class="btn btn-wishlist" onclick="removeFromWishlist({{ $product->id }})">
-                <i class="fas fa-heart text-danger"></i>
-            </button>
-            @else
-            <form action="{{ route('wishlist.add', $product) }}" method="POST" class="d-flex w-100">
-                @csrf
-                <button type="submit" class="btn btn-wishlist">
-                    <i class="far fa-heart"></i>
+            <div class="wishlist-btn-container d-flex">
+                @if(isset($isWishlistPage) && $isWishlistPage)
+                <button type="button" class="btn btn-wishlist btn-wishlist-action h-100" onclick="removeFromWishlist({{ $product->id }})">
+                    <i class="fas fa-heart text-danger"></i>
                 </button>
-            </form>
-            @endif
+                @else
+                <form action="{{ route('wishlist.add', $product) }}" method="POST" class="d-flex h-100">
+                    @csrf
+                    <button type="submit" class="btn btn-wishlist btn-wishlist-action h-100">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </form>
+                @endif
+            </div>
         </div>
 
-        <!-- <style>
-            .btn-buy-now {
-                background-color: #72a420 !important;
-                color: white !important;
-                border-radius: 8px !important;
-                border: none !important;
-                font-weight: 600 !important;
-                padding: 10px 16px !important;
-                font-size: 14px !important;
-                white-space: nowrap;
-            }
-            .btn-add-cart {
-                background-color: #e9ecef !important;
-                color: #212529 !important;
-                border-radius: 8px !important;
-                border: none !important;
-                font-weight: 600 !important;
-                padding: 10px 16px !important;
-                font-size: 14px !important;
-                white-space: nowrap;
-            }
-            .btn-wishlist-action {
-                background-color: white !important;
-                color: #6c757d !important;
-                border: 1px solid #dee2e6 !important;
-                border-radius: 8px !important;
-                padding: 10px 16px !important;
-                font-size: 14px !important;
-            }
-            .btn-wishlist-action:hover {
-                color: #dc3545 !important;
-                border-color: #dc3545 !important;
-            }
-            .product-actions {
-                display: flex;
-                align-items: center;
-            }
-            .current-price {
-                color: #72a420 !important;
-            }
-        </style> -->
     </div>
 </div>

@@ -107,7 +107,7 @@ class ProductController extends Controller
                 }
             }
         }
-        $validated['size'] = !empty($validatedSizes) ? json_encode($validatedSizes) : null;
+        $validated['size'] = !empty($validatedSizes) ? $validatedSizes : null;
 
         $validated['slug'] = Str::slug($validated['name']);
 
@@ -193,7 +193,7 @@ class ProductController extends Controller
                 }
             }
         }
-        $validated['size'] = !empty($validatedSizes) ? json_encode($validatedSizes) : null;
+        $validated['size'] = !empty($validatedSizes) ? $validatedSizes : null;
 
         $validated['slug'] = Str::slug($validated['name']);
 
