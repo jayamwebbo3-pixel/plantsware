@@ -19,23 +19,23 @@
     <div class="container">
         <h2 class="plantsware-section-title">About Us</h2>
         <div class="row">
+            
+
             <!-- Right Side - Image -->
             <div class="col-lg-6">
                 <div class="about-image">
-                    <img src="{{ asset ('assets/images/about.jpg') }}" alt="PlantsWare - Bringing Nature to Your Home">
+                    @if($page->image)
+                        <img src="{{ asset('storage/' . $page->image) }}" alt="{{ $page->title }}">
+                    @else
+                        <img src="{{ asset ('assets/images/about.jpg') }}" alt="PlantsWare - Bringing Nature to Your Home">
+                    @endif
                 </div>
             </div>
-
             <!-- Left Side - Content -->
             <div class="col-lg-6">
-
-                <p class="about-text">PlantsWare is a dedicated plant and nature-focused company committed to bringing the beauty of greenery into every home and space. We specialize in offering high-quality plants and nature-inspired products that support healthy, vibrant environments.</p>
-
-                <p class="about-text">Our collection includes carefully selected Garden Products to help customers create thriving outdoor and indoor green spaces, focusing on sustainability and natural beauty.</p>
-
-                <p class="about-text">We provide premium Planted Aquarium Products with live aquatic plants and accessories for stunning aquascapes, making aquarium planting accessible to all experience levels.</p>
-
-                <p class="about-text">Our Natural Products category features eco-friendly items sourced directly from nature, promoting wellness and sustainable living.</p>
+                <div class="about-content-area">
+                    {!! $page->content !!}
+                </div>
             </div>
         </div>
     </div>
@@ -46,33 +46,52 @@
     <div class="container">
         <h2 class="plantsware-section-title">Why Choose PlantsWare?</h2>
         <div class="row">
-            <div class="col-md-4">
-                <div class="plantsware-feature">
-                    <div class="plantsware-feature-icon">
-                        <i class="fas fa-leaf"></i>
+            @php
+                $features = $page->extra_content['features'] ?? [];
+            @endphp
+            
+            @if(count($features) > 0)
+                @foreach($features as $feature)
+                    <div class="col-md-4 mb-4">
+                        <div class="plantsware-feature">
+                            <div class="plantsware-feature-icon">
+                                <i class="{{ $feature['icon'] ?? 'fas fa-check' }}"></i>
+                            </div>
+                            <h3 class="plantsware-feature-title">{{ $feature['title'] ?? '' }}</h3>
+                            <p>{{ $feature['description'] ?? '' }}</p>
+                        </div>
                     </div>
-                    <h3 class="plantsware-feature-title">Eco-Friendly Products</h3>
-                    <p>All our products are carefully selected for their environmental sustainability and minimal ecological impact.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="plantsware-feature">
-                    <div class="plantsware-feature-icon">
-                        <i class="fas fa-award"></i>
+                @endforeach
+            @else
+                <!-- Fallback content if no features are set -->
+                <div class="col-md-4">
+                    <div class="plantsware-feature">
+                        <div class="plantsware-feature-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3 class="plantsware-feature-title">Eco-Friendly Products</h3>
+                        <p>All our products are carefully selected for their environmental sustainability and minimal ecological impact.</p>
                     </div>
-                    <h3 class="plantsware-feature-title">Premium Quality</h3>
-                    <p>We source only the highest quality products that meet our rigorous standards for performance and durability.</p>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="plantsware-feature">
-                    <div class="plantsware-feature-icon">
-                        <i class="fas fa-shipping-fast"></i>
+                <div class="col-md-4">
+                    <div class="plantsware-feature">
+                        <div class="plantsware-feature-icon">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <h3 class="plantsware-feature-title">Premium Quality</h3>
+                        <p>We source only the highest quality products that meet our rigorous standards for performance and durability.</p>
                     </div>
-                    <h3 class="plantsware-feature-title">Fast Shipping</h3>
-                    <p>Free shipping on orders over ₹50. Most orders ship within 24 hours and arrive within 3-5 business days.</p>
                 </div>
-            </div>
+                <div class="col-md-4">
+                    <div class="plantsware-feature">
+                        <div class="plantsware-feature-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <h3 class="plantsware-feature-title">Fast Shipping</h3>
+                        <p>Free shipping on orders over ₹50. Most orders ship within 24 hours and arrive within 3-5 business days.</p>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </section>

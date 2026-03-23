@@ -149,25 +149,22 @@
                         </div>
                     @else
                         <!-- Empty Wishlist -->
-                        <div class="text-center py-5">
+                        <div class="empty-cart-container">
+                            <div class="empty-icon-wrapper">
+                                <i class="far fa-heart"></i>
+                            </div>
                             @if(!Auth::check())
-                                <div class="empty-wishlist">
-                                    <i class="far fa-heart fa-4x text-muted mb-3"></i>
-                                    <h4>Your wishlist is empty</h4>
-                                    <p class="text-muted">Please login to add items to your wishlist</p>
-                                    <a href="{{ route('login') }}" class="btn btn-primary mt-3">
-                                        <i class="fas fa-sign-in-alt me-2"></i> Login Now
-                                    </a>
-                                </div>
+                                <h3 class="empty-text">Your Wishlist is Empty</h3>
+                                <p class="empty-subtext">Please login to view and add items to your wishlist.</p>
+                                <a href="{{ route('login') }}" class="continue-shopping-btn">
+                                    Login Now
+                                </a>
                             @else
-                                <div class="empty-wishlist">
-                                    <i class="far fa-heart fa-4x text-muted mb-3"></i>
-                                    <h4>Your wishlist is empty</h4>
-                                    <p class="text-muted">You haven't added any products to your wishlist yet</p>
-                                    <a href="{{ route('home') }}" class="btn btn-primary mt-3">
-                                        <i class="fas fa-shopping-bag me-2"></i> Start Shopping
-                                    </a>
-                                </div>
+                                <h3 class="empty-text">Your Wishlist is Empty</h3>
+                                <p class="empty-subtext">You haven't added any products to your wishlist yet. Explore our beautiful plants and save your favorites!</p>
+                                <a href="{{ route('home') }}" class="continue-shopping-btn">
+                                    Continue Shopping
+                                </a>
                             @endif
                         </div>
                     @endif
@@ -358,15 +355,15 @@ function showEmptyWishlist() {
     const wishlistBody = document.querySelector('.gi-vendor-card-body');
     if (wishlistBody) {
         wishlistBody.innerHTML = `
-            <div class="text-center py-5">
-                <div class="empty-wishlist">
-                    <i class="far fa-heart fa-4x text-muted mb-3"></i>
-                    <h4>Your wishlist is empty</h4>
-                    <p class="text-muted">You haven't added any products to your wishlist yet</p>
-                    <a href="{{ route('home') }}" class="btn btn-primary mt-3">
-                        <i class="fas fa-shopping-bag me-2"></i> Start Shopping
-                    </a>
+            <div class="empty-cart-container" style="animation: fadeInUp 0.5s ease-out;">
+                <div class="empty-icon-wrapper">
+                    <i class="far fa-heart"></i>
                 </div>
+                <h3 class="empty-text">Your Wishlist is Empty</h3>
+                <p class="empty-subtext">You haven't added any products to your wishlist yet. Explore our beautiful plants and save your favorites!</p>
+                <a href="${baseUrl}" class="continue-shopping-btn">
+                    Continue Shopping
+                </a>
             </div>
         `;
         
@@ -600,6 +597,78 @@ style.textContent = `
     .tbl-btn {
         display: flex;
         gap: 8px;
+    }
+
+    /* Simple Empty Cart Styles */
+    .empty-cart-container {
+        text-align: center;
+        padding: 60px 20px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .empty-icon-wrapper {
+        width: 100px;
+        height: 100px;
+        background-color: #f3f7ed;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+        color: #72a420;
+        font-size: 40px;
+        transition: all 0.3s ease;
+    }
+
+    .empty-icon-wrapper:hover {
+        transform: scale(1.1) rotate(-10deg);
+    }
+
+    .empty-text {
+        font-size: 22px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 12px;
+    }
+
+    .empty-subtext {
+        font-size: 15px;
+        color: #777;
+        margin-bottom: 30px;
+        max-width: 400px;
+    }
+
+    .continue-shopping-btn {
+        display: inline-block;
+        background-color: #72a420;
+        color: #fff !important;
+        padding: 12px 35px;
+        border-radius: 4px;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: all 0.3s ease;
+        border: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .continue-shopping-btn:hover {
+        background-color: #5b8c19;
+        box-shadow: 0 5px 15px rgba(114, 164, 32, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .empty-cart-container {
+            padding: 40px 15px;
+        }
+        .empty-text {
+            font-size: 18px;
+        }
     }
 `;
 document.head.appendChild(style);

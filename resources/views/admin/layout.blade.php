@@ -61,7 +61,7 @@
                     </a>
 
                     <!-- Informative Pages Dropdown -->
-                    <!-- <a class="nav-link" data-bs-toggle="collapse" href="#informativePagesCollapse" role="button" aria-expanded="{{ request()->routeIs('admin.pages.*') ? 'true' : 'false' }}" aria-controls="informativePagesCollapse">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#informativePagesCollapse" role="button" aria-expanded="{{ request()->routeIs('admin.pages.*') ? 'true' : 'false' }}" aria-controls="informativePagesCollapse">
                         <i class="fas fa-file-alt"></i> Informative Pages <i class="fas fa-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
                     </a>
                     <div class="collapse {{ request()->routeIs('admin.pages.*') ? 'show' : '' }}" id="informativePagesCollapse">
@@ -106,33 +106,20 @@
                                     <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Shipping Policy
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <hr style="border-color: rgba(255,255,255,0.2); margin: 5px 20px;">
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('admin.sliders.*') ? 'active' : '' }}" href="{{ route('admin.sliders.index') }}">
+                                    <i class="fas fa-images"></i> Home Sliders
+                                </a>
+                            </li>
                         </ul>
-                    </div> -->
+                    </div>
 
-                    {{-- <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
-                        <i class="fas fa-box"></i> Products
-                    </a> --}}
-                    {{-- <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
-                        <i class="fas fa-tags"></i> Categories
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.subcategories.*') ? 'active' : '' }}" href="{{ route('admin.subcategories.index') }}">
-                        <i class="fas fa-list"></i> Subcategories
-                    </a> --}}
-                    {{-- <a class="nav-link {{ request()->routeIs('admin.attributes.*') ? 'active' : '' }}" href="{{ route('admin.attributes.index') }}">
-                        <i class="fa-solid fa-cog"></i> Attributes
-                    </a> --}}
                     <a class="nav-link {{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}" href="{{ route('admin.blogs.index') }}">
                         <i class="fas fa-blog"></i> Blogs
                     </a>
-                    <!--<a class="nav-link {{ request()->routeIs('admin.sliders.*') ? 'active' : '' }}" href="{{ route('admin.sliders.index') }}">-->
-                    <!--    <i class="fas fa-images"></i> Sliders-->
-                    <!--</a>-->
-                    <!--<a class="nav-link {{ request()->routeIs('admin.testimonials.*') ? 'active' : '' }}" href="{{ route('admin.testimonials.index') }}">-->
-                    <!--    <i class="fas fa-star"></i> Testimonials-->
-                    <!--</a>-->
-                    <!--<a class="nav-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}">-->
-                    <!--    <i class="fas fa-cog"></i> Settings-->
-                    <!--</a>-->
                     <hr style="border-color: rgba(255,255,255,0.3);">
                     <form method="POST" action="{{ route('admin.logout') }}">
                         @csrf

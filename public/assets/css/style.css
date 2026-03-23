@@ -6050,7 +6050,6 @@ del {
 }
 
 .continue-shopping-btn {
-    width: 100%;
     padding: 12px;
     background-color: transparent;
     color: var(--primary-color);
@@ -7751,10 +7750,11 @@ del {
     padding: 50px 0;
 }
 
-.about-text {
+.about-text, .about-content-area p {
     font-size: 1.1rem;
     line-height: 1.8;
     margin-bottom: 25px;
+    color: #333;
 }
 
 .about-image {

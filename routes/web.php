@@ -151,10 +151,24 @@ Route::post('/logout', [LoginController::class, 'logout'])
 
 // ================= STATIC PAGES =================
 
-Route::view('about', 'view.about')->name('about');
-Route::view('privacy-policy', 'view.privacypolicy')->name('privacy-policy');
-Route::view('terms-conditions', 'view.termsandconditions')->name('terms-conditions');
-Route::view('refund-policy', 'view.refundpolicy')->name('refund-policy');
+Route::get('about', function () {
+    $page = \App\Models\Page::where('slug', 'about-us')->firstOrFail();
+    return view('view.about', compact('page'));
+})->name('about');
+Route::get('privacy-policy', function () {
+    $page = \App\Models\Page::where('slug', 'privacy-policy')->firstOrFail();
+    return view('view.privacypolicy', compact('page'));
+})->name('privacy-policy');
+
+Route::get('terms-conditions', function () {
+    $page = \App\Models\Page::where('slug', 'terms-conditions')->firstOrFail();
+    return view('view.termsandconditions', compact('page'));
+})->name('terms-conditions');
+
+Route::get('refund-policy', function () {
+    $page = \App\Models\Page::where('slug', 'return-refund-policy')->firstOrFail();
+    return view('view.refundpolicy', compact('page'));
+})->name('refund-policy');
 
 // ======================================================
 // ================= ADMIN ROUTES ========================
