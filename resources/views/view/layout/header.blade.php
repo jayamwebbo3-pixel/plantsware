@@ -136,8 +136,171 @@
                 left: 0 !important;
                 right: 0 !important;
                 padding: 15px !important;
+                background-color: #fdfdfd !important; /* Force light background for mobile menu */
+            }
+
+            /* Mobile Side Menu Fixes */
+            header { position: relative; z-index: 1050; }
+            .header-top { padding: 10px 0 !important; background: #fff; }
+            .head-logo { flex: 0 0 50% !important; max-width: 50% !important; text-align: left !important; }
+            .head-logo img { max-height: 45px; width: auto; }
+            .head-search { flex: 0 0 50% !important; max-width: 50% !important; }
+            .input-class { display: none !important; }
+            .head-right { display: block !important; width: 100% !important; padding: 0 !important; }
+            .top_cart { display: flex !important; justify-content: flex-end !important; align-items: center !important; margin: 0 !important; height: 45px !important; }
+            .top_cart li { padding: 0 5px !important; position: relative !important; min-width: 45px !important; display: flex !important; align-items: center !important; height: 100% !important; }
+            .Price-amount { font-size: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; min-height: 35px !important; min-width: 35px !important; position: relative !important; }
+            .Price-amount::before { display: block !important; visibility: visible !important; width: 28px !important; height: 28px !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; z-index: 1 !important; }
+            .my_account { font-size: 0 !important; padding-left: 28px !important; display: flex !important; align-items: center !important; height: 35px !important; position: relative !important; }
+            .my_account::before { display: block !important; visibility: visible !important; width: 28px !important; height: 28px !important; position: absolute !important; left: 0 !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 1 !important; }
+            .price_cart { font-size: 11px !important; background: #6EA820; color: #fff !important; border-radius: 50%; width: 18px; height: 18px; display: flex !important; align-items: center; justify-content: center; position: absolute !important; top: -5px !important; left: 24px !important; z-index: 10; padding: 0 !important; }
+            .dropdown-menu.r_menu { padding: 5px 0 !important; min-height: auto !important; top: 40px !important; }
+            .header_bottom { background: #6EA820 !important; min-height: 45px; display: flex !important; align-items: center; justify-content: flex-end; position: relative; }
+            #menuToggle { background: transparent; border: none; color: #fff; font-size: 28px; padding: 5px 15px; cursor: pointer; display: block !important; }
+            
+            .main-menu { position: fixed !important; top: 0; left: -110% !important; width: 280px !important; height: 100vh !important; background: #fff !important; z-index: 9999 !important; flex-direction: column !important; justify-content: flex-start !important; padding: 70px 0 20px 0 !important; transition: all 0.4s ease-in-out !important; box-shadow: 5px 0 15px rgba(0,0,0,0.1); display: block !important; overflow-y: auto; opacity: 1 !important; transform: none !important; }
+            .main-menu.show { left: 0 !important; }
+            .main-menu li { width: 100%; display: block !important; border-bottom: 1px solid #f0f0f0; }
+            .main-menu li a { color: #333 !important; padding: 12px 20px !important; font-size: 14px !important; font-weight: 600 !important; display: flex; justify-content: space-between; }
+            
+            .main-menu > li.dropdown .dropdown-menu { position: static !important; display: none !important; width: 100% !important; opacity: 0 !important; transform: scale(1, 0) !important; transform-origin: top !important; transition: all 0.3s !important; visibility: visible !important; margin: 0 !important; border: none !important; box-shadow: none !important; }
+            .main-menu li.dropdown.active > .dropdown-menu { display: block !important; opacity: 1 !important; transform: scale(1, 1) !important; }
+            
+            .main-menu li.mega_menu .dropdown-menu .h_title { color: #6EA820 !important; font-size: 12px !important; font-weight: 800 !important; margin-top: 10px !important; padding-bottom: 5px !important; border-bottom: 1px solid #f0f0f0 !important; display: block !important; }
+            .main-menu li.mega_menu .dropdown-menu ul.list-unstyled li a { color: #666 !important; padding: 8px 0 !important; font-size: 13px !important; display: block !important; background: transparent !important; }
+            
+            #closeMenu { display: flex !important; position: absolute; top: 15px; right: 15px; background: #6EA820; color: #fff; border: none; width: 35px; height: 35px; border-radius: 50%; font-size: 20px; justify-content: center; align-items: center; z-index: 10001; }
+        }
+
+        /* Ultra small screen optimization (320px - 375px) */
+        @media (max-width: 375px) {
+            .head-logo { flex: 0 0 35% !important; max-width: 35% !important; }
+            .head-search { flex: 0 0 65% !important; max-width: 65% !important; }
+            .top_cart li { padding: 0 1px !important; min-width: 35px !important; }
+            .head-logo img { max-height: 32px; }
+            .price_cart { left: 14px !important; top: -10px !important; width: 16px !important; height: 16px !important; font-size: 10px !important; }
+            .Price-amount, .my_account { padding-left: 20px !important; }
+        }
+
+        /* 1024px Layout Optimization (Handles 110-125% zoom) */
+        @media (min-width: 992px) and (max-width: 1250px) {
+            .header_row { display: flex !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; margin: 0 !important; }
+            
+            /* Logo (15%) */
+            .head-logo { flex: 0 0 15% !important; max-width: 15% !important; padding: 0 !important; display: flex !important; align-items: center !important; }
+            .head-logo img { max-width: 100%; height: auto; display: block !important; }
+            
+            /* Search Container (85%) */
+            .head-search { flex: 0 0 85% !important; max-width: 85% !important; padding: 0 !important; }
+            
+            /* Internal 65/35 Split to pull Icons closer to Search */
+            .input-class { flex: 0 0 65% !important; max-width: 65% !important; padding-right: 20px !important; display: flex !important; align-items: center !important; }
+            .head-right { flex: 0 0 35% !important; max-width: 35% !important; text-align: right !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; }
+            
+            .between-header { min-width: auto !important; width: 100% !important; margin: 0 !important; display: flex !important; align-items: center !important; }
+            .top_cart { display: flex !important; justify-content: flex-end !important; align-items: center !important; flex-wrap: nowrap !important; margin: 0 !important; width: 100% !important; height: 100% !important; }
+            .top_cart li { margin-left: 10px !important; padding: 0 !important; display: flex !important; align-items: center !important; height: 100% !important; }
+            
+            /* Precise Centering for Wishlist, Cart, and My Account */
+            a.Price-amount, span.my_account { 
+                display: inline-flex !important; 
+                align-items: center !important; 
+                height: 40px !important; 
+                font-size: 11px !important; 
+                font-weight: 600 !important; 
+                padding-left: 26px !important; 
+                white-space: nowrap !important; 
+                line-height: normal !important; 
+                color: #333 !important; 
+                text-decoration: none !important;
+                vertical-align: middle !important;
+            }
+            .my_account_link { padding: 0 !important; margin: 0 !important; text-decoration: none !important; height: 100% !important; display: flex !important; align-items: center !important; }
+            .price_cart { top: -8px !important; left: 2px !important; transform: scale(0.9); }
+            
+            /* Fixed Search Button and Input Alignment */
+            .between-header .btn.btn-danger { width: 85px !important; font-size: 11px !important; height: 38px !important; padding: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 0 4px 4px 0 !important; }
+            .between-header input { height: 38px !important; font-size: 12px !important; width: calc(100% - 85px) !important; padding-left: 10px !important; border-radius: 4px 0 0 4px !important; }
+
+            .main-menu li a { padding: 12px 3px !important; font-size: 11px !important; }
+            .header_bottom { padding: 0 1.5% !important; }
+
+            /* Account Dropdown for 1024px */
+            .dropdown-menu.r_menu { top: 40px !important; right: 0 !important; left: auto !important; min-width: 180px !important; height: auto !important; display: none; overflow: visible !important; padding-bottom: 15px !important; z-index: 100000; }
+
+            /* Mega Menu column adjustment for 1024px */
+            .mega_menu .dropdown-menu .col-lg-4 { flex: 0 0 50% !important; max-width: 50% !important; }
+        }
+
+        /* Main Menu Aesthetic Refinement (Professional Center) */
+        @media (min-width: 992px) {
+            .main-menu {
+                justify-content: center !important; 
+                flex-wrap: wrap !important;
+                gap: 6px !important; /* User requested 6px gap */
+            }
+            .main-menu li {
+                margin: 0 !important;
+            }
+            .main-menu li a {
+                padding: 15px 15px !important;
+                font-size: 14px !important;
+                letter-spacing: 0.2px;
+            }
+            .header_bottom {
+                padding: 0 3% !important;
             }
         }
+        
+        @media (max-width: 1400px) and (min-width: 992px) {
+            .main-menu { gap: 4px !important; }
+            .main-menu li a { padding: 15px 12px !important; font-size: 13px !important; }
+        }
+
+        .owl-theme .owl-dots { display: block !important; visibility: visible !important; z-index: 10; }
+
+        /* Global Account Dropdown Fix */
+        .dropdown-menu.r_menu {
+            height: auto !important;
+            min-height: auto !important; /* Removed 100px forced height to reduce empty space */
+            overflow: visible !important;
+            padding: 10px 0 !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+            min-width: 180px !important;
+            background-color: #fff !important;
+            z-index: 99999 !important;
+            display: none;
+        }
+        
+        button.dropdown-item { 
+            width: 100% !important; 
+            text-align: left !important; 
+            background: none !important; 
+            border: none !important; 
+            padding: 8px 20px !important; 
+            outline: none !important; 
+            cursor: pointer !important; 
+            display: block !important;
+        }
+        .r_menu .dropdown-item { padding: 8px 20px !important; display: block !important; }
+        .r_menu form { margin: 0 !important; padding: 0 !important; display: block !important; }
+        button.dropdown-item:hover { background-color: #f8f9fa !important; color: #6EA820 !important; }
+        
+        .right1.dropdown { overflow: visible !important; height: auto !important; }
+
+        /* My Account / Utility Hover logic for Desktop */
+        @media (min-width: 992px) {
+            .top_cart .dropdown:hover > .dropdown-menu {
+                display: block !important;
+                margin-top: 0;
+            }
+            .main-menu > li.dropdown:hover > .dropdown-menu {
+                display: block !important;
+            }
+            #closeMenu, #menuToggle { display: none !important; }
+        }
+        
+        .my_account_link { color: inherit !important; display: inline-block; }
     </style>
 </head>
 
@@ -192,23 +355,23 @@
                             <div class="col-xl-5 col-lg-5 head-right text-right order-1 order-lg-2">
                                 <ul class="top_cart">
                                     <!-- Wishlist -->
-                                    <li class="dropdown d-inline-block my-cart md_acco">
+                                    <li class="d-inline-block my-cart md_acco">
                                         <a href="{{ url('wishlist') }}" class="cart-qty">
                                             <span class="price_cart d-md-inline-block align-middle font-weight-bolder">
                                                 {{ session('wishlist_count', 0) }}
                                             </span>
-                                            <span class="dropdown-toggle Price-amount" role="menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="Price-amount font-weight-bolderer">
                                                 Wishlist
                                             </span>
                                         </a>
                                     </li>
                                     <!-- Cart -->
-                                    <li class="dropdown d-inline-block my-cart md_acco">
+                                    <li class="d-inline-block my-cart md_acco">
                                         <a href="{{ url('cart') }}" class="cart-qty">
                                             <span class="price_cart d-md-inline-block align-middle font-weight-bolder">
                                                 {{ session('cart_count', 0) }}
                                             </span>
-                                            <span class="dropdown-toggle Price-amount" role="menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="Price-amount font-weight-bolderer">
                                                 Cart
                                             </span>
                                         </a>
@@ -216,13 +379,15 @@
                                     <!-- My Account -->
                                     <li class="dropdown right1 md_acc md_acco">
                                         <span class="account-block"></span>
-                                        <span class="dropdown-toggle my_account" role="menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            My account
-                                        </span>
-                                        <span class="dropdown-menu r_menu dropdown-menu-right">
+                                        <a href="{{ Auth::check() ? url('user/dashboard') : url('login') }}" class="my_account_link" style="text-decoration: none;">
+                                            <span class="dropdown-toggle my_account" role="menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                My account
+                                            </span>
+                                        </a>
+                                        <div class="dropdown-menu r_menu dropdown-menu-right">
                                             @auth
                                             <a class="dropdown-item font-weight-bolderer" href="{{ url('user/dashboard') }}">Dashboard</a>
-                                            <form method="POST" action="{{ route('logout') }}">
+                                            <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
                                                 @csrf
                                                 <button type="submit" class="dropdown-item font-weight-bolderer">Logout</button>
                                             </form>
@@ -230,7 +395,7 @@
                                             <a class="dropdown-item font-weight-bolderer" href="{{ url('login') }}">Login</a>
                                             {{-- <a class="dropdown-item font-weight-bolderer" href="{{ url('register') }}">Register</a> --}}
                                             @endauth
-                                        </span>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -386,31 +551,50 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // TOGGLE MENU OPEN
             const menuToggle = document.getElementById('menuToggle');
-            if (menuToggle) {
+            const closeMenu = document.getElementById('closeMenu');
+            const mainMenu = document.querySelector('.main-menu');
+
+            if (menuToggle && mainMenu) {
                 menuToggle.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    document.querySelector(".main-menu").classList.add("show");
+                    mainMenu.classList.add('show');
+                    document.body.style.overflow = 'hidden';
                 });
             }
 
-            // TOGGLE MENU CLOSE
-            const closeMenu = document.getElementById('closeMenu');
-            if (closeMenu) {
+            if (closeMenu && mainMenu) {
                 closeMenu.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    document.querySelector(".main-menu").classList.remove("show");
+                    mainMenu.classList.remove('show');
+                    document.body.style.overflow = '';
                 });
             }
+
+            // Mobile Dropdown Toggle
+            const dropdownToggles = document.querySelectorAll('.main-menu .dropdown > a');
+            dropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    if (window.innerWidth < 992) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const parent = this.parentElement;
+                        parent.classList.toggle('active');
+                        
+                        // Optional: close other dropdowns
+                        // const allDropdowns = document.querySelectorAll('.main-menu .dropdown');
+                        // allDropdowns.forEach(d => { if(d !== parent) d.classList.remove('active'); });
+                    }
+                });
+            });
 
             // Close mobile menu when clicking outside
             document.addEventListener('click', function(event) {
-                const mainMenu = document.querySelector('.main-menu');
-                if (mainMenu && !event.target.closest('.navbar-toggler') &&
-                    !event.target.closest('.main-menu') &&
-                    mainMenu.classList.contains('show')) {
-                    mainMenu.classList.remove('show');
+                if (mainMenu && mainMenu.classList.contains('show')) {
+                    if (!mainMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+                        mainMenu.classList.remove('show');
+                        document.body.style.overflow = '';
+                    }
                 }
             });
         });

@@ -2191,3 +2191,6 @@
 	/*.......  COMPARE ........*/
 }
 
+
+/* Header responsive fixes moved to header.blade.php for better load priority */
+

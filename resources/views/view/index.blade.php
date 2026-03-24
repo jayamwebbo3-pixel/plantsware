@@ -105,7 +105,7 @@
                     data-wow-duration="0.8s" data-wow-delay="{{ 0.1 * ($index + 1) }}s">
                     <li class="ser-svg d-lg-inline-block d-md-block  align-middle">
                         @if(isset($item['icon']) && str_starts_with($item['icon'], 'fa'))
-                            <i class="{{ $item['icon'] }} service-icon" style="font-size: 32px; color: #6ea820;"></i>
+                            <i class="{{ $item['icon'] }} service-icon" style="font-size: 32px;"></i>
                         @else
                             <span class="icon-image"></span>
                         @endif

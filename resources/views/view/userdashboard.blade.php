@@ -250,7 +250,6 @@
                                     @if(in_array(strtolower($order->status), ['delivered', 'completed']))
                                     <button type="button" class="btn-review" onclick="event.stopPropagation(); openReviewModal({{ $order->id }}, '{{ $order->order_number }}')" style="background-color: var(--primary-color); border: none; color: white; border-radius: 4px; padding: 2px 8px; margin-left: 10px; cursor: pointer;">Review & Rating</button>
                                     @endif
-
                                     <a href="{{ route('user.order.invoice', $order->id) }}" class="btn-invoice" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); border-radius: 4px; padding: 2px 8px; margin-left: 10px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 0.85rem;">Invoice</a>
                             </div>
                             <div class="order-price">₹{{ number_format($order->total ?? 0, 2) }}</div>

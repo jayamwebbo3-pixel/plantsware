@@ -3478,16 +3478,23 @@ del {
     background-image: url("../images/svg/gift-hover.svg");
 }
 
-.service:hover .icon-image,
-.service:hover .service-icon {
-    transform: rotateY(360deg);
+.service:hover .icon-image {
+    transform: rotateY(180deg);
 }
 
-.service-icon {
+.service:hover .icon-image,
+.service:hover .service-icon,
+.service:hover .service-icon svg {
+    transform: rotateY(360deg);
+    color: #6ea820 !important;
+}
+
+.service-icon,
+.service-icon svg {
     display: inline-block;
     transition: 0.6s ease-in-out;
+    color: #6c757d !important;
 }
-
 
 /*===================================================================/  SERVICE STYLE  ====================================================================================*/
 
@@ -7756,7 +7763,8 @@ del {
     padding: 50px 0;
 }
 
-.about-text, .about-content-area p {
+.about-text,
+.about-content-area p {
     font-size: 1.1rem;
     line-height: 1.8;
     margin-bottom: 25px;
@@ -8579,6 +8587,7 @@ body.sticky-nav-active {
     }
 
 }
+
 /* Product Card Styling */
 .product-card {
     background: #fff;
@@ -8737,7 +8746,9 @@ body.sticky-nav-active {
 
 /* Responsive Adjustments */
 @media (max-width: 1200px) {
-    .btn-buy-now, .btn-add-cart {
+
+    .btn-buy-now,
+    .btn-add-cart {
         font-size: 0.75rem !important;
         padding: 8px 6px !important;
     }
@@ -8748,16 +8759,16 @@ body.sticky-nav-active {
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .action-buttons-container {
         width: 100%;
     }
-    
+
     .wishlist-action-container {
         margin-left: 0 !important;
         width: 100%;
     }
-    
+
     .btn-wishlist-action {
         width: 100% !important;
     }
@@ -8837,7 +8848,9 @@ body.sticky-nav-active {
 
 /* Product Card Responsiveness */
 @media (max-width: 768px) {
-    .btn-buy-now, .btn-add-cart {
+
+    .btn-buy-now,
+    .btn-add-cart {
         padding: 10px 8px !important;
         font-size: 12px !important;
     }
@@ -8848,19 +8861,20 @@ body.sticky-nav-active {
         flex-direction: column;
         gap: 10px;
     }
-    
-    .product-actions > form,
-    .product-actions > .flex-grow-1,
-    .product-actions > .wishlist-btn-container {
+
+    .product-actions>form,
+    .product-actions>.flex-grow-1,
+    .product-actions>.wishlist-btn-container {
         width: 100% !important;
     }
-    
+
     .btn-wishlist-action {
         width: 100% !important;
         height: 45px !important;
     }
-    
-    .btn-buy-now, .btn-add-cart {
+
+    .btn-buy-now,
+    .btn-add-cart {
         height: 45px !important;
     }
 }
