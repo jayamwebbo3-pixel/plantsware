@@ -26,7 +26,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="category_id" class="form-label">Category</label>
-                                    <select class="form-select" id="category_id" name="category_id">
+                                    <select class="form-select @if(isset($selectedCategoryId)) bg-light @endif" id="category_id" name="category_id_display" @if(isset($selectedCategoryId)) disabled @endif>
                                         <option value="">Select Category</option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" {{ old('category_id', $selectedCategoryId ?? '') == $category->id ? 'selected' : '' }}>
@@ -34,12 +34,15 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                    @if(isset($selectedCategoryId))
+                                        <input type="hidden" name="category_id" value="{{ $selectedCategoryId }}">
+                                    @endif
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="subcategory_id" class="form-label">Subcategory</label>
-                                    <select class="form-select" id="subcategory_id" name="subcategory_id">
+                                    <select class="form-select @if(isset($selectedSubcategoryId)) bg-light @endif" id="subcategory_id" name="subcategory_id_display" @if(isset($selectedSubcategoryId)) disabled @endif>
                                         <option value="">Select Subcategory</option>
                                         @foreach($subcategories as $subcategory)
                                             <option value="{{ $subcategory->id }}" {{ old('subcategory_id', $selectedSubcategoryId ?? '') == $subcategory->id ? 'selected' : '' }}>
@@ -47,6 +50,9 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                    @if(isset($selectedSubcategoryId))
+                                        <input type="hidden" name="subcategory_id" value="{{ $selectedSubcategoryId }}">
+                                    @endif
                                 </div>
                             </div>
                         </div>

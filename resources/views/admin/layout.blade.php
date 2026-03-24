@@ -68,27 +68,27 @@
                         <ul class="nav flex-column ms-3">
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->is('admin/pages/about-us/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'about-us') }}">
-                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> About Us
+                                    <i class="fas fa-lightbulb"></i> About Us
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->is('admin/pages/contact-us/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'contact-us') }}">
-                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Contact Us
+                                    <i class="fas fa-lightbulb"></i> Contact Us
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->is('admin/pages/services/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'services') }}">
-                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Services
+                                    <i class="fas fa-lightbulb"></i> Services
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->is('admin/pages/management-team/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'management-team') }}">
-                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Management Team
+                                    <i class="fas fa-circle"></i> Management Team
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->is('admin/pages/terms-conditions/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'terms-conditions') }}">
-                                    <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle;"></i> Terms & Conditions
+                                    <i class="fas fa-circle"></i> Terms & Conditions
                                 </a>
                             </li>
                             <li class="nav-item">

@@ -59,12 +59,14 @@ class HomeController extends Controller
     $gardenCategory = Category::where('name', 'like', '%Garden%')->first();
     $aquariumCategory = Category::where('name', 'like', '%Aquarium%')->first();
     $naturalCategory = Category::where('name', 'like', '%Natural%')->first();
+    $servicesPage = \App\Models\Page::where('slug', 'services')->first();
+    $serviceHighlights = $servicesPage->extra_content['features'] ?? [];
 
     return view('view.index', compact(
         'categories', 'sliders', 'newArrivals',
         'gardenProducts', 'aquariumProducts', 'naturalProducts',
         'gardenCategory', 'aquariumCategory', 'naturalCategory',
-        'testimonials', 'blogs'
+        'testimonials', 'blogs', 'serviceHighlights'
     ));
 }
 }

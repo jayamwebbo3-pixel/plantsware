@@ -21,7 +21,8 @@
                     </div>
                 @endif
 
-                @if($page->slug === 'about-us')
+                @if($page->slug === 'about-us' || $page->slug === 'services')
+                    @if($page->slug === 'about-us')
                     <div class="mb-4">
                         <label for="image" class="form-label fw-bold">About Image</label>
                         @if($page->image)
@@ -34,30 +35,44 @@
                         <input type="file" name="image" id="image" class="form-control">
                         <small class="text-muted">Upload a new image to replace the current one.</small>
                     </div>
+                    @endif
 
+                    @if($page->slug !== 'services')
                     <div class="mb-4">
-                    <label for="editor" class="form-label fw-bold">Page Content</label>
-                    <textarea name="content" id="editor" class="form-control">{{ old('content', $page->content) }}</textarea>
-                </div>
+                        <label for="editor" class="form-label fw-bold">Page Content</label>
+                        <textarea name="content" id="editor" class="form-control">{{ old('content', $page->content) }}</textarea>
+                    </div>
+                    @endif
 
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save"></i> Save Changes</button>
-                    
-                    <a href="{{ route('admin.dashboard') }}" class="btn btn-light ms-2">Cancel</a>
-                </div>
-                <div class="mt-4 text-end">
+                    @if($page->slug !== 'services')
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save"></i> Save Changes</button>
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-light ms-2">Cancel</a>
+                    </div>
+                    @endif
+
+                    <div class="mt-4 text-end">
                         <button type="button" class="btn btn-success btn-sm" id="add-feature"><i class="fas fa-plus"></i> Add New Feature</button></div>
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Why Choose Us Features</label>
+                        <label class="form-label fw-bold">{{ $page->slug === 'about-us' ? 'Why Choose Us Features' : 'Service Highlights' }}</label>
                         <div id="features-container">
                             @php
                                 $features = $page->extra_content['features'] ?? [];
                                 if (empty($features)) {
-                                    $features = [
-                                        ['icon' => 'fas fa-leaf', 'title' => 'Eco-Friendly Products', 'description' => 'All our products are carefully selected for their environmental sustainability and minimal ecological impact.'],
-                                        ['icon' => 'fas fa-award', 'title' => 'Premium Quality', 'description' => 'We source only the highest quality products that meet our rigorous standards for performance and durability.'],
-                                        ['icon' => 'fas fa-shipping-fast', 'title' => 'Fast Shipping', 'description' => 'Free shipping on orders over ₹50. Most orders ship within 24 hours and arrive within 3-5 business days.']
-                                    ];
+                                    if ($page->slug === 'about-us') {
+                                        $features = [
+                                            ['icon' => 'fas fa-leaf', 'title' => 'Eco-Friendly Products', 'description' => 'All our products are carefully selected for their environmental sustainability and minimal ecological impact.'],
+                                            ['icon' => 'fas fa-award', 'title' => 'Premium Quality', 'description' => 'We source only the highest quality products that meet our rigorous standards for performance and durability.'],
+                                            ['icon' => 'fas fa-shipping-fast', 'title' => 'Fast Shipping', 'description' => 'Free shipping on orders over ₹50. Most orders ship within 24 hours and arrive within 3-5 business days.']
+                                        ];
+                                    } else {
+                                        $features = [
+                                            ['icon' => 'fas fa-headset', 'title' => 'Fast Delivery', 'description' => 'Fast Shipping On All Orders'],
+                                            ['icon' => 'fas fa-coins', 'title' => 'Secure Payment', 'description' => '100% Secure Payment'],
+                                            ['icon' => 'fas fa-truck', 'title' => 'Easy Returns', 'description' => '30-Day Return Policy'],
+                                            ['icon' => 'fas fa-gift', 'title' => 'Quality Guarantee', 'description' => 'Premium Quality Products']
+                                        ];
+                                    }
                                 }
                             @endphp
 
@@ -92,11 +107,15 @@
                             
                         </div>
                     </div>
-                @endif               
-
+                @else
+                    <div class="mb-4">
+                        <label for="editor" class="form-label fw-bold">Page Content</label>
+                        <textarea name="content" id="editor" class="form-control">{{ old('content', $page->content) }}</textarea>
+                    </div>
+                @endif
+                
                 <div class="mt-4 text-end">
                     <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save"></i> Save</button>
-                   
                 </div>
             </form>
         </div>

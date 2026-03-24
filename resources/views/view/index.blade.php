@@ -88,54 +88,35 @@
 <div class="container-fluid">
     <div class="main_services">
         <div class="row">
+            @php
+                $highlights = $serviceHighlights;
+                if (empty($highlights)) {
+                    $highlights = [
+                        ['icon' => 'fas fa-headset', 'title' => 'Fast Delivery', 'description' => 'Fast shipping on all orders'],
+                        ['icon' => 'fas fa-shield-alt', 'title' => 'Secure Payment', 'description' => '100% Secure Payment'],
+                        ['icon' => 'fas fa-undo', 'title' => 'Easy Returns', 'description' => '30-Day Return Policy'],
+                        ['icon' => 'fas fa-award', 'title' => 'Quality Guarantee', 'description' => 'Premium Quality Products']
+                    ];
+                }
+            @endphp
+            @foreach($highlights as $index => $item)
             <div class="col-md-3 col-sm-6 col-12 m_service ">
-                <ul class="bg-white service service-1 rounded text-center  animate__animated animate__fadeInUp"
-                    data-wow-duration="0.8s" data-wow-delay="0.1s">
+                <ul class="bg-white service service-{{ $index + 1 }} rounded text-center  animate__animated animate__fadeInUp"
+                    data-wow-duration="0.8s" data-wow-delay="{{ 0.1 * ($index + 1) }}s">
                     <li class="ser-svg d-lg-inline-block d-md-block  align-middle">
-                        <span class="icon-image"></span>
+                        @if(isset($item['icon']) && str_starts_with($item['icon'], 'fa'))
+                            <i class="{{ $item['icon'] }} service-icon" style="font-size: 32px; color: #6ea820;"></i>
+                        @else
+                            <span class="icon-image"></span>
+                        @endif
                     </li>
                     <li class="ser-t d-lg-inline-block d-md-block  align-middle text-left">
-                        <h6>Fast Delivery</h6>
-                        <span class="mb-0 text-muted">Fast shipping on all orders</span>
+                        <h6>{{ $item['title'] ?? '' }}</h6>
+                        <span class="mb-0 text-muted">{{ $item['description'] ?? '' }}</span>
                     </li>
                 </ul>
             </div>
-            <div class="col-md-3 col-sm-6 col-12 m_service">
-                <ul class="bg-white service service-2 rounded text-center  animate__animated animate__fadeInUp"
-                    data-wow-duration="0.8s" data-wow-delay="0.2s">
-                    <li class="ser-svg d-lg-inline-block d-md-block align-middle">
-                        <span class="icon-image"></span>
-                    </li>
-                    <li class="ser-t d-lg-inline-block d-md-block align-middle text-left">
-                        <h6>secure payment</h6>
-                        <span class="mb-0 text-muted">100% Secure Payment</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-md-3 col-sm-6 col-12 m_service">
-                <ul class="bg-white service service-3 rounded text-center  animate__animated animate__fadeInUp"
-                    data-wow-duration="0.8s" data-wow-delay="0.3s">
-                    <li class="ser-svg d-lg-inline-block d-md-block align-middle">
-                        <span class="icon-image"></span>
-                    </li>
-                    <li class="ser-t d-lg-inline-block d-md-block align-middle  text-left">
-                        <h6>Easy Returns</h6>
-                        <span class="mb-0 text-muted">30-Day Return Policy</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-md-3 col-sm-6 col-12 m_service">
-                <ul class="bg-white service service-4 rounded text-center  animate__animated animate__fadeInUp"
-                    data-wow-duration="0.8s" data-wow-delay="0.4s">
-                    <li class="ser-svg d-lg-inline-block d-md-block align-middle">
-                        <span class="icon-image"></span>
-                    </li>
-                    <li class="ser-t d-lg-inline-block d-md-block align-middle  text-left">
-                        <h6>Quality Guarantee</h6>
-                        <span class="mb-0 text-muted">Premium Quality Products</span>
-                    </li>
-                </ul>
-            </div>
+            @endforeach
         </div>
     </div>
 </div>

@@ -3478,8 +3478,14 @@ del {
     background-image: url("../images/svg/gift-hover.svg");
 }
 
-.service:hover .icon-image {
-    transform: rotateY(180deg);
+.service:hover .icon-image,
+.service:hover .service-icon {
+    transform: rotateY(360deg);
+}
+
+.service-icon {
+    display: inline-block;
+    transition: 0.6s ease-in-out;
 }
 
 

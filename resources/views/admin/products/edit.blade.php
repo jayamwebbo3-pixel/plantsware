@@ -27,7 +27,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="category_id" class="form-label">Category</label>
-                                <select class="form-select" id="category_id" name="category_id">
+                                <select class="form-select bg-light" id="category_id" name="category_id_display" disabled>
                                     <option value="">Select Category</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
@@ -35,12 +35,13 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                <input type="hidden" name="category_id" value="{{ $product->category_id }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="subcategory_id" class="form-label">Subcategory</label>
-                                <select class="form-select" id="subcategory_id" name="subcategory_id">
+                                <select class="form-select bg-light" id="subcategory_id" name="subcategory_id_display" disabled>
                                     <option value="">Select Subcategory</option>
                                     @foreach($subcategories as $subcategory)
                                         <option value="{{ $subcategory->id }}" {{ old('subcategory_id', $product->subcategory_id) == $subcategory->id ? 'selected' : '' }}>
@@ -48,6 +49,7 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                <input type="hidden" name="subcategory_id" value="{{ $product->subcategory_id }}">
                             </div>
                         </div>
                     </div>
