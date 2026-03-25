@@ -17,16 +17,54 @@ class CartController extends Controller
     public function index()
     {
         $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
+        $totals = $this->calculateCartTotals($cartItems);
 
+        $this->updateSessionCounts();
+
+        return view('view.cart', array_merge(['cartItems' => $cartItems], $totals));
+    }
+
+    private function calculateCartTotals($cartItems)
+    {
         $subtotal = $cartItems->sum(function ($item) {
             return $item->calculated_price * $item->quantity;
         });
 
-        $total = $subtotal;
+        $discount = $cartItems->sum(function ($item) {
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            $regularPrice = $item->combo_pack_id ? $p->total_price : $p->price;
+            $savingsPerItem = max(0, $regularPrice - $item->calculated_price);
+            return $savingsPerItem * $item->quantity;
+        });
 
-        $this->updateSessionCounts();
+        $totalWeight = $cartItems->sum(function ($item) {
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            return ($p->weight ?? 0) * $item->quantity;
+        });
 
-        return view('view.cart', compact('cartItems', 'subtotal', 'total'));
+        $shipping = 0;
+        $defaultRate = \App\Models\ShippingRate::where('state_name', 'Default')->first() 
+                    ?? \App\Models\ShippingRate::where('state_name', 'All India')->first()
+                    ?? \App\Models\ShippingRate::first();
+        
+        if ($defaultRate) {
+            $shipping = (float) $defaultRate->base_cost;
+            if ($totalWeight > $defaultRate->base_weight) {
+                $extraWeight = $totalWeight - $defaultRate->base_weight;
+                $units = ceil($extraWeight / $defaultRate->additional_weight_unit);
+                $shipping += $units * (float) $defaultRate->additional_cost_per_unit;
+            }
+        }
+
+        $total = $subtotal + $shipping;
+
+        return [
+            'subtotal' => $subtotal,
+            'discount' => $discount,
+            'totalWeight' => $totalWeight,
+            'shipping' => $shipping,
+            'total' => $total,
+        ];
     }
 
     public function add(Request $request, Product $product)
@@ -106,18 +144,14 @@ $existingItem = $query->first();
 
         $cartCount = Cart::current()->sum('quantity') ?? 0;
         $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
-        $subtotal = $cartItems->sum(function ($ci) {
-            return $ci->calculated_price * $ci->quantity;
-        });
+        $totals = $this->calculateCartTotals($cartItems);
 
         if ($request->ajax()) {
-            return response()->json([
+            return response()->json(array_merge([
                 'success' => true,
                 'message' => "{$quantity} × {$name} added to cart!",
-                'cart_count' => $cartCount,
-                'subtotal' => $subtotal,
-                'total' => $subtotal
-            ]);
+                'cart_count' => $cartCount
+            ], $totals));
         }
 
         if ($request->input('buy_now')) {
@@ -158,27 +192,19 @@ $existingItem = $query->first();
 
         $cartCount = Cart::current()->sum('quantity') ?? 0;
         $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
-        $subtotal = $cartItems->sum(function ($ci) {
-            return $ci->calculated_price * $ci->quantity;
-        });
+        $totals = $this->calculateCartTotals($cartItems);
 
-        if ($cartItem->combo_pack_id) {
-            $priceToUseForItem = $cartItem->comboPack->offer_price;
-        } else {
-            $priceToUseForItem = $cartItem->calculated_price;
-        }
+        $priceToUseForItem = $cartItem->calculated_price;
         $itemTotal = $priceToUseForItem * $quantity;
 
         if ($request->ajax()) {
-            return response()->json([
+            return response()->json(array_merge([
                 'success' => true,
                 'message' => 'Quantity updated successfully!',
                 'cart_count' => $cartCount,
-                'subtotal' => $subtotal,
-                'total' => $subtotal,
                 'item_total' => $itemTotal,
                 'quantity' => $quantity
-            ]);
+            ], $totals));
         }
 
         return back()->with('success', 'Cart updated successfully!');
@@ -199,19 +225,15 @@ $existingItem = $query->first();
 
         $cartCount = Cart::current()->sum('quantity') ?? 0;
         $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
-        $subtotal = $cartItems->sum(function ($ci) {
-            return $ci->calculated_price * $ci->quantity;
-        });
+        $totals = $this->calculateCartTotals($cartItems);
 
         if ($request->ajax()) {
-            return response()->json([
+            return response()->json(array_merge([
                 'success' => true,
                 'message' => 'Item removed from cart.',
                 'cart_count' => $cartCount,
-                'subtotal' => $subtotal,
-                'total' => $subtotal,
                 'item_id' => $itemId
-            ]);
+            ], $totals));
         }
 
         return back()->with('success', 'Item removed from cart.');
@@ -227,16 +249,14 @@ $existingItem = $query->first();
         $this->updateSessionCounts();
 
         $cartCount = 0;
-        $subtotal = 0;
+        $totals = $this->calculateCartTotals(collect());
 
         if ($request->ajax()) {
-            return response()->json([
+            return response()->json(array_merge([
                 'success' => true,
                 'message' => 'Cart cleared successfully!',
-                'cart_count' => $cartCount,
-                'subtotal' => 0,
-                'total' => 0
-            ]);
+                'cart_count' => $cartCount
+            ], $totals));
         }
 
         return back()->with('success', 'Cart cleared successfully!');

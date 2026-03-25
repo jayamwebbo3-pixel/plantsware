@@ -240,7 +240,7 @@
 <div class="reviews-carousel">
     <div class="carousel-header">
         <h2 class="section-title1 text-center">Trusted by thousands</h2>
-        <div class="see-more">See more reviews</div>
+        
     </div>
 
     <!-- Swiper -->
@@ -252,17 +252,30 @@
                     <div class="review-card">
                         <div class="reviewer-info">
                             <div class="reviewer-name">{{ $testimonial->name }}</div>
-                            <div class="verified-badge">
-                                <i class="fas fa-badge-check"></i>
-                                <span>Verified Buyer</span>
-                            </div>
+                            @if($testimonial->is_verified)
+                                <div class="verified-badge">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Verified Buyer</span>
+                                </div>
+                            @endif
                         </div>
-                        <div class="review-date">{{ $testimonial->created_at ? $testimonial->created_at->format('m/d/y') : '' }}</div>
+                        <div class="review-date">
+                            @if($testimonial->date)
+                                {{ \Carbon\Carbon::parse($testimonial->date)->format('m/d/y') }}
+                            @elseif($testimonial->created_at)
+                                {{ $testimonial->created_at->format('m/d/y') }}
+                            @endif
+                        </div>
+                        <div class="star-rating">
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="fas fa-star {{ $i <= ($testimonial->rating ?? 5) ? 'star' : 'star-muted' }}" style="color: {{ $i <= ($testimonial->rating ?? 5) ? 'var(--star-color)' : '#ddd' }}"></i>
+                            @endfor
+                        </div>
                         @if(isset($testimonial->title) && $testimonial->title)
                             <h3 class="review-title">{{ $testimonial->title }}</h3>
                         @endif
                         <p class="review-content">
-                            {{ $testimonial->message ?? '' }}
+                            {{ $testimonial->content ?? '' }}
                         </p>
                     </div>
                 </div>
@@ -289,6 +302,7 @@
                 </div>
             @endforelse
         </div>
+        <div class="swiper-pagination"></div>
     </div>
 
     <!-- Navigation -->

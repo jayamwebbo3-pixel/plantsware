@@ -80,6 +80,16 @@
                                                             $priceToUse = $item->calculated_price;
                                                         @endphp
                                                         <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
+                                                        <div class="item-meta small text-muted mb-1">
+                                                            <span>Weight: {{ $p->weight ?? 0 }} KG</span>
+                                                            @php
+                                                                $regularPrice = $isCombo ? $p->total_price : $p->price;
+                                                                $savings = max(0, $regularPrice - $priceToUse);
+                                                            @endphp
+                                                            @if($savings > 0)
+                                                                <span class="ms-2 text-success">Saved: ₹{{ number_format($savings, 2) }}</span>
+                                                            @endif
+                                                        </div>
                                                         <div class="item-total" id="itemTotal_{{ $item->id }}">
                                                             ₹{{ number_format($priceToUse * $item->quantity, 2) }}
                                                         </div>
@@ -117,8 +127,18 @@
                                             <span class="summary-amount" id="cartSubtotal">₹{{ number_format($subtotal ?? 0, 2) }}</span>
                                         </div>
                                         <div class="summary-row">
+                                            <span>Total Weight:</span>
+                                            <span class="summary-amount" id="cartWeight">{{ $totalWeight ?? 0 }} KG</span>
+                                        </div>
+                                        <div class="summary-row">
                                             <span>Shipping:</span>
-                                            <span class="summary-amount">Free</span>
+                                            <span class="summary-amount" id="cartShipping">
+                                                @if(($shipping ?? 0) > 0)
+                                                    ₹{{ number_format($shipping, 2) }}
+                                                @else
+                                                    Free
+                                                @endif
+                                            </span>
                                         </div>
                                         <div class="summary-row">
                                             <span>Tax:</span>
@@ -126,7 +146,9 @@
                                         </div>
                                         <div class="summary-row">
                                             <span>Discount:</span>
-                                            <span class="summary-amount" style="color: var(--primary-color);">-₹0.00</span>
+                                            <span class="summary-amount" id="cartDiscount" style="color: var(--primary-color);">
+                                                -₹{{ number_format($discount ?? 0, 2) }}
+                                            </span>
                                         </div>
                                         <div class="summary-row total">
                                             <span>Total:</span>
@@ -231,6 +253,19 @@
                     document.getElementById('cartTotal').textContent =
                         `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
                 }
+                if (data.discount !== undefined) {
+                    document.getElementById('cartDiscount').textContent =
+                        `-₹${parseFloat(data.discount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                }
+                if (data.totalWeight !== undefined) {
+                    document.getElementById('cartWeight').textContent = `${data.totalWeight} KG`;
+                }
+                if (data.shipping !== undefined) {
+                    const shipEl = document.getElementById('cartShipping');
+                    shipEl.textContent = data.shipping > 0 
+                        ? `₹${parseFloat(data.shipping).toLocaleString('en-IN', {minimumFractionDigits: 2})}`
+                        : 'Free';
+                }
                 // Update cart count if present
                 const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
                 cartCountEls.forEach(el => {
@@ -288,6 +323,19 @@
                         if (data.total) {
                             document.getElementById('cartTotal').textContent =
                                 `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                        }
+                        if (data.discount !== undefined) {
+                            document.getElementById('cartDiscount').textContent =
+                                `-₹${parseFloat(data.discount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                        }
+                        if (data.totalWeight !== undefined) {
+                            document.getElementById('cartWeight').textContent = `${data.totalWeight} KG`;
+                        }
+                        if (data.shipping !== undefined) {
+                            const shipEl = document.getElementById('cartShipping');
+                            shipEl.textContent = data.shipping > 0 
+                                ? `₹${parseFloat(data.shipping).toLocaleString('en-IN', {minimumFractionDigits: 2})}`
+                                : 'Free';
                         }
                         const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
                         cartCountEls.forEach(el => {

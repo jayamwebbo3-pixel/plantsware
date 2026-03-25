@@ -46,7 +46,7 @@
         <h3 class="mb-3">Shipping Details</h3>
         <form action="{{ route('checkout.saveAddress') }}" method="POST" id="shipping-address-form">
             @csrf
-            <input type="hidden" name="address_id" id="address_id" value="{{ old('address_id', session('shipping_address')['address_id'] ?? '') }}">
+            <input type="hidden" name="address_id" id="address_id" value="{{ old('address_id', $savedAddress['address_id'] ?? session('shipping_address')['address_id'] ?? '') }}">
             
             <div class="form-group mb-3">
                 <label for="name" class="form-label">Full Name *</label>

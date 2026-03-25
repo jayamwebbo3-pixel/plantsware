@@ -138,18 +138,31 @@ class CheckoutController extends Controller
         $subtotal = $cartItems->sum(function ($item) {
             return $item->calculated_price * $item->quantity;
         });
-        $shipping = 0; // Fixed or calculate
+
+        // Calculate Total Savings/Discount
+        $discount = $cartItems->sum(function ($item) {
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            $regularPrice = $item->combo_pack_id ? $p->total_price : $p->price;
+            $savingsPerItem = max(0, $regularPrice - $item->calculated_price);
+            return $savingsPerItem * $item->quantity;
+        });
+
+        // Calculate Total Weight
+        $totalWeight = $cartItems->sum(function ($item) {
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            return ($p->weight ?? 0) * $item->quantity;
+        });
+
+        $shipping = $this->calculateShipping($cartItems, $shippingAddress['state']);
         $tax = 0; // Fixed or calculate
         $total = $subtotal + $shipping + $tax;
 
-        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'total'));
+        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'total', 'discount', 'totalWeight'));
     }
 
     // Place order (confirm and save)
     public function placeOrder(Request $request)
     {
-        // dd(auth()->check(), auth()->id());
-
         $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
@@ -172,29 +185,24 @@ class CheckoutController extends Controller
         $subtotal = $cartItems->sum(function ($item) {
             return $item->calculated_price * $item->quantity;
         });
-        $shipping = 0;
+
+        // Calculate Total Savings/Discount
+        $discount = $cartItems->sum(function ($item) {
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            $regularPrice = $item->combo_pack_id ? $p->total_price : $p->price;
+            $savingsPerItem = max(0, $regularPrice - $item->calculated_price);
+            return $savingsPerItem * $item->quantity;
+        });
+
+        // Calculate Total Weight
+        $totalWeight = $cartItems->sum(function ($item) {
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            return ($p->weight ?? 0) * $item->quantity;
+        });
+
+        $shipping = $this->calculateShipping($cartItems, $shippingAddress['state']);
         $tax = 0;
         $total = $subtotal + $shipping + $tax;
-
-        $checkoutItems = [];
-        foreach ($cartItems as $item) {
-            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
-            $price = $item->calculated_price;
-
-            $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
-            $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : (is_string($p->image) ? $p->image : null);
-
-            $checkoutItems[] = [
-                'product_id' => $item->product_id,
-                'combo_pack_id' => $item->combo_pack_id,
-                'product_name' => $p->name,
-                'product_image' => $firstImg,
-                'price' => $price,
-                'quantity' => $item->quantity,
-                'total' => $price * $item->quantity,
-                'options' => $item->options,
-            ];
-        }
 
         $order = Order::create([
             'order_number' => 'ORD-' . strtoupper(uniqid()),
@@ -204,22 +212,34 @@ class CheckoutController extends Controller
             'shipping' => $shipping,
             'tax' => $tax,
             'total' => $total,
+            'total_weight' => $totalWeight,
+            'total_discount' => $discount,
             'status' => 'pending',
             'payment_status' => 'pending',
             'payment_method' => 'online',
         ]);
 
-        foreach ($checkoutItems as $item) {
+        foreach ($cartItems as $item) {
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            $price = $item->calculated_price;
+            $regularPrice = $item->combo_pack_id ? $p->total_price : $p->price;
+            $unitDiscount = max(0, $regularPrice - $price);
+
+            $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+            $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : (is_string($p->image) ? $p->image : null);
+
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => $item['product_id'],
-                'combo_pack_id' => $item['combo_pack_id'],
-                'product_name' => $item['product_name'],
-                'product_image' => $item['product_image'],
-                'price' => $item['price'],
-                'quantity' => $item['quantity'],
-                'total' => $item['total'],
-                'options' => $item['options'],
+                'product_id' => $item->product_id,
+                'combo_pack_id' => $item->combo_pack_id,
+                'product_name' => $p->name,
+                'product_image' => $firstImg,
+                'price' => $price,
+                'quantity' => $item->quantity,
+                'weight' => ($p->weight ?? 0),
+                'discount' => $unitDiscount,
+                'total' => $price * $item->quantity,
+                'options' => $item->options,
             ]);
         }
 
@@ -234,6 +254,33 @@ class CheckoutController extends Controller
         ]);
 
         return redirect()->route('payment.gateway', ['transaction_ref' => $transaction->transaction_ref]);
+    }
+
+    private function calculateShipping($cartItems, $state)
+    {
+        $totalWeight = $cartItems->sum(function ($item) {
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            return ($p->weight ?? 0) * $item->quantity;
+        });
+
+        $rate = \App\Models\ShippingRate::where('state_name', $state)->first();
+        if (!$rate) {
+            $rate = \App\Models\ShippingRate::where('state_name', $state)->first()
+             ?? \App\Models\ShippingRate::where('state_name', 'Default')->first()
+             ?? \App\Models\ShippingRate::where('state_name', 'All India')->first()
+             ?? \App\Models\ShippingRate::first();
+
+            if (!$rate) return 0;
+        }
+
+        $shipping = (float) $rate->base_cost;
+        if ($totalWeight > $rate->base_weight) {
+            $extraWeight = $totalWeight - $rate->base_weight;
+            $units = ceil($extraWeight / $rate->additional_weight_unit);
+            $shipping += $units * (float) $rate->additional_cost_per_unit;
+        }
+
+        return $shipping;
     }
 
     public function confirmation(Order $order)

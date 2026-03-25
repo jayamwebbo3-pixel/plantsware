@@ -40,6 +40,7 @@ class ComboOnlyProductController extends Controller
             'stock_quantity' => 'nullable|integer|min:0',
             'image' => 'nullable|image|max:2048',
             'is_active' => 'nullable|boolean',
+            'weight' => 'nullable|numeric|min:0',
         ]);
 
         $slug = Str::slug($validated['name']);
@@ -63,6 +64,7 @@ class ComboOnlyProductController extends Controller
             'stock_quantity' => $validated['stock_quantity'] ?? 0,
             'image' => $imagePath,
             'is_active' => $request->has('is_active') ? 1 : 1,
+            'weight' => $validated['weight'] ?? 0,
         ]);
 
         return redirect()->route('admin.combo-only-products.index')->with('success', 'Combo Only Product created successfully.');
@@ -84,6 +86,7 @@ class ComboOnlyProductController extends Controller
             'price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'nullable|integer|min:0',
             'image' => 'nullable|image|max:2048',
+            'weight' => 'nullable|numeric|min:0',
         ]);
 
         if ($request->hasFile('image')) {
@@ -100,6 +103,7 @@ class ComboOnlyProductController extends Controller
             'price' => $validated['price'] ?? 0,
             'stock_quantity' => $validated['stock_quantity'] ?? 0,
             'image' => $product->image,
+            'weight' => $validated['weight'] ?? 0,
         ]);
 
         return redirect()->route('admin.combo-only-products.index')->with('success', 'Updated successfully.');

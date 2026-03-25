@@ -348,6 +348,42 @@
         </div>
     </div>
 </div>
+
+<div class="product-reviews-section py-5 bg-white border-top">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h3 class="mb-4">Customer Reviews</h3>
+                @if($product->reviews->count() > 0)
+                    <div class="reviews-list">
+                        @foreach($product->reviews as $review)
+                            <div class="review-item mb-4 pb-4 border-bottom">
+                                <div class="reviewer-header d-flex justify-content-between align-items-center mb-2">
+                                    <div class="reviewer-name fw-bold" style="color: #333; font-size: 16px;">{{ $review->user->name ?? 'Anonymous' }}</div>
+                                    <div class="review-date text-muted small">{{ $review->created_at->format('M d, Y') }}</div>
+                                </div>
+                                <div class="review-rating mb-2" style="color: #ffc107;">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fa{{ $i <= $review->rating ? 's' : 'r' }} fa-star"></i>
+                                    @endfor
+                                </div>
+                                @if($review->review)
+                                    <div class="review-text text-secondary" style="font-size: 15px; line-height: 1.6;">
+                                        {{ $review->review }}
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="no-reviews text-center py-5 bg-light rounded-3">
+                        <i class="far fa-comment-dots fa-3x text-muted mb-3 opacity-25"></i>
+                        <p class="mb-0 text-muted">No reviews yet for this product. Be the first to share your experience!</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Related Products Section -->

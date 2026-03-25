@@ -19,6 +19,27 @@
                 {{ $product->name }}
             </a>
         </h3>
+        
+        <!-- Product Rating -->
+        @if(($product->total_reviews ?? 0) > 0)
+        <div class="product-rating mb-2">
+            <span class="stars" style="color: #ffc107; font-size: 13px;">
+                @php $avg = $product->avg_rating ?? 0; @endphp
+                @for($i = 1; $i <= 5; $i++)
+                    @if($i <= floor($avg))
+                        <i class="fas fa-star"></i>
+                    @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
+                        <i class="fas fa-star-half-alt"></i>
+                    @else
+                        <i class="far fa-star"></i>
+                    @endif
+                @endfor
+            </span>
+            <span class="rating-count text-muted small">({{ $product->total_reviews }})</span>
+        </div>
+        @else
+        <div class="product-rating mb-2" style="height: 19px;"></div> <!-- Spacer -->
+        @endif
 
         <div class="product-price">
             @if($product->sale_price && $product->sale_price < $product->price)
@@ -29,20 +50,20 @@
                 @endif
         </div>
 
-        <div class="product-actions mt-3 d-flex align-items-stretch gap-2">
+        <div class="product-actions mt-3 d-flex align-items-stretch" style="gap: 4px !important;">
             @if($product->stock_quantity > 0)
             <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex">
                 @csrf
                 <input type="hidden" name="quantity" value="1">
                 <input type="hidden" name="buy_now" value="1">
-                <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100">
+                <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap" style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content;">
                     Buy Now
                 </button>
             </form>
             <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex">
                 @csrf
                 <input type="hidden" name="quantity" value="1">
-                <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100">
+                <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap" style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content;">
                     Add To Cart
                 </button>
             </form>

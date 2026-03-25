@@ -390,8 +390,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .card-actions-row {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    align-items: stretch;
+    gap: 4px !important;
     margin-top: auto;
 }
 
@@ -399,12 +399,14 @@ document.addEventListener('DOMContentLoaded', function() {
     background: #72a420;
     color: #fff;
     border: none;
-    padding: 8px 15px;
+    padding: 6px 2px !important;
     border-radius: 8px;
     font-weight: 600;
     width: 100%;
-    font-size: 13px;
+    font-size: 12px !important;
     transition: background 0.2s;
+    white-space: nowrap !important;
+    min-width: max-content !important;
 }
 
 .btn-buy-now:hover {
@@ -415,12 +417,14 @@ document.addEventListener('DOMContentLoaded', function() {
     background: #ebf1f5;
     color: #333;
     border: none;
-    padding: 8px 10px;
+    padding: 6px 2px !important;
     border-radius: 8px;
     font-weight: 600;
     width: 100%;
-    font-size: 13px;
+    font-size: 12px !important;
     transition: background 0.2s;
+    white-space: nowrap !important;
+    min-width: max-content !important;
 }
 
 .btn-add-to-cart:hover {

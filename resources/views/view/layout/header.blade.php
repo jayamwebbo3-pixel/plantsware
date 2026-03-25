@@ -79,6 +79,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
     <style>
+        /* Global override to reliably locate Wishlist and Cart icons, bypassing style.css nth-child issues entirely */
+        .wishlist-icon-link .Price-amount::before { background: url("{{ asset('uploads/img/svg/heart.svg') }}") no-repeat center !important; background-size: 100% !important; }
+        .cart-icon-link .Price-amount::before { background: url("{{ asset('uploads/img/svg/cart.svg') }}") no-repeat center !important; background-size: 100% !important; }
+
         .mega_menu {
             position: static !important;
         }
@@ -141,11 +145,17 @@
 
             /* Mobile Side Menu Fixes */
             header { position: relative; z-index: 1050; }
+            .header_row { position: relative !important; }
             .header-top { padding: 10px 0 !important; background: #fff; }
             .head-logo { flex: 0 0 50% !important; max-width: 50% !important; text-align: left !important; }
             .head-logo img { max-height: 45px; width: auto; }
-            .head-search { flex: 0 0 50% !important; max-width: 50% !important; }
+            .head-search { flex: 0 0 50% !important; max-width: 50% !important; position: static !important; }
             .input-class { display: none !important; }
+            .input-class.mobile-active { display: block !important; position: absolute !important; top: 60px !important; right: 15px !important; width: 350px !important; max-width: calc(100vw - 30px) !important; z-index: 100000 !important; background: #fff !important; padding: 15px !important; border-radius: 8px !important; box-shadow: 0 8px 30px rgba(0,0,0,0.2) !important; border: 1px solid #eaeaea !important; }
+            .input-class.mobile-active .between-header { box-shadow: none !important; border-radius: 6px !important; overflow: hidden !important; background: #fff !important; height: auto !important; border: 2px solid #6EA820 !important; }
+            .input-class.mobile-active input { height: 45px !important; font-size: 14px !important; border: none !important; }
+            .input-class.mobile-active .btn-danger { width: 55px !important; height: 45px !important; font-size: 0 !important; padding: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 0 !important; }
+            .input-class.mobile-active .btn-danger::before { content: '\f002' !important; font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; font-size: 18px !important; visibility: visible !important; color: #fff !important; }
             .head-right { display: block !important; width: 100% !important; padding: 0 !important; }
             .top_cart { display: flex !important; justify-content: flex-end !important; align-items: center !important; margin: 0 !important; height: 45px !important; }
             .top_cart li { padding: 0 5px !important; position: relative !important; min-width: 45px !important; display: flex !important; align-items: center !important; height: 100% !important; }
@@ -153,7 +163,7 @@
             .Price-amount::before { display: block !important; visibility: visible !important; width: 28px !important; height: 28px !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; z-index: 1 !important; }
             .my_account { font-size: 0 !important; padding-left: 28px !important; display: flex !important; align-items: center !important; height: 35px !important; position: relative !important; }
             .my_account::before { display: block !important; visibility: visible !important; width: 28px !important; height: 28px !important; position: absolute !important; left: 0 !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 1 !important; }
-            .price_cart { font-size: 11px !important; background: #6EA820; color: #fff !important; border-radius: 50%; width: 18px; height: 18px; display: flex !important; align-items: center; justify-content: center; position: absolute !important; top: -5px !important; left: 24px !important; z-index: 10; padding: 0 !important; }
+            .price_cart { font-size: 11px !important; background: #6EA820; color: #fff !important; border-radius: 50%; width: 18px; height: 18px; display: flex !important; align-items: center; justify-content: center; position: absolute !important; top: -5px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 10; padding: 0 !important; }
             .dropdown-menu.r_menu { padding: 5px 0 !important; min-height: auto !important; top: 40px !important; }
             .header_bottom { background: #6EA820 !important; min-height: 45px; display: flex !important; align-items: center; justify-content: flex-end; position: relative; }
             #menuToggle { background: transparent; border: none; color: #fff; font-size: 28px; padding: 5px 15px; cursor: pointer; display: block !important; }
@@ -178,7 +188,7 @@
             .head-search { flex: 0 0 65% !important; max-width: 65% !important; }
             .top_cart li { padding: 0 1px !important; min-width: 35px !important; }
             .head-logo img { max-height: 32px; }
-            .price_cart { left: 14px !important; top: -10px !important; width: 16px !important; height: 16px !important; font-size: 10px !important; }
+            .price_cart { left: 50% !important; top: -8px !important; width: 16px !important; height: 16px !important; font-size: 10px !important; transform: translateX(-50%) !important; }
             .Price-amount, .my_account { padding-left: 20px !important; }
         }
 
@@ -186,20 +196,21 @@
         @media (min-width: 992px) and (max-width: 1250px) {
             .header_row { display: flex !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; margin: 0 !important; }
             
-            /* Logo (15%) */
-            .head-logo { flex: 0 0 15% !important; max-width: 15% !important; padding: 0 !important; display: flex !important; align-items: center !important; }
+            /* Logo (25%) */
+            .head-logo { flex: 0 0 25% !important; max-width: 25% !important; padding: 0 !important; display: flex !important; align-items: center !important; }
             .head-logo img { max-width: 100%; height: auto; display: block !important; }
             
-            /* Search Container (85%) */
-            .head-search { flex: 0 0 85% !important; max-width: 85% !important; padding: 0 !important; }
+            /* Search Container (75%) */
+            .head-search { flex: 0 0 75% !important; max-width: 75% !important; padding: 0 !important; }
             
-            /* Internal 65/35 Split to pull Icons closer to Search */
-            .input-class { flex: 0 0 65% !important; max-width: 65% !important; padding-right: 20px !important; display: flex !important; align-items: center !important; }
-            .head-right { flex: 0 0 35% !important; max-width: 35% !important; text-align: right !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; }
+            /* Internal Split to pull Icons closer to Search */
+            .input-class { flex: 0 0 55% !important; max-width: 55% !important; padding-right: 20px !important; display: flex !important; align-items: center !important; }
+            .head-right { flex: 0 0 45% !important; max-width: 45% !important; text-align: right !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; }
             
             .between-header { min-width: auto !important; width: 100% !important; margin: 0 !important; display: flex !important; align-items: center !important; }
             .top_cart { display: flex !important; justify-content: flex-end !important; align-items: center !important; flex-wrap: nowrap !important; margin: 0 !important; width: 100% !important; height: 100% !important; }
-            .top_cart li { margin-left: 10px !important; padding: 0 !important; display: flex !important; align-items: center !important; height: 100% !important; }
+            .top_cart li:not(.d-lg-none) { margin-left: 10px !important; padding: 0 !important; display: flex !important; align-items: center !important; height: 100% !important; position: relative !important; }
+            .top_cart li.d-lg-none { display: none !important; }
             
             /* Precise Centering for Wishlist, Cart, and My Account */
             a.Price-amount, span.my_account { 
@@ -208,7 +219,7 @@
                 height: 40px !important; 
                 font-size: 11px !important; 
                 font-weight: 600 !important; 
-                padding-left: 26px !important; 
+                padding-left: 30px !important; 
                 white-space: nowrap !important; 
                 line-height: normal !important; 
                 color: #333 !important; 
@@ -216,11 +227,11 @@
                 vertical-align: middle !important;
             }
             .my_account_link { padding: 0 !important; margin: 0 !important; text-decoration: none !important; height: 100% !important; display: flex !important; align-items: center !important; }
-            .price_cart { top: -8px !important; left: 2px !important; transform: scale(0.9); }
+            .price_cart { top: -8px !important; left: 14px !important; transform: translateX(-50%) scale(0.9) !important; position: absolute !important; }
             
             /* Fixed Search Button and Input Alignment */
-            .between-header .btn.btn-danger { width: 85px !important; font-size: 11px !important; height: 38px !important; padding: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 0 4px 4px 0 !important; }
-            .between-header input { height: 38px !important; font-size: 12px !important; width: calc(100% - 85px) !important; padding-left: 10px !important; border-radius: 4px 0 0 4px !important; }
+            .between-header .btn.btn-danger { width: auto !important; min-width: 80px !important; font-size: 11px !important; height: 38px !important; padding: 0 15px !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 0 4px 4px 0 !important; }
+            .between-header input { height: 38px !important; font-size: 11px !important; width: calc(100% - auto) !important; flex-grow: 1 !important; padding-left: 8px !important; border-radius: 4px 0 0 4px !important; }
 
             .main-menu li a { padding: 12px 3px !important; font-size: 11px !important; }
             .header_bottom { padding: 0 1.5% !important; }
@@ -354,9 +365,15 @@
                             <!-- Account / Cart / Wishlist -->
                             <div class="col-xl-5 col-lg-5 head-right text-right order-1 order-lg-2">
                                 <ul class="top_cart">
+                                    <!-- Mobile Search Icon (1st Icon on Mobile) -->
+                                    <li class="d-lg-none md_acco pr-2">
+                                        <a href="javascript:void(0)" onclick="document.querySelector('.input-class').classList.toggle('mobile-active')" class="cart-qty d-flex align-items-center justify-content-center h-100">
+                                            <i class="fas fa-search" style="font-size: 22px; color: #333;"></i>
+                                        </a>
+                                    </li>
                                     <!-- Wishlist -->
                                     <li class="d-inline-block my-cart md_acco">
-                                        <a href="{{ url('wishlist') }}" class="cart-qty">
+                                        <a href="{{ url('wishlist') }}" class="cart-qty wishlist-icon-link">
                                             <span class="price_cart d-md-inline-block align-middle font-weight-bolder">
                                                 {{ session('wishlist_count', 0) }}
                                             </span>
@@ -367,7 +384,7 @@
                                     </li>
                                     <!-- Cart -->
                                     <li class="d-inline-block my-cart md_acco">
-                                        <a href="{{ url('cart') }}" class="cart-qty">
+                                        <a href="{{ url('cart') }}" class="cart-qty cart-icon-link">
                                             <span class="price_cart d-md-inline-block align-middle font-weight-bolder">
                                                 {{ session('cart_count', 0) }}
                                             </span>

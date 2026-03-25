@@ -111,5 +111,9 @@ class Product extends Model
     {
         return auth()->check() && auth()->user()->inWishlist($this);
     }
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class)->where('is_approved', true);
+    }
 }
 

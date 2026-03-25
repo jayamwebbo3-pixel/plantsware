@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\ShippingRateController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\HeaderFooterController;
@@ -245,6 +246,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('combo-packs/{id}', [ComboPackController::class, 'destroy'])->name('combo-packs.destroy');
         Route::patch('combo-packs/{combo}/status', [ComboPackController::class, 'updateStatus'])->name('combo-packs.update-status');
         Route::get('combo-packs/get-items', [ComboPackController::class, 'getItems'])->name('combo-packs.get-items');
+
+        Route::resource('shipping-rates', ShippingRateController::class);
 
         // Combo Only Products
         Route::prefix('combo-only-products')->name('combo-only-products.')->group(function () {

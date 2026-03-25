@@ -128,4 +128,30 @@ class ComboPack extends Model
 
         return $minStock ?? 0;
     }
+
+    /**
+     * Dynamic weight accessor
+     */
+    public function getWeightAttribute()
+    {
+        $comboProduct = $this->comboProduct;
+        if (!$comboProduct || !$comboProduct->product_ids) {
+            return 0;
+        }
+
+        $totalWeight = 0;
+        foreach ($comboProduct->product_ids as $id) {
+            if (str_starts_with($id, 'p_')) {
+                $p = Product::find(str_replace('p_', '', $id));
+                $totalWeight += $p ? (float) $p->weight : 0;
+            } elseif (str_starts_with($id, 'co_')) {
+                $co = ComboOnlyProduct::find(str_replace('co_', '', $id));
+                $totalWeight += $co ? (float) $co->weight : 0;
+            } elseif (str_starts_with($id, 'c_')) {
+                $c = self::find(str_replace('c_', '', $id));
+                $totalWeight += $c ? (float) $c->weight : 0;
+            }
+        }
+        return $totalWeight;
+    }
 }

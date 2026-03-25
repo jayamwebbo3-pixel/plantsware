@@ -15,12 +15,14 @@ class ComboOnlyProduct extends Model
         'image',
         'stock_quantity',
         'is_active',
+        'weight',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'is_active' => 'boolean',
         'stock_quantity' => 'integer',
+        'weight' => 'decimal:2',
     ];
 
     protected static function booted(): void

@@ -52,6 +52,7 @@
                                     <th>Name</th>
                                     <th>Price</th>
                                     <th>Stock</th>
+                                    <th>Weight (KG)</th>
                                     <th>Status</th>
                                     <th class="text-end pe-4">Actions</th>
                                 </tr>
@@ -74,6 +75,9 @@
                                             <span class="badge {{ $product->stock_quantity > 0 ? 'bg-success-subtle text-success border border-success' : 'bg-danger-subtle text-danger border border-danger' }}">
                                                 {{ $product->stock_quantity }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small">{{ $product->weight ?? 0 }} KG</span>
                                         </td>
                                         <td>
                                             <div class="form-check form-switch p-0 m-0">
@@ -146,6 +150,11 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label class="form-label fw-bold">Weight (KG)</label>
+                                    <input type="number" name="weight" class="form-control" value="0" min="0" step="0.001">
+                                </div>
+
+                                <div class="mb-3">
                                     <label class="form-label fw-bold">Image</label>
                                     <div id="current-image-container" class="mb-2" style="display:none;">
                                         <div class="d-flex align-items-center gap-2 border rounded p-2 bg-light">
@@ -205,6 +214,7 @@
                         form.querySelector('[name="price"]').value = p.price || 0;
                         form.querySelector('[name="stock_quantity"]').value = p.stock_quantity || 0;
                         form.querySelector('[name="description"]').value = p.description || '';
+                        form.querySelector('[name="weight"]').value = p.weight || 0;
 
                         if (p.image) {
                             document.getElementById('current-image-container').style.display = 'block';

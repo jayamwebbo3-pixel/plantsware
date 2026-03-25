@@ -55,6 +55,9 @@
                     <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
                         <i class="fa-solid fa-truck"></i> Orders Management
                     </a>
+                    <a class="nav-link {{ request()->routeIs('admin.shipping-rates.*') ? 'active' : '' }}" href="{{ route('admin.shipping-rates.index') }}">
+                        <i class="fas fa-shipping-fast"></i> Shipping Cost
+                    </a>
 
                     <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                         <i class="fas fa-users"></i> <span>Users</span>

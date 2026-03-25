@@ -20,13 +20,19 @@ class ProductController extends Controller
 
     public function show($slug)
     {
-        $product = Product::where('slug', $slug)->where('is_active', true)->firstOrFail();
+        $product = Product::where('slug', $slug)
+            ->where('is_active', true)
+            ->with(['reviews.user'])
+            ->firstOrFail();
+            
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
-            ->orderBy('sort_order')
+            ->orderBy('sort_order', 'asc')
             ->orderBy('created_at', 'desc')
-            ->take(10)->get();
+            ->take(10)
+            ->get();
+            
         return view('view.product', compact('product', 'relatedProducts'));
     }
 
