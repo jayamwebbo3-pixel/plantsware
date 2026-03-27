@@ -16,30 +16,35 @@ class BlogController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
+        $categoryId = $request->query('category');
 
-        $blogs = Blog::with('blogCategory') // Note: use blogCategory (relation name)
+        $blogs = Blog::with('blogCategory')
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%");
             })
+            ->when($categoryId, function ($query, $categoryId) {
+                $query->where('blog_category_id', $categoryId);
+            })
             ->latest()
-            ->paginate(10); // 10 or 20 — your choice
+            ->paginate(10);
 
-        return view('admin.blogs.index', compact('blogs', 'search'));
+        return view('admin.blogs.index', compact('blogs', 'search', 'categoryId'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $selectedCategoryId = $request->query('blog_category_id');
         $categories = BlogCategory::where('is_active', true)->get();
         $tags = Tag::orderBy('name')->get();
 
-        return view('admin.blogs.create', compact('categories', 'tags'));
+        return view('admin.blogs.create', compact('categories', 'tags', 'selectedCategoryId'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title'             => 'required|string|max:255',
-            // 'blog_category_id'  => 'nullable|exists:blog_categories,id',
+            'blog_category_id'  => 'required|exists:blog_categories,id',
             'content'           => 'required|string',
             'excerpt'           => 'nullable|string',
             'image'             => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -165,6 +170,7 @@ class BlogController extends Controller
 {
     $validated = $request->validate([
         'title'             => 'required|string|max:255',
+        'blog_category_id'  => 'required|exists:blog_categories,id',
         'content'           => 'required|string',
         'excerpt'           => 'nullable|string',
         'image'             => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -307,7 +313,7 @@ public function ckeditorUpload(Request $request)
             ]
         ], 422);
     } catch (\Exception $e) {
-        \Log::error('CKEditor upload failed: ' . $e->getMessage());
+        Log::error('CKEditor upload failed: ' . $e->getMessage());
 
         return response()->json([
             'uploaded' => false,

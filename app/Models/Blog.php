@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Blog extends Model
 {
     protected $fillable = [
-        // 'blog_category_id',
+        'blog_category_id',
         'title',
         'slug',
         'content',
@@ -28,10 +29,15 @@ class Blog extends Model
         'published_at' => 'datetime', 
     ];
 
- public function blogCategory(): BelongsTo
-{
-    return $this->belongsTo(BlogCategory::class, 'blog_category_id');
-}
+    public function blogCategory(): BelongsTo
+    {
+        return $this->belongsTo(BlogCategory::class, 'blog_category_id');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(BlogCategory::class, 'blog_category_id');
+    }
 
 
 /**
@@ -53,8 +59,8 @@ public function getImageUrlAttribute()
         return null; // or asset('images/no-image.jpg') for placeholder
     }
 
-    // This converts 'blogs/xxx.jpg' → '/storage/blogs/xxx.jpg'
-    return Storage::url($this->image);
+    // Use asset() because images are saved directly to public/uploads/blogs
+    return asset($this->image);
 }
 //  end here 
 
@@ -72,10 +78,9 @@ public function getImageUrlAttribute()
     /**
      * Scope: Latest blogs (by published_at or created_at)
      */
-    public function scopeLatest($query)
+    public function scopeLatest($query, $column = 'published_at')
     {
-        return $query->orderBy('published_at', 'desc')
-                     ->orderBy('created_at', 'desc');
+        return $query->orderBy($column, 'desc');
     }
 
     /**

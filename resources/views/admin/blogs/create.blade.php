@@ -25,27 +25,38 @@
                             </div>
 
                             <!-- Category -->
-                            <!-- <div class="form-group mb-3">
+                            <div class="form-group mb-3">
                                 <label>Category</label>
-                                <select name="blog_category_id" class="form-control">
-                                    <option value="">-- Select Category --</option>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('blog_category_id') == $category->id ? 'selected' : '' }}>
-                                            {{ $category->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div> -->
+                                @if(isset($selectedCategoryId) && $selectedCategoryId)
+                                    @php
+                                        $selectedCategory = $categories->firstWhere('id', $selectedCategoryId);
+                                    @endphp
+                                    <input type="text" class="form-control" value="{{ $selectedCategory?->name ?? 'Unknown Category' }}" readonly>
+                                    <input type="hidden" name="blog_category_id" value="{{ old('blog_category_id', $selectedCategoryId) }}">
+                                @else
+                                    <select name="blog_category_id" class="form-select @error('blog_category_id') is-invalid @enderror">
+                                        <option value="">-- Select Category --</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ old('blog_category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('blog_category_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                @endif
+                            </div>
 
                             <!-- Tags (multi-select) -->
-                            <div class="form-group mb-3">
+                            <!-- <div class="form-group mb-3">
                                 <label>Tags (hold Ctrl/Cmd to select multiple)</label>
                                 <select name="tags[]" class="form-control" multiple>
                                     @foreach($tags as $tag)
                                         <option value="{{ $tag->id }}">{{ $tag->name }}</option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </div> -->
 
                             <!-- Content - CKEditor -->
                             <div class="form-group mb-3">
@@ -57,10 +68,10 @@
                             </div>
 
                             <!-- Excerpt -->
-                            <div class="form-group mb-3">
+                            <!-- <div class="form-group mb-3">
                                 <label>Excerpt (short summary)</label>
                                 <textarea name="excerpt" class="form-control" rows="3">{{ old('excerpt') }}</textarea>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="col-md-4">

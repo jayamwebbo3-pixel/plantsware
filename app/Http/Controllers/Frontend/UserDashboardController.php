@@ -22,6 +22,22 @@ class UserDashboardController extends Controller
         ]);
     }
 
+    public function updateProfile(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $user = Auth::user();
+        $user->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'name' => $user->name,
+            'message' => 'Profile updated successfully.'
+        ]);
+    }
+
     public function storeAddress(Request $request)
     {
         $validated = $request->validate([

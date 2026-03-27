@@ -537,7 +537,7 @@
 
                             <li><a href="{{ route('combo_packs.frontend_index') }}">Combo Packs</a></li>
                             <li><a href="{{ url('about') }}">About Plantsware</a></li>
-                            <li><a href="{{ route('blog.index') }}">Blog</a></li>
+                            <li><a href="{{ route('blog.categories') }}">Blog</a></li>
                         </ul>
                     </div>
                 </div>

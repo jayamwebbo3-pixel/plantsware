@@ -9,7 +9,7 @@
                         <h3 class="card-title">All Blogs</h3>
 
                         <div class="card-tools">
-                            <a href="{{ route('admin.blogs.create') }}" class="btn btn-primary btn-sm">
+                            <a href="{{ route('admin.blogs.create', ['blog_category_id' => $categoryId]) }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-plus"></i> Create New Blog
                             </a>
                         </div>

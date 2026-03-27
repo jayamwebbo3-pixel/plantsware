@@ -10,6 +10,7 @@ class BlogCategory extends Model
     protected $fillable = [
         'name',
         'slug',
+        'image',
         'description',
         'is_active',
     ];
@@ -21,6 +22,11 @@ class BlogCategory extends Model
     public function blogs(): HasMany
     {
         return $this->hasMany(Blog::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }
 

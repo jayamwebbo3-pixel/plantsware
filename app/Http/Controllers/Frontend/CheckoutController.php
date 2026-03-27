@@ -35,7 +35,8 @@ class CheckoutController extends Controller
                 $savedAddress = [
                     'address_id' => $defaultAddress->id,
                     'name' => $defaultAddress->first_name . ' ' . $defaultAddress->last_name,
-                    'address' => ($defaultAddress->door_number ? $defaultAddress->door_number . ', ' : '') . $defaultAddress->street,
+                    'door_number' => $defaultAddress->door_number,
+                    'address' => $defaultAddress->street,
                     'city' => $defaultAddress->city,
                     'state' => $defaultAddress->state,
                     'pincode' => $defaultAddress->post_code,
@@ -64,6 +65,7 @@ class CheckoutController extends Controller
         $validated = $request->validate([
             'address_id' => 'nullable',
             'name' => 'required|string|max:255',
+            'door_number' => 'nullable|string|max:255',
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'state' => 'required|string|max:100',
@@ -94,6 +96,7 @@ class CheckoutController extends Controller
                 $user->addresses()->where('id', $validated['address_id'])->update([
                     'first_name' => $firstName,
                     'last_name' => $lastName,
+                    'door_number' => $validated['door_number'],
                     'street' => $validated['address'],
                     'city' => $validated['city'],
                     'state' => $validated['state'],
@@ -111,6 +114,7 @@ class CheckoutController extends Controller
                     [
                         'first_name' => $firstName,
                         'last_name' => $lastName,
+                        'door_number' => $validated['door_number'],
                         'state' => $validated['state'],
                         // If no addresses yet, make this default
                         'is_default' => $user->addresses()->count() === 0,

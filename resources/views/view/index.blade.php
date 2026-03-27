@@ -302,7 +302,7 @@
                 </div>
             @endforelse
         </div>
-        <div class="swiper-pagination"></div>
+        
     </div>
 
     <!-- Navigation -->
@@ -321,7 +321,7 @@
         <div class="section-title">
             <h2>Blogs</h2>
             <div class="title-link">
-                <a href="{{ url('blogs') }}">More <i class="fas fa-chevron-right"></i></a>
+                <a href="{{ route('blog.index') }}">More <i class="fas fa-chevron-right"></i></a>
             </div>
         </div>
 
@@ -334,21 +334,21 @@
                             <div class="blog-card">
                                 <div class="blog-card-image">
                                     @if(isset($blog->image) && $blog->image)
-                                        <img src="{{ asset('storage/' . $blog->image) }}" alt="{{ $blog->title }}">
+                                        <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}">
                                     @else
                                         <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="{{ $blog->title }}">
                                     @endif
                                     <span class="blog-card-category">{{ $blog->category->name ?? 'General' }}</span>
                                 </div>
                                 <div class="blog-card-content">
-                                    <div class="blog-card-date">{{ $blog->created_at ? $blog->created_at->format('M d, Y') : '' }}</div>
+                                    <div class="blog-card-date">{{ $blog->published_at ? $blog->published_at->format('M d, Y') : ($blog->created_at ? $blog->created_at->format('M d, Y') : '') }}</div>
                                     <h3 class="blog-card-title">{{ $blog->title }}</h3>
                                     <p class="blog-card-excerpt">
                                         {{ isset($blog->content) ? \Illuminate\Support\Str::limit(strip_tags($blog->content), 100) : '' }}
                                     </p>
                                     <div class="blog-card-footer">
                                         <span class="blog-card-author">{{ $blog->author_name ?? 'Admin' }}</span>
-                                        <a href="#" class="read-more-link">Read →</a>
+                                        <a href="{{ route('blog.show', $blog->slug) }}" class="read-more-link">Read →</a>
                                     </div>
                                 </div>
                             </div>

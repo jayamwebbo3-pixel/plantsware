@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\ProductController as FrontendProductController;
 use App\Http\Controllers\Frontend\BlogController as FrontendBlogController;
+use App\Http\Controllers\Admin\BlogCategoryController;
+use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\PaymentController;
@@ -45,17 +47,12 @@ Route::get('categories', [FrontendProductController::class, 'categories'])->name
 Route::get('category/{slug}', [FrontendProductController::class, 'category'])->name('category.show');
 Route::get('sub-category/{slug}', [FrontendProductController::class, 'subcategory'])->name('subcategory.show');
 
-// Route::get('blog', [FrontendBlogController::class, 'index'])->name('blog.index');
-// Route::get('blog/{slug}', [FrontendBlogController::class, 'show'])->name('blog.show');
-// Route::get('blog-categories', [FrontendBlogController::class, 'categories'])->name('blog.categories');
-// Route::get('blog-category/{slug}', [FrontendBlogController::class, 'category'])->name('blog.category.show');
-
-// ================= Blog section Fix =====================
-Route::get('blog', [App\Http\Controllers\Frontend\BlogController::class, 'allBlogs'])->name('blog.index');  // Home page itself is not loading without it
-Route::get('blog/{slug}', [FrontendBlogController::class, 'show'])->name('blog.show');                      // Home page itself is not loading without it
-Route::get('blog-categories', [FrontendBlogController::class, 'categories'])->name('blog.categories');      // single blog page is not opeing laravel error without it
-// Route::get('blog-category/{slug}', [FrontendBlogController::class, 'category'])->name('blog.category.show'); Not used anywhere as of now 
-//================== Blog section Fix =====================
+// ================= Blog Section =====================
+Route::get('blogs', [FrontendBlogController::class, 'allBlogs'])->name('blog.index');
+Route::get('blog/{slug}', [FrontendBlogController::class, 'show'])->name('blog.show');
+Route::get('blog-categories', [FrontendBlogController::class, 'categories'])->name('blog.categories');
+Route::get('blog-category/{slug}', [FrontendBlogController::class, 'category'])->name('blog.category.show');
+//======================================================
 
 // ================= CART ROUTES =================
 
@@ -113,6 +110,7 @@ Route::post('/cart/add-combo/{combo}', [App\Http\Controllers\Frontend\CartContro
 
 Route::middleware('auth')->group(function () {
     Route::get('/user/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
+    Route::post('/user/profile/update', [UserDashboardController::class, 'updateProfile'])->name('user.profile.update');
     Route::post('/user/order/{id}/cancel', [UserDashboardController::class, 'cancelOrder'])->name('user.order.cancel');
     Route::post('/user/order/{id}/return', [UserDashboardController::class, 'returnOrder'])->name('user.order.return');
     Route::get('/user/order/{order}/invoice', [UserDashboardController::class, 'downloadInvoice'])->name('user.order.invoice');
@@ -194,7 +192,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('products.updateStatus');
         Route::resource('categories', CategoryController::class);
         Route::resource('subcategories', SubcategoryController::class);
-        Route::resource('blogs', BlogController::class);
+        Route::resource('blogs', AdminBlogController::class);
+        Route::resource('blog-categories', BlogCategoryController::class);
         Route::resource('sliders', SliderController::class);
         Route::resource('testimonials', TestimonialController::class);
 

@@ -57,12 +57,23 @@
                 @enderror
             </div>
             
-            <div class="form-group mb-3">
-                <label for="address" class="form-label">Full Address *</label>
-                <textarea name="address" id="address" class="form-control" rows="3" required>{{ old('address', $savedAddress['address'] ?? '') }}</textarea>
-                @error('address')
-                    <span class="text-danger">{{ $message }}</span>
-                @enderror
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="door_number" class="form-label">Door / Block No.</label>
+                    <input type="text" name="door_number" id="door_number" class="form-control" 
+                           placeholder="e.g. 23" value="{{ old('door_number', $savedAddress['door_number'] ?? '') }}">
+                    @error('door_number')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="col-md-8">
+                    <label for="address" class="form-label">Street / Road Name *</label>
+                    <input type="text" name="address" id="address" class="form-control" 
+                           placeholder="e.g. roadstret" required value="{{ old('address', $savedAddress['address'] ?? '') }}">
+                    @error('address')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
             </div>
             
             <div class="row mb-3">
@@ -113,7 +124,8 @@
 function fillAddressForm(addr) {
     document.getElementById('address_id').value = addr.id;
     document.getElementById('name').value = addr.first_name + ' ' + addr.last_name;
-    document.getElementById('address').value = (addr.door_number ? addr.door_number + ', ' : '') + addr.street;
+    document.getElementById('door_number').value = addr.door_number || '';
+    document.getElementById('address').value = addr.street || '';
     document.getElementById('city').value = addr.city;
     document.getElementById('state').value = addr.state;
     document.getElementById('pincode').value = addr.post_code;

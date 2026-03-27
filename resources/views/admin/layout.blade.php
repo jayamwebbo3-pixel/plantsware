@@ -120,8 +120,8 @@
                         </ul>
                     </div>
 
-                    <a class="nav-link {{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}" href="{{ route('admin.blogs.index') }}">
-                        <i class="fas fa-blog"></i> Blogs
+                    <a class="nav-link {{ request()->routeIs('admin.blog-categories.*') || request()->routeIs('admin.blogs.*') ? 'active' : '' }}" href="{{ route('admin.blog-categories.index') }}">
+                        <i class="fas fa-blog"></i> Blog Management
                     </a>
                     <hr style="border-color: rgba(255,255,255,0.3);">
                     <form method="POST" action="{{ route('admin.logout') }}">

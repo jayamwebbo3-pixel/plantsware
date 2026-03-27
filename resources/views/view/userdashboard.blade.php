@@ -22,12 +22,20 @@
             <!-- Sidebar -->
             <div class="profile-sidebar">
                 <div class="user-info">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
+                    <div class="user-avatar" style="overflow: hidden; border: 4px solid var(--primary-color);">
+                        <img src="https://www.gravatar.com/avatar/{{ md5(strtolower(trim(auth()->user()->email))) }}?s=150&d=mp" alt="{{ auth()->user()->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
-                    <div style="flex-grow: 1; min-width: 0; overflow: hidden;">
-                        <div class="user-name">{{ auth()->user()->name }}</div>
-                        <div class="user-email" style="word-break: break-all; overflow-wrap: break-word; font-size: 0.78rem; color: #444; line-height: 1.3; display: block;" title="{{ auth()->user()->email }}">{{ auth()->user()->email }}</div>
+                    <div style="flex-grow: 1; min-width: 0; overflow: hidden; position: relative;">
+                        <div id="userNameDisplayContainer" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <div class="user-name" id="userNameLabel">{{ auth()->user()->name }}</div>
+                            <i class="fas fa-pen" id="editNameIcon" style="cursor: pointer; font-size: 0.8rem; color: var(--primary-color);" onclick="showEditNameForm()"></i>
+                        </div>
+                        <div id="userNameEditContainer" style="display: none; align-items: center; justify-content: center; gap: 5px;">
+                            <input type="text" id="userNameInput" class="form-control form-control-sm" value="{{ auth()->user()->name }}" style="max-width: 150px; font-size: 0.9rem;">
+                            <button class="btn btn-sm btn-success" onclick="saveName()">✓</button>
+                            <button class="btn btn-sm btn-danger" onclick="hideEditNameForm()">✗</button>
+                        </div>
+                        <div class="user-email" id="userEmailDisplay" style="word-break: break-all; overflow-wrap: break-word; font-size: 0.78rem; color: #444; line-height: 1.3; display: block;" title="{{ auth()->user()->email }}">{{ auth()->user()->email }}</div>
                     </div>
                 </div>
 
@@ -647,18 +655,76 @@
 
 
 
+    // Profile Name Editing
+    function showEditNameForm() {
+        document.getElementById('userNameDisplayContainer').style.display = 'none';
+        document.getElementById('userNameEditContainer').style.display = 'flex';
+        document.getElementById('userNameInput').focus();
+    }
+
+    function hideEditNameForm() {
+        document.getElementById('userNameDisplayContainer').style.display = 'flex';
+        document.getElementById('userNameEditContainer').style.display = 'none';
+    }
+
+    function saveName() {
+        const newName = document.getElementById('userNameInput').value;
+        if (!newName.trim()) {
+            alert('Name cannot be empty');
+            return;
+        }
+
+        const submitBtn = event.target;
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = '...';
+        submitBtn.disabled = true;
+
+        fetch("{{ route('user.profile.update') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ name: newName })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('userNameLabel').innerText = data.name;
+                hideEditNameForm();
+            } else {
+                alert(data.message || 'Error updating name');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update name. Please try again.');
+        })
+        .finally(() => {
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        });
+    }
+
     // Review Modal Functions
     function openReviewModal(orderId, orderNumber) {
         document.getElementById('modalOrderNumber').innerText = '#' + orderNumber;
         document.getElementById('modalOrderId').value = orderId;
         document.getElementById('reviewModal').style.display = 'block';
 
-        // Fetch order items (this would ideally be an API call, but for simplicity we'll fetch from a route)
+        // Fetch order items using Laravel route helper to ensure compatibility with all hosting environments (like cPanel)
         const itemsList = document.getElementById('orderItemsList');
         itemsList.innerHTML = '<p style="text-align: center; color: #888;">Loading items...</p>';
 
-        fetch(`/user/order/${orderId}/items`)
-            .then(response => response.json())
+        const fetchUrl = "{{ route('user.order.items', ':id') }}".replace(':id', orderId);
+        
+        fetch(fetchUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.items && data.items.length > 0) {
                     let html = '';
@@ -725,7 +791,7 @@
         const orderNumberSpan = document.getElementById('returnModalOrderNumber');
 
         orderNumberSpan.innerText = '#' + orderNumber;
-        form.action = `/user/order/${orderId}/return`;
+        form.action = "{{ route('user.order.return', ':id') }}".replace(':id', orderId);
         modal.style.display = 'block';
     }
 

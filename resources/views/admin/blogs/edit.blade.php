@@ -26,10 +26,17 @@
                                 @enderror
                             </div>
 
-                            <!-- Tags (multi-select) -->
+                            <!-- Category (Readonly) -->
                             <div class="form-group mb-3">
+                                <label>Category</label>
+                                <input type="text" class="form-control" value="{{ $blog->blogCategory?->name ?? 'Uncategorized' }}" readonly>
+                                <input type="hidden" name="blog_category_id" value="{{ $blog->blog_category_id }}">
+                            </div>
+
+                            <!-- Tags (multi-select) -->
+                            <!-- <div class="form-group mb-3">
                                 <label>Tags (hold Ctrl/Cmd to select multiple)</label>
-                                <select name="tags[]" class="form-control" multiple>
+                                <select name="tags[]" class="form-control" @if(isset($tags)) multiple @endif>
                                     @foreach($tags as $tag)
                                         <option value="{{ $tag->id }}"
                                             {{ $blog->tags->contains($tag->id) ? 'selected' : '' }}>
@@ -37,7 +44,7 @@
                                         </option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </div> -->
 
                             <!-- Content - CKEditor -->
                             <div class="form-group mb-3">
@@ -51,12 +58,12 @@
                             </div>
 
                             <!-- Excerpt -->
-                            <div class="form-group mb-3">
+                            <!-- <div class="form-group mb-3">
                                 <label>Excerpt (short summary - optional)</label>
                                 <textarea name="excerpt" class="form-control" rows="3">
                                     {{ old('excerpt', $blog->excerpt) }}
                                 </textarea>
-                            </div>
+                            </div> -->
                         </div>
 
                         <!-- Sidebar column -->

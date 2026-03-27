@@ -52,12 +52,12 @@ class HomeController extends Controller
         ->take(12)
         ->get();
 
-    $dbTestimonials = Testimonial::active()->latest()->take(5)->get();
+    $dbTestimonials = Testimonial::active()->latest()->take(20)->get();
     $productReviews = \App\Models\ProductReview::where('is_approved', true)
         ->where('rating', '>=', 1)
         ->with('user')
         ->latest()
-        ->take(5)
+        ->take(20)
         ->get()
         ->map(function($review) {
             return (object)[
