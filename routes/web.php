@@ -42,6 +42,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('products', [FrontendProductController::class, 'index'])->name('products.index');
 Route::get('product/{slug}', [FrontendProductController::class, 'show'])->name('product.show');
+Route::get('search/autocomplete', [FrontendProductController::class, 'searchAutocomplete'])->name('search.autocomplete');
 
 Route::get('categories', [FrontendProductController::class, 'categories'])->name('categories');
 Route::get('category/{slug}', [FrontendProductController::class, 'category'])->name('category.show');
@@ -114,6 +115,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/order/{id}/cancel', [UserDashboardController::class, 'cancelOrder'])->name('user.order.cancel');
     Route::post('/user/order/{id}/return', [UserDashboardController::class, 'returnOrder'])->name('user.order.return');
     Route::get('/user/order/{order}/invoice', [UserDashboardController::class, 'downloadInvoice'])->name('user.order.invoice');
+    Route::get('/user/order/{id}/details', [UserDashboardController::class, 'showOrder'])->name('user.order.show');
     
     // Address Routes
     Route::post('/user/address', [UserDashboardController::class, 'storeAddress'])->name('user.address.store');
@@ -213,6 +215,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('settings', [HeaderFooterController::class, 'index'])->name('settings');
         Route::post('settings', [HeaderFooterController::class, 'update'])->name('settings.update');
+
+        Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::post('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
 
         // Informative Pages Management
         Route::get('pages/{slug}/edit', [\App\Http\Controllers\Admin\PageController::class, 'edit'])->name('pages.edit');

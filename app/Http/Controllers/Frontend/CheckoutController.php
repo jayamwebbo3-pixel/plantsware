@@ -21,6 +21,12 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
+        try {
+            app(\App\Services\TempCartService::class)->reserveStockForCheckout();
+        } catch (\Exception $e) {
+            return redirect()->route('cart.index')->with('error', $e->getMessage());
+        }
+
         // Pre-fill address if user has one saved
         $savedAddress = [];
         $userAddresses = collect();
@@ -158,10 +164,17 @@ class CheckoutController extends Controller
         });
 
         $shipping = $this->calculateShipping($cartItems, $shippingAddress['state']);
-        $tax = 0; // Fixed or calculate
+        
+        // ---- GST CALCULATION ----
+        $tax = 0;
+        $gstSettings = \App\Models\HeaderFooter::first();
+        if ($gstSettings && $gstSettings->gst_status) {
+            $tax = ($subtotal * $gstSettings->gst_percentage) / 100;
+        }
+
         $total = $subtotal + $shipping + $tax;
 
-        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'total', 'discount', 'totalWeight'));
+        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'total', 'discount', 'totalWeight', 'gstSettings'));
     }
 
     // Place order (confirm and save)
@@ -175,15 +188,6 @@ class CheckoutController extends Controller
         $shippingAddress = session('shipping_address');
         if (!$shippingAddress) {
             return redirect()->route('checkout.address')->with('error', 'Please provide shipping address.');
-        }
-
-        // Validate stock again
-        foreach ($cartItems as $item) {
-            $stock = $item->combo_pack_id ? $item->comboPack->stock_quantity : $item->product->stock_quantity;
-            $name = $item->combo_pack_id ? $item->comboPack->name : $item->product->name;
-            if ($item->quantity > $stock) {
-                return back()->with('error', "Insufficient stock for {$name}.");
-            }
         }
 
         $subtotal = $cartItems->sum(function ($item) {
@@ -205,7 +209,14 @@ class CheckoutController extends Controller
         });
 
         $shipping = $this->calculateShipping($cartItems, $shippingAddress['state']);
+        
+        // ---- GST CALCULATION ----
         $tax = 0;
+        $gstSettings = \App\Models\HeaderFooter::first();
+        if ($gstSettings && $gstSettings->gst_status) {
+            $tax = ($subtotal * $gstSettings->gst_percentage) / 100;
+        }
+
         $total = $subtotal + $shipping + $tax;
 
         $order = Order::create([
@@ -291,6 +302,7 @@ class CheckoutController extends Controller
     {
         if ($order->user_id !== auth()->id())
             abort(403);
+        $order->load('items');
         return view('view.order.confirmation', compact('order'));
     }
 }

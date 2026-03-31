@@ -17,7 +17,7 @@ class UserDashboardController extends Controller
         return view('view.userdashboard', [
             'user' => $user,
             'addresses' => $user->addresses()->latest()->get(),
-            'orders' => $user->orders()->latest()->get(),
+            'orders' => $user->orders()->with('items')->latest()->get(),
             'wishlist' => $user->wishlist()->with('product')->get(),
         ]);
     }
@@ -200,7 +200,18 @@ class UserDashboardController extends Controller
         ]);
     }
 
-    public function downloadInvoice(Order $order)
+    public function showOrder($id)
+    {
+        $order = \App\Models\Order::with(['items.product', 'items.comboPack'])->findOrFail($id);
+        
+        if ($order->user_id != \Illuminate\Support\Facades\Auth::id()) {
+            abort(403, 'Unauthorized access to this order.');
+        }
+
+        return view('view.order.details', compact('order'));
+    }
+
+    public function downloadInvoice(\App\Models\Order $order)
     {
         $user = Auth::user();
 

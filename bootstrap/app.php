@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->web(append: [
+            \Illuminate\Session\Middleware\AuthenticateSession::class,
+        ]);
         $middleware->alias([
             'auth.seller' => \App\Http\Middleware\sellerAuth::class,
             'auth.admin' => \App\Http\Middleware\AdminAuth::class,

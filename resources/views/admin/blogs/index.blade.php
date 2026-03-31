@@ -29,10 +29,10 @@
                         <table class="table table-bordered table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>#</th>
+                                    <th>S.No</th>
                                     <th>Title</th>
                                     <!-- <th>Category</th> -->
-                                    <th>Author</th>
+                                    <!-- <th>Author</th> -->
                                     <th>Published</th>
                                     <th>Status</th>
                                     <th>Actions</th>

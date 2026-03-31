@@ -17,47 +17,85 @@ class ImageService
     {
         $manager = new ImageManager(new Driver());
 
+        // Absolute paths
         $fullPath = storage_path('app/public/' . $imagePath);
+        $watermarkPath = public_path('assets/images/logo-1.png');
 
+        // Validate paths
         if (!file_exists($fullPath)) {
-            return;
+            throw new \Exception('Main image not found: ' . $fullPath);
+        }
+
+        if (!file_exists($watermarkPath)) {
+            throw new \Exception('Watermark image not found: ' . $watermarkPath);
         }
 
         try {
+            // Load images
             $image = $manager->read($fullPath);
-            $watermarkPath = public_path('assets/images/logo-1.png');
-
-            if (!file_exists($watermarkPath)) {
-                return;
-            }
-
             $watermark = $manager->read($watermarkPath);
 
-            // Reduce logo size: Scale logo to 30% of image width
-            $targetWidth = $image->width() * 0.30;
+            /*
+            -----------------------------------------
+            STEP 1 — SCALE WATERMARK
+            -----------------------------------------
+            30% of main image width
+            */
+            $targetWidth = (int) ($image->width() * 0.30);
             $watermark->scale(width: $targetWidth);
 
-            // Remove tagline: Crop the bottom 15% of the logo height to keep only pot + name
+            /*
+            -----------------------------------------
+            STEP 2 — CROP WATERMARK (REMOVE TAGLINE)
+            -----------------------------------------
+            Keep top 85% only
+            */
             $watermark->crop(
                 width: $watermark->width(),
                 height: (int) ($watermark->height() * 0.85),
                 position: 'top'
             );
 
-            // Boost visibility slightly
+            /*
+            -----------------------------------------
+            STEP 3 — ENHANCE VISIBILITY
+            -----------------------------------------
+            */
             $watermark->brightness(10);
             $watermark->contrast(5);
 
-            // Use a balanced padding (4% of width, minimum 8px)
-            $padding = max(8, (int) ($image->width() * 0.04));
+            /*
+            -----------------------------------------
+            STEP 4 — POSITION WATERMARK (BOTTOM-RIGHT)
+            -----------------------------------------
+            We manually compute the top-left insertion point so
+            the ENTIRE watermark sits inside the image with a margin.
+            margin = 3% of image dimension, at least 8px
+            */
+            $marginX = max(8, (int) ($image->width()  * 0.03));
+            $marginY = max(8, (int) ($image->height() * 0.03));
 
-            // Place at bottom-right with 100% opacity
-            $image->place($watermark, 'bottom-right', $padding, $padding, 100);
+            // Top-left X and Y where watermark will be pasted
+            $posX = $image->width()  - $watermark->width()  - $marginX;
+            $posY = $image->height() - $watermark->height() - $marginY;
 
+            // Safety clamp — never go negative
+            $posX = max(0, $posX);
+            $posY = max(0, $posY);
+
+            $image->place($watermark, 'top-left', $posX, $posY, 100);
+
+            /*
+            -----------------------------------------
+            STEP 5 — SAVE FINAL IMAGE
+            -----------------------------------------
+            */
             $image->save($fullPath);
+
         } catch (\Exception $e) {
-            // Log error or handle gracefully
-            // \Log::error('Watermarking failed: ' . $e->getMessage());
+            // Never fail silently
+            \Log::error('Watermark failed: ' . $e->getMessage());
+            throw $e;
         }
     }
 }

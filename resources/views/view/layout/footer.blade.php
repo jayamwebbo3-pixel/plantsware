@@ -22,7 +22,6 @@
                     <li><a href="{{ url('about') }}">About Us</a></li>
                     <li><a href="{{ route('products.index') }}">Products</a></li>
                     <li><a href="{{ route('blog.index') }}">Blog</a></li>
-                    <li><a href="{{ url('contact') }}">Contact</a></li>
                     <li><a href="{{ url('privacy-policy') }}">Privacy Policy</a></li>
                     <li><a href="{{ url('terms-conditions') }}">Terms & Conditions</a></li>
                     <li><a href="{{ url('refund-policy') }}">Refund Policy</a></li>
@@ -124,7 +123,7 @@
 <a href="https://wa.me/919876543212?text=Hello! I have a question about your products." class="whatsapp-float shadow-lg" target="_blank">
     <div class="whatsapp-message-container">
         <div class="whatsapp-message">Chat with us</div>
-        <div class="whatsapp-message">Order and Enquiry</div>
+        <div class="whatsapp-message">Enquire and Order</div>
         <div class="whatsapp-message">Green World</div>
     </div>
     <i class="fab fa-whatsapp"></i>

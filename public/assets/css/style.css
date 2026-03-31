@@ -1,3 +1,4 @@
+
 /* @font-face {
     font-family: 'Rubik', 'sans-serif';
     src: url(../fonts/Rubik-Bold.ttf);
@@ -3875,6 +3876,7 @@ del {
     position: relative;
     overflow: hidden;
     height: 220px;
+    border-radius: 12px;
 }
 
 .product-image {
@@ -5001,9 +5003,9 @@ del {
 }
 
 .product-page-gallery-main img {
-    width: 100%;
+    width: 100% !important;
     height: 500px;
-    object-fit: cover;
+    object-fit: cover !important;
 }
 
 .product-page-badge-sale {
@@ -5419,6 +5421,10 @@ del {
 
     .product-page-action-buttons {
         flex-direction: column;
+    }
+
+    .product-page-action-buttons .btn {
+        width: 100% !important;
     }
 
     .product-page-info-badges {
@@ -8610,13 +8616,13 @@ body.sticky-nav-active {
     aspect-ratio: 1/1;
     overflow: hidden;
     background: #f8fafc;
+    border-radius: 12px;
 }
 
 .product-image {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    padding: 15px;
+    object-fit: cover;
     transition: transform 0.5s ease;
 }
 
@@ -8754,7 +8760,7 @@ body.sticky-nav-active {
     }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 1024px) {
     .product-actions {
         flex-direction: column;
         gap: 10px;
@@ -8856,7 +8862,7 @@ body.sticky-nav-active {
     }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 1024px) {
     .product-actions {
         flex-direction: column;
         gap: 10px;
@@ -8868,6 +8874,10 @@ body.sticky-nav-active {
         width: 100% !important;
     }
 
+    .wishlist-btn-container form {
+        width: 100% !important;
+    }
+
     .btn-wishlist-action {
         width: 100% !important;
         height: 45px !important;
@@ -8876,5 +8886,11 @@ body.sticky-nav-active {
     .btn-buy-now,
     .btn-add-cart {
         height: 45px !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .w-100-mobile {
+        width: 100% !important;
     }
 }

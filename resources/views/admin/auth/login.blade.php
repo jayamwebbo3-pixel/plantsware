@@ -45,6 +45,10 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
+        /* Hide browser-default password reveal icons */
+        ::-ms-reveal, ::-ms-clear {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -83,6 +87,9 @@
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-lock"></i></span>
                     <input type="password" class="form-control" id="password" name="password" required>
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
             </div>
 
@@ -98,6 +105,21 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function (e) {
+            const password = document.getElementById('password');
+            const icon = this.querySelector('i');
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
 </body>
 </html>
 

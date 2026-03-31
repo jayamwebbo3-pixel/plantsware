@@ -12,6 +12,9 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
+        // Automatically mark old shipped orders as delivered
+        Order::autoUpdateShippedToDelivered();
+
         $perPage = $request->get('per_page', 10); // Default 10 to match your screenshot
         $search = $request->get('search');
         $status = $request->get('status'); // e.g., pending, processing, etc.
@@ -77,6 +80,10 @@ class OrderController extends Controller
         ]);
 
         $data = ['status' => $request->status];
+
+        if ($request->status === 'shipped' && !$order->shipped_at) {
+            $data['shipped_at'] = now();
+        }
 
         if ($request->status === 'delivered' && !$order->delivered_at) {
             $data['delivered_at'] = now();

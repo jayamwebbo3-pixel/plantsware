@@ -37,7 +37,7 @@
                                     {{ Str::limit(strip_tags($blog->content), 120) }}
                                 </p>
                                 <div class="blog-card-footer">
-                                    <span class="blog-card-author">{{ $blog->author_name ?? 'Admin' }}</span>
+                                    <!-- <span class="blog-card-author">{{ $blog->author_name ?? 'Admin' }}</span> -->
                                     <a href="{{ route('blog.show', $blog->slug) }}" class="read-more-link">Read →</a>
                                 </div>
                             </div>

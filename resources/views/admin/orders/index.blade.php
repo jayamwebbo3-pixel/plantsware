@@ -321,8 +321,8 @@
                                 {{ $order->shipping_address['phone'] ?? ($order->user?->phone ?? 'N/A') }}
                             </td>
                             <td rowspan="{{ $itemCount }}" class="align-middle small">
-                                {{ $order->shipping_address['address'] ?? 'N/A' }}
-                                @if(!empty($order->shipping_address['address']))<br>@endif
+                                @if(!empty($order->shipping_address['door_number'])){{ $order->shipping_address['door_number'] }}, @endif{{ $order->shipping_address['address'] ?? 'N/A' }}
+                                @if(!empty($order->shipping_address['address']) || !empty($order->shipping_address['door_number']))<br>@endif
                                 {{ $order->shipping_address['city'] ?? '' }}
                                 @if(!empty($order->shipping_address['city'])),@endif
                                 {{ $order->shipping_address['state'] ?? '' }}
@@ -396,8 +396,8 @@
                                 {{ $order->shipping_address['phone'] ?? ($order->user?->phone ?? 'N/A') }}
                             </td>
                             <td class="align-middle small">
-                                {{ $order->shipping_address['address'] ?? 'N/A' }}
-                                @if(!empty($order->shipping_address['address']))<br>@endif
+                                @if(!empty($order->shipping_address['door_number'])){{ $order->shipping_address['door_number'] }}, @endif{{ $order->shipping_address['address'] ?? 'N/A' }}
+                                @if(!empty($order->shipping_address['address']) || !empty($order->shipping_address['door_number']))<br>@endif
                                 {{ $order->shipping_address['city'] ?? '' }}
                                 @if(!empty($order->shipping_address['city'])),@endif
                                 {{ $order->shipping_address['state'] ?? '' }}

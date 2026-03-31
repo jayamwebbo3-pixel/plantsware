@@ -171,7 +171,7 @@
             <td>
                 <div class="address-title">Billed To:</div>
                 <strong>{{ $customer_name }}</strong><br>
-                {{ $customer_address['address'] ?? 'N/A' }}<br>
+                @if(!empty($customer_address['door_number'])){{ $customer_address['door_number'] }}, @endif @if(!empty($customer_address['street'])){{ $customer_address['street'] }}, @endif {{ $customer_address['address'] ?? 'N/A' }}<br>
                 {{ $customer_address['city'] ?? '' }} - {{ $customer_address['pincode'] ?? '' }}<br>
                 {{ $customer_phone }}<br>
                 {{ $customer_email }}

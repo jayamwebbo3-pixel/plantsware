@@ -44,6 +44,23 @@ class PaymentController extends Controller
 
         $transaction = PaymentTransaction::where('transaction_ref', $transaction_ref)->firstOrFail();
 
+        // [DEMO FEATURE] Test 10 Minute Cron Job Timeout
+        if ($status === 'EXPIRE_DEMO') {
+            // 1. Backdate the Transaction 11 minutes
+            $transaction->created_at = now()->subMinutes(11);
+            $transaction->save();
+            
+            // 2. Backdate the TempCart records so the Cron will pick them up
+            \App\Models\TempCart::where('user_id', $transaction->user_id)
+                ->where('status', 'pending')
+                ->update(['created_at' => now()->subMinutes(11)]);
+            
+            // 3. Trigger the Laravel schedule manually to run the 1-minute cron
+            \Illuminate\Support\Facades\Artisan::call('schedule:run');
+
+            return redirect()->route('cart.index')->with('error', 'Cron Job Triggered successfully! Over 10 minutes passed. Transaction expired and Stock restored automatically.');
+        }
+
         if ($transaction->status !== 'PENDING') {
             return redirect()->route('home')->with('error', 'Transaction is no longer pending or is invalid.');
         }
@@ -58,6 +75,7 @@ class PaymentController extends Controller
                     $orderToFail->delete();
                 }
             }
+            app(\App\Services\TempCartService::class)->clearUserTempCarts($transaction->user_id, null);
             return redirect()->route('cart.index')->with('error', 'Payment expired due to 10-minutes timeout. Order was not created.');
         }
 
@@ -70,6 +88,7 @@ class PaymentController extends Controller
                     $orderToFail->delete();
                 }
             }
+            app(\App\Services\TempCartService::class)->clearUserTempCarts($transaction->user_id, null);
             return redirect()->route('cart.index')->with('error', 'Payment failed. Order was not created.');
         }
 
@@ -107,26 +126,10 @@ class PaymentController extends Controller
                     'payment_status' => 'paid', // Or success
                 ]);
 
-                foreach ($order->items as $item) {
-                    if ($item->combo_pack_id) {
-                        $combo = \App\Models\ComboPack::find($item->combo_pack_id);
-                        if ($combo) {
-                            if ($combo->is_combo_only) {
-                                // Combo-only: Subtract from the combo_packs table
-                                $combo->decrement('stock_quantity', $item->quantity);
-                            } else {
-                                // Standard combo: Subtract from the constituent products
-                                $comboProducts = \App\Models\ComboPackProduct::where('combo_pack_id', $combo->id)->first();
-                                if ($comboProducts && $comboProducts->product_ids) {
-                                    $this->subtractConstituentStock($comboProducts->product_ids, $item->quantity);
-                                }
-                            }
-                        }
-                    } else {
-                        // Regular product stock subtraction
-                        Product::where('id', $item->product_id)->decrement('stock_quantity', $item->quantity);
-                    }
-                }
+                // Update TempCarts to paid since stock is already reduced
+                \App\Models\TempCart::where('user_id', $transaction->user_id)
+                    ->where('status', 'pending')
+                    ->update(['status' => 'paid']);
 
                 $transaction->update([
                     'status' => 'SUCCESS'
@@ -142,15 +145,14 @@ class PaymentController extends Controller
                 }
 
                 \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderConfirmation($order));
-                
+
                 // Also send to Admin
                 $headerFooter = \App\Models\HeaderFooter::first();
-                if(!empty($headerFooter->email)) {
+                if (!empty($headerFooter->email)) {
                     \Illuminate\Support\Facades\Mail::to($headerFooter->email)->send(new \App\Mail\OrderConfirmation($order));
                 }
 
                 return redirect()->route('checkout.confirmation', $order->id)->with('success', 'Payment successful and Order placed!');
-
             } catch (Exception $e) {
                 DB::rollBack();
                 $transaction->update(['status' => 'FAILED']);
@@ -160,35 +162,5 @@ class PaymentController extends Controller
 
         return redirect()->route('home');
     }
-    /**
-     * Helper to subtract stock for constituent products/combos recursively
-     */
-    private function subtractConstituentStock(array $productIds, int $orderQuantity)
-    {
-        foreach ($productIds as $id) {
-            if (str_starts_with($id, 'p_')) {
-                // Regular product: Subtract stock
-                $realId = str_replace('p_', '', $id);
-                \App\Models\Product::where('id', $realId)->decrement('stock_quantity', $orderQuantity);
-            } elseif (str_starts_with($id, 'co_')) {
-                // Combo only product: Subtract stock
-                $realId = str_replace('co_', '', $id);
-                \App\Models\ComboOnlyProduct::where('id', $realId)->decrement('stock_quantity', $orderQuantity);
-            } elseif (str_starts_with($id, 'c_')) {
-                // Nested combo: Recursive subtraction or combo stock decrement
-                $realId = str_replace('c_', '', $id);
-                $nestedCombo = \App\Models\ComboPack::find($realId);
-                if ($nestedCombo) {
-                    if ($nestedCombo->is_combo_only) {
-                        $nestedCombo->decrement('stock_quantity', $orderQuantity);
-                    } else {
-                        $nestedComboProducts = \App\Models\ComboPackProduct::where('combo_pack_id', $nestedCombo->id)->first();
-                        if ($nestedComboProducts && $nestedComboProducts->product_ids) {
-                            $this->subtractConstituentStock($nestedComboProducts->product_ids, $orderQuantity);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // helper methods removed, originally handled constituent stock reduction
 }

@@ -1,10 +1,15 @@
 <div class="product-card">
     <div class="product-image-container">
         <a href="{{ route('product.show', $product->slug) }}">
-            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}"
-                alt="{{ $product->name }}" class="product-image main-image w-100 h-100 object-fit-contain">
-            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}"
-                alt="{{ $product->name }}" class="product-image hover-image w-100 h-100 object-fit-contain">
+            @php
+                $mainImage = $product->image ? asset('storage/' . $product->image) : null;
+                $galleryImages = $product->gallery_images ?? [];
+                $hoverImage = !empty($galleryImages) ? asset('storage/' . $galleryImages[0]) : $mainImage;
+            @endphp
+            <img src="{{ $mainImage }}"
+                alt="{{ $product->name }}" class="product-image main-image w-100 h-100" style="object-fit:cover;">
+            <img src="{{ $hoverImage }}"
+                alt="{{ $product->name }}" class="product-image hover-image w-100 h-100" style="object-fit:cover;">
             @if($product->sale_price && $product->sale_price < $product->price)
                 <span class="discount-badge">
                     {{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF

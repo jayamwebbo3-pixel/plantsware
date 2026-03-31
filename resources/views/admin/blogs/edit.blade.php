@@ -87,11 +87,11 @@
                             </div>
 
                             <!-- Author -->
-                            <div class="form-group mb-3">
+                            <!-- <div class="form-group mb-3">
                                 <label>Author Name</label>
                                 <input type="text" name="author_name" class="form-control"
                                        value="{{ old('author_name', $blog->author_name ?? 'Admin') }}">
-                            </div>
+                            </div> -->
 
                             <!-- Published Date -->
                             <div class="form-group mb-3">

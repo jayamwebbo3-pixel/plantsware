@@ -101,9 +101,9 @@
                             <div class="category-description">
                                 {!! Str::limit(strip_tags($category->description), 150) !!}
                             </div>
-                            <div class="category-meta">
+                            <!-- <div class="category-meta">
                                 <span>Learn More →</span>
-                            </div>
+                            </div> -->
                         </div>
                     </a>
                 </div>

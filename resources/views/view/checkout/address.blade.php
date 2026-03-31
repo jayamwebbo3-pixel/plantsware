@@ -113,8 +113,8 @@
             </div>
             
             <div class="d-flex justify-content-between">
-                <a href="{{ route('cart.index') }}" class="btn btn-secondary">Back to Cart</a>
-                <button type="submit" class="btn btn-primary">Save & Proceed to Checkout</button>
+                <a href="{{ route('cart.index') }}" class="btn btn-secondary" style="background: #6c757d !important; color: white !important; border: 1px solid #6c757d !important ;margin:0 8px 0 0;">Back to Cart</a>
+                <button type="submit" class="btn btn-primary" style="background: #72a420 !important; color: white !important; border: 1px solid #72a420 !important;">Save & Proceed to Checkout</button>
             </div>
         </form>
     @endif

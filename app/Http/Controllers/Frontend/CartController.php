@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Wishlist;
+use App\Services\TempCartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,8 +15,10 @@ class CartController extends Controller
     /**
      * Display the cart page
      */
-    public function index()
+    public function index(TempCartService $tempCartService)
     {
+        $tempCartService->clearUserTempCarts(Auth::id(), Auth::check() ? null : session()->getId());
+
         $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
         $totals = $this->calculateCartTotals($cartItems);
 
@@ -56,13 +59,24 @@ class CartController extends Controller
             }
         }
 
-        $total = $subtotal + $shipping;
+        // Tax Calculation
+        $settings = \App\Models\HeaderFooter::first();
+        $tax = 0;
+        $taxPercentage = 0;
+        if ($settings && $settings->gst_status) {
+            $taxPercentage = (float)$settings->gst_percentage;
+            $tax = ($subtotal * $taxPercentage) / 100;
+        }
+
+        $total = $subtotal + $shipping + $tax;
 
         return [
             'subtotal' => $subtotal,
             'discount' => $discount,
             'totalWeight' => $totalWeight,
             'shipping' => $shipping,
+            'tax' => $tax,
+            'taxPercentage' => $taxPercentage,
             'total' => $total,
         ];
     }
@@ -85,6 +99,8 @@ class CartController extends Controller
      */
     protected function addToCart(Request $request, $item, $type)
     {
+        app(TempCartService::class)->clearUserTempCarts(Auth::id(), Auth::check() ? null : session()->getId());
+
         $quantity = max(1, (int) $request->input('quantity', 1));
         
         $optionsInput = $request->input('options') ?? $request->input('size');
@@ -166,6 +182,8 @@ $existingItem = $query->first();
      */
     public function update(Request $request, $id)
     {
+        app(TempCartService::class)->clearUserTempCarts(Auth::id(), Auth::check() ? null : session()->getId());
+
         $cartItem = Cart::findOrFail($id);
         $this->authorizeCartItem($cartItem);
 
@@ -215,6 +233,8 @@ $existingItem = $query->first();
      */
     public function remove(Request $request, $id)
     {
+        app(TempCartService::class)->clearUserTempCarts(Auth::id(), Auth::check() ? null : session()->getId());
+
         $cartItem = Cart::findOrFail($id);
         $this->authorizeCartItem($cartItem);
 
@@ -244,6 +264,8 @@ $existingItem = $query->first();
      */
     public function clear(Request $request)
     {
+        app(TempCartService::class)->clearUserTempCarts(Auth::id(), Auth::check() ? null : session()->getId());
+
         Cart::current()->delete();
 
         $this->updateSessionCounts();

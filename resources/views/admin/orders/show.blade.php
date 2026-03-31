@@ -167,7 +167,7 @@
                 <hr>
                 <p><strong>Shipping Address:</strong><br>
                     {{ $order->shipping_address['name'] ?? '' }}<br>
-                    {{ $order->shipping_address['address'] ?? '' }}<br>
+                    @if(!empty($order->shipping_address['door_number'])){{ $order->shipping_address['door_number'] }}, @endif{{ $order->shipping_address['address'] ?? '' }}<br>
                     {{ $order->shipping_address['city'] ?? '' }}, {{ $order->shipping_address['pincode'] ?? '' }}<br>
                     {{ $order->shipping_address['state'] ?? '' }}
                 </p>

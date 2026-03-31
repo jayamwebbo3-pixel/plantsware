@@ -8,7 +8,7 @@
                 <ul class="list-unstyled mb-0">
                     <li class="d-inline-block font-weight-bolder"><a href="{{ url('/') }}" class="text-decoration-none">home</a></li>
                     <li class="d-inline-block font-weight-bolder mx-2">/</li>
-                    <li class="d-inline-block font-weight-bolder"><a href="#" class="text-decoration-none">Product</a></li>
+                    <li class="d-inline-block font-weight-bolder"><a href="#" class="text-decoration-none">My Dashboard</a></li>
                 </ul>
             </div>
         </div>
@@ -23,7 +23,10 @@
             <div class="profile-sidebar">
                 <div class="user-info">
                     <div class="user-avatar" style="overflow: hidden; border: 4px solid var(--primary-color);">
-                        <img src="https://www.gravatar.com/avatar/{{ md5(strtolower(trim(auth()->user()->email))) }}?s=150&d=mp" alt="{{ auth()->user()->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        @php
+                            $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=76a713&color=fff&size=150';
+                        @endphp
+                        <img src="{{ $avatarUrl }}" alt="{{ auth()->user()->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div style="flex-grow: 1; min-width: 0; overflow: hidden; position: relative;">
                         <div id="userNameDisplayContainer" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
@@ -42,27 +45,21 @@
                 <ul class="nav-menu">
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link active" data-tab="address-book">
+                        <a href="#address-book" class="nav-link active" data-tab="address-book">
                             <i class="fas fa-map-marker-alt nav-icon"></i>
                             <span>Address Book</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link" data-tab="order-history">
+                        <a href="#order-history" class="nav-link" data-tab="order-history">
                             <i class="fas fa-box nav-icon"></i>
                             <span>Order History</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link" data-tab="wishlist">
+                        <a href="#wishlist" class="nav-link" data-tab="wishlist">
                             <i class="fas fa-heart nav-icon"></i>
                             <span>Wishlist</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" data-tab="settings">
-                            <i class="fas fa-cog nav-icon"></i>
-                            <span>Settings</span>
                         </a>
                     </li>
                     <li class="nav-item" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e0e0e0;">
@@ -171,6 +168,7 @@
                                         <option value="Assam">Assam</option>
                                         <option value="Bihar">Bihar</option>
                                         <option value="Chhattisgarh">Chhattisgarh</option>
+                                        <option value="Delhi">Delhi</option>
                                         <option value="Goa">Goa</option>
                                         <option value="Gujarat">Gujarat</option>
                                         <option value="Haryana">Haryana</option>
@@ -194,7 +192,7 @@
                                         <option value="Uttar Pradesh">Uttar Pradesh</option>
                                         <option value="Uttarakhand">Uttarakhand</option>
                                         <option value="West Bengal">West Bengal</option>
-                                        <option value="Delhi">Delhi</option>
+                                        
                                     </select>
                                 </div>
                             </div>
@@ -231,13 +229,47 @@
                     <h2 class="section-title">Order History</h2>
                     <div class="order-items">
                         @forelse($orders as $order)
-                        <div class="order-item" onclick="window.location='{{ route('checkout.confirmation', $order->id) }}'" style="cursor: pointer;">
+                        <div class="order-item">
                             <div class="order-image">
-                                <!-- Could render related product image if relationships exist, displaying a reliable icon fallback -->
-                                <i class="fas fa-box" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                @php
+                                    $hasImage = false;
+                                    $imgSrc = '';
+                                    if ($order->items && $order->items->count() > 0) {
+                                        $pImg = $order->items->first()->product_image;
+                                        if (!$pImg && $order->items->first()->product) {
+                                            $pImg = $order->items->first()->product->image;
+                                        }
+                                        if ($pImg) {
+                                            $hasImage = true;
+                                            if (is_string($pImg) && str_starts_with($pImg, '[')) {
+                                                $decoded = json_decode($pImg, true);
+                                                $pImg = is_array($decoded) && count($decoded) > 0 ? $decoded[0] : $pImg;
+                                            }
+                                            if (is_string($pImg) && (str_starts_with($pImg, 'http') || str_starts_with($pImg, 'assets/'))) {
+                                                $imgSrc = asset($pImg);
+                                            } else {
+                                                $imgSrc = asset('storage/' . $pImg);
+                                            }
+                                        }
+                                    }
+                                @endphp
+                                @if($hasImage)
+                                    <img src="{{ $imgSrc }}" alt="{{ $order->items->first()->product_name }}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;" onerror="this.onerror=null; this.src='{{ asset('assets/images/product/product1.jpg') }}';">
+                                @else
+                                    <i class="fas fa-box" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                @endif
                             </div>
                             <div class="order-info">
-                                <h4>Order {{ $order->order_number }}</h4>
+                                <h4>
+                                    @if($order->items && $order->items->count() > 0)
+                                        {{ $order->items->first()->product_name }}
+                                        @if($order->items->count() > 1)
+                                            <span style="font-size: 0.8em; color: gray; display: block; margin-top: 4px; font-weight: normal;">+ {{ $order->items->count() - 1 }} more item(s)</span>
+                                        @endif
+                                    @else
+                                        Order {{ $order->order_number }}
+                                    @endif
+                                </h4>
                                 <p>Date: {{ $order->created_at->format('d M Y') }}</p>
 
                                 <span class="order-status {{ strtolower($order->status) }}" style="padding: 3px 8px; border-radius: 4px; color: white; background-color: {{ in_array(strtolower($order->status), ['cancelled', 'return_rejected']) ? '#dc3545' : (strtolower($order->status) === 'shipped' ? '#17a2b8' : (in_array(strtolower($order->status), ['delivered', 'completed']) ? '#28a745' : (strtolower($order->status) === 'returned' ? '#343a40' : '#ffc107'))) }};">
@@ -260,7 +292,10 @@
                                     @endif
                                     <a href="{{ route('user.order.invoice', $order->id) }}" class="btn-invoice" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); border-radius: 4px; padding: 2px 8px; margin-left: 10px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 0.85rem;">Invoice</a>
                             </div>
-                            <div class="order-price">₹{{ number_format($order->total ?? 0, 2) }}</div>
+                            <div class="order-price" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-start; gap: 10px;">
+                                <div>₹{{ number_format($order->total ?? 0, 2) }}</div>
+                                <a href="{{ route('user.order.show', $order->id) }}" class="btn-view" style="background-color: var(--primary-color); color: white; padding: 4px 12px; border-radius: 4px; text-decoration: none; font-size: 0.85rem; white-space: nowrap;">View Details</a>
+                            </div>
                         </div>
                         @empty
                         <div style="padding: 20px; color: #666; font-style: italic;">
@@ -319,24 +354,7 @@
                     </div>
                 </div>
 
-                <!-- Settings Section -->
-                <div class="content-section" id="settings">
-                    <h2 class="section-title">Settings</h2>
-                    <form>
-                        <h3 style="margin: 2rem 0 1.5rem 0; color: var(--dark-color); font-weight: 600;">Security</h3>
-                        <div class="form-group">
-                            <label class="form-label">Change Password</label>
-                            <button type="button" class="btn-primary">Update Password</button>
-                        </div>
 
-                        <h3 style="margin: 2rem 0 1.5rem 0; color: var(--dark-color); font-weight: 600;">Account</h3>
-                        <div class="form-group">
-                            <label class="form-label">Delete Account</label>
-                            <p style="color: #888; margin-bottom: 1rem; font-size: 0.9rem;">Once deleted, this action cannot be undone.</p>
-                            <button type="button" class="btn-secondary">Delete Account</button>
-                        </div>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
@@ -583,7 +601,25 @@
             link.classList.add('active');
             const tabId = link.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
+            
+            // Update URL hash
+            window.history.pushState(null, null, '#' + tabId);
         });
+    });
+
+    // Check hash on load to open correct tab
+    document.addEventListener('DOMContentLoaded', () => {
+        if(window.location.hash) {
+            const tabId = window.location.hash.substring(1);
+            const link = document.querySelector(`[data-tab="${tabId}"]`);
+            if(link) {
+                document.querySelectorAll('[data-tab]').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                link.classList.add('active');
+                const targetSection = document.getElementById(tabId);
+                if(targetSection) targetSection.classList.add('active');
+            }
+        }
     });
 
     // Toggle Address Form

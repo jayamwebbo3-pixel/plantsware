@@ -45,25 +45,21 @@
                             </span>
                         </div>
                     </div>
-                    <div class="card-footer bg-transparent border-0 pb-3">
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <a href="{{ route('admin.blogs.index', ['category' => $category->id]) }}" class="btn btn-outline-primary btn-sm w-100">
-                                    Manage Blogs
-                                </a>
-                            </div>
-                            <div class="col-6 d-flex gap-1">
-                                <a href="{{ route('admin.blog-categories.edit', $category->id) }}" class="btn btn-info btn-sm flex-fill">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('admin.blog-categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this category?')" class="flex-fill">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm w-100">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
+                    <div class="card-footer bg-transparent border-0 pb-3 px-3">
+                        <div class="d-flex gap-1">
+                            <a href="{{ route('admin.blogs.index', ['category' => $category->id]) }}" class="btn btn-outline-primary btn-sm flex-grow-1 text-nowrap">
+                                Manage Blogs
+                            </a>
+                            <a href="{{ route('admin.blog-categories.edit', $category->id) }}" class="btn btn-info btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ route('admin.blog-categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this category?')" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

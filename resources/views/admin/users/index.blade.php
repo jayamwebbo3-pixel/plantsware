@@ -25,28 +25,61 @@
                             <td class="text-center align-middle">{{ $user->phone ?? 'N/A' }}</td>
                             <td class="align-middle">
                                 @php
-                                    $addressData = $user->address;
-                                    if(is_string($addressData) && is_array(json_decode($addressData, true)) && (json_last_error() == JSON_ERROR_NONE)){
-                                        $addressData = json_decode($addressData, true);
+                                    $latestOrder = $user->orders()->latest()->first();
+                                    $displayAddress = null;
+                                    $isLegacy = false;
+                                    $sourceLabel = '';
+
+                                    if ($latestOrder && !empty($latestOrder->shipping_address)) {
+                                        $displayAddress = $latestOrder->shipping_address;
+                                        $sourceLabel = 'Last Ordered Address';
+                                    } else {
+                                        $defaultAddress = $user->addresses()->where('is_default', true)->first() ?? $user->addresses()->first();
+                                        if ($defaultAddress) {
+                                            $displayAddress = [
+                                                'name' => $defaultAddress->first_name . ' ' . $defaultAddress->last_name,
+                                                'door_number' => $defaultAddress->door_number,
+                                                'street' => $defaultAddress->street,
+                                                'city' => $defaultAddress->city,
+                                                'state' => $defaultAddress->state,
+                                                'pincode' => $defaultAddress->post_code,
+                                                'phone' => $defaultAddress->phone_number
+                                            ];
+                                            $sourceLabel = 'Default Address';
+                                        } else {
+                                            $legacyAddress = $user->address;
+                                            if (is_string($legacyAddress) && is_array(json_decode($legacyAddress, true))) {
+                                                $displayAddress = json_decode($legacyAddress, true);
+                                            } elseif (is_array($legacyAddress)) {
+                                                $displayAddress = $legacyAddress;
+                                            }
+                                            $isLegacy = true;
+                                            $sourceLabel = 'Legacy Address';
+                                        }
                                     }
                                 @endphp
 
-                                @if(is_array($addressData))
-                                    @if(isset($addressData['name'])) <strong>{{ $addressData['name'] }}</strong><br> @endif
-                                    @if(isset($addressData['address'])) {{ $addressData['address'] }}<br> @endif
-                                    @if(isset($addressData['city']) || isset($addressData['state']) || isset($addressData['pincode']))
-                                        {{ implode(', ', array_filter([$addressData['city'] ?? null, $addressData['state'] ?? null, $addressData['pincode'] ?? null])) }}<br>
-                                    @endif
-                                    @if(isset($addressData['phone'])) <small class="text-muted">Phone: {{ $addressData['phone'] }}</small> @endif
+                                @if($displayAddress)
+                                    <div class="p-2 border rounded bg-light" style="font-size: 0.9rem;">
+                                        <small class="text-uppercase fw-bold text-muted d-block mb-1" style="font-size: 0.7rem;">{{ $sourceLabel }}</small>
+                                        
+                                        <strong>{{ $displayAddress['name'] ?? ($user->name ?? 'User') }}</strong><br>
+                                        
+                                        @if(!empty($displayAddress['door_number'])){{ $displayAddress['door_number'] }}, @endif
+                                        @if(!empty($displayAddress['door_no'])){{ $displayAddress['door_no'] }}, @endif
+                                        @if(!empty($displayAddress['street'])){{ $displayAddress['street'] }}, @endif
+                                        {{ $displayAddress['address'] ?? '' }}
+                                        
+                                        @if(isset($displayAddress['city']) || isset($displayAddress['state']) || isset($displayAddress['pincode']))
+                                            <br>{{ implode(', ', array_filter([$displayAddress['city'] ?? null, $displayAddress['state'] ?? null, $displayAddress['pincode'] ?? null])) }}
+                                        @endif
+                                        
+                                        @if(!empty($displayAddress['phone']))
+                                            <div class="mt-1"><small class="text-muted"><i class="fas fa-phone-alt me-1"></i> {{ $displayAddress['phone'] }}</small></div>
+                                        @endif
+                                    </div>
                                 @else
-                                    {{ $user->address ?? 'N/A' }}
-                                @endif
-                                
-                                @if(!is_array($addressData) && ($user->city || $user->state || $user->pincode))
-                                    <br>
-                                    <small class="text-muted">
-                                        {{ implode(', ', array_filter([$user->city, $user->state, $user->pincode])) }}
-                                    </small>
+                                    <span class="text-muted">No address available</span>
                                 @endif
                             </td>
                         </tr>

@@ -38,6 +38,12 @@ class UpdateOrderStatuses extends Command
             $this->info("Order #{$order->order_number} return window expired. Marked as completed.");
         }
         
-        $this->info("Finished updating order statuses. Updated " . count($expiredDeliveredOrders) . " records.");
+        // 2. Automatically update shipped orders to delivered 48h after shipped_at
+        $shippedToDeliveredCount = \App\Models\Order::autoUpdateShippedToDelivered();
+        if ($shippedToDeliveredCount > 0) {
+            $this->info("Automatically updated $shippedToDeliveredCount orders from shipped to delivered (48h dispatch window expired).");
+        }
+        
+        $this->info("Finished updating order statuses. Completed " . count($expiredDeliveredOrders) . " returns and $shippedToDeliveredCount deliveries.");
     }
 }

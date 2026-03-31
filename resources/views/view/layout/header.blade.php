@@ -353,13 +353,37 @@
                         <div class="d-flex navbar">
                             <!-- Search Bar -->
                             <div class="input-class text-left col-12 col-md-12 col-lg-7 order-2 order-lg-1">
-                                <div class="between-header border border-danger rounded mb-0 head-left">
+                                <div class="between-header border border-danger rounded mb-0 head-left" style="position:relative;">
                                     <div class="d-flex align-items-stretch w-100" style="gap: 0;">
-                                        <input type="text" placeholder="Search Products" class="form-control flex-grow-1" aria-label="search" aria-describedby="button-addon2">
-                                        <button type="button" class="btn btn-danger text-uppercase font-weight-normal flex-shrink-0">
+                                        <input type="text"
+                                               id="liveSearchInput"
+                                               placeholder="Search Products"
+                                               class="form-control flex-grow-1"
+                                               aria-label="search"
+                                               aria-describedby="button-addon2"
+                                               autocomplete="off">
+                                        <button type="button"
+                                                id="liveSearchBtn"
+                                                class="btn btn-danger text-uppercase font-weight-normal flex-shrink-0">
                                             Search
                                         </button>
                                     </div>
+                                    <!-- Autocomplete Dropdown -->
+                                    <div id="searchDropdown" style="
+                                        display:none;
+                                        position:absolute;
+                                        top:100%;
+                                        left:0;
+                                        right:0;
+                                        background:#fff;
+                                        border:1px solid #e0e0e0;
+                                        border-top:none;
+                                        border-radius:0 0 10px 10px;
+                                        box-shadow:0 8px 24px rgba(0,0,0,0.12);
+                                        z-index:99999;
+                                        max-height:420px;
+                                        overflow-y:auto;
+                                    "></div>
                                 </div>
                             </div>
                             <!-- Account / Cart / Wishlist -->
@@ -615,6 +639,107 @@
                 }
             });
         });
+    </script>
+
+    <!-- Live Search Autocomplete -->
+    <script>
+    (function () {
+        const input    = document.getElementById('liveSearchInput');
+        const dropdown = document.getElementById('searchDropdown');
+        const btn      = document.getElementById('liveSearchBtn');
+
+        if (!input || !dropdown || !btn) return;
+
+        const AUTOCOMPLETE_URL = '{{ route("search.autocomplete") }}';
+        const PRODUCTS_URL     = '{{ url("products") }}';
+
+        let debounceTimer = null;
+        let activeIndex   = -1;
+        let lastResults   = [];
+
+        function fetchSuggestions(q) {
+            fetch(AUTOCOMPLETE_URL + '?q=' + encodeURIComponent(q))
+                .then(r => r.json())
+                .then(data => { lastResults = data; renderDropdown(data, q); })
+                .catch(() => closeDropdown());
+        }
+
+        function renderDropdown(items, q) {
+            activeIndex = -1;
+            if (!items.length) {
+                dropdown.innerHTML = '<div style="padding:18px 16px;color:#888;font-size:14px;text-align:center;"><i class="fas fa-search" style="margin-right:6px;"></i>No products found for <strong>' + escHtml(q) + '</strong></div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+            let html = '';
+            items.forEach(function(p, i) {
+                var price = (p.sale_price && p.sale_price < p.price)
+                    ? '<s style="color:#aaa;font-size:11px;">&#8377;' + fmt(p.price) + '</s>&nbsp;<span style="color:#6EA820;font-weight:700;">&#8377;' + fmt(p.sale_price) + '</span>'
+                    : '<span style="color:#6EA820;font-weight:700;">&#8377;' + fmt(p.price) + '</span>';
+                var highlighted = highlightMatch(escHtml(p.name), q);
+                html += '<a href="' + escHtml(p.url) + '" class="search-suggestion-item"'
+                    + ' style="display:flex;align-items:center;gap:12px;padding:10px 14px;text-decoration:none;color:#333;border-bottom:1px solid #f4f4f4;">'
+                    + '<img src="' + escHtml(p.image) + '" alt="' + escHtml(p.name) + '"'
+                    + ' style="width:52px;height:52px;object-fit:contain;border-radius:8px;border:1px solid #eee;background:#fafafa;flex-shrink:0;">'
+                    + '<div style="flex:1;min-width:0;">'
+                    + '<div style="font-size:13px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + highlighted + '</div>'
+                    + '<div style="font-size:12px;margin-top:3px;">' + price + '</div>'
+                    + '</div>'
+                    + '<i class="fas fa-chevron-right" style="color:#ccc;font-size:11px;flex-shrink:0;"></i>'
+                    + '</a>';
+            });
+            html += '<a href="' + PRODUCTS_URL + '?q=' + encodeURIComponent(q) + '"'
+                + ' style="display:block;text-align:center;padding:11px;font-size:13px;color:#6EA820;font-weight:600;border-top:2px solid #f0f0f0;text-decoration:none;background:#fafff4;">'
+                + '<i class="fas fa-search" style="margin-right:5px;"></i>See all results for <strong>' + escHtml(q) + '</strong></a>';
+            dropdown.innerHTML = html;
+            dropdown.style.display = 'block';
+            dropdown.querySelectorAll('.search-suggestion-item').forEach(function(el) {
+                el.addEventListener('mouseenter', function() { el.style.background = '#f5fbe8'; });
+                el.addEventListener('mouseleave', function() { el.style.background = ''; });
+            });
+        }
+
+        function closeDropdown() { dropdown.style.display = 'none'; activeIndex = -1; }
+        function fmt(n) { return parseFloat(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        function escHtml(s) { var d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+        function highlightMatch(name, q) {
+            var re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+            return name.replace(re, '<mark style="background:#d4f0a0;padding:0 1px;border-radius:3px;">$1</mark>');
+        }
+
+        input.addEventListener('keydown', function(e) {
+            var items = dropdown.querySelectorAll('.search-suggestion-item');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                activeIndex = Math.min(activeIndex + 1, items.length - 1);
+                items.forEach(function(el, i) { el.style.background = i === activeIndex ? '#f5fbe8' : ''; });
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                activeIndex = Math.max(activeIndex - 1, -1);
+                items.forEach(function(el, i) { el.style.background = i === activeIndex ? '#f5fbe8' : ''; });
+            } else if (e.key === 'Enter') {
+                if (activeIndex >= 0 && items[activeIndex]) { e.preventDefault(); items[activeIndex].click(); }
+                else { goSearch(); }
+            } else if (e.key === 'Escape') { closeDropdown(); }
+        });
+
+        input.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            var q = this.value.trim();
+            if (q.length < 2) { closeDropdown(); return; }
+            debounceTimer = setTimeout(function() { fetchSuggestions(q); }, 280);
+        });
+
+        function goSearch() { var q = input.value.trim(); if (q) window.location.href = PRODUCTS_URL + '?q=' + encodeURIComponent(q); }
+        btn.addEventListener('click', goSearch);
+
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) closeDropdown();
+        });
+        input.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2 && lastResults.length) dropdown.style.display = 'block';
+        });
+    })();
     </script>
 </body>
 

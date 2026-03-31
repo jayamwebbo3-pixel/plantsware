@@ -80,12 +80,13 @@ class HomeController extends Controller
     $naturalCategory = Category::where('name', 'like', '%Natural%')->first();
     $servicesPage = \App\Models\Page::where('slug', 'services')->first();
     $serviceHighlights = $servicesPage->extra_content['features'] ?? [];
+    $adBanner = \App\Models\Page::where('slug', 'ad-banner')->first();
 
     return view('view.index', compact(
         'categories', 'sliders', 'newArrivals',
         'gardenProducts', 'aquariumProducts', 'naturalProducts',
         'gardenCategory', 'aquariumCategory', 'naturalCategory',
-        'testimonials', 'blogs', 'serviceHighlights'
+        'testimonials', 'blogs', 'serviceHighlights', 'adBanner'
     ));
 }
 }

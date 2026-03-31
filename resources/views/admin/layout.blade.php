@@ -63,6 +63,9 @@
                         <i class="fas fa-users"></i> <span>Users</span>
                     </a>
 
+                    <a class="nav-link {{ request()->routeIs('admin.blog-categories.*') || request()->routeIs('admin.blogs.*') ? 'active' : '' }}" href="{{ route('admin.blog-categories.index') }}">
+                        <i class="fas fa-blog"></i> Blog Management
+                    </a>
                     <!-- Informative Pages Dropdown -->
                     <a class="nav-link" data-bs-toggle="collapse" href="#informativePagesCollapse" role="button" aria-expanded="{{ request()->routeIs('admin.pages.*') ? 'true' : 'false' }}" aria-controls="informativePagesCollapse">
                         <i class="fas fa-file-alt"></i> Informative Pages <i class="fas fa-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
@@ -110,6 +113,11 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/ad-banner/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'ad-banner') }}">
+                                    <i class="fas fa-ad"></i> Ad Banner
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <hr style="border-color: rgba(255,255,255,0.2); margin: 5px 20px;">
                             </li>
                             <li class="nav-item">
@@ -120,8 +128,8 @@
                         </ul>
                     </div>
 
-                    <a class="nav-link {{ request()->routeIs('admin.blog-categories.*') || request()->routeIs('admin.blogs.*') ? 'active' : '' }}" href="{{ route('admin.blog-categories.index') }}">
-                        <i class="fas fa-blog"></i> Blog Management
+                    <a class="nav-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}">
+                        <i class="fas fa-cog"></i> <span>General Settings</span>
                     </a>
                     <hr style="border-color: rgba(255,255,255,0.3);">
                     <form method="POST" action="{{ route('admin.logout') }}">
@@ -138,7 +146,31 @@
                 <nav class="navbar navbar-light bg-white mb-3">
                     <div class="container-fluid">
                         <span class="navbar-brand mb-0 h1">@yield('title', 'Dashboard')</span>
-                        <span class="text-muted">Welcome, {{ auth()->guard('admin')->user()->name ?? 'Admin' }}</span>
+                        <div class="dropdown ms-auto">
+                            <button class="btn btn-light dropdown-toggle d-flex align-items-center rounded-pill px-3 shadow-sm border-0" type="button" id="adminUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-2 text-primary fs-5"></i>
+                                <span class="fw-semibold text-dark">{{ auth()->guard('admin')->user()->name ?? 'Admin' }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 py-2" aria-labelledby="adminUserDropdown">
+                                <li>
+                                    <h6 class="dropdown-header small text-muted text-uppercase fw-bold pb-2">Admin Profile</h6>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 px-3" href="{{ route('admin.profile.edit') }}">
+                                        <i class="fas fa-user-gear me-2 text-info opacity-75"></i> Manage Account
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider opacity-25"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('admin.logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item py-2 px-3 text-danger">
+                                            <i class="fas fa-sign-out-alt me-2 opacity-75"></i> Sign Out
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </nav>
 

@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Schedule;
 use App\Models\PaymentTransaction;
 
 Schedule::call(function () {
+    // 1. Cleanup expired temp carts and restore stock (10 mins)
+    app(\App\Services\TempCartService::class)->cleanupExpiredTempCarts();
+
+    // 2. Expire old pending payment transactions
     $expiredTransactions = PaymentTransaction::whereIn('status', ['INITIATED', 'PENDING'])
         ->where('created_at', '<', now()->subMinutes(10))
         ->get();

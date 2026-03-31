@@ -242,4 +242,35 @@ class ProductController extends Controller
             $query->orderBy('sort_order')->orderBy('created_at', 'desc');
         }
     }
+
+    /**
+     * Live search autocomplete — returns JSON with product image, name, slug, price.
+     */
+    public function searchAutocomplete(Request $request)
+    {
+        $q = trim($request->get('q', ''));
+
+        if (strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        $products = Product::where('is_active', true)
+            ->where('name', 'LIKE', '%' . $q . '%')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->limit(8)
+            ->get(['id', 'name', 'slug', 'image', 'price', 'sale_price']);
+
+        return response()->json($products->map(function ($p) {
+            return [
+                'id'         => $p->id,
+                'name'       => $p->name,
+                'slug'       => $p->slug,
+                'image'      => $p->image ? asset('storage/' . $p->image) : asset('assets/images/product/product1.jpg'),
+                'price'      => $p->price,
+                'sale_price' => $p->sale_price,
+                'url'        => route('product.show', $p->slug),
+            ];
+        }));
+    }
 }

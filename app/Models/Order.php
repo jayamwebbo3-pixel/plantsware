@@ -20,6 +20,7 @@ class Order extends Model
         'status',
         'payment_status',
         'payment_method',
+        'shipped_at',
         'delivered_at',
         'return_requested_at',
         'return_reason',
@@ -29,6 +30,7 @@ class Order extends Model
 
     protected $casts = [
         'shipping_address' => 'array',
+        'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
         'return_requested_at' => 'datetime',
         'return_images' => 'array'
@@ -58,5 +60,25 @@ class Order extends Model
             'return_rejected' => 'bg-danger',
             'completed' => 'bg-success',
         ][$this->status] ?? 'bg-secondary';
+    }
+
+    /**
+     * Automatically update orders with 'shipped' status to 'delivered' after 2 days.
+     */
+    public static function autoUpdateShippedToDelivered()
+    {
+        return self::where('status', 'shipped')
+            ->where(function($q) {
+                $q->where('shipped_at', '<=', now()->subDays(2))
+                  ->orWhere(function($sq) {
+                      $sq->whereNull('shipped_at')
+                        ->where('updated_at', '<=', now()->subDays(2));
+                  });
+            })
+            ->update([
+                'status' => 'delivered',
+                'delivered_at' => now(),
+                'updated_at' => now(),
+            ]);
     }
 }

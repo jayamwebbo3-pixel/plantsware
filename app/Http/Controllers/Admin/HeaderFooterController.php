@@ -37,6 +37,8 @@ class HeaderFooterController extends Controller
             'email' => 'nullable|email',
             'address' => 'nullable|string',
             'mobile_no' => 'nullable|string',
+            'gst_status' => 'nullable|boolean',
+            'gst_percentage' => 'nullable|numeric|min:0',
             'home_meta_title' => 'nullable|string',
             'home_meta_keywords' => 'nullable|string',
             'home_meta_description' => 'nullable|string',

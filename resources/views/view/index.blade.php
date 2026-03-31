@@ -154,7 +154,7 @@
 <section class="bg-light-section">
     <div class="container-fluid px-4">
         <div class="section-title">
-            <h2>Garden Products</h2>
+            <h2>{{ $gardenCategory->name ?? null }}</h2>
             <div class="title-link">
                 <a href="{{ $gardenCategory ? route('category.show', $gardenCategory->slug) : url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
             </div>
@@ -176,11 +176,16 @@
     </div>
 </section>
 
-<section class="ad-banner">
+<section class="ad-banner" style="background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('{{ $adBanner && $adBanner->image ? asset('storage/' . $adBanner->image) : asset('assets/images/ad-banner.jpg') }}');">
     <div class="banner-content">
-        <h1 class="big-title">Fresh Plant-Based Goodness</h1>
-        <p class="small-title">Discover our organic, sustainable products for a healthier lifestyle</p>
-        <a href="{{ url('categories') }}" class="contact-btn">Shop Now <i class="fas fa-leaf"></i></a>
+        <h1 class="big-title">{{ $adBanner->title ?? 'Fresh Plant-Based Goodness' }}</h1>
+        @php
+            $smallTitle = $adBanner->content ?? 'Discover our organic, sustainable products for a healthier lifestyle';
+        @endphp
+        <p class="small-title">{!! $smallTitle !!}</p>
+        <a href="{{ $adBanner && isset($adBanner->extra_content['button_link']) ? (str_contains($adBanner->extra_content['button_link'], 'http') ? $adBanner->extra_content['button_link'] : url($adBanner->extra_content['button_link'])) : url('categories') }}" class="contact-btn">
+            {{ $adBanner->extra_content['button_text'] ?? 'Shop Now' }} <i class="fas fa-leaf"></i>
+        </a>
     </div>
 </section>
 
@@ -188,7 +193,7 @@
 <section class="bg-white-section">
     <div class="container-fluid px-4">
         <div class="section-title">
-            <h2>Planted Aquarium Products</h2>
+            <h2>{{ $aquariumCategory->name ?? null }}</h2>
             <div class="title-link">
                 <a href="{{ $aquariumCategory ? route('category.show', $aquariumCategory->slug) : url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
             </div>
@@ -214,7 +219,7 @@
 <section class="bg-light-section">
     <div class="container-fluid px-4">
         <div class="section-title">
-            <h2>Natural Products</h2>
+            <h2>{{ $naturalCategory->name ?? null }}</h2>
             <div class="title-link">
                 <a href="{{ $naturalCategory ? route('category.show', $naturalCategory->slug) : url('categories') }}">More <i class="fas fa-chevron-right"></i></a>
             </div>
@@ -347,7 +352,7 @@
                                         {{ isset($blog->content) ? \Illuminate\Support\Str::limit(strip_tags($blog->content), 100) : '' }}
                                     </p>
                                     <div class="blog-card-footer">
-                                        <span class="blog-card-author">{{ $blog->author_name ?? 'Admin' }}</span>
+                                        <!-- <span class="blog-card-author">{{ $blog->author_name ?? 'Admin' }}</span> -->
                                         <a href="{{ route('blog.show', $blog->slug) }}" class="read-more-link">Read →</a>
                                     </div>
                                 </div>

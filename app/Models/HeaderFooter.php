@@ -21,6 +21,8 @@ class HeaderFooter extends Model
         'email',
         'address',
         'mobile_no',
+        'gst_status',
+        'gst_percentage',
         'home_meta_title',
         'home_meta_keywords',
         'home_meta_description',

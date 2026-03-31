@@ -107,6 +107,46 @@
                             
                         </div>
                     </div>
+                @elseif($page->slug === 'ad-banner')
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label for="image" class="form-label fw-bold">Banner Image</label>
+                                @if($page->image)
+                                    <div class="mb-2">
+                                        <img src="{{ asset('storage/' . $page->image) }}" alt="Banner Image" style="max-height: 150px;" class="img-thumbnail">
+                                    </div>
+                                @else
+                                    <p class="text-muted small">Current: Default Banner Image</p>
+                                @endif
+                                <input type="file" name="image" id="image" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label for="title" class="form-label fw-bold">Big Title</label>
+                                <input type="text" name="title" id="title" class="form-control" value="{{ old('title', $page->title) }}">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-4">
+                                <label for="content" class="form-label fw-bold">Small Title (Description)</label>
+                                <textarea name="content" id="content" class="form-control" rows="3">{{ old('content', $page->content) }}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label for="button_text" class="form-label fw-bold">Button Text</label>
+                                <input type="text" name="extra_content[button_text]" id="button_text" class="form-control" value="{{ old('extra_content.button_text', $page->extra_content['button_text'] ?? '') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label for="button_link" class="form-label fw-bold">Button Link (URL or product slug)</label>
+                                <input type="text" name="extra_content[button_link]" id="button_link" class="form-control" value="{{ old('extra_content.button_link', $page->extra_content['button_link'] ?? '') }}">
+                            </div>
+                        </div>
+                    </div>
                 @else
                     <div class="mb-4">
                         <label for="editor" class="form-label fw-bold">Page Content</label>

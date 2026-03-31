@@ -35,7 +35,7 @@ class UpdateCartCounts
                 $wishlistCount = cache()->remember(
                     'wishlist_count_user_' . Auth::id(),
                     300,
-                    fn () => Auth::user()->wishlist()->count()
+                    fn() => Auth::user()->wishlist()->count()
                 );
             } else {
                 $wishlistCount = 0;

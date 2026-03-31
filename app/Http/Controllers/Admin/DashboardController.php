@@ -17,10 +17,13 @@ class DashboardController extends Controller
     {
         // Calculate core ecommerce metrics
         $stats = [
-            'revenue' => Order::where('payment_status', 'success')->sum('total'),
+            'revenue' => Order::where(function($q) {
+                $q->where('payment_status', 'success')
+                  ->orWhere('status', 'delivered');
+            })->sum('total'),
             'total_orders' => Order::count(),
             'total_customers' => User::count(),
-            'pending_orders' => Order::where('status', 'pending')->count(),
+            'pending_orders' => Order::whereNotIn('status', ['shipped', 'delivered', 'cancelled', 'returned'])->count(),
         ];
 
         // Retrieve top selling products (fallback to latest if none sold)
@@ -53,9 +56,11 @@ class DashboardController extends Controller
             $chart_labels[] = $date->format('d M');
             
             // Sum revenue for that specific day
-            $daily_sum = Order::where('payment_status', 'success')
-                              ->whereDate('created_at', $date)
-                              ->sum('total');
+            $daily_sum = Order::where(function($q) {
+                $q->where('payment_status', 'success')
+                  ->orWhere('status', 'delivered');
+            })->whereDate('created_at', $date)
+              ->sum('total');
             $chart_data[] = $daily_sum;
         }
 

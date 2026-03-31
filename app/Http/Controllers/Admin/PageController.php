@@ -14,7 +14,24 @@ class PageController extends Controller
      */
     public function edit($slug)
     {
-        $page = Page::where('slug', $slug)->firstOrFail();
+        $page = Page::where('slug', $slug)->first();
+        
+        if (!$page && $slug === 'ad-banner') {
+            $page = Page::create([
+                'title' => 'Ad Banner',
+                'slug' => 'ad-banner',
+                'content' => 'Discover our organic, sustainable products for a healthier lifestyle',
+                'extra_content' => [
+                    'button_text' => 'Shop Now',
+                    'button_link' => 'categories'
+                ]
+            ]);
+        }
+
+        if (!$page) {
+            abort(404);
+        }
+
         return view('admin.pages.edit', compact('page'));
     }
 
@@ -26,6 +43,7 @@ class PageController extends Controller
         $page = Page::where('slug', $slug)->firstOrFail();
 
         $data = $request->validate([
+            'title' => 'nullable|string',
             'content' => 'nullable|string',
             'policy_date' => 'nullable|date',
             'image' => 'nullable|image|max:2048',
@@ -33,6 +51,7 @@ class PageController extends Controller
             'features.*.icon' => 'nullable|string',
             'features.*.title' => 'nullable|string',
             'features.*.description' => 'nullable|string',
+            'extra_content' => 'nullable|array',
         ]);
 
         if ($request->hasFile('image')) {
@@ -44,11 +63,17 @@ class PageController extends Controller
             $page->image = $path;
         }
 
+        if ($request->has('title')) {
+            $page->title = $request->input('title');
+        }
+        
         $page->content = $request->input('content');
         $page->policy_date = $request->input('policy_date');
         
         if ($request->has('features')) {
             $page->extra_content = ['features' => $request->input('features')];
+        } elseif ($request->has('extra_content')) {
+            $page->extra_content = $request->input('extra_content');
         }
 
         $page->save();

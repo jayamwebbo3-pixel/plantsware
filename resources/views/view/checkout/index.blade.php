@@ -80,16 +80,20 @@
             <div class="text-end">
                 <p>Subtotal: ₹{{ number_format($subtotal, 2) }}</p>
                 <p>Total Weight: {{ $total_weight ?? $totalWeight ?? 0 }} KG</p>
-                <p>Shipping: ₹{{ number_format($shipping, 2) }}</p>
-                <p>Tax: ₹{{ number_format($tax, 2) }}</p>
-                <p>Discount: <span style="color: #72a420;">-₹{{ number_format($discount ?? 0, 2) }}</span></p>
+                <p>Shipping: <span class="fw-bold">₹{{ number_format($shipping, 2) }}</span></p>
+                @if(isset($gstSettings) && $gstSettings->gst_status)
+                    <p>GST ({{ number_format($gstSettings->gst_percentage, 1) }}%): <span class="fw-bold text-danger">+₹{{ number_format($tax, 2) }}</span></p>
+                @else
+                    <p>Tax: <span class="fw-bold">₹{{ number_format($tax, 2) }}</span></p>
+                @endif
+                <p>Discount: <span style="color: #72a420;" class="fw-bold">-₹{{ number_format($discount ?? 0, 2) }}</span></p>
                 <h4>Total: ₹{{ number_format($total, 2) }}</h4>
             </div>
         </div>
         <div class="col-md-4">
             <h3>Shipping Address</h3>
             <p>{{ $shippingAddress['name'] }}<br>
-            {{ $shippingAddress['address'] }}<br>
+            @if(!empty($shippingAddress['door_number'])){{ $shippingAddress['door_number'] }}, @endif{{ $shippingAddress['address'] }}<br>
             {{ $shippingAddress['city'] }}, {{ $shippingAddress['state'] }} - {{ $shippingAddress['pincode'] }}<br>
             Phone: {{ $shippingAddress['phone'] }}</p>
             <a href="{{ route('checkout.address') }}" class="btn btn-secondary">Edit Address</a>

@@ -86,9 +86,9 @@
                                                                 $regularPrice = $isCombo ? $p->total_price : $p->price;
                                                                 $savings = max(0, $regularPrice - $priceToUse);
                                                             @endphp
-                                                            @if($savings > 0)
+                                                            <!-- @if($savings > 0)
                                                                 <span class="ms-2 text-success">Saved: ₹{{ number_format($savings, 2) }}</span>
-                                                            @endif
+                                                            @endif -->
                                                         </div>
                                                         <div class="item-total" id="itemTotal_{{ $item->id }}">
                                                             ₹{{ number_format($priceToUse * $item->quantity, 2) }}
@@ -140,9 +140,9 @@
                                                 @endif
                                             </span>
                                         </div>
-                                        <div class="summary-row">
-                                            <span>Tax:</span>
-                                            <span class="summary-amount">₹0.00</span>
+                                        <div class="summary-row" id="taxRow" style="{{ ($tax ?? 0) > 0 ? '' : 'display:none;' }}">
+                                            <span id="cartTaxLabel">GST ({{ $taxPercentage ?? 0 }}%):</span>
+                                            <span class="summary-amount" id="cartTax">₹{{ number_format($tax ?? 0, 2) }}</span>
                                         </div>
                                         <div class="summary-row">
                                             <span>Discount:</span>
@@ -156,8 +156,7 @@
                                         </div>
                                         <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">Proceed to Checkout</button>
                                         <button type="button" class="continue-shopping-btn" onclick="window.location='{{ route('home') }}'">Continue Shopping</button>
-                                        <button type="button" class="clear-cart-btn btn btn-outline-danger w-100 mt-3" 
-                                                onclick="clearCart()">
+                                        <button type="button" class="clear-cart-btn btn-clear-red w-100 mt-2" onclick="clearCart()">
                                             <i class="fas fa-trash"></i> Clear Cart
                                         </button>
                                     </div>
@@ -260,6 +259,21 @@
                 if (data.totalWeight !== undefined) {
                     document.getElementById('cartWeight').textContent = `${data.totalWeight} KG`;
                 }
+                if (data.tax !== undefined) {
+                    const taxEl = document.getElementById('cartTax');
+                    const taxRow = document.getElementById('taxRow');
+                    const taxLabelEl = document.getElementById('cartTaxLabel');
+                    
+                    if (taxEl) {
+                        taxEl.textContent = `₹${parseFloat(data.tax).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                    }
+                    if (taxLabelEl && data.taxPercentage !== undefined) {
+                        taxLabelEl.textContent = `GST (${data.taxPercentage}%):`;
+                    }
+                    if (taxRow) {
+                        taxRow.style.display = data.tax > 0 ? 'flex' : 'none';
+                    }
+                }
                 if (data.shipping !== undefined) {
                     const shipEl = document.getElementById('cartShipping');
                     shipEl.textContent = data.shipping > 0 
@@ -336,6 +350,21 @@
                             shipEl.textContent = data.shipping > 0 
                                 ? `₹${parseFloat(data.shipping).toLocaleString('en-IN', {minimumFractionDigits: 2})}`
                                 : 'Free';
+                        }
+                        if (data.tax !== undefined) {
+                            const taxEl = document.getElementById('cartTax');
+                            const taxRow = document.getElementById('taxRow');
+                            const taxLabelEl = document.getElementById('cartTaxLabel');
+                            
+                            if (taxEl) {
+                                taxEl.textContent = `₹${parseFloat(data.tax).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                            }
+                            if (taxLabelEl && data.taxPercentage !== undefined) {
+                                taxLabelEl.textContent = `GST (${data.taxPercentage}%):`;
+                            }
+                            if (taxRow) {
+                                taxRow.style.display = data.tax > 0 ? 'flex' : 'none';
+                            }
                         }
                         const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
                         cartCountEls.forEach(el => {
@@ -628,8 +657,9 @@
     max-width: 400px;
 }
 
-.continue-shopping-btn {
-    display: inline-block;
+.checkout-btn {
+    display: block;
+    width: 100%;
     background-color: var(--primary-color);
     color: #fff !important;
     padding: 14px 40px;
@@ -639,13 +669,58 @@
     text-decoration: none !important;
     transition: all 0.3s ease;
     border: none;
-    text-transform: uppercase;
+    text-transform: capitalize;
     letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.checkout-btn:hover {
+    background-color: #5b8c19;
+    box-shadow: 0 5px 15px rgba(110, 168, 32, 0.3);
+}
+
+.continue-shopping-btn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    background-color: #fff;
+    color: var(--primary-color) !important;
+    border: 1px solid var(--primary-color);
+    padding: 14px 40px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+    text-align: center;
 }
 
 .continue-shopping-btn:hover {
-    background-color: #5b8c19;
+    background-color: var(--primary-color);
+    color: #fff !important;
     box-shadow: 0 5px 15px rgba(110, 168, 32, 0.3);
+}
+
+.btn-clear-red {
+    display: block;
+    background-color: #fff;
+    color: #dc3545 !important;
+    border: 1px solid #dc3545;
+    padding: 14px 40px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+}
+
+.btn-clear-red:hover {
+    background-color: #dc3545;
+    color: #fff !important;
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
 }
 
 @keyframes fadeInUp {

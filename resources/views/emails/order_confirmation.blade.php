@@ -102,7 +102,7 @@
                     <h3 style="margin-top: 0; font-size: 16px; color: #333;">Shipping Address</h3>
                     <p style="margin: 0; font-size: 14px; color: #666;">
                         {{ $order->shipping_address['name'] }}<br>
-                        {{ $order->shipping_address['address'] }}<br>
+                        @if(!empty($order->shipping_address['door_number'])){{ $order->shipping_address['door_number'] }}, @endif{{ $order->shipping_address['address'] ?? '' }}<br>
                         {{ $order->shipping_address['city'] }}, {{ $order->shipping_address['state'] }} - {{ $order->shipping_address['pincode'] }}<br>
                         Phone: {{ $order->shipping_address['phone'] }}
                     </p>
