@@ -25,12 +25,12 @@
             <button type="submit" class="btn btn-danger btn-lg">Simulate Payment Failure</button>
         </form>
         <!-- Simulate 10 Mins Expire & Cron -->
-        <form action="{{ route('payment.callback') }}" method="POST" class="d-inline-block m-2">
+        <!-- <form action="{{ route('payment.callback') }}" method="POST" class="d-inline-block m-2">
             @csrf
             <input type="hidden" name="transaction_ref" value="{{ $transaction->transaction_ref }}">
             <input type="hidden" name="status" value="EXPIRE_DEMO">
             <button type="submit" class="btn btn-warning btn-lg">Simulate 10 Mins Timeout (Cron Demo)</button>
-        </form>
+        </form> -->
     </div>
 
     <p class="mt-4 text-muted border p-3 rounded bg-light mx-auto" style="max-width: 400px;">

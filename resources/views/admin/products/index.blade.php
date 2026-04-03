@@ -3,17 +3,22 @@
 @section('title', 'Products - ' . ($subcategory->name ?? 'All'))
 
 @section('content')
-        <div class="mb-4">
+        <!-- <div class="mb-4">
             <a href="{{ route('admin.categories.subcategories', $subcategory->category) }}" class="text-decoration-none">
                 ← Back to Subcategories
             </a>
-        </div>
+        </div> -->
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Products in "{{ $subcategory->name }}"</h2>
+            <h4 class="text-secondary">Products in "{{ $subcategory->name }}"</h4>
+            <div class="d-flex gap-2">
+            <a href="{{ route('admin.categories.subcategories', $subcategory->category) }}" class="text-decoration-none">
+                <i class="fas fa-arrow-left"></i> Back to Subcategories
+            </a>
             <a href="{{ route('admin.products.create') }}?subcategory_id={{ $subcategory->id }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Add New Product
             </a>
+            </div>
         </div>
 
         <div class="card">
@@ -52,33 +57,33 @@
                             <tr>
                                 <th>S.NO</th>
                                 <th>Image</th>
-                                <th>
-                                    <a href="{{ route('admin.subcategories.products', $subcategory) }}?sort=name&direction={{ request('direction') == 'asc' ? 'desc' : 'asc' }}&search={{ request('search') }}&per_page={{ request('per_page') }}" class="text-dark text-decoration-none">
-                                        Name
+                                <th>Name
+                                    <a href="{{ route('admin.subcategories.products', $subcategory) }}?sort=name&direction={{ request('direction') == 'asc' ? 'desc' : 'asc' }}&search={{ request('search') }}&per_page={{ request('per_page') }}">
+                                        
                                         @if(request('sort') == 'name')
                                             <i class="fas fa-sort-{{ request('direction') == 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @endif
                                     </a>
                                 </th>
-                                <th>
-                                    <a href="{{ route('admin.subcategories.products', $subcategory) }}?sort=price&direction={{ request('direction') == 'asc' ? 'desc' : 'asc' }}&search={{ request('search') }}&per_page={{ request('per_page') }}" class="text-dark text-decoration-none">
-                                        Price
+                                <th>Price
+                                    <a href="{{ route('admin.subcategories.products', $subcategory) }}?sort=price&direction={{ request('direction') == 'asc' ? 'desc' : 'asc' }}&search={{ request('search') }}&per_page={{ request('per_page') }}">
+                                        
                                         @if(request('sort') == 'price')
                                             <i class="fas fa-sort-{{ request('direction') == 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @endif
                                     </a>
                                 </th>
-                                <th>
-                                    <a href="{{ route('admin.subcategories.products', $subcategory) }}?sort=stock_quantity&direction={{ request('direction') == 'asc' ? 'desc' : 'asc' }}&search={{ request('search') }}&per_page={{ request('per_page') }}" class="text-dark text-decoration-none">
-                                        Stock
+                                <th>Stock
+                                    <a href="{{ route('admin.subcategories.products', $subcategory) }}?sort=stock_quantity&direction={{ request('direction') == 'asc' ? 'desc' : 'asc' }}&search={{ request('search') }}&per_page={{ request('per_page') }}">
+                                        
                                         @if(request('sort') == 'stock_quantity')
                                             <i class="fas fa-sort-{{ request('direction') == 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @endif
                                     </a>
                                 </th>
-                                <th>
-                                    <a href="{{ route('admin.subcategories.products', $subcategory) }}?sort=sort_order&direction={{ request('direction') == 'asc' ? 'desc' : 'asc' }}&search={{ request('search') }}&per_page={{ request('per_page') }}" class="text-dark text-decoration-none">
-                                        Sort Order
+                                <th>Sort Order
+                                    <a href="{{ route('admin.subcategories.products', $subcategory) }}?sort=sort_order&direction={{ request('direction') == 'asc' ? 'desc' : 'asc' }}&search={{ request('search') }}&per_page={{ request('per_page') }}">
+                                        
                                         @if(request('sort') == 'sort_order')
                                             <i class="fas fa-sort-{{ request('direction') == 'asc' ? 'up' : 'down' }} ms-1"></i>
                                         @endif
@@ -102,7 +107,7 @@
                                             </div>
                                         @endif
                                     </td>
-                                    <td><strong>{{ $product->name }}</strong></td>
+                                    <td>{{ $product->name }}</td>
                                     <td>
                                         @if($product->sale_price && $product->sale_price < $product->price)
 
@@ -126,7 +131,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.reviews.index') }}?product_id={{ $product->id }}" class="text-decoration-none">
+                                        <a href="{{ route('admin.reviews.index') }}?product_id={{ $product->id }}">
                                             <div class="d-flex align-items-center">
                                                 <span class="text-warning me-1"><i class="fas fa-star"></i></span>
                                                 <strong>{{ number_format($product->avg_rating, 1) }}</strong>
@@ -134,17 +139,19 @@
                                             </div>
                                         </a>
                                     </td>
-                                    <td>
-                                        <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-primary" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                    <td class="text-nowrap">
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="d-inline" onsubmit="return confirmDelete('Are you sure you want to delete this product?', this)">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

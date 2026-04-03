@@ -99,6 +99,9 @@
             <div class="col-md-6 info-section">
                 <h4>Order Details</h4>
                 <div class="detail-row">
+                    <strong>Order ID:</strong> {{ $order->order_number }}
+                </div>
+                <div class="detail-row">
                     <strong>Order Date:</strong> {{ $order->created_at->format('n/j/Y') }}
                 </div>
                 <div class="detail-row">

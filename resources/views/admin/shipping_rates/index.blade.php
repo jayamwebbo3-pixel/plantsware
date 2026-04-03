@@ -11,15 +11,12 @@
 </div>
 
 <div class="card shadow-sm border-0 rounded-3">
-    <div class="card-header bg-white py-3">
-        <h5 class="mb-0 text-muted">Shipping Cost Details</h5>
-    </div>
     <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light text-uppercase small">
+       <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
                     <tr>
-                        <th class="text-muted">ID</th>
+                        <th class="text-muted">S.NO</th>
                         <th class="text-muted">STATE NAME</th>
                         <th class="text-muted">BASE WEIGHT (KG)</th>
                         <th class="text-muted">BASE COST (₹)</th>
@@ -37,17 +34,19 @@
                         <td>{{ number_format($rate->base_cost, 2) }}</td>
                         <td>{{ $rate->additional_weight_unit }}</td>
                         <td>{{ number_format($rate->additional_cost_per_unit, 2) }}</td>
-                        <td>
-                            <a href="{{ route('admin.shipping-rates.edit', $rate) }}" class="btn btn-sm btn-info text-white rounded-3 px-3">
-                                Edit
-                            </a>
-                            <form action="{{ route('admin.shipping-rates.destroy', $rate) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger rounded-3 px-3">
-                                    Delete
-                                </button>
-                            </form>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('admin.shipping-rates.edit', $rate) }}" class="btn btn-sm btn-primary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('admin.shipping-rates.destroy', $rate) }}" method="POST" class="d-inline" onsubmit="return confirmDelete('Are you sure you want to delete this shipping rate?', this)">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty

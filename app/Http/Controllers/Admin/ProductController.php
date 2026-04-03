@@ -47,15 +47,16 @@ class ProductController extends Controller
 
         $selectedSubcategoryId = $request->query('subcategory_id');
         $selectedCategoryId = null;
+        $selectedSubcategory = null;
 
         if ($selectedSubcategoryId) {
-            $subcategory = Subcategory::find($selectedSubcategoryId);
-            if ($subcategory) {
-                $selectedCategoryId = $subcategory->category_id;
+            $selectedSubcategory = Subcategory::find($selectedSubcategoryId);
+            if ($selectedSubcategory) {
+                $selectedCategoryId = $selectedSubcategory->category_id;
             }
         }
 
-        return view('admin.products.create', compact('categories', 'subcategories', 'selectedCategoryId', 'selectedSubcategoryId'));
+        return view('admin.products.create', compact('categories', 'subcategories', 'selectedCategoryId', 'selectedSubcategoryId', 'selectedSubcategory'));
     }
 
     public function store(Request $request)

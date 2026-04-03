@@ -107,6 +107,44 @@
                             
                         </div>
                     </div>
+
+                    @if($page->slug === 'about-us')
+                    <div class="card mt-4 border-success">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-bullhorn me-2"></i> Bottom Call to Action (CTA) Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label for="cta_title" class="form-label fw-bold">CTA Title</label>
+                                    <input type="text" name="extra_content[cta_title]" id="cta_title" class="form-control" value="{{ old('extra_content.cta_title', $page->extra_content['cta_title'] ?? 'Ready To Transform Your Space?') }}">
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="cta_subtitle" class="form-label fw-bold">CTA Subtitle</label>
+                                    <textarea name="extra_content[cta_subtitle]" id="cta_subtitle" class="form-control" rows="2">{{ old('extra_content.cta_subtitle', $page->extra_content['cta_subtitle'] ?? 'Join Thousands Of Satisfied Customers Who Trust PlantsWare For All Their Gardening And Natural Product Needs. Start Your Green Journey Today!') }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="cta_btn_text" class="form-label fw-bold">Button Text</label>
+                                    <input type="text" name="extra_content[cta_btn_text]" id="cta_btn_text" class="form-control" value="{{ old('extra_content.cta_btn_text', $page->extra_content['cta_btn_text'] ?? 'Shop Now') }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="cta_btn_link" class="form-label fw-bold">Button Link (URL)</label>
+                                    <input type="text" name="extra_content[cta_btn_link]" id="cta_btn_link" class="form-control" value="{{ old('extra_content.cta_btn_link', $page->extra_content['cta_btn_link'] ?? 'products') }}">
+                                </div>
+                                <!-- <div class="col-md-12">
+                                    <label for="cta_bg_image" class="form-label fw-bold">CTA Background Image</label>
+                                    @if(isset($page->extra_content['cta_bg_image']))
+                                        <div class="mb-2">
+                                            <img src="{{ asset('storage/' . $page->extra_content['cta_bg_image']) }}" alt="CTA Bg Image" style="max-height: 100px;" class="img-thumbnail">
+                                        </div>
+                                    @endif
+                                    <input type="file" name="cta_bg_image" id="cta_bg_image" class="form-control">
+                                    <small class="text-muted">Upload a high-quality background for the CTA section (usually a green texture or leaf image).</small>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 @elseif($page->slug === 'ad-banner')
                     <div class="row g-4">
                         <div class="col-md-6">

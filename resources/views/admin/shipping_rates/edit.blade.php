@@ -57,7 +57,7 @@
             </div>
 
             <div class="text-end mt-4">
-                <button type="submit" class="btn btn-info text-white px-5 rounded-3">Update Rate</button>
+                <button type="submit" class="btn btn-primary px-5 rounded-3">Update Rate</button>
             </div>
         </form>
     </div>

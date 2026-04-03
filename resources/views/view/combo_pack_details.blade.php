@@ -81,12 +81,16 @@
                     @endif
                     
                     <div class="product-page-price mb-4">
-                        <span class="product-page-current-price">₹{{ number_format($comboPack->offer_price, 2) }}</span>
-                        @if($comboPack->total_price > $comboPack->offer_price)
-                            <span class="product-page-original-price">₹{{ number_format($comboPack->total_price, 2) }}</span>
-                            <span class="product-page-discount-badge">
-                                Save ₹{{ number_format($comboPack->total_price - $comboPack->offer_price, 2) }}
-                            </span>
+                        @if($comboPack->stock_quantity > 0)
+                            <span class="product-page-current-price">₹{{ number_format($comboPack->offer_price, 2) }}</span>
+                            @if($comboPack->total_price > $comboPack->offer_price)
+                                <span class="product-page-original-price">₹{{ number_format($comboPack->total_price, 2) }}</span>
+                                <span class="product-page-discount-badge">
+                                    Save ₹{{ number_format($comboPack->total_price - $comboPack->offer_price, 2) }}
+                                </span>
+                            @endif
+                        @else
+                            <span class="product-page-discount-badge" style="background: #dc3545 !important; color: white !important;">OUT OF STOCK</span>
                         @endif
                     </div>
                     
@@ -181,7 +185,7 @@ $(document).ready(function() {
         if (value < 1) value = 1;
         
         // Check max stock if available
-        var maxStock = {{ $comboPack->stock_quantity }};
+        var maxStock = {{ $comboPack->stock_quantity ?? 0 }};
         if (value > maxStock) {
             value = maxStock;
             alert("Only " + maxStock + " items available in stock.");

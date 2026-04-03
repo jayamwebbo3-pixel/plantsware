@@ -103,11 +103,13 @@
                             {{-- Preview lives OUTSIDE the overflow:hidden wrap --}}
                             <div id="dpzPreview"></div>
 
-                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                <span class="product-page-badge-sale">
-                                    -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
-                                </span>
-                                @endif
+                            @if($product->stock_quantity <= 0)
+                                <span class="product-page-badge-sale" style="background: #dc3545 !important;">OUT OF STOCK</span>
+                                @elseif($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
+                                    <span class="product-page-badge-sale">
+                                        -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
+                                    </span>
+                                    @endif
                         </div>
 
                     </div>{{-- /dpz-wrapper --}}
@@ -241,11 +243,13 @@
                         @endif
                         <!-- Price -->
                         <div class="product-page-price mb-4">
+                            @if($product->stock_quantity > 0)
                             @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="product-page-current-price h3">₹{{ number_format($product->sale_price, 2) }}</span>
                                 <span class="product-page-original-price ms-3 text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</span>
                                 @else
                                 <span class="product-page-current-price h3">₹{{ number_format($product->price, 2) }}</span>
+                                @endif
                                 @endif
                         </div>
                         <!-- Description -->
@@ -302,7 +306,7 @@
                                     if (originalPriceEl) originalPriceEl.style.display = 'none';
                                 } else {
                                     // Restore default prices
-                                    @if($product -> sale_price && $product -> sale_price > 0 && $product -> sale_price < $product -> price)
+                                    @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                     if (currentPriceEl) currentPriceEl.innerText = '₹{{ number_format($product->sale_price, 2) }}';
                                     if (originalPriceEl) {
                                         originalPriceEl.style.display = 'inline';
@@ -531,6 +535,7 @@
             min-height: 420px;
             max-height: 600px;
             object-fit: contain;
+            object-position: bottom right;
             border-radius: 7px;
         }
 

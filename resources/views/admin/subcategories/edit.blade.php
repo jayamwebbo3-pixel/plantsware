@@ -44,7 +44,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <!-- <div class="col-md-4">
                     <div class="mb-3">
                         <label for="image" class="form-label">Subcategory Image</label>
                         @if($subcategory->image)
@@ -65,7 +65,7 @@
                             <label class="form-check-label" for="is_active">Active</label>
                         </div>
                     </div> --}}
-                </div>
+                </div> -->
             </div>
 
             <div class="mt-4">

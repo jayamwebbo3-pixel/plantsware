@@ -38,13 +38,7 @@
                         Welcome back! Please enter your details
                     </p>
 
-                    {{-- Session Messages --}}
-                    @if(session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
-                    @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
+                    {{-- Session alerts now use SweetAlert2 Toast --}}
 
                     {{-- ✅ STEP 1: EMAIL ENTRY --}}
                     @if(!session('step') || session('step') == 'email')

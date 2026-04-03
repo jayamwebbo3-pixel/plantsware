@@ -7,7 +7,22 @@
                 <ul class="list-unstyled mb-0">
                     <li class="d-inline-block font-weight-bolder"><a href="{{ route('home') }}" class="text-decoration-none">home</a></li>
                     <li class="d-inline-block font-weight-bolder mx-2">/</li>
-                    <li class="d-inline-block font-weight-bolder"><a href="#" class="text-decoration-none">Categories</a></li>
+                    <li class="d-inline-block font-weight-bolder">
+                        <a href="{{ route('products.index') }}" class="text-decoration-none">
+                            @if(request()->filled('q'))
+                                Search Results
+                            @else
+                                Categories
+                            @endif
+                        </a>
+                    </li>
+                    @if(isset($category))
+                        <li class="d-inline-block font-weight-bolder mx-2">/</li>
+                        <li class="d-inline-block font-weight-bolder">{{ $category->name }}</li>
+                    @elseif(isset($subcategory))
+                        <li class="d-inline-block font-weight-bolder mx-2">/</li>
+                        <li class="d-inline-block font-weight-bolder">{{ $subcategory->name }}</li>
+                    @endif
                 </ul>
             </div>
         </div>
@@ -243,13 +258,23 @@
             <div class="col-lg-9 col-md-8">
                 <div class="products-area">
                     <div class="products-header bg-white rounded p-3 mb-4">
-                        @if(isset($category) && $category->image)
+                        <!-- @if(isset($category) && $category->image)
                         <div class="category-image-banner mb-4 text-center">
                             <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                         </div>
-                        @endif
+                        @endif -->
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-                            <h2 class="category-name mb-2 mb-md-0">{{ isset($category) ? $category->name : 'All Categories' }}</h2>
+                            <h2 class="category-name mb-2 mb-md-0">
+                                @if(request()->filled('q'))
+                                    Search results for "{{ request('q') }}"
+                                @elseif(isset($category))
+                                    {{ $category->name }}
+                                @elseif(isset($subcategory))
+                                    {{ $subcategory->name }}
+                                @else
+                                    All Categories
+                                @endif
+                            </h2>
 
                             <div class="sort-options">
                                 <select id="sort-products" class="form-select">
@@ -269,8 +294,16 @@
                             @include('view.partials.product-card', ['product' => $product])
                         </div>
                         @empty
-                        <div class="col-12">
-                            <p class="text-center">No products found in this category.</p>
+                        <div class="col-12 py-5 text-center">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <p class="h4 text-muted">
+                                @if(request()->filled('q'))
+                                    No products found for "{{ request('q') }}".
+                                @else
+                                    No products available in this category.
+                                @endif
+                            </p>
+                            <a href="{{ route('products.index') }}" class="btn btn-success mt-3" style="background-color: #72a420; border: none;">View All Products</a>
                         </div>
                         @endforelse
                         @if(isset($products) && method_exists($products, 'links'))

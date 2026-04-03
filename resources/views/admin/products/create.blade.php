@@ -1,10 +1,10 @@
 @extends('admin.layout')
 
-@section('title', 'Create Product')
+@section('title', $selectedSubcategory ? 'Create Product - ' . $selectedSubcategory->name : 'Create New Product')
 
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Create Product</h2>
+        <h4>Create Product - {{ $selectedSubcategory->name }}</h4>
         <a href="{{ url()->previous() }}" class="btn btn-secondary">Back</a>
     </div>
 

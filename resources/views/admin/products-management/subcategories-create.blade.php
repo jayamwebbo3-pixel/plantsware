@@ -178,7 +178,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <!-- <div class="col-md-4">
                     <div class="mb-3">
                         <label for="image" class="form-label">Image</label>
                         <input type="file" class="form-control" name="image" id="image" accept="image/*" onchange="if(this.files[0]) { document.getElementById('imagePreview').src = window.URL.createObjectURL(this.files[0]); document.getElementById('previewContainer').style.display = 'block'; } else { document.getElementById('previewContainer').style.display = 'none'; }">
@@ -187,7 +187,7 @@
                             <small class="text-success d-block mt-1">New Image Preview</small>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <div class="mt-4">

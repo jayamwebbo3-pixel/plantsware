@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Categories</h2>
+    <h4>Categories</h4>
     <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Add New Category
     </a>
@@ -22,7 +22,7 @@
                             <i class="fas fa-search"></i>
                         </button>
                         {{-- preserve sorting when submitting search --}}
-                        <input type="hidden" name="per_page" value="{{ request('per_page', 20) }}">
+                        <input type="hidden" name="per_page" value="{{ request('per_page',10) }}">
                         <input type="hidden" name="sort" value="{{ request('sort', 'sort_order') }}">
                         <input type="hidden" name="direction" value="{{ request('direction', 'asc') }}">
                     </div>
@@ -32,10 +32,11 @@
                 <form action="{{ route('admin.products.management') }}" method="GET" class="d-inline">
                     <label class="me-2">Show</label>
                     <select name="per_page" onchange="this.form.submit()" class="form-select d-inline w-auto">
-                        <option value="10" {{ request('per_page', 20) == 10 ? 'selected' : '' }}>10</option>
-                        <option value="25" {{ request('per_page', 20) == 25 ? 'selected' : '' }}>25</option>
-                        <option value="50" {{ request('per_page', 20) == 50 ? 'selected' : '' }}>50</option>
-                        <option value="100" {{ request('per_page', 20) == 100 ? 'selected' : '' }}>100</option>
+                        <option value="5" {{ request('per_page', 10) == 5 ? 'selected' : '' }}>5</option>
+                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page', 10) == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page', 10) == 50 ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ request('per_page', 10) == 100 ? 'selected' : '' }}>100</option>
                     </select>
                     <input type="hidden" name="search" value="{{ request('search') }}">
                     <input type="hidden" name="sort" value="{{ request('sort', 'sort_order') }}">
@@ -45,32 +46,33 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover align-middle">
                 <thead class="table-light">
                     <tr>
+                        <th>S.No.</th>
                         <th>Image</th>
-                        <th>
+                        <th>Name  
                             <a href="{{ route('admin.products.management', [
                                     'sort' => 'name',
                                     'direction' => request('sort') == 'name' && request('direction') == 'asc' ? 'desc' : 'asc',
                                     'search' => request('search'),
-                                    'per_page' => request('per_page', 20)
-                                ]) }}" class="text-dark text-decoration-none">
-                                Name
+                                    'per_page' => request('per_page', 10)
+                                ]) }}">
+                                
                                 @if(request('sort') == 'name')
                                     <i class="fas fa-sort-{{ request('direction') == 'asc' ? 'up' : 'down' }} ms-1"></i>
                                 @endif
                             </a>
                         </th>
                         <th>Badge</th>
-                        <th>
+                        <th>Sort Order
                             <a href="{{ route('admin.products.management', [
                                     'sort' => 'sort_order',
                                     'direction' => request('sort') == 'sort_order' && request('direction') == 'asc' ? 'desc' : 'asc',
                                     'search' => request('search'),
-                                    'per_page' => request('per_page', 20)
-                                ]) }}" class="text-dark text-decoration-none">
-                                Sort Order
+                                    'per_page' => request('per_page', 10)
+                                ]) }}">
+                                
                                 @if(request('sort') == 'sort_order')
                                     <i class="fas fa-sort-{{ request('direction') == 'asc' ? 'up' : 'down' }} ms-1"></i>
                                 @endif
@@ -82,6 +84,7 @@
                 <tbody>
                     @forelse($categories as $category)
                     <tr>
+                        <td>{{ $loop->iteration }}</td>
                         <td>
                             @if($category->image)
                                 <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
@@ -91,7 +94,7 @@
                                 </div>
                             @endif
                         </td>
-                        <td><strong>{{ $category->name }}</strong></td>
+                        <td>{{ $category->name }}</td>
                         <td>
                             @if($category->badge_type)
                                 <span class="badge bg-info">{{ ucfirst($category->badge_type) }}</span>
@@ -100,20 +103,22 @@
                             @endif
                         </td>
                         <td>{{ $category->sort_order ?? 0 }}</td>
-                        <td>
-                            <a href="{{ route('admin.categories.subcategories', $category) }}" class="btn btn-sm btn-outline-primary">
-                                View Subcategories →
-                            </a>
-                            <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-primary" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this category?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+                        <td class="text-nowrap">
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('admin.categories.subcategories', $category) }}" class="btn btn-sm btn-outline-primary">
+                                    View Subcategories →
+                                </a>
+                                <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-primary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirmDelete('Are you sure you want to delete this category?', this)">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty

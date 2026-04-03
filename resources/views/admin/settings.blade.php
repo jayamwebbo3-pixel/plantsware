@@ -16,7 +16,7 @@
                     <div class="row g-4">
                         <!-- GST Configuration Section -->
                         <div class="col-12 mb-2">
-                            <h6 class="fw-bold border-bottom pb-2">
+                            <h6 class="fw-bold border-bottom pb-2" style="color: #0f7e5dff;">
                                 <i class="fas fa-file-invoice-dollar me-2"></i> GST Calculation Settings
                             </h6>
                         </div>
@@ -42,19 +42,19 @@
                                     <input type="number" step="0.01" min="0" name="gst_percentage" id="gst_percentage" class="form-control @error('gst_percentage') is-invalid @enderror" value="{{ old('gst_percentage', $settings->gst_percentage) }}" placeholder="e.g. 18.00">
                                     <span class="input-group-text">%</span>
                                 </div>
+                                 <div class="form-text small">Minimum amount for GST calculation 0</div>
                                 @error('gst_percentage')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
 
-                        <!-- General Website Settings -->
+                        <!-- Footer Settings -->
                         <div class="col-12 mt-4 mb-2">
-                            <h6 class="fw-bold border-bottom pb-2">
-                                <i class="fas fa-globe me-2"></i> Header & Contact Information
+                            <h6 class="fw-bold border-bottom pb-2" style="color: #0f7e5dff;">
+                                <i class="fas fa-shoe-prints me-2"></i>Header & Footer
                             </h6>
                         </div>
-
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label for="header_title" class="form-label fw-semibold">Header Title</label>
@@ -62,6 +62,20 @@
                             </div>
                         </div>
 
+                        <div class="col-md-12">
+                            <div class="form-group mb-3">
+                                <label for="footer_content" class="form-label fw-semibold">Footer About Content</label>
+                                <textarea name="footer_content" id="footer_content" class="form-control" rows="3">{{ old('footer_content', $settings->footer_content) }}</textarea>
+                            </div>
+                        </div>
+
+
+                        <!-- General Website Settings -->
+                        <div class="col-12 mt-4 mb-2">
+                            <h6 class="fw-bold border-bottom pb-2" style="color: #0f7e5dff;">
+                                <i class="fas fa-globe me-2"></i> Contact Information
+                            </h6>
+                        </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label for="email" class="form-label fw-semibold">Contact Email</label>
@@ -79,11 +93,45 @@
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label for="address" class="form-label fw-semibold">Office Address</label>
-                                <textarea name="address" id="address" class="form-control" rows="1">{{ old('address', $settings->address) }}</textarea>
+                                <textarea name="address" id="address" class="form-control" rows="3">{{ old('address', $settings->address) }}</textarea>
                             </div>
                         </div>
 
-                        <!-- SEO Settings -->
+                        <!-- WhatsApp Settings -->
+                        <div class="col-12 mt-4 mb-2">
+                            <h6 class="fw-bold border-bottom pb-2" style="color: #0f7e5dff;">
+                                <i class="fab fa-whatsapp me-2"></i> WhatsApp Settings
+                            </h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="whatsapp_no" class="form-label fw-semibold">WhatsApp Number (with country code e.g. 919876543212)</label>
+                                <input type="text" name="whatsapp_no" id="whatsapp_no" class="form-control" value="{{ old('whatsapp_no', $settings->whatsapp_no) }}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="whatsapp_msg_1" class="form-label fw-semibold">WhatsApp Message 1</label>
+                                <input type="text" name="whatsapp_msg_1" id="whatsapp_msg_1" class="form-control" value="{{ old('whatsapp_msg_1', $settings->whatsapp_msg_1) }}" placeholder="e.g. Chat with us">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="whatsapp_msg_2" class="form-label fw-semibold">WhatsApp Message 2</label>
+                                <input type="text" name="whatsapp_msg_2" id="whatsapp_msg_2" class="form-control" value="{{ old('whatsapp_msg_2', $settings->whatsapp_msg_2) }}" placeholder="e.g. Enquire and Order">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="whatsapp_msg_3" class="form-label fw-semibold">WhatsApp Message 3</label>
+                                <input type="text" name="whatsapp_msg_3" id="whatsapp_msg_3" class="form-control" value="{{ old('whatsapp_msg_3', $settings->whatsapp_msg_3) }}" placeholder="e.g. Green World">
+                            </div>
+                        </div>
+
+                        <!-- SEO Settings
                         <div class="col-12 mt-4 mb-2">
                             <h6 class="fw-bold border-bottom pb-2">
                                 <i class="fas fa-search me-2"></i> SEO Meta Information (Home Page)
@@ -109,25 +157,12 @@
                                 <label for="home_meta_description" class="form-label fw-semibold">Home Meta Description</label>
                                 <textarea name="home_meta_description" id="home_meta_description" class="form-control" rows="2">{{ old('home_meta_description', $settings->home_meta_description) }}</textarea>
                             </div>
-                        </div>
+                        </div> -->
 
-                        <!-- Footer Settings -->
-                        <div class="col-12 mt-4 mb-2">
-                            <h6 class="fw-bold border-bottom pb-2">
-                                <i class="fas fa-shoe-prints me-2"></i> Footer Content
-                            </h6>
-                        </div>
-
-                        <div class="col-md-12">
-                            <div class="form-group mb-3">
-                                <label for="footer_content" class="form-label fw-semibold">Footer About Content</label>
-                                <textarea name="footer_content" id="footer_content" class="form-control" rows="3">{{ old('footer_content', $settings->footer_content) }}</textarea>
-                            </div>
-                        </div>
-
+                        
                         <!-- Social Media Links -->
                         <div class="col-12 mt-4 mb-2">
-                            <h6 class="fw-bold border-bottom pb-2">
+                            <h6 class="fw-bold border-bottom pb-2" style="color: #0f7e5dff;">
                                 <i class="fas fa-share-alt me-2"></i> Social Media Links
                             </h6>
                         </div>
@@ -167,26 +202,7 @@
                             </div>
                         </div>
 
-                        <!-- Footer Titles -->
-                        <div class="col-12 mt-4 mb-2">
-                            <h6 class="fw-bold border-bottom pb-2">
-                                <i class="fas fa-heading me-2"></i> Footer Section Titles
-                            </h6>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="footer_title" class="form-label fw-semibold">About Us Section Title</label>
-                                <input type="text" name="footer_title" id="footer_title" class="form-control" value="{{ old('footer_title', $settings->footer_title) }}">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="footer_contact_title" class="form-label fw-semibold">Contact Section Title</label>
-                                <input type="text" name="footer_contact_title" id="footer_contact_title" class="form-control" value="{{ old('footer_contact_title', $settings->footer_contact_title) }}">
-                            </div>
-                        </div>
+                        
 
                         <div class="col-md-12 mt-4">
                             <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm">

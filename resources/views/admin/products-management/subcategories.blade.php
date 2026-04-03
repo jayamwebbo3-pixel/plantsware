@@ -3,17 +3,22 @@
 @section('title', 'Subcategories - ' . $category->name)
 
 @section('content')
-<div class="mb-4">
+<!-- <div class="mb-4">
     <a href="{{ route('admin.products.management') }}" class="text-decoration-none">
-        ← Back to Categories
+        <i class="fas fa-arrow-left"></i> Back to Categories
     </a>
-</div>
+</div> -->
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Subcategories in "{{ $category->name }}"</h2>
+<div class="d-flex justify-content-between align-items-center mb-4 ">
+    <h4 class="text-secondary">Subcategories in "{{ $category->name }}"</h4>
+    <div class="d-flex gap-2">
+    <a href="{{ route('admin.products.management') }}" class="text-decoration-none">
+        <i class="fas fa-arrow-left"></i> Back to Categories
+    </a>
     <a href="{{ route('admin.categories.subcategories.create', ['category' => $category->id]) }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Add Subcategory
     </a>
+    </div>
 </div>
 
 <div class="card">
@@ -52,30 +57,30 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Image</th>
-                    <th>
+                    <th>S.No</th>
+                    <th>Name
                         <a href="{{ route('admin.categories.subcategories', [
                                 'category' => $category->id,
                                 'sort' => 'name',
                                 'direction' => request('sort') == 'name' && request('direction') == 'asc' ? 'desc' : 'asc',
                                 'search' => request('search'),
                                 'per_page' => request('per_page', 20),
-                            ]) }}" class="text-dark text-decoration-none">
-                            Name
+                            ]) }}">
+                            
                             @if(request('sort') == 'name')
                                 <i class="fas fa-sort-{{ request('direction') == 'asc' ? 'up' : 'down' }} ms-1"></i>
                             @endif
                         </a>
                     </th>
-                    <th>
+                    <th>Sort Order
                         <a href="{{ route('admin.categories.subcategories', [
                                 'category' => $category->id,
                                 'sort' => 'sort_order',
                                 'direction' => request('sort') == 'sort_order' && request('direction') == 'asc' ? 'desc' : 'asc',
                                 'search' => request('search'),
                                 'per_page' => request('per_page', 20),
-                            ]) }}" class="text-dark text-decoration-none">
-                            Sort Order
+                            ]) }}">
+                            
                             @if(request('sort') == 'sort_order')
                                 <i class="fas fa-sort-{{ request('direction') == 'asc' ? 'up' : 'down' }} ms-1"></i>
                             @endif
@@ -89,35 +94,31 @@
                 @forelse($subcategories as $subcategory)
                 <tr>
                     <td>
-                        @if($subcategory->image)
-                            <img src="{{ asset('storage/' . $subcategory->image) }}" style="width: 60px; height: 60px; object-fit: cover;">
-                        @else
-                            <div class="bg-light border d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 8px;">
-                                <i class="fas fa-image text-muted"></i>
-                            </div>
-                        @endif
+                       {{ $loop->iteration }}
                     </td>
-                    <td><strong>{{ $subcategory->name }}</strong></td>
+                    <td>{{ $subcategory->name }}</td>
                     <td>{{ $subcategory->sort_order }}</td>
                     {{-- <td>
                         <span class="badge {{ $subcategory->is_active ? 'bg-success' : 'bg-secondary' }}">
                             {{ $subcategory->is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </td> --}}
-                    <td>
-                        <a href="{{ route('admin.subcategories.products', $subcategory) }}" class="btn btn-sm btn-outline-primary">
-                            View Products &rarr;
-                        </a>
-                        <a href="{{ route('admin.subcategories.edit', $subcategory) }}" class="btn btn-sm btn-primary" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form action="{{ route('admin.subcategories.destroy', $subcategory) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
+                    <td class="text-nowrap">
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('admin.subcategories.products', $subcategory) }}" class="btn btn-sm btn-outline-primary">
+                                View Products &rarr;
+                            </a>
+                            <a href="{{ route('admin.subcategories.edit', $subcategory) }}" class="btn btn-sm btn-primary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ route('admin.subcategories.destroy', $subcategory) }}" method="POST" class="d-inline" onsubmit="return confirmDelete('Are you sure?', this)">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @empty

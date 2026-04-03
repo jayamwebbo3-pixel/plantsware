@@ -154,7 +154,9 @@
                                                 $discount = round((($combo->total_price - $combo->offer_price) / $combo->total_price) * 100);
                                             }
                                         @endphp
-                                        @if($discount > 0)
+                                        @if($combo->stock_quantity <= 0)
+                                            <div class="custom-discount-badge" style="background: #dc3545 !important;">OUT OF STOCK</div>
+                                        @elseif($discount > 0)
                                             <div class="custom-discount-badge">{{ $discount }}% OFF</div>
                                         @endif
                                     </div>
@@ -163,8 +165,12 @@
                                             <a href="{{ route('combo_packs.frontend_show', $combo->slug) }}">{{ $combo->name }}</a>
                                         </h3>
                                         <div class="card-price-row">
-                                            <span class="old-price">₹{{ number_format($combo->total_price, 2) }}</span>
-                                            <span class="new-price">₹{{ number_format($combo->offer_price, 2) }}</span>
+                                            @if($combo->stock_quantity > 0)
+                                                <span class="old-price">₹{{ number_format($combo->total_price, 2) }}</span>
+                                                <span class="new-price">₹{{ number_format($combo->offer_price, 2) }}</span>
+                                            @else
+                                                <div style="height: 30px;"></div>
+                                            @endif
                                         </div>
                                         <div class="card-actions-row">
                                             @if($combo->stock_quantity > 0)

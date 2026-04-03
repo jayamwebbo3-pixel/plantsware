@@ -2,19 +2,21 @@
     <div class="product-image-container">
         <a href="{{ route('product.show', $product->slug) }}">
             @php
-                $mainImage = $product->image ? asset('storage/' . $product->image) : null;
-                $galleryImages = $product->gallery_images ?? [];
-                $hoverImage = !empty($galleryImages) ? asset('storage/' . $galleryImages[0]) : $mainImage;
+            $mainImage = $product->image ? asset('storage/' . $product->image) : null;
+            $galleryImages = $product->gallery_images ?? [];
+            $hoverImage = !empty($galleryImages) ? asset('storage/' . $galleryImages[0]) : $mainImage;
             @endphp
             <img src="{{ $mainImage }}"
                 alt="{{ $product->name }}" class="product-image main-image w-100 h-100" style="object-fit:cover;">
             <img src="{{ $hoverImage }}"
                 alt="{{ $product->name }}" class="product-image hover-image w-100 h-100" style="object-fit:cover;">
-            @if($product->sale_price && $product->sale_price < $product->price)
-                <span class="discount-badge">
-                    {{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
-                </span>
-                @endif
+            @if($product->stock_quantity <= 0)
+                <span class="discount-badge" style="background-color: #dc3545 !important;">OUT OF STOCK</span>
+                @elseif($product->sale_price && $product->sale_price < $product->price)
+                    <span class="discount-badge">
+                        {{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
+                    </span>
+                    @endif
         </a>
     </div>
 
@@ -24,21 +26,21 @@
                 {{ $product->name }}
             </a>
         </h3>
-        
+
         <!-- Product Rating -->
         @if(($product->total_reviews ?? 0) > 0)
         <div class="product-rating mb-2">
             <span class="stars" style="color: #ffc107; font-size: 13px;">
                 @php $avg = $product->avg_rating ?? 0; @endphp
                 @for($i = 1; $i <= 5; $i++)
-                    @if($i <= floor($avg))
-                        <i class="fas fa-star"></i>
+                    @if($i <=floor($avg))
+                    <i class="fas fa-star"></i>
                     @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
-                        <i class="fas fa-star-half-alt"></i>
+                    <i class="fas fa-star-half-alt"></i>
                     @else
-                        <i class="far fa-star"></i>
+                    <i class="far fa-star"></i>
                     @endif
-                @endfor
+                    @endfor
             </span>
             <span class="rating-count text-muted small">({{ $product->total_reviews }})</span>
         </div>
@@ -47,11 +49,15 @@
         @endif
 
         <div class="product-price">
+            @if($product->stock_quantity > 0)
             @if($product->sale_price && $product->sale_price < $product->price)
                 <span class="original-price text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</span>
                 <span class="current-price ms-2 fw-bold">₹{{ number_format($product->sale_price, 2) }}</span>
                 @else
                 <span class="current-price fw-bold">₹{{ number_format($product->price, 2) }}</span>
+                @endif
+                @else
+                <div style="height: 24px;"></div> <!-- Spacer to keep layout consistent -->
                 @endif
         </div>
 

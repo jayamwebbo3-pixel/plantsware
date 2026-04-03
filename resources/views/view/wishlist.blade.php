@@ -231,39 +231,41 @@ async function removeFromWishlistCombo(comboId) {
 }
 
 async function handleRemoveFromWishlist(url) {
-    if (!confirm('Are you sure you want to remove this item from your wishlist?')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(url, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+    Swal.fire({
+        title: 'Remove from Wishlist?',
+        text: "Are you sure you want to remove this item from your wishlist?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#72a420',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, remove it!',
+        cancelButtonText: 'No, keep it'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    showToast(data.message || 'Failed to remove from wishlist', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Failed to remove item. Please try again.', 'error');
             }
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Reload the page is simpler given the complex table structure and potential serial changes
-            window.location.reload();
-            return;
-            /* 
-            // Original logic for animation
-            const rows = document.querySelectorAll('.pro-gl-content');
-            ...
-            */
-        } else {
-            showToast(data.message || 'Failed to remove from wishlist', 'error');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        showToast('Failed to remove item. Please try again.', 'error');
-    }
+    });
 }
 
 // Add to cart from wishlist
@@ -432,53 +434,24 @@ async function addToWishlistFromRelated(productId) {
     }
 }
 
-// Show toast notification
+// Show toast notification using SweetAlert2
 function showToast(message, type = 'success') {
-    // Remove existing toast
-    const existingToast = document.querySelector('.wishlist-toast');
-    if (existingToast) {
-        existingToast.remove();
-    }
-    
-    // Create toast
-    const toast = document.createElement('div');
-    toast.className = `wishlist-toast ${type}`;
-    toast.innerHTML = `
-        <div class="toast-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
-    `;
-    
-    // Style the toast
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'success' ? '#2ecc71' : '#e74c3c'};
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        z-index: 9999;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        animation: slideIn 0.3s ease;
-        max-width: 400px;
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
         }
-    }, 3000);
+    });
+
+    Toast.fire({
+        icon: type,
+        title: message
+    });
 }
 
 // Add CSS animations

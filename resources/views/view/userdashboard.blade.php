@@ -114,10 +114,10 @@
                                 </form>
                                 @endif
                                 <button type="button" class="address-btn address-btn-edit" onclick="editAddress({{ json_encode($address) }})">Edit</button>
-                                <form action="{{ route('user.address.delete', $address->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this address?');">
+                                <form action="{{ route('user.address.delete', $address->id) }}" method="POST" style="display: inline;" class="delete-address-form">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="address-btn address-btn-delete">Delete</button>
+                                    <button type="button" class="address-btn address-btn-delete" onclick="confirmDeleteAddress(this.form)">Delete</button>
                                 </form>
                             </div>
                         </div>
@@ -277,9 +277,9 @@
                                 </span>
 
                                 @if(!in_array(strtolower($order->status), ['shipped', 'delivered', 'cancelled', 'returned', 'return_requested', 'return_rejected', 'completed']))
-                                <form action="{{ route('user.order.cancel', $order->id) }}" method="POST" style="display:inline; margin-left:10px;" onclick="event.stopPropagation();" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                <form action="{{ route('user.order.cancel', $order->id) }}" method="POST" style="display:inline; margin-left:10px;" class="cancel-order-form">
                                     @csrf
-                                    <button type="submit" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid #dc3545; color: #dc3545; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Cancel</button>
+                                    <button type="button" onclick="event.stopPropagation(); confirmCancelOrder(this.form);" style="background-color: transparent; border: 1px solid #dc3545; color: #dc3545; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Cancel</button>
                                 </form>
                                 @endif
 
@@ -851,10 +851,56 @@
 
     // Add to Cart
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            alert('Product added to cart!');
+        btn.addEventListener('click', (e) => {
+            // Let the form submit naturally if it's in a form, otherwise show toast
+            const toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+            toast.fire({
+                icon: 'success',
+                title: 'Product added to cart!'
+            });
         });
     });
+
+    // Confirmation functions
+    function confirmDeleteAddress(form) {
+        Swal.fire({
+            title: 'Delete Address?',
+            text: "Are you sure you want to delete this address? This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+
+    function confirmCancelOrder(form) {
+        Swal.fire({
+            title: 'Cancel Order?',
+            text: "Are you sure you want to cancel this order?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
 
     // Address Selection UI implementation
     document.addEventListener('DOMContentLoaded', function() {

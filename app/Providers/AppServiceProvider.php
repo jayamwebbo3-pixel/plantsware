@@ -33,6 +33,12 @@ class AppServiceProvider extends ServiceProvider
             
             $view->with('headerFooter', $headerFooter);
             $view->with('headerCategories', $categories);
+
+            // Dynamically calculate counts to avoid stale session bugs
+            $view->with('cartCount', \App\Models\Cart::current()->sum('quantity') ?? 0);
+            $view->with('wishlistCount', \Illuminate\Support\Facades\Auth::check() 
+                ? \Illuminate\Support\Facades\Auth::user()->wishlist()->count() ?? 0 
+                : 0);
         });
     }
 }

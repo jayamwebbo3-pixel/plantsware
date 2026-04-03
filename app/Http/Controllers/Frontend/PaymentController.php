@@ -103,23 +103,8 @@ class PaymentController extends Controller
 
                 $order = Order::with(['items.product', 'user'])->findOrFail($transaction->order_id);
 
-                // Re-verify stock before confirming the order
-                foreach ($order->items as $item) {
-                    $stock = 0;
-                    $name = '';
-                    if ($item->combo_pack_id) {
-                        $combo = \App\Models\ComboPack::find($item->combo_pack_id);
-                        $stock = $combo ? $combo->stock_quantity : 0;
-                        $name = $combo ? $combo->name : 'Unknown Combo';
-                    } else {
-                        $stock = $item->product ? $item->product->stock_quantity : 0;
-                        $name = $item->product ? $item->product->name : 'Unknown Product';
-                    }
-
-                    if ($item->quantity > $stock) {
-                        throw new Exception("Insufficient stock for: " . $name);
-                    }
-                }
+                // Stock is already reserved/reduced via TempCartService during checkout initiation
+                // No need to re-verify here as it causes "Insufficient stock" errors when stock reaches 0 after reservation.
 
                 $order->update([
                     'status' => 'confirmed', // Fulfilment starts at confirmed
@@ -141,6 +126,9 @@ class PaymentController extends Controller
                 try {
                     Cart::where('user_id', $transaction->user_id)->delete();
                     session()->forget('shipping_address');
+                    
+                    // Update session counts immediately for header display
+                    session(['cart_count' => 0]);
                 } catch (Exception $e) {
                 }
 

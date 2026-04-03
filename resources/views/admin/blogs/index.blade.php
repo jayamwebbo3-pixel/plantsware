@@ -44,7 +44,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $blog->title }}</td>
                                         <!-- <td>{{ $blog->blogCategory?->name ?? '—' }}</td> -->
-                                        <td>{{ $blog->author_name ?? 'Admin' }}</td>
+                                        <!-- <td>{{ $blog->author_name ?? 'Admin' }}</td> -->
                                         <td>{{ $blog->published_at?->format('d M Y') ?? 'Draft' }}</td>
                                         <td>
                                             @if($blog->is_active)

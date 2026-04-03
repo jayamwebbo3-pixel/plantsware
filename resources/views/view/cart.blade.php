@@ -155,7 +155,7 @@
                                             <span class="summary-amount total" id="cartTotal">₹{{ number_format($total ?? $subtotal ?? 0, 2) }}</span>
                                         </div>
                                         <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">Proceed to Checkout</button>
-                                        <button type="button" class="continue-shopping-btn" onclick="window.location='{{ route('home') }}'">Continue Shopping</button>
+                                        <button type="button" class="continue-shopping-btn w-100" onclick="window.location='{{ route('home') }}'">Continue Shopping</button>
                                         <button type="button" class="clear-cart-btn btn-clear-red w-100 mt-2" onclick="clearCart()">
                                             <i class="fas fa-trash"></i> Clear Cart
                                         </button>
@@ -301,155 +301,157 @@
 
     // Remove item function
     function removeCartItem(itemId) {
-        if (!confirm('Are you sure you want to remove this item from cart?')) {
-            return;
+        Swal.fire({
+            title: 'Remove Item?',
+            text: "Are you sure you want to remove this item from your cart?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#72a420',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, remove it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log('Removing item:', itemId);
+                fetch(`${baseUrl}/cart/remove/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(async response => {
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                    }
+                    return data;
+                })
+                .then(data => {
+                    if (data.success) {
+                        const cartItem = document.getElementById(`cartItem_${itemId}`);
+                        if (cartItem) {
+                            cartItem.style.transition = 'opacity 0.3s';
+                            cartItem.style.opacity = '0';
+                            setTimeout(() => {
+                                cartItem.remove();
+                                // ... (rest of the update logic remains same)
+                                updateTotals(data);
+                                // Check if cart is empty
+                                const cartItemsWrapper = document.getElementById('cartItemsWrapper');
+                                if ((cartItemsWrapper && cartItemsWrapper.children.length === 0) || !document.querySelector('.cart-item')) {
+                                    showEmptyCart();
+                                }
+                                showMessage(data.message || 'Item removed!', 'success');
+                            }, 300);
+                        }
+                    } else {
+                        showMessage(data.message || 'Failed to remove item', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage(error.message || 'Failed to remove item. Please try again.', 'error');
+                });
+            }
+        });
+    }
+
+    // Helper for updating totals
+    function updateTotals(data) {
+        if (data.subtotal) {
+            document.getElementById('cartSubtotal').textContent = `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
         }
-        console.log('Removing item:', itemId);
-        fetch(`${baseUrl}/cart/remove/${itemId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+        if (data.total) {
+            document.getElementById('cartTotal').textContent = `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        }
+        if (data.discount !== undefined) {
+            document.getElementById('cartDiscount').textContent = `-₹${parseFloat(data.discount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        }
+        if (data.totalWeight !== undefined) {
+            document.getElementById('cartWeight').textContent = `${data.totalWeight} KG`;
+        }
+        if (data.shipping !== undefined) {
+            const shipEl = document.getElementById('cartShipping');
+            shipEl.textContent = data.shipping > 0 ? `₹${parseFloat(data.shipping).toLocaleString('en-IN', {minimumFractionDigits: 2})}` : 'Free';
+        }
+        if (data.tax !== undefined) {
+            const taxEl = document.getElementById('cartTax');
+            const taxRow = document.getElementById('taxRow');
+            const taxLabelEl = document.getElementById('cartTaxLabel');
+            if (taxEl) {
+                taxEl.textContent = `₹${parseFloat(data.tax).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
             }
-        })
-        .then(async response => {
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                throw new Error(data.message || `HTTP error! status: ${response.status}`);
+            if (taxLabelEl && data.taxPercentage !== undefined) {
+                taxLabelEl.textContent = `GST (${data.taxPercentage}%):`;
             }
-            return data;
-        })
-        .then(data => {
-            if (data.success) {
-                const cartItem = document.getElementById(`cartItem_${itemId}`);
-                if (cartItem) {
-                    cartItem.style.transition = 'opacity 0.3s';
-                    cartItem.style.opacity = '0';
-                    setTimeout(() => {
-                        cartItem.remove();
-                        // Update cart totals
-                        if (data.subtotal) {
-                            document.getElementById('cartSubtotal').textContent =
-                                `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                        }
-                        if (data.total) {
-                            document.getElementById('cartTotal').textContent =
-                                `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                        }
-                        if (data.discount !== undefined) {
-                            document.getElementById('cartDiscount').textContent =
-                                `-₹${parseFloat(data.discount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                        }
-                        if (data.totalWeight !== undefined) {
-                            document.getElementById('cartWeight').textContent = `${data.totalWeight} KG`;
-                        }
-                        if (data.shipping !== undefined) {
-                            const shipEl = document.getElementById('cartShipping');
-                            shipEl.textContent = data.shipping > 0 
-                                ? `₹${parseFloat(data.shipping).toLocaleString('en-IN', {minimumFractionDigits: 2})}`
-                                : 'Free';
-                        }
-                        if (data.tax !== undefined) {
-                            const taxEl = document.getElementById('cartTax');
-                            const taxRow = document.getElementById('taxRow');
-                            const taxLabelEl = document.getElementById('cartTaxLabel');
-                            
-                            if (taxEl) {
-                                taxEl.textContent = `₹${parseFloat(data.tax).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                            }
-                            if (taxLabelEl && data.taxPercentage !== undefined) {
-                                taxLabelEl.textContent = `GST (${data.taxPercentage}%):`;
-                            }
-                            if (taxRow) {
-                                taxRow.style.display = data.tax > 0 ? 'flex' : 'none';
-                            }
-                        }
-                        const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
-                        cartCountEls.forEach(el => {
-                            if (data.cart_count !== undefined) el.textContent = data.cart_count;
-                        });
-                        // Check if cart is empty
-                        const cartItemsWrapper = document.getElementById('cartItemsWrapper');
-                        // Or fallback: count remaining .cart-item
-                        if (
-                            (cartItemsWrapper && cartItemsWrapper.children.length === 0)
-                            || !document.querySelector('.cart-item')
-                        ) {
-                            showEmptyCart();
-                        }
-                        showMessage(data.message || 'Item removed!', 'success');
-                    }, 300);
-                }
-            } else {
-                showMessage(data.message || 'Failed to remove item', 'error');
+            if (taxRow) {
+                taxRow.style.display = data.tax > 0 ? 'flex' : 'none';
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage(error.message || 'Failed to remove item. Please try again.', 'error');
+        }
+        const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
+        cartCountEls.forEach(el => {
+            if (data.cart_count !== undefined) el.textContent = data.cart_count;
         });
     }
 
     // Clear cart function
     function clearCart() {
-        if (!confirm('Are you sure you want to clear your entire cart?')) {
-            return;
-        }
-        console.log('Clearing cart...');
-        fetch(`${baseUrl}/cart/clear`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(async response => {
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                throw new Error(data.message || `HTTP error! status: ${response.status}`);
-            }
-            return data;
-        })
-        .then(data => {
-            if (data.success) {
-                // Animate and remove all items
-                const cartItems = document.querySelectorAll('.cart-item');
-                cartItems.forEach((item, index) => {
-                    item.style.transition = 'opacity 0.3s';
-                    item.style.opacity = '0';
-                    setTimeout(() => {
-                        item.remove();
-                    }, index * 100);
+        Swal.fire({
+            title: 'Clear Cart?',
+            text: "Are you sure you want to clear your entire cart?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, clear it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log('Clearing cart...');
+                fetch(`${baseUrl}/cart/clear`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(async response => {
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                    }
+                    return data;
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Animate and remove all items
+                        const cartItems = document.querySelectorAll('.cart-item');
+                        cartItems.forEach((item, index) => {
+                            item.style.transition = 'opacity 0.3s';
+                            item.style.opacity = '0';
+                            setTimeout(() => {
+                                item.remove();
+                            }, index * 100);
+                        });
+                        setTimeout(() => {
+                            updateTotals(data);
+                            showEmptyCart();
+                            showMessage(data.message || 'Cart cleared!', 'success');
+                        }, cartItems.length * 100);
+                    } else {
+                        showMessage(data.message || 'Failed to clear cart', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage(error.message || 'Failed to clear cart. Please try again.', 'error');
                 });
-                setTimeout(() => {
-                    // Update totals
-                    if (data.subtotal) {
-                        document.getElementById('cartSubtotal').textContent =
-                            `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                    }
-                    if (data.total) {
-                        document.getElementById('cartTotal').textContent =
-                            `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                    }
-                    // Update cart count
-                    const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
-                    cartCountEls.forEach(el => {
-                        if (data.cart_count !== undefined) el.textContent = data.cart_count;
-                    });
-                    showEmptyCart();
-                    showMessage(data.message || 'Cart cleared!', 'success');
-                }, cartItems.length * 100);
-            } else {
-                showMessage(data.message || 'Failed to clear cart', 'error');
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage(error.message || 'Failed to clear cart. Please try again.', 'error');
         });
     }
 
@@ -473,35 +475,24 @@
         }
     }
 
-    // Show message popup
+    // Show message popup using SweetAlert2 Toast
     function showMessage(message, type = 'info') {
-        // Remove existing messages
-        const existingMsg = document.querySelector('.cart-message');
-        if (existingMsg) {
-            existingMsg.remove();
-        }
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
 
-        // Create message element
-        const msgEl = document.createElement('div');
-        msgEl.className = `cart-message alert alert-${type === 'success' ? 'success' : 'danger'}`;
-        msgEl.textContent = message;
-
-        // Style it
-        msgEl.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            min-width: 300px;
-            animation: fadeIn 0.3s;
-        `;
-
-        document.body.appendChild(msgEl);
-
-        setTimeout(() => {
-            msgEl.style.animation = 'fadeOut 0.3s';
-            setTimeout(() => msgEl.remove(), 300);
-        }, 3000);
+        Toast.fire({
+            icon: type,
+            title: message
+        });
     }
 
     // Add CSS animations
@@ -681,7 +672,7 @@
 
 .continue-shopping-btn {
     display: block;
-    width: 100%;
+    width: 30%;
     margin-top: 10px;
     background-color: #fff;
     color: var(--primary-color) !important;

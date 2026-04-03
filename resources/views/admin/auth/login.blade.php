@@ -4,46 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Plantsware</title>
+     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/fav-icon.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, #134e5e, #71b280);
+            background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), 
+                        url('{{ asset('assets/images/login-bg.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
         }
         .login-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 40px;
-            max-width: 400px;
-            width: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px 40px;
+            max-width: 450px;
+            width: 90%;
+            transition: all 0.3s ease;
         }
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
         .login-header h2 {
-            color: #1590ceff;
+            color: #134e5e;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-top: 10px;
+        }
+        .form-label {
             font-weight: 600;
+            color: #444;
+            margin-bottom: 8px;
+        }
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-right: none;
+            color: #134e5e;
+        }
+        .form-control {
+            border-left: none;
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
         }
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: #71b280;
+            box-shadow: 0 0 0 0.25rem rgba(113, 178, 128, 0.2);
         }
         .btn-login {
-           background: linear-gradient(135deg, #134e5e, #71b280);
+            background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
             border: none;
-            padding: 12px;
-            font-weight: 600;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 1.1rem;
             width: 100%;
+            border-radius: 12px;
+            margin-top: 10px;
+            color: white;
+            transition: all 0.3s ease;
         }
         .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(19, 78, 94, 0.3);
+            background: linear-gradient(135deg, #0f3d4a 0%, #5a8e66 100%);
+        }
+        .input-group .btn-outline-secondary {
+            border-left: none;
+            background: white;
+            color: #666;
+            border-color: #dee2e6;
         }
         /* Hide browser-default password reveal icons */
         ::-ms-reveal, ::-ms-clear {
@@ -54,7 +93,8 @@
 <body>
     <div class="login-card">
         <div class="login-header">
-            <h2><i class="fas fa-leaf"></i> Admin Login</h2>
+             @php $headerFooter = \App\Models\HeaderFooter::first(); @endphp
+                     <img src="{{ asset('assets/images/logo-1.png') }}" alt="Plantly Logo" style="background-color: #fff; border: 1px solid #bd1313ff; border-radius: 10px; margin-bottom: 15px;height: 13vh;width: 14vw;object-fit: cover;">
             <!-- <p class="text-muted">Plantsware Admin Panel</p> -->
         </div>
 

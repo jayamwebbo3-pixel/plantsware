@@ -1,10 +1,10 @@
 @extends('admin.layout')
 
-@section('title', 'Edit Product')
+@section('title', $product->subcategory ? 'Edit Product - ' . $product->name : 'Edit Product')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Edit Product</h2>
+    <h4>Edit Product - {{ $product->name }}</h4>
     <a href="{{ route('admin.subcategories.products', $product->subcategory_id) }}" class="btn btn-secondary">Back</a>
 </div>
 

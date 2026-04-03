@@ -70,11 +70,27 @@ class PageController extends Controller
         $page->content = $request->input('content');
         $page->policy_date = $request->input('policy_date');
         
+        // Handle extra_content merging
+        $extraContent = $page->extra_content ?? [];
+        
         if ($request->has('features')) {
-            $page->extra_content = ['features' => $request->input('features')];
-        } elseif ($request->has('extra_content')) {
-            $page->extra_content = $request->input('extra_content');
+            $extraContent['features'] = $request->input('features');
         }
+
+        if ($request->has('extra_content')) {
+            $extraContent = array_merge($extraContent, $request->input('extra_content'));
+        }
+
+        // Specific handling for CTA background image on about-us page
+        if ($request->hasFile('cta_bg_image')) {
+            if (isset($extraContent['cta_bg_image']) && Storage::disk('public')->exists($extraContent['cta_bg_image'])) {
+                Storage::disk('public')->delete($extraContent['cta_bg_image']);
+            }
+            $ctaPath = $request->file('cta_bg_image')->store('pages', 'public');
+            $extraContent['cta_bg_image'] = $ctaPath;
+        }
+
+        $page->extra_content = $extraContent;
 
         $page->save();
 

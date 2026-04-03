@@ -10,11 +10,6 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h4 class="mb-0">Combo Packs</h4>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item active text-muted small">Combo Management</li>
-                    </ol>
-                </nav>
             </div>
             <div class="d-flex gap-2">
                 <a href="{{ route('admin.combo-only-products.index') }}" class="btn btn-outline-success fw-bold">
@@ -50,19 +45,21 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="ps-4">Preview</th>
+                                    <th>S.No</th>
+                                    <th>Preview</th>
                                     <th>Name</th>
                                     <th>Pricing</th>
                                     <th>Stock</th>
                                     <th>Status</th>
                                     <th>Rating</th>
-                                    <th class="text-end pe-4">Actions</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($comboPacks as $combo)
                                     <tr>
-                                        <td class="ps-4">
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
                                             @php $imgs = $combo->images @endphp
                                             <div class="composite-preview">
                                                 @foreach(array_slice($imgs ?? [], 0, 2) as $img)
@@ -72,7 +69,7 @@
                                         </td>
                                         <td>
                                             <div class="fw-bold">{{ $combo->name }}</div>
-                                            <small class="text-muted">{{ $combo->slug }}</small>
+                                           
                                         </td>
 
                                         <td>
@@ -119,7 +116,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <a href="{{ route('admin.reviews.index') }}?combo_pack_id={{ $combo->id }}" class="text-decoration-none">
+                                            <a href="{{ route('admin.reviews.index') }}?combo_pack_id={{ $combo->id }}">
                                                 <div class="d-flex align-items-center">
                                                     <span class="text-warning me-1"><i class="fas fa-star"></i></span>
                                                     <strong>{{ number_format($combo->avg_rating, 1) }}</strong>
@@ -127,12 +124,12 @@
                                                 </div>
                                             </a>
                                         </td>
-                                        <td class="text-end pe-4">
-                                            <button class="btn btn-sm btn-outline-primary border-0" onclick="editCombo({{ $combo->id }})"><i class="fas fa-edit"></i></button>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary border-0" onclick="editCombo({{ $combo->id }})"><i class="fas fa-edit"></i></button>
                                             <form action="{{ route('admin.combo-packs.destroy', $combo->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this combo?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger border-0"><i class="fas fa-trash"></i></button>
+                                                <button type="submit" class="btn btn-sm btn-danger border-0"><i class="fas fa-trash"></i></button>
                                             </form>
                                         </td>
                                     </tr>

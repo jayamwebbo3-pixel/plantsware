@@ -6,11 +6,11 @@
                 <h5>About Us</h5>
                 <p>{{ $headerFooter->footer_content ?? 'We are passionate about providing high-quality gardening products and solutions to help you create beautiful, thriving green spaces.' }}</p>
                 <div class="social-links">
-                    @if($headerFooter->facebook_link) <a href="{{ $headerFooter->facebook_link }}"><i class="fab fa-facebook-f"></i></a> @endif
-                    @if($headerFooter->twitter_link) <a href="{{ $headerFooter->twitter_link }}"><i class="fab fa-twitter"></i></a> @endif
-                    @if($headerFooter->insta_link) <a href="{{ $headerFooter->insta_link }}"><i class="fab fa-instagram"></i></a> @endif
-                    @if($headerFooter->linkedin_link) <a href="{{ $headerFooter->linkedin_link }}"><i class="fab fa-linkedin-in"></i></a> @endif
-                    @if($headerFooter->youtube_link) <a href="{{ $headerFooter->youtube_link }}"><i class="fab fa-youtube"></i></a> @endif
+                    @if($headerFooter->facebook_link) <a href="{{ $headerFooter->facebook_link }}" target="_blank"><i class="fab fa-facebook-f"></i></a> @endif
+                    @if($headerFooter->twitter_link) <a href="{{ $headerFooter->twitter_link }}" target="_blank"><i class="fab fa-twitter"></i></a> @endif
+                    @if($headerFooter->insta_link) <a href="{{ $headerFooter->insta_link }}" target="_blank"><i class="fab fa-instagram"></i></a> @endif
+                    @if($headerFooter->linkedin_link) <a href="{{ $headerFooter->linkedin_link }}" target="_blank"><i class="fab fa-linkedin-in"></i></a> @endif
+                    @if($headerFooter->youtube_link) <a href="{{ $headerFooter->youtube_link }}" target="_blank"><i class="fab fa-youtube"></i></a> @endif
                 </div>
             </div>
 
@@ -20,7 +20,7 @@
                 <ul>
                     <li><a href="{{ route('home') }}">Home</a></li>
                     <li><a href="{{ url('about') }}">About Us</a></li>
-                    <li><a href="{{ route('products.index') }}">Products</a></li>
+                    <li><a href="{{ url('combo-packs') }}">Combo Packs</a></li>
                     <li><a href="{{ route('blog.index') }}">Blog</a></li>
                     <li><a href="{{ url('privacy-policy') }}">Privacy Policy</a></li>
                     <li><a href="{{ url('terms-conditions') }}">Terms & Conditions</a></li>
@@ -84,7 +84,7 @@
 
                         <!-- Left Side -->
                         <p class="mb-2 mb-md-0">
-                            &copy; 2025 Plantsware. All rights reserved.
+                            &copy; 2026 Plantsware. All rights reserved.
                         </p>
 
                         <div class="footer-bottom-payment d-flex justify-content-center">
@@ -120,14 +120,16 @@
 <!-- footer -->
 <!-- footer end -->
 <!-- Floating WhatsApp Button -->
-<a href="https://wa.me/919876543212?text=Hello! I have a question about your products." class="whatsapp-float shadow-lg" target="_blank">
+@if($headerFooter->whatsapp_no)
+<a href="https://wa.me/{{ $headerFooter->whatsapp_no }}?text=Hello! I have a question about your products." class="whatsapp-float shadow-lg" target="_blank">
     <div class="whatsapp-message-container">
-        <div class="whatsapp-message">Chat with us</div>
-        <div class="whatsapp-message">Enquire and Order</div>
-        <div class="whatsapp-message">Green World</div>
+        <div class="whatsapp-message">{{ $headerFooter->whatsapp_msg_1 ?? 'Chat with us' }}</div>
+        <div class="whatsapp-message">{{ $headerFooter->whatsapp_msg_2 ?? 'Enquire and Order' }}</div>
+        <div class="whatsapp-message">{{ $headerFooter->whatsapp_msg_3 ?? 'Green World' }}</div>
     </div>
     <i class="fab fa-whatsapp"></i>
 </a>
+@endif
 
 <style>
     .whatsapp-float {
@@ -166,8 +168,9 @@
         font-size: 14px;
         font-weight: 500;
         white-space: nowrap;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        min-width: 160px; /* Stable width for longest message */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        min-width: 160px;
+        /* Stable width for longest message */
         height: 40px;
         display: flex;
         align-items: center;
@@ -186,22 +189,59 @@
     }
 
     /* Sequential timing: 2s per message in a 6s total cycle */
-    .whatsapp-message:nth-child(1) { animation-delay: 0s; }
-    .whatsapp-message:nth-child(2) { animation-delay: 2s; }
-    .whatsapp-message:nth-child(3) { animation-delay: 4s; }
+    .whatsapp-message:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    .whatsapp-message:nth-child(2) {
+        animation-delay: 2s;
+    }
+
+    .whatsapp-message:nth-child(3) {
+        animation-delay: 4s;
+    }
 
     @keyframes fade-sequence {
-        0% { opacity: 0; transform: translateY(10px); }
-        5% { opacity: 1; transform: translateY(0); }
-        28% { opacity: 1; transform: translateY(0); }
-        33% { opacity: 0; transform: translateY(-10px); }
-        100% { opacity: 0; }
+        0% {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        5% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        28% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        33% {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        100% {
+            opacity: 0;
+        }
     }
 
     @keyframes pulse-whatsapp {
-        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-        70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
-        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+        }
+
+        70% {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+        }
+
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+        }
     }
 
     @media (max-width: 768px) {
@@ -212,7 +252,10 @@
             bottom: 20px;
             right: 20px;
         }
-        .whatsapp-message-container { display: none; }
+
+        .whatsapp-message-container {
+            display: none;
+        }
     }
 </style>
 
@@ -227,6 +270,39 @@
 <script src="{{ asset('assets/js/all.min.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.fancybox.min.js') }}"></script>
 <script src="{{ asset('assets/js/custom.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        const successMessage = "{{ session('success') }}";
+        const errorMessage = "{{ session('error') }}";
+
+        if (successMessage) {
+            Toast.fire({
+                icon: 'success',
+                title: successMessage
+            });
+        }
+
+        if (errorMessage) {
+            Toast.fire({
+                icon: 'error',
+                title: errorMessage
+            });
+        }
+    });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>

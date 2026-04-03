@@ -220,9 +220,9 @@ class CheckoutController extends Controller
         $total = $subtotal + $shipping + $tax;
 
         $order = Order::create([
-            'order_number' => 'ORD-' . strtoupper(uniqid()),
+            'order_number' => 'PLW-' . strtoupper(uniqid()),
             'user_id' => auth()->id(),
-            'shipping_address' => $shippingAddress, // JSON encoded via Model cast
+            'shipping_address' => $shippingAddress,
             'subtotal' => $subtotal,
             'shipping' => $shipping,
             'tax' => $tax,
@@ -231,7 +231,7 @@ class CheckoutController extends Controller
             'total_discount' => $discount,
             'status' => 'pending',
             'payment_status' => 'pending',
-            'payment_method' => 'online',
+            'payment_method' => $request->payment_method ?? 'online',
         ]);
 
         foreach ($cartItems as $item) {
@@ -258,6 +258,17 @@ class CheckoutController extends Controller
             ]);
         }
 
+        // Logic split by payment method
+        if ($order->payment_method === 'cod') {
+            // Clear cart immediately
+            Cart::current()->delete();
+            session()->forget('shipping_address');
+            session(['cart_count' => 0]);
+
+            return redirect()->route('checkout.confirmation', $order->id)->with('success', 'Order placed successfully (Cash on Delivery).');
+        }
+
+        // Online Payment Flow
         $transaction = \App\Models\PaymentTransaction::create([
             'user_id' => auth()->id(),
             'transaction_ref' => 'TXN-' . strtoupper(uniqid()),
@@ -265,7 +276,7 @@ class CheckoutController extends Controller
             'payment_method' => 'online',
             'status' => 'INITIATED',
             'order_id' => $order->id,
-            'checkout_data' => [] // No longer need to save array in JSON, the order contains it all
+            'checkout_data' => [] 
         ]);
 
         return redirect()->route('payment.gateway', ['transaction_ref' => $transaction->transaction_ref]);

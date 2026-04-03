@@ -151,13 +151,13 @@
                             <h4 class="mb-0 text-secondary">{{ $stats['returned'] ?? 0 }}</h4>
                             <small class="text-muted">Returned</small>
                         </div>
-                        <div class="col-lg-10 col-md-8 col-6 mb-3 text-start small text-muted d-flex align-items-center">
+                        <!-- <div class="col-lg-10 col-md-8 col-6 mb-3 text-start small text-muted d-flex align-items-center">
                             <span>
                                 Returned Requested: {{ $stats['return_requested'] ?? 0 }} |
                                 Returned Approved: {{ $stats['return_approved'] ?? 0 }} |
                                 Returned Rejected: {{ $stats['return_rejected'] ?? 0 }}
                             </span>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -297,9 +297,9 @@
                             @endif
                             <td class="align-middle small">
                                 @if($item->product && !$item->combo_pack_id)
-                                <a href="{{ route('product.show', $item->product->slug ?? '') }}" target="_blank" class="text-decoration-none fw-bold" style="color:#2ea25a;">{{ $item->product_name }}</a>
+                                <a href="{{ route('product.show', $item->product->slug ?? '') }}" target="_blank" style="color:#2ea25a;">{{ $item->product_name }}</a>
                                 @elseif($item->comboPack)
-                                <a href="{{ route('combo_packs.frontend_show', $item->comboPack->slug ?? '') }}" target="_blank" class="text-decoration-none fw-bold" style="color:#2ea25a;">{{ $item->product_name }}</a> <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">COMBO</span>
+                                <a href="{{ route('combo_packs.frontend_show', $item->comboPack->slug ?? '') }}" target="_blank" style="color:#2ea25a;">{{ $item->product_name }}</a> <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">COMBO</span>
                                 @else
                                 <span class="fw-bold">{{ $item->product_name }}</span>
                                 @endif
@@ -364,7 +364,7 @@
                                     {{ ucfirst(str_replace('_', ' ', $order->status)) }}
                                 </span>
                             </td>
-                            <td rowspan="{{ $itemCount }}" class="align-middle">
+                            <td rowspan="{{ $itemCount }}" class="text-nowrap align-middle">
                                 <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-info mb-1" title="View Order">
                                     <i class="fas fa-eye"></i>
                                 </a>
@@ -439,7 +439,7 @@
                                     {{ ucfirst(str_replace('_', ' ', $order->status)) }}
                                 </span>
                             </td>
-                            <td class="align-middle">
+                            <td class="text-nowrap align-middle">
                                 <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-info mb-1" title="View Order">
                                     <i class="fas fa-eye"></i>
                                 </a>

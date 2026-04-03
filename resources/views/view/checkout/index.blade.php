@@ -99,43 +99,104 @@
             <a href="{{ route('checkout.address') }}" class="btn btn-secondary">Edit Address</a>
         </div>
     </div>
-    <form action="{{ route('checkout.placeOrder') }}" method="POST">
+    <form action="{{ route('checkout.placeOrder') }}" method="POST" class="mt-4">
         @csrf
-        <div class="form-group mb-4">
-            <label class="font-weight-bold">Payment Method</label>
-            <select name="payment_method" class="form-control" readonly>
-                <option value="online">Online Payment (Cards/UPI/Netbanking)</option>
-            </select>
+        <div class="payment-selection mb-4">
+            <label class="font-weight-bold text-dark mb-2" style="font-size: 16px;">
+                <i class="fas fa-wallet text-success me-1"></i> Choose Payment Method
+            </label>
+            <div class="custom-select-wrapper position-relative">
+                <select name="payment_method" id="payment_method" class="form-control form-select py-3 px-4 shadow-sm" 
+                        style="border: 2px solid #e0e0e0; border-radius: 12px; font-weight: 600; cursor: pointer; background-color: #fff !important; height: auto !important; position: relative; z-index: 5;">
+                    <option value="online" selected>💳 Online Payment (Zero Transaction Fee)</option>
+                    <option value="cod">🚚 Cash on Delivery (COD)</option>
+                </select>
+            </div>
+            
+            <!-- Accepted Icons -->
+            <div id="payment-icons-list" class="mt-3 p-3 bg-light rounded d-flex flex-wrap align-items-center justify-content-center gap-2 border shadow-sm">
+                <span class="small text-muted w-100 text-center mb-2">We Accept:</span>
+                <img src="https://christianbooksworld.com/home/img/hero-bg/visa.png" alt="Visa" style="height: 20px;">
+                <img src="https://christianbooksworld.com/home/img/hero-bg/rupay.png" alt="RuPay" style="height: 20px;">
+                <img src="https://christianbooksworld.com/home/img/hero-bg/gpay.png" alt="GPay" style="height: 20px;">
+                <img src="https://christianbooksworld.com/home/img/hero-bg/paytm.png" alt="Paytm" style="height: 20px;">
+                <img src="https://christianbooksworld.com/home/img/hero-bg/upi.webp" alt="UPI" style="height: 20px;">
+            </div>
         </div>
-        <button type="submit" class="btn btn-success w-100 py-3 font-weight-bold">Proceed to Payment -> </button>
+
+        <button type="submit" class="btn btn-success w-100 py-3 rounded-pill font-weight-bold shadow transition-all hover-scale" 
+                style="font-size: 18px; letter-spacing: 0.5px; background-color: #28a745 !important; border-color: #28a745 !important; color: #ffffff !important; display: block !important; border-width: 0;">
+            SECURE CHECKOUT <i class="fas fa-lock ms-2"></i>
+        </button>
     </form>
+
+    <style>
+        .custom-select-wrapper {
+            position: relative;
+        }
+        .form-select:focus {
+            border-color: #28a745 !important;
+            box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.15) !important;
+        }
+        .hover-scale:active {
+            transform: scale(0.97);
+        }
+        @media (max-width: 576px) {
+            #payment-icons-list img {
+                height: 16px !important;
+            }
+            .form-select {
+                font-size: 14px !important;
+                padding: 10px 15px !important;
+            }
+        }
+    </style>
 </div>
 
 <script>
     function removeCheckoutItem(cartId) {
-        if (confirm('Remove this item from your order?')) {
-            fetch(`{{ url('cart/remove') }}/${cartId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload(); 
-                } else {
-                    alert(data.message || 'Error removing item');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            });
-        }
+        Swal.fire({
+            title: 'Remove Item?',
+            text: "Are you sure you want to remove this item from your order?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#72a420',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, remove it!',
+            cancelButtonText: 'No'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`{{ url('cart/remove') }}/${cartId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload(); 
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Error removing item'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred. Please try again.'
+                    });
+                });
+            }
+        });
     }
 </script>
 

@@ -11,11 +11,24 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products   = Product::where('is_active', true)->orderBy('sort_order')->orderBy('created_at', 'desc')->paginate(20);
-        $categories = Category::where('is_active', true)->orderBy('sort_order')->get();
-        return view('view.products', compact('products', 'categories'));
+        $categories   = Category::where('is_active', true)->orderBy('sort_order')->get();
+        $baseQuery    = Product::where('is_active', true);
+        
+        // Apply search if present for counts
+        if ($request->filled('q')) {
+            $q = $request->input('q');
+            $baseQuery->where('name', 'LIKE', "%{$q}%");
+        }
+        
+        $filterCounts = $this->buildFilterCounts(clone $baseQuery);
+
+        $query = Product::where('is_active', true);
+        $this->applyFilters($query, $request);
+        $products = $query->paginate(20)->withQueryString();
+
+        return view('view.productcategory', compact('categories', 'products', 'filterCounts'));
     }
 
     public function show($slug)
@@ -129,6 +142,12 @@ class ProductController extends Controller
     private function applyFilters($query, Request $request): void
     {
         $ep = "COALESCE(NULLIF(sale_price, 0), price)";
+
+        // ── Search Keyword ─────────────────────────────────────────────
+        if ($request->filled('q')) {
+            $q = $request->input('q');
+            $query->where('name', 'LIKE', "%{$q}%");
+        }
 
         // ── Price range (radio bands) ──────────────────────────────────
         if ($request->filled('price_range')) {
@@ -259,17 +278,18 @@ class ProductController extends Controller
             ->orderBy('sort_order')
             ->orderBy('name')
             ->limit(8)
-            ->get(['id', 'name', 'slug', 'image', 'price', 'sale_price']);
+            ->get(['id', 'name', 'slug', 'image', 'price', 'sale_price', 'stock_quantity']);
 
         return response()->json($products->map(function ($p) {
             return [
-                'id'         => $p->id,
-                'name'       => $p->name,
-                'slug'       => $p->slug,
-                'image'      => $p->image ? asset('storage/' . $p->image) : asset('assets/images/product/product1.jpg'),
-                'price'      => $p->price,
-                'sale_price' => $p->sale_price,
-                'url'        => route('product.show', $p->slug),
+                'id'             => $p->id,
+                'name'           => $p->name,
+                'slug'           => $p->slug,
+                'image'          => $p->image ? asset('storage/' . $p->image) : asset('assets/images/product/product1.jpg'),
+                'price'          => $p->price,
+                'sale_price'     => $p->sale_price,
+                'url'            => route('product.show', $p->slug),
+                'stock_quantity' => $p->stock_quantity,
             ];
         }));
     }

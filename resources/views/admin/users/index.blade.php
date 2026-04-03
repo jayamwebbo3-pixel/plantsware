@@ -7,7 +7,7 @@
     <div class="card">
         <div class="card-body">
             <table class="table table-bordered table-striped">
-                <thead class="table-dark">
+                <thead class="table-light">
                     <tr>
                         <th class="text-center">S.No</th>
                         <th class="text-center">Name</th>

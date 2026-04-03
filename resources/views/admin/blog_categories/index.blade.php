@@ -47,16 +47,16 @@
                     </div>
                     <div class="card-footer bg-transparent border-0 pb-3 px-3">
                         <div class="d-flex gap-1">
-                            <a href="{{ route('admin.blogs.index', ['category' => $category->id]) }}" class="btn btn-outline-primary btn-sm flex-grow-1 text-nowrap">
+                            <a href="{{ route('admin.blogs.index', ['category' => $category->id]) }}" class="btn btn-sm btn-outline-primary flex-grow-1 text-nowrap">
                                 Manage Blogs
                             </a>
-                            <a href="{{ route('admin.blog-categories.edit', $category->id) }}" class="btn btn-info btn-sm">
+                            <a href="{{ route('admin.blog-categories.edit', $category->id) }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('admin.blog-categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this category?')" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">
+                                <button type="submit" class="btn btn-sm btn-danger">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
@@ -73,10 +73,7 @@
 </div>
 
 <style>
-    .border-primary { border-color: #6ea820 !important; }
-    .btn-primary { background-color: #6ea820; border-color: #6ea820; }
-    .btn-primary:hover { background-color: #5d8e1a; border-color: #5d8e1a; }
-    .btn-outline-primary { color: #6ea820; border-color: #6ea820; }
-    .btn-outline-primary:hover { background-color: #6ea820; color: #fff; }
+    .border-primary { border-color: #134e5e !important; }
+    
 </style>
 @endsection
