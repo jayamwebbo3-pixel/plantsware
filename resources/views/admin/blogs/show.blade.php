@@ -2,7 +2,12 @@
 
 @section('content')
     <div class="container-fluid">
+        <div class="mt-4 text-end">
+                    <!-- <a href="{{ route('admin.blogs.edit', $blog) }}" class="btn btn-warning">Edit</a> -->
+                    <a href="{{ route('admin.blogs.index') }}" class="text-decoration-none"><i class="fas fa-arrow-left"></i> Back to Blogs</a>
+                </div><br>
         <div class="card">
+            
             <div class="card-header">
                 <h3>{{ $blog->title }}</h3>
                 <small>Published: {{ $blog->published_at?->format('d M Y') ?? 'Draft' }}</small>
@@ -76,7 +81,7 @@
                 <!--end here -->
                 
 
-                <hr>
+              
 <!-- 
                 <div>
                     <strong>Category:</strong> {{ $blog->blogCategory?->name ?? 'None' }}<br>
@@ -86,9 +91,9 @@
                     @endforeach
                 </div> -->
 
-                <hr>
+                <!-- <hr> -->
 
-                <h4>Related Blogs</h4>
+                <!-- <h4>Related Blogs</h4>
                 @if($related->count() > 0)
                     <ul>
                         @foreach($related as $rel)
@@ -97,12 +102,9 @@
                     </ul>
                 @else
                     <p>No related blogs yet.</p>
-                @endif
+                @endif -->
 
-                <div class="mt-4">
-                    <a href="{{ route('admin.blogs.edit', $blog) }}" class="btn btn-warning">Edit</a>
-                    <a href="{{ route('admin.blogs.index') }}" class="btn btn-secondary">Back to List</a>
-                </div>
+                
             </div>
         </div>
     </div>

@@ -8,7 +8,8 @@
                     <div class="card-header">
                         <h3 class="card-title">All Blogs</h3>
 
-                        <div class="card-tools">
+                        <div class="card-tools text-end">
+                            <a href="{{ route('admin.blog-categories.index') }}" class="text-decoration-none"><i class="fas fa-arrow-left"></i> Back to Blog Categories</a>
                             <a href="{{ route('admin.blogs.create', ['blog_category_id' => $categoryId]) }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-plus"></i> Create New Blog
                             </a>
@@ -26,8 +27,8 @@
                             </div>
                         </form>
 
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-dark">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-light">
                                 <tr>
                                     <th>S.No</th>
                                     <th>Title</th>
@@ -54,14 +55,14 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('admin.blogs.show', $blog) }}" class="btn btn-info btn-sm">View</a>
-                                            <a href="{{ route('admin.blogs.edit', $blog) }}" class="btn btn-warning btn-sm">Edit</a>
+                                            <a href="{{ route('admin.blogs.show', $blog) }}" class="btn btn-sm btn-outline-primary">viewblogs</a>
+                                            <a href="{{ route('admin.blogs.edit', $blog) }}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
                                             
                                             <form action="{{ route('admin.blogs.destroy', $blog) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" 
-                                                        onclick="return confirm('Are you sure?')">Delete</button>
+                                                <button type="submit" class="btn btn-sm btn-danger" 
+                                                        onclick="return confirm('Are you sure?')"><i class="fas fa-trash"></i></button>
                                             </form>
                                         </td>
                                     </tr>

@@ -5,7 +5,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Add Shipping Rate</h2>
-    <a href="{{ route('admin.shipping-rates.index') }}" class="btn btn-secondary">Back</a>
+    <a href="{{ route('admin.shipping-rates.index') }}" class="text-decoration-none"> <i class="fas fa-arrow-left"></i> Back</a>
 </div>
 
 <div class="card shadow-sm border-0 rounded-3">
@@ -14,8 +14,39 @@
             @csrf
             
             <div class="mb-4">
-                <label for="state_name" class="form-label fw-bold">State Name</label>
-                <input type="text" name="state_name" class="form-control rounded-3" id="state_name" value="{{ old('state_name') }}" required placeholder="e.g. Tamil Nadu">
+                <label for="state_name" class="form-label fw-bold">Select State</label>
+                <select name="state_name" id="state_name" class="form-select rounded-3 @error('state_name') is-invalid @enderror" required>
+                    <option value="">Select a State</option>
+                    <option value="Andhra Pradesh" {{ old('state_name') == 'Andhra Pradesh' ? 'selected' : '' }}>Andhra Pradesh</option>
+                    <option value="Arunachal Pradesh" {{ old('state_name') == 'Arunachal Pradesh' ? 'selected' : '' }}>Arunachal Pradesh</option>
+                    <option value="Assam" {{ old('state_name') == 'Assam' ? 'selected' : '' }}>Assam</option>
+                    <option value="Bihar" {{ old('state_name') == 'Bihar' ? 'selected' : '' }}>Bihar</option>
+                    <option value="Chhattisgarh" {{ old('state_name') == 'Chhattisgarh' ? 'selected' : '' }}>Chhattisgarh</option>
+                    <option value="Delhi" {{ old('state_name') == 'Delhi' ? 'selected' : '' }}>Delhi</option>
+                    <option value="Goa" {{ old('state_name') == 'Goa' ? 'selected' : '' }}>Goa</option>
+                    <option value="Gujarat" {{ old('state_name') == 'Gujarat' ? 'selected' : '' }}>Gujarat</option>
+                    <option value="Haryana" {{ old('state_name') == 'Haryana' ? 'selected' : '' }}>Haryana</option>
+                    <option value="Himachal Pradesh" {{ old('state_name') == 'Himachal Pradesh' ? 'selected' : '' }}>Himachal Pradesh</option>
+                    <option value="Jharkhand" {{ old('state_name') == 'Jharkhand' ? 'selected' : '' }}>Jharkhand</option>
+                    <option value="Karnataka" {{ old('state_name') == 'Karnataka' ? 'selected' : '' }}>Karnataka</option>
+                    <option value="Kerala" {{ old('state_name') == 'Kerala' ? 'selected' : '' }}>Kerala</option>
+                    <option value="Madhya Pradesh" {{ old('state_name') == 'Madhya Pradesh' ? 'selected' : '' }}>Madhya Pradesh</option>
+                    <option value="Maharashtra" {{ old('state_name') == 'Maharashtra' ? 'selected' : '' }}>Maharashtra</option>
+                    <option value="Manipur" {{ old('state_name') == 'Manipur' ? 'selected' : '' }}>Manipur</option>
+                    <option value="Meghalaya" {{ old('state_name') == 'Meghalaya' ? 'selected' : '' }}>Meghalaya</option>
+                    <option value="Mizoram" {{ old('state_name') == 'Mizoram' ? 'selected' : '' }}>Mizoram</option>
+                    <option value="Nagaland" {{ old('state_name') == 'Nagaland' ? 'selected' : '' }}>Nagaland</option>
+                    <option value="Odisha" {{ old('state_name') == 'Odisha' ? 'selected' : '' }}>Odisha</option>
+                    <option value="Punjab" {{ old('state_name') == 'Punjab' ? 'selected' : '' }}>Punjab</option>
+                    <option value="Rajasthan" {{ old('state_name') == 'Rajasthan' ? 'selected' : '' }}>Rajasthan</option>
+                    <option value="Sikkim" {{ old('state_name') == 'Sikkim' ? 'selected' : '' }}>Sikkim</option>
+                    <option value="Tamil Nadu" {{ old('state_name') == 'Tamil Nadu' ? 'selected' : '' }}>Tamil Nadu</option>
+                    <option value="Telangana" {{ old('state_name') == 'Telangana' ? 'selected' : '' }}>Telangana</option>
+                    <option value="Tripura" {{ old('state_name') == 'Tripura' ? 'selected' : '' }}>Tripura</option>
+                    <option value="Uttar Pradesh" {{ old('state_name') == 'Uttar Pradesh' ? 'selected' : '' }}>Uttar Pradesh</option>
+                    <option value="Uttarakhand" {{ old('state_name') == 'Uttarakhand' ? 'selected' : '' }}>Uttarakhand</option>
+                    <option value="West Bengal" {{ old('state_name') == 'West Bengal' ? 'selected' : '' }}>West Bengal</option>
+                </select>
                 @error('state_name')
                     <div class="text-danger small mt-1">{{ $message }}</div>
                 @enderror

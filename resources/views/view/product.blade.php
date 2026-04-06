@@ -665,6 +665,17 @@
                 var input = document.getElementById('quantityInput');
                 var value = Math.max(1, (parseInt(input.value) || 1) + change);
                 input.value = value;
+                
+                // Hide minus button if quantity is 1
+                var minusBtn = document.querySelector('.product-page-qty-btn:first-child');
+                if (minusBtn) {
+                    if (value <= 1) {
+                        minusBtn.style.visibility = 'hidden';
+                    } else {
+                        minusBtn.style.visibility = 'visible';
+                    }
+                }
+
                 var cartQty = document.getElementById('cartQuantity');
                 if (cartQty) cartQty.value = value;
                 var buyNow = document.getElementById('buyNowQuantity');

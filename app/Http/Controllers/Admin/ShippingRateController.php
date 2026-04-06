@@ -10,7 +10,15 @@ class ShippingRateController extends Controller
 {
     public function index()
     {
-        $shippingRates = ShippingRate::all();
+        $search = request('search');
+        $perPage = request('per_page', 10);
+
+        $shippingRates = ShippingRate::when($search, function ($query) use ($search) {
+                return $query->where('state_name', 'like', "%{$search}%");
+            })
+            ->paginate($perPage)
+            ->appends(request()->query());
+
         return view('admin.shipping_rates.index', compact('shippingRates'));
     }
 

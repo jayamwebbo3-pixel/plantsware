@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -15,20 +16,24 @@ class ProductController extends Controller
     {
         $categories   = Category::where('is_active', true)->orderBy('sort_order')->get();
         $baseQuery    = Product::where('is_active', true);
-        
+
         // Apply search if present for counts
         if ($request->filled('q')) {
             $q = $request->input('q');
             $baseQuery->where('name', 'LIKE', "%{$q}%");
         }
-        
+
         $filterCounts = $this->buildFilterCounts(clone $baseQuery);
 
         $query = Product::where('is_active', true);
         $this->applyFilters($query, $request);
         $products = $query->paginate(20)->withQueryString();
 
-        return view('view.productcategory', compact('categories', 'products', 'filterCounts'));
+        $ep = "COALESCE(NULLIF(sale_price, 0), price)";
+        $minPrice = floor(Product::where('is_active', true)->min(\DB::raw($ep)) ?? 0);
+        $maxPrice = ceil(Product::where('is_active', true)->max(\DB::raw($ep)) ?? 10000);
+
+        return view('view.productcategory', compact('categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'));
     }
 
     public function show($slug)
@@ -37,7 +42,7 @@ class ProductController extends Controller
             ->where('is_active', true)
             ->with(['reviews.user'])
             ->firstOrFail();
-            
+
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
@@ -45,7 +50,7 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
-            
+
         return view('view.product', compact('product', 'relatedProducts'));
     }
 
@@ -59,7 +64,11 @@ class ProductController extends Controller
         $this->applyFilters($query, $request);
         $products = $query->paginate(20)->withQueryString();
 
-        return view('view.productcategory', compact('categories', 'products', 'filterCounts'));
+        $ep = "COALESCE(NULLIF(sale_price, 0), price)";
+        $minPrice = floor(Product::where('is_active', true)->min(\DB::raw($ep)) ?? 0);
+        $maxPrice = ceil(Product::where('is_active', true)->max(\DB::raw($ep)) ?? 10000);
+
+        return view('view.productcategory', compact('categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'));
     }
 
     public function category(Request $request, $slug)
@@ -74,7 +83,11 @@ class ProductController extends Controller
         $this->applyFilters($query, $request);
         $products = $query->paginate(20)->withQueryString();
 
-        return view('view.productcategory', compact('category', 'categories', 'products', 'filterCounts'));
+        $ep = "COALESCE(NULLIF(sale_price, 0), price)";
+        $minPrice = floor(Product::where('category_id', $category->id)->where('is_active', true)->min(\DB::raw($ep)) ?? 0);
+        $maxPrice = ceil(Product::where('category_id', $category->id)->where('is_active', true)->max(\DB::raw($ep)) ?? 10000);
+
+        return view('view.productcategory', compact('category', 'categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'));
     }
 
     public function subcategory(Request $request, $slug)
@@ -89,7 +102,11 @@ class ProductController extends Controller
         $this->applyFilters($query, $request);
         $products = $query->paginate(20)->withQueryString();
 
-        return view('view.productcategory', compact('subcategory', 'categories', 'products', 'filterCounts'));
+        $ep = "COALESCE(NULLIF(sale_price, 0), price)";
+        $minPrice = floor(Product::where('subcategory_id', $subcategory->id)->where('is_active', true)->min(\DB::raw($ep)) ?? 0);
+        $maxPrice = ceil(Product::where('subcategory_id', $subcategory->id)->where('is_active', true)->max(\DB::raw($ep)) ?? 10000);
+
+        return view('view.productcategory', compact('subcategory', 'categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'));
     }
 
     /* ------------------------------------------------------------------ */
@@ -168,8 +185,10 @@ class ProductController extends Controller
                     $query->whereRaw("$ep >= 5000");
                     break;
             }
-        } elseif ($request->filled('price_max')) {
-            $query->whereRaw("$ep <= ?", [(float) $request->price_max]);
+        } elseif ($request->filled('price_min') || $request->filled('price_max')) {
+            $min = $request->input('price_min', 0);
+            $max = $request->input('price_max', 10000);
+            $query->whereRaw("$ep >= ? AND $ep <= ?", [(float) $min, (float) $max]);
         }
 
         // ── Discount ──────────────────────────────────────────────────

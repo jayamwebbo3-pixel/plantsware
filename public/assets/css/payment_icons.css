@@ -1,0 +1,24 @@
+.payment-icon {
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: grayscale(100%);
+    opacity: 0.6;
+    transition: all 0.3s ease;
+    margin: 0 10px;
+}
+
+.payment-icon:hover {
+    filter: grayscale(0);
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+.icon-visa { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%231a1f71" d="M371.4 128H234.3l-24.9 144H371.4z"/><path fill="%23f7b600" d="M140.6 128L80 384h54.8l60.6-256H140.6z"/><path fill="%231a1f71" d="M480 384L512 256H371.4l-24.9 128H480z"/></svg>'); }
+.icon-rupay { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240"><path fill="%23c21a1a" d="M362.4 227.1l-24.9-106.6h72.2l24.9 106.6h-72.2z"/></svg>'); }
+.icon-gpay { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%234285F4" d="M410 256c0-12-1-24-3-36H256v72h86c-4 22-16 41-35 54l56 44c33-31 53-78 53-134z"/><path fill="%2334A853" d="M256 412c42 0 78-14 104-38l-56-44c-14 9-33 15-48 15-37 0-68-25-79-59l-58 45c29 57 88 81 137 81z"/><path fill="%23FBBC05" d="M177 286c-3-9-4-19-4-30s1-21 4-30l-58-45c-10 21-16 45-16 75s6 54 16 75l58-45z"/><path fill="%23EA4335" d="M256 100c23 0 44 8 60 23l45-45C335 54 300 40 256 40c-49 0-108 24-137 81l58 45c11-34 42-59 79-59z"/></svg>'); }
+.icon-paytm { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="%2300baf2" d="M384 32H64C28.65 32 0 60.65 0 96v320c0 35.35 28.65 64 64 64h320c35.35 0 64-28.65 64-64V96c0-35.35-28.65-64-64-64zM245.8 416H184l-40.2-144h-54.8V416H34V96h125c48.6 0 88 39.4 88 88 0 35-20.5 65.3-50.5 79.4l49.3 152.6z"/></svg>'); }
+.icon-upi { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%236739B7" d="M432 64H80C44.65 64 16 92.65 16 128v256c0 35.35 28.65 64 64 64h352c35.35 0 64-28.65 64-64V128c0-35.35-28.65-64-64-64zm-56 320h-80l-40-144h-54V384h-56V128h125c48 0 88 40 88 88 0 35-20 65-50 79l47 153z"/></svg>'); }

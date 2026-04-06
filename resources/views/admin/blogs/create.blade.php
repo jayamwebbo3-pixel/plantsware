@@ -3,6 +3,10 @@
 
 @section('content')
     <div class="container-fluid">
+        <div class="mt-4 text-end">
+                    <!-- <a href="{{ route('admin.blogs.edit', $blog) }}" class="btn btn-warning">Edit</a> -->
+                    <a href="{{ route('admin.blogs.index') }}" class="text-decoration-none"><i class="fas fa-arrow-left"></i> Back to Blogs</a>
+                </div><br>
         <div class="card">
             <div class="card-header">
                 <h3>Create New Blog Post</h3>
@@ -117,7 +121,7 @@
                     </div>
 
                     <div class="mt-4">
-                        <button type="submit" class="btn btn-success">Save Blog</button>
+                        <button type="submit" class="btn btn-primary">Save Blog</button>
                         <a href="{{ route('admin.blogs.index') }}" class="btn btn-secondary">Cancel</a>
                     </div>
                 </form>

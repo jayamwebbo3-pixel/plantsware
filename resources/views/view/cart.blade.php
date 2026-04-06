@@ -32,147 +32,157 @@
                     </div>
                     <div class="gi-vendor-card-body">
                         @if(isset($cartItems) && $cartItems->count() > 0)
-                            <div class="row" id="cartContent">
-                                <!-- CART ITEMS -->
-                                <div class="col-lg-8">
-                                    <div class="cart-items-wrapper" id="cartItemsWrapper">
-                                        @foreach($cartItems as $item)
+                        <div class="row" id="cartContent">
+                            <!-- CART ITEMS -->
+                            <div class="col-lg-8">
+                                <div class="cart-items-wrapper" id="cartItemsWrapper">
+                                    @foreach($cartItems as $item)
+                                    @php
+                                    $isCombo = (bool) $item->combo_pack_id;
+                                    $p = $isCombo ? $item->comboPack : $item->product;
+                                    @endphp
+                                    @if($p)
+                                    <div class="cart-item" id="cartItem_{{ $item->id }}">
+                                        <div class="item-image position-relative d-flex align-items-center justify-content-center" style="background: #fdfdfd; border-radius: 8px; overflow: hidden; width: 80px; height: 80px;">
                                             @php
-                                                $isCombo = (bool) $item->combo_pack_id;
-                                                $p = $isCombo ? $item->comboPack : $item->product;
+                                            $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
                                             @endphp
-                                            @if($p)
-                                                <div class="cart-item" id="cartItem_{{ $item->id }}">
-                                                    <div class="item-image position-relative d-flex align-items-center justify-content-center" style="background: #fdfdfd; border-radius: 8px; overflow: hidden; width: 80px; height: 80px;">
-                                                        @php
-                                                            $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
-                                                        @endphp
 
-                                                        @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
-                                                            <div class="cart-dual-image d-flex align-items-center justify-content-center w-100 h-100 p-1">
-                                                                <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
-                                                                <span style="font-size: 12px; font-weight: bold; color: #72a420; margin: 0 2px;">+</span>
-                                                                <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
-                                                            </div>
-                                                        @else
-                                                            @php
-                                                                $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
-                                                            @endphp
-                                                            <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}" 
-                                                                 alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                                                        @endif
+                                            @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
+                                            <div class="cart-dual-image d-flex align-items-center justify-content-center w-100 h-100 p-1">
+                                                <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
+                                                <span style="font-size: 12px; font-weight: bold; color: #72a420; margin: 0 2px;">+</span>
+                                                <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
+                                            </div>
+                                            @else
+                                            @php
+                                            $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
+                                            @endphp
+                                            <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}"
+                                                alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                            @endif
 
-                                                        @if($isCombo)
-                                                            <span class="badge badge-danger position-absolute" style="top:2px; left:2px; font-size: 8px; padding: 2px 4px;">COMBO</span>
-                                                        @endif
-                                                    </div>
-                                                    <div class="item-details">
-                                                        <h3 class="item-name mb-1">{{ $p->name }}</h3>
-                                                        @if($item->options)
-                                                            @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
-                                                            @if(is_array($options) && isset($options['size']))
-                                                                <div class="text-muted small mb-2">Size: {{ $options['size'] }}</div>
-                                                            @elseif(is_string($options) && !empty($options))
-                                                                <div class="text-muted small mb-2">Size: {{ $options }}</div>
-                                                            @endif
-                                                        @endif
-                                                        @php
-                                                            $priceToUse = $item->calculated_price;
-                                                        @endphp
-                                                        <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
-                                                        <div class="item-meta small text-muted mb-1">
-                                                            <span>Weight: {{ $p->weight ?? 0 }} KG</span>
-                                                            @php
-                                                                $regularPrice = $isCombo ? $p->total_price : $p->price;
-                                                                $savings = max(0, $regularPrice - $priceToUse);
-                                                            @endphp
-                                                            <!-- @if($savings > 0)
+                                            @if($isCombo)
+                                            <span class="badge badge-danger position-absolute" style="top:2px; left:2px; font-size: 8px; padding: 2px 4px;">COMBO</span>
+                                            @endif
+                                        </div>
+                                        <div class="item-details">
+                                            <h3 class="item-name mb-1">{{ $p->name }}</h3>
+                                            @if($item->options)
+                                            @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
+                                            @if(is_array($options) && isset($options['size']))
+                                            <div class="text-muted small mb-2">Size: {{ $options['size'] }}</div>
+                                            @elseif(is_string($options) && !empty($options))
+                                            <div class="text-muted small mb-2">Size: {{ $options }}</div>
+                                            @endif
+                                            @endif
+                                            @php
+                                            $priceToUse = $item->calculated_price;
+                                            @endphp
+                                            <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
+                                            <div class="item-meta small text-muted mb-1">
+                                                <span>Weight: {{ $p->weight ?? 0 }} KG</span>
+                                                @php
+                                                $regularPrice = $isCombo ? $p->total_price : $p->price;
+                                                $savings = max(0, $regularPrice - $priceToUse);
+                                                @endphp
+                                                <!-- @if($savings > 0)
                                                                 <span class="ms-2 text-success">Saved: ₹{{ number_format($savings, 2) }}</span>
                                                             @endif -->
-                                                        </div>
-                                                        <div class="item-total" id="itemTotal_{{ $item->id }}">
-                                                            ₹{{ number_format($priceToUse * $item->quantity, 2) }}
-                                                        </div>
-                                                        <div class="quantity-controls">
-                                                            <span class="qty-label">Quantity:</span>
-                                                            <div class="qty-input-group">
-                                                                <button type="button" class="qty-btn decrement" 
-                                                                        data-item-id="{{ $item->id }}">−</button>
-                                                                <input type="number" id="quantity_{{ $item->id }}" 
-                                                                       value="{{ $item->quantity }}" min="1" 
-                                                                       class="qty-input" readonly>
-                                                                <button type="button" class="qty-btn increment" 
-                                                                        data-item-id="{{ $item->id }}">+</button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="item-actions">
-                                                            <button type="button" class="action-btn remove" 
-                                                                    data-item-id="{{ $item->id }}">
-                                                                <i class="fas fa-trash-alt"></i> Remove
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                </div>
+                                            </div>
+                                            <div class="item-total" id="itemTotal_{{ $item->id }}">
+                                                ₹{{ number_format($priceToUse * $item->quantity, 2) }}
+                                            </div>
+                                            <div class="quantity-controls">
+                                                <span class="qty-label">Quantity:</span>
+                                                <div class="qty-pill-control">
+                                                    <button type="button" class="qty-btn-inline decrement-btn {{ $item->quantity <= 1 ? 'd-none' : '' }}"
+                                                        id="minus_{{ $item->id }}" data-item-id="{{ $item->id }}">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <button type="button" class="qty-btn-inline delete-btn {{ $item->quantity > 1 ? 'd-none' : '' }}"
+                                                        id="trash_{{ $item->id }}" onclick="removeCartItem('{{ $item->id }}')">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
 
-                                <!-- CART SUMMARY -->
-                                <div class="col-lg-4">
-                                    <div class="cart-summary">
-                                        <h2 class="summary-title">Order Summary</h2>
-                                        <div class="summary-row">
-                                            <span>Subtotal:</span>
-                                            <span class="summary-amount" id="cartSubtotal">₹{{ number_format($subtotal ?? 0, 2) }}</span>
+                                                    <input type="number" id="quantity_{{ $item->id }}"
+                                                        value="{{ $item->quantity }}" min="1"
+                                                        class="qty-number-input" readonly>
+
+                                                    <button type="button" class="qty-btn-inline increment-btn"
+                                                        data-item-id="{{ $item->id }}">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="item-actions">
+                                                <button type="button" class="action-btn top-right-remove"
+                                                    data-item-id="{{ $item->id }}" title="Remove from Cart">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="summary-row">
-                                            <span>Total Weight:</span>
-                                            <span class="summary-amount" id="cartWeight">{{ $totalWeight ?? 0 }} KG</span>
-                                        </div>
-                                        <div class="summary-row">
-                                            <span>Shipping:</span>
-                                            <span class="summary-amount" id="cartShipping">
-                                                @if(($shipping ?? 0) > 0)
-                                                    ₹{{ number_format($shipping, 2) }}
-                                                @else
-                                                    Free
-                                                @endif
-                                            </span>
-                                        </div>
-                                        <div class="summary-row" id="taxRow" style="{{ ($tax ?? 0) > 0 ? '' : 'display:none;' }}">
-                                            <span id="cartTaxLabel">GST ({{ $taxPercentage ?? 0 }}%):</span>
-                                            <span class="summary-amount" id="cartTax">₹{{ number_format($tax ?? 0, 2) }}</span>
-                                        </div>
-                                        <div class="summary-row">
-                                            <span>Discount:</span>
-                                            <span class="summary-amount" id="cartDiscount" style="color: var(--primary-color);">
-                                                -₹{{ number_format($discount ?? 0, 2) }}
-                                            </span>
-                                        </div>
-                                        <div class="summary-row total">
-                                            <span>Total:</span>
-                                            <span class="summary-amount total" id="cartTotal">₹{{ number_format($total ?? $subtotal ?? 0, 2) }}</span>
-                                        </div>
-                                        <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">Proceed to Checkout</button>
-                                        <button type="button" class="continue-shopping-btn w-100" onclick="window.location='{{ route('home') }}'">Continue Shopping</button>
-                                        <button type="button" class="clear-cart-btn btn-clear-red w-100 mt-2" onclick="clearCart()">
-                                            <i class="fas fa-trash"></i> Clear Cart
-                                        </button>
                                     </div>
+                                    @endif
+                                    @endforeach
                                 </div>
                             </div>
+
+                            <!-- CART SUMMARY -->
+                            <div class="col-lg-4">
+                                <div class="cart-summary">
+                                    <h2 class="summary-title">Order Summary</h2>
+                                    <div class="summary-row">
+                                        <span>Subtotal:</span>
+                                        <span class="summary-amount" id="cartSubtotal">₹{{ number_format($subtotal ?? 0, 2) }}</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span>Total Weight:</span>
+                                        <span class="summary-amount" id="cartWeight">{{ $totalWeight ?? 0 }} KG</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span>Shipping:</span>
+                                        <span class="summary-amount" id="cartShipping">
+                                            @if(($shipping ?? 0) > 0)
+                                            ₹{{ number_format($shipping, 2) }}
+                                            @else
+                                            Free
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="summary-row" id="taxRow" style="{{ ($tax ?? 0) > 0 ? '' : 'display:none;' }}">
+                                        <span id="cartTaxLabel">GST ({{ $taxPercentage ?? 0 }}%):</span>
+                                        <span class="summary-amount" id="cartTax">₹{{ number_format($tax ?? 0, 2) }}</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span>Discount:</span>
+                                        <span class="summary-amount" id="cartDiscount" style="color: var(--primary-color);">
+                                            -₹{{ number_format($discount ?? 0, 2) }}
+                                        </span>
+                                    </div>
+                                    <div class="summary-row total">
+                                        <span>Total:</span>
+                                        <span class="summary-amount total" id="cartTotal">₹{{ number_format($total ?? $subtotal ?? 0, 2) }}</span>
+                                    </div>
+                                    <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">Proceed to Checkout</button>
+                                    <button type="button" class="continue-shopping-btn w-100" onclick="window.location='{{ route('home') }}'">Continue Shopping</button>
+                                    <button type="button" class="clear-cart-btn btn-clear-red w-100 mt-2" onclick="clearCart()">
+                                        <i class="fas fa-trash"></i> Clear Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         @else
-                            <div class="empty-cart-container">
-                                <div class="empty-icon-wrapper">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </div>
-                                <h3 class="empty-text">Your Cart Is Currently Empty</h3>
-                                <p class="empty-subtext">Before You Proceed To Checkout, You Must Add Some Products To Your Shopping Cart.</p>
-                                <a href="{{ route('home') }}" class="continue-shopping-btn">
-                                    Continue Shopping
-                                </a>
+                        <div class="empty-cart-container">
+                            <div class="empty-icon-wrapper">
+                                <i class="fas fa-shopping-cart"></i>
                             </div>
+                            <h3 class="empty-text">Your Cart Is Currently Empty</h3>
+                            <p class="empty-subtext">Before You Proceed To Checkout, You Must Add Some Products To Your Shopping Cart.</p>
+                            <a href="{{ route('home') }}" class="continue-shopping-btn">
+                                Continue Shopping
+                            </a>
+                        </div>
                         @endif
                     </div>
                 </div>
@@ -217,86 +227,100 @@
         input.disabled = true;
 
         fetch(`${baseUrl}/cart/update/${itemId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken(),
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                quantity: newQuantity
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    quantity: newQuantity
+                })
             })
-        })
-        .then(async response => {
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                throw new Error(data.message || `HTTP error! status: ${response.status}`);
-            }
-            return data;
-        })
-        .then(data => {
-            if (data.success) {
-                input.value = data.quantity;
-                // Update item total
-                const itemTotalEl = document.getElementById(`itemTotal_${itemId}`);
-                if (itemTotalEl && data.item_total) {
-                    itemTotalEl.textContent = `₹${parseFloat(data.item_total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            .then(async response => {
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.message || `HTTP error! status: ${response.status}`);
                 }
-                // Update cart totals
-                if (data.subtotal) {
-                    document.getElementById('cartSubtotal').textContent =
-                        `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                }
-                if (data.total) {
-                    document.getElementById('cartTotal').textContent =
-                        `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                }
-                if (data.discount !== undefined) {
-                    document.getElementById('cartDiscount').textContent =
-                        `-₹${parseFloat(data.discount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-                }
-                if (data.totalWeight !== undefined) {
-                    document.getElementById('cartWeight').textContent = `${data.totalWeight} KG`;
-                }
-                if (data.tax !== undefined) {
-                    const taxEl = document.getElementById('cartTax');
-                    const taxRow = document.getElementById('taxRow');
-                    const taxLabelEl = document.getElementById('cartTaxLabel');
-                    
-                    if (taxEl) {
-                        taxEl.textContent = `₹${parseFloat(data.tax).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                return data;
+            })
+            .then(data => {
+                if (data.success) {
+                    input.value = data.quantity;
+
+                    // Dynamic Trash/Minus Toggle Logic
+                    const minusBtn = document.getElementById(`minus_${itemId}`);
+                    const trashBtn = document.getElementById(`trash_${itemId}`);
+                    if (minusBtn && trashBtn) {
+                        if (data.quantity <= 1) {
+                            minusBtn.classList.add('d-none');
+                            trashBtn.classList.remove('d-none');
+                        } else {
+                            minusBtn.classList.remove('d-none');
+                            trashBtn.classList.add('d-none');
+                        }
                     }
-                    if (taxLabelEl && data.taxPercentage !== undefined) {
-                        taxLabelEl.textContent = `GST (${data.taxPercentage}%):`;
+
+                    // Update item total
+                    const itemTotalEl = document.getElementById(`itemTotal_${itemId}`);
+                    if (itemTotalEl && data.item_total) {
+                        itemTotalEl.textContent = `₹${parseFloat(data.item_total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
                     }
-                    if (taxRow) {
-                        taxRow.style.display = data.tax > 0 ? 'flex' : 'none';
+                    // Update cart totals
+                    if (data.subtotal) {
+                        document.getElementById('cartSubtotal').textContent =
+                            `₹${parseFloat(data.subtotal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
                     }
+                    if (data.total) {
+                        document.getElementById('cartTotal').textContent =
+                            `₹${parseFloat(data.total).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                    }
+                    if (data.discount !== undefined) {
+                        document.getElementById('cartDiscount').textContent =
+                            `-₹${parseFloat(data.discount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                    }
+                    if (data.totalWeight !== undefined) {
+                        document.getElementById('cartWeight').textContent = `${data.totalWeight} KG`;
+                    }
+                    if (data.tax !== undefined) {
+                        const taxEl = document.getElementById('cartTax');
+                        const taxRow = document.getElementById('taxRow');
+                        const taxLabelEl = document.getElementById('cartTaxLabel');
+
+                        if (taxEl) {
+                            taxEl.textContent = `₹${parseFloat(data.tax).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                        }
+                        if (taxLabelEl && data.taxPercentage !== undefined) {
+                            taxLabelEl.textContent = `GST (${data.taxPercentage}%):`;
+                        }
+                        if (taxRow) {
+                            taxRow.style.display = data.tax > 0 ? 'flex' : 'none';
+                        }
+                    }
+                    if (data.shipping !== undefined) {
+                        const shipEl = document.getElementById('cartShipping');
+                        shipEl.textContent = data.shipping > 0 ?
+                            `₹${parseFloat(data.shipping).toLocaleString('en-IN', {minimumFractionDigits: 2})}` :
+                            'Free';
+                    }
+                    // Update cart count if present
+                    const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
+                    cartCountEls.forEach(el => {
+                        if (data.cart_count !== undefined) el.textContent = data.cart_count;
+                    });
+                    showMessage(data.message || 'Quantity updated!', 'success');
+                } else {
+                    showMessage(data.message || 'Update failed', 'error');
                 }
-                if (data.shipping !== undefined) {
-                    const shipEl = document.getElementById('cartShipping');
-                    shipEl.textContent = data.shipping > 0 
-                        ? `₹${parseFloat(data.shipping).toLocaleString('en-IN', {minimumFractionDigits: 2})}`
-                        : 'Free';
-                }
-                // Update cart count if present
-                const cartCountEls = document.querySelectorAll('.cart-count, .cart-count-badge');
-                cartCountEls.forEach(el => {
-                    if (data.cart_count !== undefined) el.textContent = data.cart_count;
-                });
-                showMessage(data.message || 'Quantity updated!', 'success');
-            } else {
-                showMessage(data.message || 'Update failed', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage(error.message || 'Failed to update quantity. Please try again.', 'error');
-        })
-        .finally(() => {
-            input.disabled = false;
-        });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage(error.message || 'Failed to update quantity. Please try again.', 'error');
+            })
+            .finally(() => {
+                input.disabled = false;
+            });
     }
 
     // Remove item function
@@ -314,47 +338,47 @@
             if (result.isConfirmed) {
                 console.log('Removing item:', itemId);
                 fetch(`${baseUrl}/cart/remove/${itemId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': getCsrfToken(),
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(async response => {
-                    const data = await response.json().catch(() => ({}));
-                    if (!response.ok) {
-                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
-                    }
-                    return data;
-                })
-                .then(data => {
-                    if (data.success) {
-                        const cartItem = document.getElementById(`cartItem_${itemId}`);
-                        if (cartItem) {
-                            cartItem.style.transition = 'opacity 0.3s';
-                            cartItem.style.opacity = '0';
-                            setTimeout(() => {
-                                cartItem.remove();
-                                // ... (rest of the update logic remains same)
-                                updateTotals(data);
-                                // Check if cart is empty
-                                const cartItemsWrapper = document.getElementById('cartItemsWrapper');
-                                if ((cartItemsWrapper && cartItemsWrapper.children.length === 0) || !document.querySelector('.cart-item')) {
-                                    showEmptyCart();
-                                }
-                                showMessage(data.message || 'Item removed!', 'success');
-                            }, 300);
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': getCsrfToken(),
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
-                    } else {
-                        showMessage(data.message || 'Failed to remove item', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showMessage(error.message || 'Failed to remove item. Please try again.', 'error');
-                });
+                    })
+                    .then(async response => {
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok) {
+                            throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                        }
+                        return data;
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            const cartItem = document.getElementById(`cartItem_${itemId}`);
+                            if (cartItem) {
+                                cartItem.style.transition = 'opacity 0.3s';
+                                cartItem.style.opacity = '0';
+                                setTimeout(() => {
+                                    cartItem.remove();
+                                    // ... (rest of the update logic remains same)
+                                    updateTotals(data);
+                                    // Check if cart is empty
+                                    const cartItemsWrapper = document.getElementById('cartItemsWrapper');
+                                    if ((cartItemsWrapper && cartItemsWrapper.children.length === 0) || !document.querySelector('.cart-item')) {
+                                        showEmptyCart();
+                                    }
+                                    showMessage(data.message || 'Item removed!', 'success');
+                                }, 300);
+                            }
+                        } else {
+                            showMessage(data.message || 'Failed to remove item', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showMessage(error.message || 'Failed to remove item. Please try again.', 'error');
+                    });
             }
         });
     }
@@ -412,45 +436,45 @@
             if (result.isConfirmed) {
                 console.log('Clearing cart...');
                 fetch(`${baseUrl}/cart/clear`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': getCsrfToken(),
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(async response => {
-                    const data = await response.json().catch(() => ({}));
-                    if (!response.ok) {
-                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
-                    }
-                    return data;
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Animate and remove all items
-                        const cartItems = document.querySelectorAll('.cart-item');
-                        cartItems.forEach((item, index) => {
-                            item.style.transition = 'opacity 0.3s';
-                            item.style.opacity = '0';
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': getCsrfToken(),
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(async response => {
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok) {
+                            throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                        }
+                        return data;
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Animate and remove all items
+                            const cartItems = document.querySelectorAll('.cart-item');
+                            cartItems.forEach((item, index) => {
+                                item.style.transition = 'opacity 0.3s';
+                                item.style.opacity = '0';
+                                setTimeout(() => {
+                                    item.remove();
+                                }, index * 100);
+                            });
                             setTimeout(() => {
-                                item.remove();
-                            }, index * 100);
-                        });
-                        setTimeout(() => {
-                            updateTotals(data);
-                            showEmptyCart();
-                            showMessage(data.message || 'Cart cleared!', 'success');
-                        }, cartItems.length * 100);
-                    } else {
-                        showMessage(data.message || 'Failed to clear cart', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showMessage(error.message || 'Failed to clear cart. Please try again.', 'error');
-                });
+                                updateTotals(data);
+                                showEmptyCart();
+                                showMessage(data.message || 'Cart cleared!', 'success');
+                            }, cartItems.length * 100);
+                        } else {
+                            showMessage(data.message || 'Failed to clear cart', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showMessage(error.message || 'Failed to clear cart. Please try again.', 'error');
+                    });
             }
         });
     }
@@ -481,7 +505,7 @@
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 3000,
+            timer: 2000,
             timerProgressBar: true,
             didOpen: (toast) => {
                 toast.addEventListener('mouseenter', Swal.stopTimer)
@@ -524,7 +548,7 @@
         });
 
         // Setup increment buttons
-        document.querySelectorAll('.increment').forEach(button => {
+        document.querySelectorAll('.increment-btn, .qty-btn.increment').forEach(button => {
             if (!button.hasAttribute('data-item-id')) {
                 const cartItem = button.closest('.cart-item');
                 if (cartItem && cartItem.id) {
@@ -532,18 +556,15 @@
                     button.setAttribute('data-item-id', itemId);
                 }
             }
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
                 const itemId = this.getAttribute('data-item-id');
-                if (itemId) {
-                    updateQuantity(itemId, 1);
-                } else {
-                    alert('Error: Button configuration issue');
-                }
+                if (itemId) updateQuantity(itemId, 1);
             });
         });
 
         // Setup decrement buttons
-        document.querySelectorAll('.decrement').forEach(button => {
+        document.querySelectorAll('.decrement-btn, .qty-btn.decrement').forEach(button => {
             if (!button.hasAttribute('data-item-id')) {
                 const cartItem = button.closest('.cart-item');
                 if (cartItem && cartItem.id) {
@@ -551,18 +572,15 @@
                     button.setAttribute('data-item-id', itemId);
                 }
             }
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
                 const itemId = this.getAttribute('data-item-id');
-                if (itemId) {
-                    updateQuantity(itemId, -1);
-                } else {
-                    alert('Error: Button configuration issue');
-                }
+                if (itemId) updateQuantity(itemId, -1);
             });
         });
 
         // Setup remove buttons
-        document.querySelectorAll('.action-btn.remove').forEach(button => {
+        document.querySelectorAll('.action-btn.top-right-remove').forEach(button => {
             if (!button.hasAttribute('data-item-id')) {
                 const cartItem = button.closest('.cart-item');
                 if (cartItem && cartItem.id) {
@@ -570,215 +588,303 @@
                     button.setAttribute('data-item-id', itemId);
                 }
             }
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
                 const itemId = this.getAttribute('data-item-id');
-                if (itemId) {
-                    removeCartItem(itemId);
-                } else {
-                    alert('Error: Button configuration issue');
-                }
+                if (itemId) removeCartItem(itemId);
             });
         });
 
         console.log('Cart initialization complete');
     });
-
-    // Debug/test function: window.testCart()
-    window.testCart = function() {
-        console.log('Testing cart functions...');
-        console.log('Base URL:', baseUrl);
-        console.log('CSRF Token:', getCsrfToken());
-        console.log('Cart items:', document.querySelectorAll('.cart-item').length);
-
-        // Test with first item
-        const firstItem = document.querySelector('.cart-item');
-        if (firstItem) {
-            const itemId = firstItem.id.replace('cartItem_', '');
-            console.log('First item ID:', itemId);
-            console.log('Testing URL:', `${baseUrl}/cart/update/${itemId}`);
-            updateQuantity(itemId, 1);
-        } else {
-            console.log('No cart items found');
-        }
-    };
 </script>
 <style>
-/* Simple Empty Cart Styles */
-.empty-cart-container {
-    text-align: center;
-    padding: 80px 20px;
-    background: #fff;
-    min-height: 450px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.empty-icon-wrapper {
-    width: 120px;
-    height: 120px;
-    background-color: var(--light-bg-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 30px;
-    color: var(--primary-color);
-    font-size: 50px;
-    transition: all 0.3s ease;
-}
-
-.empty-icon-wrapper:hover {
-    transform: scale(1.1) rotate(-10deg);
-}
-
-.empty-text {
-    font-size: 24px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 15px;
-    font-family: var(--font-heading);
-}
-
-.empty-subtext {
-    font-size: 16px;
-    color: #777;
-    margin-bottom: 35px;
-    max-width: 400px;
-}
-
-.checkout-btn {
-    display: block;
-    width: 100%;
-    background-color: var(--primary-color);
-    color: #fff !important;
-    padding: 14px 40px;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 600;
-    text-decoration: none !important;
-    transition: all 0.3s ease;
-    border: none;
-    text-transform: capitalize;
-    letter-spacing: 0.5px;
-    text-align: center;
-}
-
-.checkout-btn:hover {
-    background-color: #5b8c19;
-    box-shadow: 0 5px 15px rgba(110, 168, 32, 0.3);
-}
-
-.continue-shopping-btn {
-    display: block;
-    width: 30%;
-    margin-top: 10px;
-    background-color: #fff;
-    color: var(--primary-color) !important;
-    border: 1px solid var(--primary-color);
-    padding: 14px 40px;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 600;
-    text-decoration: none !important;
-    transition: all 0.3s ease;
-    text-transform: capitalize;
-    letter-spacing: 0.5px;
-    text-align: center;
-}
-
-.continue-shopping-btn:hover {
-    background-color: var(--primary-color);
-    color: #fff !important;
-    box-shadow: 0 5px 15px rgba(110, 168, 32, 0.3);
-}
-
-.btn-clear-red {
-    display: block;
-    background-color: #fff;
-    color: #dc3545 !important;
-    border: 1px solid #dc3545;
-    padding: 14px 40px;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    text-transform: capitalize;
-    letter-spacing: 0.5px;
-}
-
-.btn-clear-red:hover {
-    background-color: #dc3545;
-    color: #fff !important;
-    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
-}
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 991px) {
-    .cart-summary {
-        margin-top: 30px;
-        position: static;
-        width: 100%;
-        padding: 20px;
+    /* Modern Pill-Style Quantity Control */
+    .qty-pill-control {
+        display: inline-flex;
+        align-items: center;
+        background: #ffffff;
+        border: 2px solid #6ea820;
+        /* Matched the yellow/gold border from screenshot */
+        border-radius: 50px;
+        padding: 2px 5px;
+        height: 38px;
+        min-width: 110px;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px rgba(255, 202, 44, 0.1);
     }
-}
 
-@media (max-width: 768px) {
+    .qty-btn-inline {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #333;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .qty-btn-inline:hover {
+        background-color: #fff9e6;
+        color: #6ea820;
+    }
+
+    .qty-btn-inline.delete-btn {
+        color: #444;
+        /* Darker for the trash icon */
+    }
+
+    .qty-btn-inline.delete-btn:hover {
+        background-color: #fff0f0;
+        color: #dc3545;
+    }
+
+    .qty-number-input {
+        width: 35px;
+        border: none;
+        text-align: center;
+        font-weight: 700;
+        font-size: 15px;
+        color: #1e293b;
+        background: transparent;
+        outline: none !important;
+    }
+
+    /* Chrome, Safari, Edge, Opera: remove arrows */
+    .qty-number-input::-webkit-outer-spin-button,
+    .qty-number-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Simple Empty Cart Styles */
     .empty-cart-container {
-        padding: 50px 15px;
-        min-height: 350px;
+        text-align: center;
+        padding: 80px 20px;
+        background: #fff;
+        min-height: 450px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
-    .empty-text {
-        font-size: 20px;
-    }
-    .empty-icon-wrapper {
-        width: 90px;
-        height: 90px;
-        font-size: 35px;
-    }
-}
 
-@media (max-width: 576px) {
-    .gi-vendor-card-header {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-    .gi-vendor-card-header h5 {
-        margin-bottom: 15px;
-        font-size: 1.2rem;
-    }
-    .gi-vendor-card-header .btn {
-        width: 100%;
-    }
+    /* Absolute Positioned Remove Button */
     .cart-item {
-        flex-direction: column;
+        position: relative;
+        padding-top: 25px !important;
+    }
+
+    .action-btn.top-right-remove {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #f1f5f9;
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        color: #64748b;
+        display: flex;
         align-items: center;
-        text-align: center;
-        gap: 15px;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        z-index: 5;
     }
-    .item-image {
-        width: 100px !important;
-        height: 100px !important;
-        margin: 0 auto;
+
+    .action-btn.top-right-remove:hover {
+        background: #fee2e2;
+        color: #ef4444;
+        transform: rotate(90deg);
     }
-    .item-details {
+
+    .empty-icon-wrapper {
+        width: 120px;
+        height: 120px;
+        background-color: #f3f7ed;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+        color: #72a420;
+        font-size: 50px;
+        transition: all 0.3s ease;
+    }
+
+    .empty-icon-wrapper:hover {
+        transform: scale(1.1) rotate(-10deg);
+    }
+
+    .empty-text {
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+        font-family: var(--font-heading);
+    }
+
+    .empty-subtext {
+        font-size: 16px;
+        color: #777;
+        margin-bottom: 35px;
+        max-width: 400px;
+    }
+
+    .checkout-btn {
+        display: block;
         width: 100%;
-        padding: 0 10px;
+        background-color: var(--primary-color);
+        color: #fff !important;
+        padding: 14px 40px;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: all 0.3s ease;
+        border: none;
+        text-transform: capitalize;
+        letter-spacing: 0.5px;
+        text-align: center;
     }
-    .qty-input-group {
-        justify-content: center;
+
+    .checkout-btn:hover {
+        background-color: #5b8c19;
+        box-shadow: 0 5px 15px rgba(110, 168, 32, 0.3);
     }
-    .item-actions {
-        justify-content: center;
-        margin-top: 15px;
+
+    .continue-shopping-btn {
+        display: block;
+        width: 30%;
+        margin-top: 10px;
+        background-color: #fff;
+        color: var(--primary-color) !important;
+        border: 1px solid var(--primary-color);
+        padding: 14px 40px;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: all 0.3s ease;
+        text-transform: capitalize;
+        letter-spacing: 0.5px;
+        text-align: center;
     }
-}
+
+    .continue-shopping-btn:hover {
+        background-color: var(--primary-color);
+        color: #fff !important;
+        box-shadow: 0 5px 15px rgba(110, 168, 32, 0.3);
+    }
+
+    .btn-clear-red {
+        display: block;
+        background-color: #fff;
+        color: #dc3545 !important;
+        border: 1px solid #dc3545;
+        padding: 14px 40px;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: capitalize;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-clear-red:hover {
+        background-color: #dc3545;
+        color: #fff !important;
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 991px) {
+        .cart-summary {
+            margin-top: 30px;
+            position: static;
+            width: 100%;
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .empty-cart-container {
+            padding: 50px 15px;
+            min-height: 350px;
+        }
+
+        .empty-text {
+            font-size: 20px;
+        }
+
+        .empty-icon-wrapper {
+            width: 90px;
+            height: 90px;
+            font-size: 35px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .gi-vendor-card-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .gi-vendor-card-header h5 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .gi-vendor-card-header .btn {
+            width: 100%;
+        }
+
+        .cart-item {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 15px;
+        }
+
+        .item-image {
+            width: 100px !important;
+            height: 100px !important;
+            margin: 0 auto;
+        }
+
+        .item-details {
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .qty-input-group {
+            justify-content: center;
+        }
+
+        .item-actions {
+            justify-content: center;
+            margin-top: 15px;
+        }
+    }
 </style>
 
 @include('view.layout.footer')

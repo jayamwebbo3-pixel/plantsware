@@ -5,7 +5,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Edit Shipping Rate</h2>
-    <a href="{{ route('admin.shipping-rates.index') }}" class="btn btn-secondary rounded-3">Back</a>
+    <a href="{{ route('admin.shipping-rates.index') }}" class="text-decoration-none"> <i class="fas fa-arrow-left"></i> Back</a>
 </div>
 
 <div class="card shadow-sm border-0 rounded-3">
@@ -15,8 +15,24 @@
             @method('PUT')
             
             <div class="mb-4">
-                <label for="state_name" class="form-label fw-bold small text-muted text-uppercase">State Name</label>
-                <input type="text" name="state_name" class="form-control rounded-3" id="state_name" value="{{ old('state_name', $shippingRate->state_name) }}" required>
+                <label for="state_name" class="form-label fw-bold small text-muted text-uppercase">Select State</label>
+                <select name="state_name" id="state_name" class="form-select rounded-3 @error('state_name') is-invalid @enderror" required>
+                    <option value="">Select a State</option>
+                    @php
+                        $selectedState = old('state_name', $shippingRate->state_name);
+                        $states = [
+                            "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
+                            "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", 
+                            "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", 
+                            "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", 
+                            "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", 
+                            "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+                        ];
+                    @endphp
+                    @foreach($states as $state)
+                        <option value="{{ $state }}" {{ $selectedState == $state ? 'selected' : '' }}>{{ $state }}</option>
+                    @endforeach
+                </select>
                 @error('state_name')
                     <div class="text-danger small mt-1">{{ $message }}</div>
                 @enderror

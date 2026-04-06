@@ -4,7 +4,7 @@
 <div class="container-fluid px-4">
     <div class="mb-4 d-flex justify-content-between align-items-center">
         <h1 class="h3 mb-0 text-gray-800">Add New Blog Category</h1>
-        <a href="{{ route('admin.blog-categories.index') }}" class="btn btn-secondary">
+        <a href="{{ route('admin.blog-categories.index') }}" class="text-decoration-none">
             <i class="fas fa-arrow-left"></i> Back
         </a>
     </div>

@@ -24,7 +24,14 @@ class DashboardController extends Controller
             'total_orders' => Order::count(),
             'total_customers' => User::count(),
             'pending_orders' => Order::whereNotIn('status', ['shipped', 'delivered', 'cancelled', 'returned'])->count(),
+            'total_products' => Product::count(),
+            'out_of_stock_products' => Product::where('stock_quantity', '<=', 0)->count(),
         ];
+
+        // Out of stock list with relationships
+        $out_of_stock_list = Product::with(['category', 'subcategory'])
+            ->where('stock_quantity', '<=', 0)
+            ->get();
 
         // Retrieve top selling products (fallback to latest if none sold)
         $top_sold_ids = DB::table('order_items')
@@ -64,6 +71,6 @@ class DashboardController extends Controller
             $chart_data[] = $daily_sum;
         }
 
-        return view('admin.dashboard', compact('stats', 'top_products', 'recent_blogs', 'chart_labels', 'chart_data'));
+        return view('admin.dashboard', compact('stats', 'top_products', 'recent_blogs', 'chart_labels', 'chart_data', 'out_of_stock_list'));
     }
 }

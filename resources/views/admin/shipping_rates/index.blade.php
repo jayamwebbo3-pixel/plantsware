@@ -12,30 +12,61 @@
 
 <div class="card shadow-sm border-0 rounded-3">
     <div class="card-body">
-       <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-light">
+        <!-- Header: Search & Per Page -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-6">
+                <form method="GET">
+                    @foreach(request()->except(['search', 'page']) as $key => $val)
+                    <input type="hidden" name="{{ $key }}" value="{{ $val }}">
+                    @endforeach
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control form-control-sm" placeholder="Search State..." value="{{ request('search') }}">
+                        <button class="btn btn-outline-secondary btn-sm" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6 text-end">
+                <form method="GET" class="d-inline">
+                    @foreach(request()->except(['per_page', 'page']) as $key => $val)
+                    <input type="hidden" name="{{ $key }}" value="{{ $val }}">
+                    @endforeach
+                    <small class="me-2 text-muted">Show</small>
+                    <select name="per_page" onchange="this.form.submit()" class="form-select form-select-sm d-inline w-auto">
+                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover align-middle">
+                <thead class="table-light text-nowrap">
                     <tr>
-                        <th class="text-muted">S.NO</th>
-                        <th class="text-muted">STATE NAME</th>
-                        <th class="text-muted">BASE WEIGHT (KG)</th>
-                        <th class="text-muted">BASE COST (₹)</th>
-                        <th class="text-muted">ADDITIONAL WEIGHT UNIT (KG)</th>
-                        <th class="text-muted">ADDITIONAL COST PER UNIT (₹)</th>
-                        <th class="text-muted">ACTIONS</th>
+                        <th class="text-center">S.NO</th>
+                        <th>STATE NAME</th>
+                        <th class="text-center">BASE WEIGHT (KG)</th>
+                        <th class="text-center">BASE COST (₹)</th>
+                        <th class="text-center">ADDITIONAL WEIGHT UNIT (KG)</th>
+                        <th class="text-center">ADDITIONAL COST PER UNIT (₹)</th>
+                        <th class="text-center">ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($shippingRates as $rate)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td class="text-center align-middle">{{ ($shippingRates->currentPage() - 1) * $shippingRates->perPage() + $loop->iteration }}</td>
                         <td class="fw-bold">{{ $rate->state_name }}</td>
-                        <td>{{ $rate->base_weight }}</td>
-                        <td>{{ number_format($rate->base_cost, 2) }}</td>
-                        <td>{{ $rate->additional_weight_unit }}</td>
-                        <td>{{ number_format($rate->additional_cost_per_unit, 2) }}</td>
-                        <td class="text-nowrap">
-                            <div class="d-flex gap-2">
+                        <td class="text-center align-middle">{{ $rate->base_weight }}</td>
+                        <td class="text-center align-middle">{{ number_format($rate->base_cost, 2) }}</td>
+                        <td class="text-center align-middle">{{ $rate->additional_weight_unit }}</td>
+                        <td class="text-center align-middle">{{ number_format($rate->additional_cost_per_unit, 2) }}</td>
+                        <td class="text-nowrap text-center">
+                            <div class="d-flex justify-content-center gap-2">
                                 <a href="{{ route('admin.shipping-rates.edit', $rate) }}" class="btn btn-sm btn-primary" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -56,6 +87,16 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <!-- Footer: Pagination Info & Links -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="text-muted small">
+                Showing {{ $shippingRates->firstItem() ?? 0 }} to {{ $shippingRates->lastItem() ?? 0 }} of {{ $shippingRates->total() }} entries
+            </div>
+            <div>
+                {{ $shippingRates->appends(request()->query())->links() }}
+            </div>
         </div>
     </div>
 </div>

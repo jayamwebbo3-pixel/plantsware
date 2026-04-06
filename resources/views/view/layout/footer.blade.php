@@ -87,27 +87,27 @@
                             &copy; 2026 Plantsware. All rights reserved.
                         </p>
 
-                        <div class="footer-bottom-payment d-flex justify-content-center">
+                        <!-- <div class="footer-bottom-payment d-flex justify-content-center">
                             <div class="payment-link">
-                                <img src="https://christianbooksworld.com/home/img/hero-bg/visa.png" alt="payment">
+                                <img src="/assets/images/visa.png" alt="payment">
                             </div>
                             <div class="payment-link">
-                                <img src="https://christianbooksworld.com/home/img/hero-bg/rupay.png" alt="payment">
+                                <img src="/assets/images/rupay.png" alt="payment">
                             </div>
                             <div class="payment-link">
-                                <img src="https://christianbooksworld.com/home/img/hero-bg/gpay.png" alt="payment">
+                                <img src="/assets/images/gpay.png" alt="payment">
                             </div>
                             <div class="payment-link">
-                                <img src="https://christianbooksworld.com/home/img/hero-bg/paytm.png" alt="payment">
+                                <img src="/assets/images/paytm.png" alt="payment">
                             </div>
                             <div class="payment-link">
-                                <img src="https://christianbooksworld.com/home/img/hero-bg/upi.webp" alt="payment">
+                                <img src="/assets/images/upi.png" alt="payment">
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Right Side -->
                         <p class="mb-0">
-                            <a href="#" class="text-dark"> Developed by Jayam Web Solutions</a>
+                            <a href="https://jayamwebsolutions.com/" class="text-dark"> Developed by Jayam Web Solutions</a>
                         </p>
 
                     </div>
@@ -277,7 +277,7 @@
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 3000,
+            timer: 2000,
             timerProgressBar: true,
             didOpen: (toast) => {
                 toast.addEventListener('mouseenter', Swal.stopTimer)

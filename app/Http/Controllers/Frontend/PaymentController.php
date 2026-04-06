@@ -49,12 +49,12 @@ class PaymentController extends Controller
             // 1. Backdate the Transaction 11 minutes
             $transaction->created_at = now()->subMinutes(11);
             $transaction->save();
-            
+
             // 2. Backdate the TempCart records so the Cron will pick them up
             \App\Models\TempCart::where('user_id', $transaction->user_id)
                 ->where('status', 'pending')
                 ->update(['created_at' => now()->subMinutes(11)]);
-            
+
             // 3. Trigger the Laravel schedule manually to run the 1-minute cron
             \Illuminate\Support\Facades\Artisan::call('schedule:run');
 
@@ -101,43 +101,63 @@ class PaymentController extends Controller
 
                 DB::beginTransaction();
 
-                $order = Order::with(['items.product', 'user'])->findOrFail($transaction->order_id);
+                // Get checkout data from transaction
+                $checkoutData = $transaction->checkout_data;
+                if (!$checkoutData || !isset($checkoutData['items'])) {
+                    throw new Exception("Invalid checkout data.");
+                }
 
-                // Stock is already reserved/reduced via TempCartService during checkout initiation
-                // No need to re-verify here as it causes "Insufficient stock" errors when stock reaches 0 after reservation.
-
-                $order->update([
-                    'status' => 'confirmed', // Fulfilment starts at confirmed
-                    'payment_status' => 'paid', // Or success
+                // 1. Create the Final Order
+                $order = Order::create([
+                    'order_number' => 'PLW-' . strtoupper(uniqid()),
+                    'user_id' => $transaction->user_id,
+                    'shipping_address' => $checkoutData['shipping_address'] ?? [],
+                    'subtotal' => $checkoutData['subtotal'] ?? 0,
+                    'shipping' => $checkoutData['shipping'] ?? 0,
+                    'tax' => $checkoutData['tax'] ?? 0,
+                    'total' => $checkoutData['total'] ?? 0,
+                    'total_weight' => $checkoutData['total_weight'] ?? 0,
+                    'total_discount' => $checkoutData['total_discount'] ?? 0,
+                    'status' => 'confirmed',
+                    'payment_status' => 'paid',
+                    'payment_method' => $transaction->payment_method ?? 'online',
                 ]);
 
-                // Update TempCarts to paid since stock is already reduced
+                // 2. Create Order Items
+                foreach ($checkoutData['items'] as $itemData) {
+                    OrderItem::create(array_merge($itemData, ['order_id' => $order->id]));
+                }
+
+                // 3. Link transaction back to order
+                $transaction->update([
+                    'status' => 'SUCCESS',
+                    'order_id' => $order->id
+                ]);
+
+                // 4. Update TempCarts to paid since stock was already reduced during checkout initiation
                 \App\Models\TempCart::where('user_id', $transaction->user_id)
                     ->where('status', 'pending')
                     ->update(['status' => 'paid']);
 
-                $transaction->update([
-                    'status' => 'SUCCESS'
-                ]);
-
                 DB::commit();
 
-                // Clear cart logic
+                // Clear live cart
                 try {
                     Cart::where('user_id', $transaction->user_id)->delete();
                     session()->forget('shipping_address');
-                    
-                    // Update session counts immediately for header display
                     session(['cart_count' => 0]);
                 } catch (Exception $e) {
                 }
 
-                \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderConfirmation($order));
-
-                // Also send to Admin
-                $headerFooter = \App\Models\HeaderFooter::first();
-                if (!empty($headerFooter->email)) {
-                    \Illuminate\Support\Facades\Mail::to($headerFooter->email)->send(new \App\Mail\OrderConfirmation($order));
+                // Send Confirmation Emails
+                try {
+                    \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderConfirmation($order));
+                    $headerFooter = \App\Models\HeaderFooter::first();
+                    if (!empty($headerFooter->email)) {
+                        \Illuminate\Support\Facades\Mail::to($headerFooter->email)->send(new \App\Mail\OrderConfirmation($order));
+                    }
+                } catch (Exception $e) {
+                    // Log mail error but don't fail the order
                 }
 
                 return redirect()->route('checkout.confirmation', $order->id)->with('success', 'Payment successful and Order placed!');

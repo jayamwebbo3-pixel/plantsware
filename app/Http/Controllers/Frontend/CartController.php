@@ -46,10 +46,10 @@ class CartController extends Controller
         });
 
         $shipping = 0;
-        $defaultRate = \App\Models\ShippingRate::where('state_name', 'Default')->first() 
-                    ?? \App\Models\ShippingRate::where('state_name', 'All India')->first()
-                    ?? \App\Models\ShippingRate::first();
-        
+        $defaultRate = \App\Models\ShippingRate::where('state_name', 'Default')->first()
+            ?? \App\Models\ShippingRate::where('state_name', 'All India')->first()
+            ?? \App\Models\ShippingRate::first();
+
         if ($defaultRate) {
             $shipping = (float) $defaultRate->base_cost;
             if ($totalWeight > $defaultRate->base_weight) {
@@ -102,7 +102,7 @@ class CartController extends Controller
         app(TempCartService::class)->clearUserTempCarts(Auth::id(), Auth::check() ? null : session()->getId());
 
         $quantity = max(1, (int) $request->input('quantity', 1));
-        
+
         $optionsInput = $request->input('options') ?? $request->input('size');
         $options = null;
         if (is_string($optionsInput) && !is_object(json_decode($optionsInput))) {
@@ -121,19 +121,19 @@ class CartController extends Controller
 
         $query = Cart::current();
 
-if ($type === 'product') {
-    $query->where('product_id', $itemId);
+        if ($type === 'product') {
+            $query->where('product_id', $itemId);
 
-    if ($options) {
-        $query->where('options', $options);
-    } else {
-        $query->whereNull('options');
-    }
-} else {
-    $query->where('combo_pack_id', $itemId);
-}
+            if ($options) {
+                $query->where('options', $options);
+            } else {
+                $query->whereNull('options');
+            }
+        } else {
+            $query->where('combo_pack_id', $itemId);
+        }
 
-$existingItem = $query->first();
+        $existingItem = $query->first();
         $currentQuantity = $existingItem ? $existingItem->quantity : 0;
         $newTotalQuantity = $currentQuantity + $quantity;
 

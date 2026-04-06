@@ -38,56 +38,60 @@
             background: white;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .btn-primary {
-    background-color: #134e5e !important;
-    border-color: #134e5e !important;
-    color: white !important;
-}
+            background-color: #134e5e !important;
+            border-color: #134e5e !important;
+            color: white !important;
+        }
 
-.btn-primary:hover {
-    background-color: #134e5e !important;
-    border-color: #134e5e !important;
-    color: white !important;
-}
-.btn-outline-primary {
-    background-color: #f0872bff !important;
-    --bs-btn-color: #fff !important;
-    --bs-btn-border-color: #f0872bff !important;
-    --bs-btn-hover-color: #fff !important;
-    --bs-btn-hover-bg: #d47527 !important;
-    --bs-btn-hover-border-color: #fd7d0dff !important;
-    --bs-btn-focus-shadow-rgb: 13, 110, 253;
-    --bs-btn-active-color: #fff !important;
-    --bs-btn-active-bg: #fd7d0dff;
-    --bs-btn-active-border-color: #fd7d0dff;
-    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-    --bs-btn-disabled-color: #fd7d0dff;
-    --bs-btn-disabled-bg: transparent;
-    --bs-btn-disabled-border-color: #fd7d0dff;
-    --bs-gradient: none;
-}
- .text-decoration-none {
-    display: inline-block;
-    background-color: #0d71fd;
-    color: #fff !important;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-weight: 400;
-    font-size: 12px;
-    text-decoration: none !important;
-    transition: 0.3s ease;
-}
+        .btn-primary:hover {
+            background-color: #134e5e !important;
+            border-color: #134e5e !important;
+            color: white !important;
+        }
 
-.text-decoration-none:hover {
-    background-color: #0b5ed7;
-    color: #fff !important;
-}
-.btn {
-    padding: 5px 10px;
-    font-size: 12px;
-    border-radius: 20px;
-    font-weight: 400;
-}
+        .btn-outline-primary {
+            background-color: #f0872bff !important;
+            --bs-btn-color: #fff !important;
+            --bs-btn-border-color: #f0872bff !important;
+            --bs-btn-hover-color: #fff !important;
+            --bs-btn-hover-bg: #d47527 !important;
+            --bs-btn-hover-border-color: #fd7d0dff !important;
+            --bs-btn-focus-shadow-rgb: 13, 110, 253;
+            --bs-btn-active-color: #fff !important;
+            --bs-btn-active-bg: #fd7d0dff;
+            --bs-btn-active-border-color: #fd7d0dff;
+            --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+            --bs-btn-disabled-color: #fd7d0dff;
+            --bs-btn-disabled-bg: transparent;
+            --bs-btn-disabled-border-color: #fd7d0dff;
+            --bs-gradient: none;
+        }
+
+        .text-decoration-none {
+            display: inline-block;
+            background-color: #36383c;
+            color: #fff !important;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 400;
+            font-size: 12px;
+            text-decoration: none !important;
+            transition: 0.3s ease;
+        }
+
+        /* .text-decoration-none:hover {
+            background-color: #0b5ed7;
+            color: #fff !important;
+        } */
+
+        .btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 20px;
+            font-weight: 400;
+        }
     </style>
 </head>
 
@@ -115,10 +119,10 @@
                     </a>
 
                     <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
-                        <i class="fas fa-users"></i> <span>Users</span>
+                        <i class="fas fa-users"></i> <span>Customers</span>
                     </a>
 
-                     <a class="nav-link {{ request()->routeIs('admin.shipping-rates.*') ? 'active' : '' }}" href="{{ route('admin.shipping-rates.index') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.shipping-rates.*') ? 'active' : '' }}" href="{{ route('admin.shipping-rates.index') }}">
                         <i class="fas fa-shipping-fast"></i> Shipping Cost
                     </a>
 
@@ -128,7 +132,7 @@
                     </a>
                     <div class="collapse {{ request()->routeIs('admin.pages.*') ? 'show' : '' }}" id="informativePagesCollapse">
                         <ul class="nav flex-column ms-3">
-                        <li class="nav-item">
+                            <li class="nav-item">
                                 <a class="nav-link {{ request()->is('admin/pages/ad-banner/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'ad-banner') }}">
                                     <i class="fas fa-ad"></i> Ad Banner
                                 </a>
@@ -139,36 +143,36 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                 <a class="nav-link {{ request()->is('admin/pages/about-us/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'about-us') }}">
+                                <a class="nav-link {{ request()->is('admin/pages/about-us/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'about-us') }}">
                                     <i class="fas fa-lightbulb"></i> About Us
-                                 </a>
+                                </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->is('admin/pages/services/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'services') }}">
                                     <i class="fas fa-lightbulb"></i> Services
                                 </a>
                             </li>
-                             
-                             <li class="nav-item">
-                                 <a class="nav-link {{ request()->is('admin/pages/terms-conditions/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'terms-conditions') }}">
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/terms-conditions/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'terms-conditions') }}">
                                     <i class="fas fa-lightbulb"></i> Terms & Conditions
                                 </a>
-                             </li>
-                             <li class="nav-item">
-                                 <a class="nav-link {{ request()->is('admin/pages/privacy-policy/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'privacy-policy') }}">
-                                     <i class="fas fa-lightbulb"></i> Privacy Policy
-                                 </a>
-                             </li>
-                             <li class="nav-item">
-                                 <a class="nav-link {{ request()->is('admin/pages/return-refund-policy/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'return-refund-policy') }}">
-                                     <i class="fas fa-lightbulb"></i> Return & Refund Policy
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/privacy-policy/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'privacy-policy') }}">
+                                    <i class="fas fa-lightbulb"></i> Privacy Policy
                                 </a>
-                             </li>
-                             
-                             <!--<li class="nav-item">
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/pages/return-refund-policy/edit') ? 'active' : '' }}" href="{{ route('admin.pages.edit', 'return-refund-policy') }}">
+                                    <i class="fas fa-lightbulb"></i> Return & Refund Policy
+                                </a>
+                            </li>
+
+                            <!--<li class="nav-item">
                                 <hr style="border-color: rgba(255,255,255,0.2); margin: 5px 20px;">
                               </li> -->
-                            
+
                         </ul>
                     </div>
 
@@ -189,7 +193,7 @@
             </div>
 
             <!-- Main Content -->
-             <div class="col-md-10">
+            <div class="col-md-10">
                 <nav class="navbar navbar-light bg-white mb-3">
                     <div class="container-fluid">
                         <span class="navbar-brand mb-0 h1">@yield('title', 'Dashboard')</span>
@@ -207,7 +211,9 @@
                                         <i class="fas fa-user-gear me-2 text-info opacity-75"></i> Manage Account
                                     </a>
                                 </li>
-                                <li><hr class="dropdown-divider opacity-25"></li>
+                                <li>
+                                    <hr class="dropdown-divider opacity-25">
+                                </li>
                                 <li>
                                     <form method="POST" action="{{ route('admin.logout') }}">
                                         @csrf
@@ -224,16 +230,16 @@
                 <div class="main-content">
                     @yield('content')
                 </div>
-                </div>
             </div>
         </div>
+    </div>
     </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Success Message
             const successMessage = "{{ session('success') }}";
             if (successMessage) {
@@ -241,7 +247,7 @@
                     icon: 'success',
                     title: 'Success!',
                     text: successMessage,
-                    timer: 3000,
+                    timer: 2000,
                     showConfirmButton: false,
                     toast: true,
                     position: 'top-end'
@@ -279,18 +285,18 @@
             };
 
             // Automatic Interceptor for standard confirm() calls in forms
-            document.addEventListener('submit', function (e) {
+            document.addEventListener('submit', function(e) {
                 const form = e.target;
                 const onsubmitAttr = form.getAttribute('onsubmit');
-                
+
                 if (onsubmitAttr && onsubmitAttr.includes('confirm(')) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
-                    
+
                     // Extract message
                     const match = onsubmitAttr.match(/confirm\(['"](.*)['"]\)/);
                     const message = match ? match[1] : 'Are you sure?';
-                    
+
                     Swal.fire({
                         title: 'Are you sure?',
                         text: message,
@@ -310,17 +316,17 @@
             }, true);
 
             // Automatic Interceptor for onclick confirm() calls on buttons
-            document.addEventListener('click', function (e) {
+            document.addEventListener('click', function(e) {
                 const target = e.target.closest('[onclick*="confirm("]');
                 if (target) {
                     const onclickAttr = target.getAttribute('onclick');
                     if (onclickAttr && onclickAttr.includes('confirm(')) {
                         e.preventDefault();
                         e.stopImmediatePropagation();
-                        
+
                         const match = onclickAttr.match(/confirm\(['"](.*)['"]\)/);
                         const message = match ? match[1] : 'Are you sure?';
-                        
+
                         Swal.fire({
                             title: 'Are you sure?',
                             text: message,

@@ -24,7 +24,7 @@
                 <div class="user-info">
                     <div class="user-avatar" style="overflow: hidden; border: 4px solid var(--primary-color);">
                         @php
-                            $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=76a713&color=fff&size=150';
+                        $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=76a713&color=fff&size=150';
                         @endphp
                         <img src="{{ $avatarUrl }}" alt="{{ auth()->user()->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
@@ -97,11 +97,11 @@
                         @forelse($addresses as $address)
                         <div class="address-card {{ $address->is_default ? 'selected' : '' }}">
                             @if($address->is_default)
-                                <span class="address-badge">DEFAULT</span>
+                            <span class="address-badge">DEFAULT</span>
                             @endif
                             <div class="address-name">{{ $address->first_name }} {{ $address->last_name }}</div>
                             @if($address->door_number)
-                                <div class="address-detail">{{ $address->door_number }}</div>
+                            <div class="address-detail">{{ $address->door_number }}</div>
                             @endif
                             <div class="address-detail">{{ $address->street }}, {{ $address->city }} {{ $address->post_code }}</div>
                             <div class="address-detail">{{ $address->district }} {{ $address->district ? ',' : '' }} {{ $address->state }}</div>
@@ -192,7 +192,7 @@
                                         <option value="Uttar Pradesh">Uttar Pradesh</option>
                                         <option value="Uttarakhand">Uttarakhand</option>
                                         <option value="West Bengal">West Bengal</option>
-                                        
+
                                     </select>
                                 </div>
                             </div>
@@ -232,42 +232,42 @@
                         <div class="order-item">
                             <div class="order-image">
                                 @php
-                                    $hasImage = false;
-                                    $imgSrc = '';
-                                    if ($order->items && $order->items->count() > 0) {
-                                        $pImg = $order->items->first()->product_image;
-                                        if (!$pImg && $order->items->first()->product) {
-                                            $pImg = $order->items->first()->product->image;
-                                        }
-                                        if ($pImg) {
-                                            $hasImage = true;
-                                            if (is_string($pImg) && str_starts_with($pImg, '[')) {
-                                                $decoded = json_decode($pImg, true);
-                                                $pImg = is_array($decoded) && count($decoded) > 0 ? $decoded[0] : $pImg;
-                                            }
-                                            if (is_string($pImg) && (str_starts_with($pImg, 'http') || str_starts_with($pImg, 'assets/'))) {
-                                                $imgSrc = asset($pImg);
-                                            } else {
-                                                $imgSrc = asset('storage/' . $pImg);
-                                            }
-                                        }
-                                    }
+                                $hasImage = false;
+                                $imgSrc = '';
+                                if ($order->items && $order->items->count() > 0) {
+                                $pImg = $order->items->first()->product_image;
+                                if (!$pImg && $order->items->first()->product) {
+                                $pImg = $order->items->first()->product->image;
+                                }
+                                if ($pImg) {
+                                $hasImage = true;
+                                if (is_string($pImg) && str_starts_with($pImg, '[')) {
+                                $decoded = json_decode($pImg, true);
+                                $pImg = is_array($decoded) && count($decoded) > 0 ? $decoded[0] : $pImg;
+                                }
+                                if (is_string($pImg) && (str_starts_with($pImg, 'http') || str_starts_with($pImg, 'assets/'))) {
+                                $imgSrc = asset($pImg);
+                                } else {
+                                $imgSrc = asset('storage/' . $pImg);
+                                }
+                                }
+                                }
                                 @endphp
                                 @if($hasImage)
-                                    <img src="{{ $imgSrc }}" alt="{{ $order->items->first()->product_name }}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;" onerror="this.onerror=null; this.src='{{ asset('assets/images/product/product1.jpg') }}';">
+                                <img src="{{ $imgSrc }}" alt="{{ $order->items->first()->product_name }}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;" onerror="this.onerror=null; this.src='{{ asset('assets/images/product/product1.jpg') }}';">
                                 @else
-                                    <i class="fas fa-box" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                <i class="fas fa-box" style="font-size: 2rem; color: var(--primary-color);"></i>
                                 @endif
                             </div>
                             <div class="order-info">
                                 <h4>
                                     @if($order->items && $order->items->count() > 0)
-                                        {{ $order->items->first()->product_name }}
-                                        @if($order->items->count() > 1)
-                                            <span style="font-size: 0.8em; color: gray; display: block; margin-top: 4px; font-weight: normal;">+ {{ $order->items->count() - 1 }} more item(s)</span>
-                                        @endif
+                                    {{ $order->items->first()->product_name }}
+                                    @if($order->items->count() > 1)
+                                    <span style="font-size: 0.8em; color: gray; display: block; margin-top: 4px; font-weight: normal;">+ {{ $order->items->count() - 1 }} more item(s)</span>
+                                    @endif
                                     @else
-                                        Order {{ $order->order_number }}
+                                    Order {{ $order->order_number }}
                                     @endif
                                 </h4>
                                 <p>Date: {{ $order->created_at->format('d M Y') }}</p>
@@ -479,9 +479,12 @@
     .address-card {
         cursor: pointer;
         transition: all 0.4s ease-in-out;
-        border: 2px solid #eaeaea; /* Standard light gray border */
-        border-radius: 8px; /* Smooth corners */
-        padding: 20px; /* Reliable content padding */
+        border: 2px solid #eaeaea;
+        /* Standard light gray border */
+        border-radius: 8px;
+        /* Smooth corners */
+        padding: 20px;
+        /* Reliable content padding */
         position: relative;
         height: 100%;
         display: flex;
@@ -490,14 +493,18 @@
     }
 
     .address-card .address-actions {
-        margin-top: auto; /* Pushes buttons to the bottom */
-        padding-top: 15px; /* Clean spacing */
+        margin-top: auto;
+        /* Pushes buttons to the bottom */
+        padding-top: 15px;
+        /* Clean spacing */
     }
 
     .address-card:hover {
         border-color: #c0c0c0;
-        transform: translateY(-2px); /* Smooth subtle lift transition */
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05); /* Soft drop shadow on hover */
+        transform: translateY(-2px);
+        /* Smooth subtle lift transition */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        /* Soft drop shadow on hover */
     }
 
     .address-card.selected {
@@ -505,10 +512,11 @@
         background-color: #f8fbf5;
         box-shadow: 0 0 0 2px rgba(118, 167, 19, 0.2);
     }
-    
+
     /* Ensure the dot/radio look for selected state if needed */
     .address-card.selected::after {
-        content: '\f058'; /* FontAwesome check-circle */
+        content: '\f058';
+        /* FontAwesome check-circle */
         font-family: 'Font Awesome 5 Free';
         font-weight: 900;
         color: var(--primary-color, #76a713);
@@ -523,7 +531,8 @@
         padding: 4px 12px !important;
         font-size: 10px !important;
         width: fit-content !important;
-        border-radius: 50px; /* pill shape */
+        border-radius: 50px;
+        /* pill shape */
         margin-bottom: 10px;
         background-color: var(--primary-color, #76a713);
         color: #fff;
@@ -544,7 +553,7 @@
         border-bottom: 2px solid #f8f8f8;
         overflow: hidden;
     }
-    
+
     .user-avatar {
         width: 75px;
         height: 75px;
@@ -554,15 +563,16 @@
         align-items: center;
         justify-content: center;
         margin-bottom: 18px;
-        border: 4px solid #76a713; /* Use primary green */
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        border: 4px solid #76a713;
+        /* Use primary green */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     }
 
     .user-avatar i {
         font-size: 32px;
         color: #76a713;
     }
-    
+
     .user-name {
         font-size: 1.15rem;
         font-weight: 800;
@@ -601,7 +611,7 @@
             link.classList.add('active');
             const tabId = link.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
-            
+
             // Update URL hash
             window.history.pushState(null, null, '#' + tabId);
         });
@@ -609,15 +619,15 @@
 
     // Check hash on load to open correct tab
     document.addEventListener('DOMContentLoaded', () => {
-        if(window.location.hash) {
+        if (window.location.hash) {
             const tabId = window.location.hash.substring(1);
             const link = document.querySelector(`[data-tab="${tabId}"]`);
-            if(link) {
+            if (link) {
                 document.querySelectorAll('[data-tab]').forEach(l => l.classList.remove('active'));
                 document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
                 link.classList.add('active');
                 const targetSection = document.getElementById(tabId);
-                if(targetSection) targetSection.classList.add('active');
+                if (targetSection) targetSection.classList.add('active');
             }
         }
     });
@@ -638,7 +648,7 @@
             formTitle.innerText = "Add New Address";
             submitBtn.innerText = "Add Address";
             methodField.innerHTML = "";
-            
+
             savedAddresses.style.display = 'none';
             newAddressForm.style.display = 'block';
             document.querySelectorAll('.tab-label').forEach((label, index) => {
@@ -716,30 +726,32 @@
         submitBtn.disabled = true;
 
         fetch("{{ route('user.profile.update') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ name: newName })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('userNameLabel').innerText = data.name;
-                hideEditNameForm();
-            } else {
-                alert(data.message || 'Error updating name');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to update name. Please try again.');
-        })
-        .finally(() => {
-            submitBtn.innerText = originalText;
-            submitBtn.disabled = false;
-        });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    name: newName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('userNameLabel').innerText = data.name;
+                    hideEditNameForm();
+                } else {
+                    alert(data.message || 'Error updating name');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update name. Please try again.');
+            })
+            .finally(() => {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            });
     }
 
     // Review Modal Functions
@@ -753,7 +765,7 @@
         itemsList.innerHTML = '<p style="text-align: center; color: #888;">Loading items...</p>';
 
         const fetchUrl = "{{ route('user.order.items', ':id') }}".replace(':id', orderId);
-        
+
         fetch(fetchUrl)
             .then(response => {
                 if (!response.ok) {
@@ -857,7 +869,7 @@
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 2000,
                 timerProgressBar: true
             });
             toast.fire({
@@ -909,18 +921,18 @@
             card.addEventListener('click', function(e) {
                 // Ignore clicks on action buttons
                 if (e.target.closest('.address-actions') || e.target.closest('.address-btn')) return;
-                
+
                 // Remove selected class from all cards
                 addressCards.forEach(c => {
                     c.classList.remove('selected', 'default');
                     const badge = c.querySelector('.address-badge');
-                    if(badge) badge.style.display = 'none';
+                    if (badge) badge.style.display = 'none';
                 });
-                
+
                 // Add selected class to the clicked card
                 this.classList.add('selected', 'default');
                 const myBadge = this.querySelector('.address-badge');
-                if(myBadge) myBadge.style.display = 'inline-block';
+                if (myBadge) myBadge.style.display = 'inline-block';
             });
         });
 

@@ -27,6 +27,33 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', $e->getMessage());
         }
 
+        // Calculate Summary for Sidebar
+        $subtotal = $cartItems->sum(function ($item) {
+            return $item->calculated_price * $item->quantity;
+        });
+        $itemCount = $cartItems->sum('quantity');
+        $totalWeight = $cartItems->sum(function ($item) {
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            return ($p->weight ?? 0) * $item->quantity;
+        });
+
+        // Calculate Total Savings/Discount
+        $discount = $cartItems->sum(function ($item) {
+            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
+            $regularPrice = $item->combo_pack_id ? $p->total_price : $p->price;
+            $savingsPerItem = max(0, $regularPrice - $item->calculated_price);
+            return $savingsPerItem * $item->quantity;
+        });
+
+        // Get shipping (use a dummy state like 'Default' or empty string for initial calculation)
+        $shipping = 0; // Default to 0 until address is selected
+        $tax = 0;
+        $gstSettings = \App\Models\HeaderFooter::first();
+        if ($gstSettings && $gstSettings->gst_status) {
+            $tax = ($subtotal * $gstSettings->gst_percentage) / 100;
+        }
+        $total = $subtotal + $shipping + $tax;
+
         // Pre-fill address if user has one saved
         $savedAddress = [];
         $userAddresses = collect();
@@ -48,21 +75,32 @@ class CheckoutController extends Controller
                     'pincode' => $defaultAddress->post_code,
                     'phone' => $defaultAddress->phone_number,
                 ];
+
+                // If we have a saved state, recalculate shipping for better accuracy
+                $shipping = $this->calculateShipping($cartItems, $defaultAddress->state);
+                $total = $subtotal + $shipping + $tax;
             } else {
-                // FALLBACK if no addresses in user_addresses table yet
-                // 'address' is cast to 'array' in User model, so Eloquent auto-decodes it
                 if (!empty($user->address) && is_array($user->address)) {
                     $savedAddress = $user->address;
+                    if (!empty($savedAddress['state'])) {
+                        $shipping = $this->calculateShipping($cartItems, $savedAddress['state']);
+                        $total = $subtotal + $shipping + $tax;
+                    }
                 }
             }
         }
 
         // Also check session for previously entered address
         if (session()->has('shipping_address')) {
-            $savedAddress = array_merge($savedAddress, session('shipping_address'));
+            $sessAddr = session('shipping_address');
+            $savedAddress = array_merge($savedAddress, $sessAddr);
+            if (!empty($sessAddr['state'])) {
+                $shipping = $this->calculateShipping($cartItems, $sessAddr['state']);
+                $total = $subtotal + $shipping + $tax;
+            }
         }
 
-        return view('view.checkout.address', compact('cartItems', 'savedAddress', 'userAddresses'));
+        return view('view.checkout.address', compact('cartItems', 'savedAddress', 'userAddresses', 'subtotal', 'shipping', 'tax', 'total', 'itemCount', 'totalWeight', 'discount'));
     }
 
     // Save address and redirect to checkout
@@ -85,7 +123,7 @@ class CheckoutController extends Controller
         // Optionally save to user profile if logged in
         if (Auth::check()) {
             $user = Auth::user();
-            
+
             // Update legacy address field
             $user->update([
                 'address' => json_encode($validated),
@@ -149,6 +187,8 @@ class CheckoutController extends Controller
             return $item->calculated_price * $item->quantity;
         });
 
+        $itemCount = $cartItems->sum('quantity');
+
         // Calculate Total Savings/Discount
         $discount = $cartItems->sum(function ($item) {
             $p = $item->combo_pack_id ? $item->comboPack : $item->product;
@@ -164,7 +204,7 @@ class CheckoutController extends Controller
         });
 
         $shipping = $this->calculateShipping($cartItems, $shippingAddress['state']);
-        
+
         // ---- GST CALCULATION ----
         $tax = 0;
         $gstSettings = \App\Models\HeaderFooter::first();
@@ -174,7 +214,7 @@ class CheckoutController extends Controller
 
         $total = $subtotal + $shipping + $tax;
 
-        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'total', 'discount', 'totalWeight', 'gstSettings'));
+        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'total', 'discount', 'totalWeight', 'itemCount', 'gstSettings'));
     }
 
     // Place order (confirm and save)
@@ -209,7 +249,7 @@ class CheckoutController extends Controller
         });
 
         $shipping = $this->calculateShipping($cartItems, $shippingAddress['state']);
-        
+
         // ---- GST CALCULATION ----
         $tax = 0;
         $gstSettings = \App\Models\HeaderFooter::first();
@@ -219,21 +259,8 @@ class CheckoutController extends Controller
 
         $total = $subtotal + $shipping + $tax;
 
-        $order = Order::create([
-            'order_number' => 'PLW-' . strtoupper(uniqid()),
-            'user_id' => auth()->id(),
-            'shipping_address' => $shippingAddress,
-            'subtotal' => $subtotal,
-            'shipping' => $shipping,
-            'tax' => $tax,
-            'total' => $total,
-            'total_weight' => $totalWeight,
-            'total_discount' => $discount,
-            'status' => 'pending',
-            'payment_status' => 'pending',
-            'payment_method' => $request->payment_method ?? 'online',
-        ]);
-
+        // Prepare Item Data for serialization to Transaction record
+        $itemsData = [];
         foreach ($cartItems as $item) {
             $p = $item->combo_pack_id ? $item->comboPack : $item->product;
             $price = $item->calculated_price;
@@ -243,8 +270,7 @@ class CheckoutController extends Controller
             $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
             $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : (is_string($p->image) ? $p->image : null);
 
-            OrderItem::create([
-                'order_id' => $order->id,
+            $itemsData[] = [
                 'product_id' => $item->product_id,
                 'combo_pack_id' => $item->combo_pack_id,
                 'product_name' => $p->name,
@@ -255,28 +281,27 @@ class CheckoutController extends Controller
                 'discount' => $unitDiscount,
                 'total' => $price * $item->quantity,
                 'options' => $item->options,
-            ]);
+            ];
         }
 
-        // Logic split by payment method
-        if ($order->payment_method === 'cod') {
-            // Clear cart immediately
-            Cart::current()->delete();
-            session()->forget('shipping_address');
-            session(['cart_count' => 0]);
-
-            return redirect()->route('checkout.confirmation', $order->id)->with('success', 'Order placed successfully (Cash on Delivery).');
-        }
-
-        // Online Payment Flow
+        // Online Payment Flow - Store all order details in transaction to wait for success
         $transaction = \App\Models\PaymentTransaction::create([
             'user_id' => auth()->id(),
             'transaction_ref' => 'TXN-' . strtoupper(uniqid()),
             'amount' => $total,
             'payment_method' => 'online',
             'status' => 'INITIATED',
-            'order_id' => $order->id,
-            'checkout_data' => [] 
+            'order_id' => null, // Will be linked after success
+            'checkout_data' => [
+                'shipping_address' => $shippingAddress,
+                'subtotal' => $subtotal,
+                'shipping' => $shipping,
+                'tax' => $tax,
+                'total' => $total,
+                'total_weight' => $totalWeight,
+                'total_discount' => $discount,
+                'items' => $itemsData
+            ]
         ]);
 
         return redirect()->route('payment.gateway', ['transaction_ref' => $transaction->transaction_ref]);
@@ -292,9 +317,9 @@ class CheckoutController extends Controller
         $rate = \App\Models\ShippingRate::where('state_name', $state)->first();
         if (!$rate) {
             $rate = \App\Models\ShippingRate::where('state_name', $state)->first()
-             ?? \App\Models\ShippingRate::where('state_name', 'Default')->first()
-             ?? \App\Models\ShippingRate::where('state_name', 'All India')->first()
-             ?? \App\Models\ShippingRate::first();
+                ?? \App\Models\ShippingRate::where('state_name', 'Default')->first()
+                ?? \App\Models\ShippingRate::where('state_name', 'All India')->first()
+                ?? \App\Models\ShippingRate::first();
 
             if (!$rate) return 0;
         }

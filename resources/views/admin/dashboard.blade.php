@@ -67,6 +67,8 @@
     .icon-orders { background: #e6f6f2; color: #3ca884; }
     .icon-customers { background: #fef3c7; color: #d97706; }
     .icon-pending { background: #fee2e2; color: #ef4444; }
+    .icon-products { background: #faf5ff; color: #9333ea; }
+    .icon-outstock { background: #fff7ed; color: #ea580c; }
 
     .stat-value {
         font-size: 2rem;
@@ -159,8 +161,8 @@
 
 <div class="row g-4 mb-4">
     <!-- Total Revenue -->
-    <div class="col-xl-3 col-md-6">
-        <div class="modern-card">
+    <div class="col-xl-4 col-md-6">
+        <div class="modern-card h-100">
             <div class="stat-header">
                 <div>
                     <div class="stat-title">Total Revenue</div>
@@ -170,16 +172,12 @@
                 </div>
             </div>
             <h3 class="stat-value">₹{{ number_format($stats['revenue'], 2) }}</h3>
-            <div class="stat-trend trend-up">
-                <i class="fa-solid fa-arrow-trend-up"></i>
-                <span>Overall Success</span>
-            </div>
         </div>
     </div>
     
     <!-- Total Orders -->
-    <div class="col-xl-3 col-md-6">
-        <div class="modern-card">
+    <div class="col-xl-4 col-md-6">
+        <div class="modern-card h-100">
             <div class="stat-header">
                 <div>
                     <div class="stat-title">Total Orders</div>
@@ -189,16 +187,12 @@
                 </div>
             </div>
             <h3 class="stat-value">{{ number_format($stats['total_orders']) }}</h3>
-            <div class="stat-trend trend-up">
-                <i class="fa-solid fa-boxes-stacked"></i>
-                <span>All operations</span>
-            </div>
         </div>
     </div>
 
     <!-- Total Customers -->
-    <div class="col-xl-3 col-md-6">
-        <div class="modern-card">
+    <div class="col-xl-4 col-md-6">
+        <div class="modern-card h-100">
             <div class="stat-header">
                 <div>
                     <div class="stat-title">Total Customers</div>
@@ -208,16 +202,49 @@
                 </div>
             </div>
             <h3 class="stat-value">{{ number_format($stats['total_customers']) }}</h3>
-            <div class="stat-trend trend-up text-primary">
-                <i class="fa-solid fa-user-plus"></i>
-                <span>New vs Return</span>
+        </div>
+    </div>
+
+    <!-- Total Products -->
+    <div class="col-xl-4 col-md-6">
+        <div class="modern-card h-100">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-title">Total Products</div>
+                </div>
+                <div class="stat-icon icon-products">
+                    <i class="fa-solid fa-box"></i>
+                </div>
             </div>
+            <h3 class="stat-value">{{ number_format($stats['total_products'] ?? 0) }}</h3>
+        </div>
+    </div>
+
+    <!-- Out of Stock -->
+    <div class="col-xl-4 col-md-6">
+        <div class="modern-card h-100 position-relative">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-title">Out of Stock</div>
+                </div>
+                <div class="stat-icon icon-outstock">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+            </div>
+            <h3 class="stat-value">{{ number_format($stats['out_of_stock_products'] ?? 0) }}</h3>
+            @if(($stats['out_of_stock_products'] ?? 0) > 0)
+                <button type="button" class="btn btn-sm btn-outline-secondary position-absolute" 
+                        style="bottom: 15px; right: 15px; font-size: 0.75rem; border-radius: 20px;"
+                        data-bs-toggle="modal" data-bs-target="#outOfStockModal">
+                    Check <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.6rem;"></i>
+                </button>
+            @endif
         </div>
     </div>
 
     <!-- Pending Orders -->
-    <div class="col-xl-3 col-md-6">
-        <div class="modern-card">
+    <div class="col-xl-4 col-md-6">
+        <div class="modern-card h-100">
             <div class="stat-header">
                 <div>
                     <div class="stat-title">Pending Orders</div>
@@ -227,13 +254,10 @@
                 </div>
             </div>
             <h3 class="stat-value">{{ number_format($stats['pending_orders']) }}</h3>
-            <div class="stat-trend trend-down">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span>Needs action</span>
-            </div>
         </div>
     </div>
 </div>
+
 
 <!-- <div class="row g-4 mb-4">
     Sales Analytic Chart Area 
@@ -250,7 +274,7 @@
     </div>
 </div> -->
 
-<div class="row g-4">
+<!-- <div class="row g-4">
     <div class="col-md-12">
         <div class="modern-card">
             <div class="chart-header">
@@ -274,7 +298,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 @push('scripts')
 <!-- Chart.js -->
@@ -347,4 +371,66 @@
     });
 </script>
 @endpush
+
+<!-- Out of Stock Modal -->
+<div class="modal fade" id="outOfStockModal" tabindex="-1" aria-labelledby="outOfStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-bottom-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark" id="outOfStockModalLabel">
+                    <i class="fa-solid fa-boxes-stacked text-warning me-2"></i> Out of Stock Products
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 small fw-bold text-muted ps-3">HIERARCHY</th>
+                                <th class="border-0 small fw-bold text-muted">PRODUCT NAME</th>
+                                <th class="border-0 small fw-bold text-muted text-center">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($out_of_stock_list as $item)
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-light text-dark fw-normal border me-2">{{ $item->category->name ?? 'N/A' }}</span>
+                                        <i class="fa-solid fa-chevron-right text-muted extra-small me-2"></i>
+                                        <span class="badge bg-light text-muted fw-normal border">{{ $item->subcategory->name ?? 'N/A' }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ $item->name }}</div>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ route('admin.products.edit', $item->id) }}" class="btn btn-sm btn-primary rounded-pill px-3">
+                                        Update Stock
+                                    </a>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-check-circle text-success fs-1 mb-3 d-block"></i>
+                                    All products are currently in stock!
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0 pb-4 px-4">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.extra-small { font-size: 0.65rem; }
+</style>
 @endsection

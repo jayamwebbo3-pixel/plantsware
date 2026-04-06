@@ -14,11 +14,11 @@
                 @method('PUT')
 
                 @if($page->slug === 'return-refund-policy')
-                    <div class="mb-4">
+                    <!-- <div class="mb-4">
                         <label for="policy_date" class="form-label fw-bold">Return Window End Date / Effective Date</label>
                         <input type="date" name="policy_date" id="policy_date" class="form-control" style="max-width: 300px;" value="{{ old('policy_date', $page->policy_date) }}">
                         <small class="text-muted">You can adjust the editable date for the Return/Refund policy here.</small>
-                    </div>
+                    </div> -->
                 @endif
 
                 @if($page->slug === 'about-us' || $page->slug === 'services')

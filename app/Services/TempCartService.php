@@ -98,7 +98,7 @@ class TempCartService
         $pendingCarts = $query->get();
         foreach ($pendingCarts as $temp) {
             $this->restoreStock($temp);
-            $temp->delete(); // mark deleted/expired
+            $temp->update(['status' => 'expired']); // Keep record in table instead of deleting
         }
     }
 

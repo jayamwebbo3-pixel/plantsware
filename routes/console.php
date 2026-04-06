@@ -21,15 +21,7 @@ Schedule::call(function () {
 
     foreach ($expiredTransactions as $transaction) {
         $transaction->update(['status' => 'EXPIRED']);
-        
-        // As requested: if payment fails (expires), do not create/keep the order.
-        if ($transaction->order_id) {
-            $orderToFail = \App\Models\Order::find($transaction->order_id);
-            if ($orderToFail) {
-                $orderToFail->items()->delete();
-                $orderToFail->delete();
-            }
-        }
+        // (Note: No order deletion needed here as orders are now created only after SUCCESS)
     }
 })->everyMinute();
 
