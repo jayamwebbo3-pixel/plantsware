@@ -241,7 +241,7 @@
                             });
                         </script>
 
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="color" class="form-label">Color</label>
@@ -302,7 +302,7 @@
                                     <input type="number" step="0.01" class="form-control" id="length_meters" name="length_meters" value="{{ old('length_meters') }}" min="0">
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
 
