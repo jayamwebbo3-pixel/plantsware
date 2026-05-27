@@ -43,7 +43,10 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <small class="text-muted d-block mt-2">Recommended size: 1920x800px or similar aspect ratio. Max size: 2MB.</small>
+                        <small class="text-muted d-block mt-2">
+                            <strong>Note:</strong> Any image size can be uploaded. The system will automatically fit the image to the slider container (550px height) without distortion using <em>cover</em> logic.
+                            <br>Recommended: 1920x800px or similar.
+                        </small>
                     </div>
                 </div>
 
@@ -74,9 +77,9 @@
 
                     <div class="row align-items-center mt-3">
                         <div class="col-md-6 mb-3">
-                            <label for="sort_order" class="form-label fw-bold">Sort Order</label>
-                            <input type="number" class="form-control" id="sort_order" name="sort_order" value="{{ old('sort_order', 0) }}">
-                            <small class="text-muted">Lower numbers appear first</small>
+                            <label for="sort_order" class="form-label fw-bold">Sort Order (Auto-suggested)</label>
+                            <input type="number" class="form-control" id="sort_order" name="sort_order" value="{{ old('sort_order', $next_sort_order) }}">
+                            <small class="text-primary fw-bold">Next available: {{ $next_sort_order }} (Last Order: {{ $next_sort_order - 1 }})</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="form-check form-switch mt-4">

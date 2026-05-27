@@ -182,15 +182,19 @@
     <table class="items-table">
         <thead>
             <tr>
-                <th style="width: 45%;">Item Description</th>
-                <th class="right" style="width: 20%;">Price</th>
-                <th class="center" style="width: 15%;">Qty</th>
-                <th class="right" style="width: 20%;">Total</th>
+                <th style="width: 5%;">S.No</th>
+                <th style="width: 35%;">Item Description</th>
+                <th style="width: 20%;">Batch Code</th>
+                <th style="width: 20%;">Product Code</th>
+                <th class="right" style="width: 15%;">Price</th>
+                <th class="center" style="width: 10%;">Qty</th>
+                <th class="right" style="width: 15%;">Total</th>
             </tr>
         </thead>
         <tbody>
             @foreach($order_items as $item)
                 <tr>
+                    <td>{{ $loop->iteration }}</td>
                     <td>
                         {{ $item->product_name ?? $item->name }}
                         @if($item->options)
@@ -202,6 +206,20 @@
                             @endif
                         @endif
                     </td>
+                    <td>
+                        @if($item->product)
+                            {{ $item->product->batch_code ?? '-' }}<br>
+                        @else
+                            -
+                        @endif
+                    </td>
+                    <td>
+                        @if($item->product)
+                            {{ $item->product->product_code ?? '-' }}<br>
+                        @else
+                            -
+                        @endif
+                    </td>
                     <td class="right">₹{{ number_format($item->price, 2) }}</td>
                     <td class="center">{{ $item->quantity }}</td>
                     <td class="right">₹{{ number_format($item->quantity * $item->price, 2) }}</td>
@@ -210,27 +228,55 @@
             
             <!-- Padding row to separate items from totals -->
             <tr>
-                <td colspan="4" style="border-bottom: 2px solid #ddd; padding: 5px;"></td>
+                <td colspan="7" style="border-bottom: 2px solid #ddd; padding: 5px;"></td>
             </tr>
 
             <!-- Totals aligning exactly underneath the headers -->
             <tr class="total-row">
-                <td colspan="2" style="border: none;"></td>
+                <td colspan="5" style="border: none;"></td>
                 <td class="label">Subtotal:</td>
                 <td class="value right">₹{{ number_format($subtotal, 2) }}</td>
             </tr>
+            @if($discount_amount > 0)
             <tr class="total-row">
-                <td colspan="2" style="border: none;"></td>
+                <td colspan="5" style="border: none;"></td>
                 <td class="label">Discount:</td>
                 <td class="value right">- ₹{{ number_format($discount_amount, 2) }}</td>
             </tr>
+            @endif
             <tr class="total-row">
-                <td colspan="2" style="border: none;"></td>
+                <td colspan="5" style="border: none;"></td>
                 <td class="label">Shipping:</td>
+                <td class="value right">₹{{ number_format($shipping_amount ?? 0, 2) }}</td>
+            </tr>
+            
+            @if(isset($igst) && $igst > 0)
+            <tr class="total-row">
+                <td colspan="5" style="border: none;"></td>
+                <td class="label">IGST:</td>
+                <td class="value right">₹{{ number_format($igst, 2) }}</td>
+            </tr>
+            @elseif((isset($cgst) && $cgst > 0) || (isset($sgst) && $sgst > 0))
+            <tr class="total-row">
+                <td colspan="5" style="border: none;"></td>
+                <td class="label">CGST:</td>
+                <td class="value right">₹{{ number_format($cgst, 2) }}</td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="5" style="border: none;"></td>
+                <td class="label">SGST:</td>
+                <td class="value right">₹{{ number_format($sgst, 2) }}</td>
+            </tr>
+            @else
+            <tr class="total-row">
+                <td colspan="5" style="border: none;"></td>
+                <td class="label">Tax (GST):</td>
                 <td class="value right">₹{{ number_format($tax_amount ?? 0, 2) }}</td>
             </tr>
+            @endif
+
             <tr class="grand-total">
-                <td colspan="2" style="border: none;"></td>
+                <td colspan="5" style="border: none;"></td>
                 <td class="label">Grand Total:</td>
                 <td class="value right">₹{{ number_format($grand_total, 2) }}</td>
             </tr>

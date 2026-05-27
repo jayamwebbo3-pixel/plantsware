@@ -45,6 +45,7 @@
                 <table>
                     <thead>
                         <tr>
+                            <th>S.no</th>
                             <th>Product</th>
                             <th class="text-right">Qty</th>
                             <th class="text-right">Total</th>
@@ -53,6 +54,7 @@
                     <tbody>
                         @foreach($order->items as $item)
                         <tr>
+                             <td>{{ $loop->iteration }}</td>
                             <td>
                                 <strong>{{ $item->product_name }}</strong>
                                 @php 

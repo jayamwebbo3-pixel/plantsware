@@ -41,8 +41,7 @@ class CartController extends Controller
         });
 
         $totalWeight = $cartItems->sum(function ($item) {
-            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
-            return ($p->weight ?? 0) * $item->quantity;
+            return $item->calculated_weight * $item->quantity;
         });
 
         $shipping = 0;

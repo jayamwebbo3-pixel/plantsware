@@ -20,6 +20,7 @@ class HeaderFooter extends Model
         'footer_contact_title',
         'email',
         'address',
+        'business_state',
         'mobile_no',
         'whatsapp_no',
         'whatsapp_msg_1',

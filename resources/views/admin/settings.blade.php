@@ -96,6 +96,13 @@
                                 <textarea name="address" id="address" class="form-control" rows="3">{{ old('address', $settings->address) }}</textarea>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="business_state" class="form-label fw-semibold">Business State (for GST Logic)</label>
+                                <input type="text" name="business_state" id="business_state" class="form-control" value="{{ old('business_state', $settings->business_state ?? 'Tamil Nadu') }}" placeholder="e.g. Tamil Nadu">
+                                <div class="form-text small">This determines if CGST+SGST (Same State) or IGST (Different State) should be applied.</div>
+                            </div>
+                        </div>
 
                         <!-- WhatsApp Settings -->
                         <div class="col-12 mt-4 mb-2">

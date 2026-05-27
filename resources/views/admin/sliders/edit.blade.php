@@ -47,7 +47,9 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <small class="text-muted d-block mt-2">Leave blank to keep the current image. Max size: 2MB.</small>
+                        <small class="text-muted d-block mt-2">
+                            <strong>Note:</strong> Any image size can be uploaded. The system will automatically fit the image to the slider container (550px height) without distortion using <em>cover</em> logic.
+                        </small>
                     </div>
                 </div>
 

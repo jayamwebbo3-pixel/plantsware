@@ -37,6 +37,71 @@
 </section>
 
 <!-- vertical menu and slider -->
+<style>
+    .main_slider #carouselExampleIndicators {
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .main_slider .carousel-item {
+        height: 550px;
+        background-color: #f8f9fa;
+        overflow: hidden; 
+    }
+    
+    .main_slider .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block; 
+    }
+
+    .silder_text {
+        bottom: 20% !important;
+        text-align: left !important;
+        left: 8% !important;
+    }
+
+    .silder_text .headding {
+        font-size: 4rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 25px;
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .silder_text .arrival {
+        font-size: 1.2rem;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    @media (max-width: 991px) {
+        .main_slider .carousel-item {
+            height: 400px;
+            overflow: hidden; 
+        }
+        .silder_text .headding {
+            font-size: 2.5rem;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .main_slider .carousel-item {
+            height: 300px;
+            overflow: hidden; 
+        }
+        .silder_text .headding {
+            font-size: 1.8rem;
+        }
+        .silder_text .arrival {
+            font-size: 0.9rem;
+        }
+    }
+</style>
 <div id="home_vertical_menu" class="menu_slider ">
     <div class="row ">
         <div class="col-lg-12 col-md-12 main_slider">

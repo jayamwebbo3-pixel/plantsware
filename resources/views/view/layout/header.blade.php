@@ -97,44 +97,44 @@
         }
 
         .mega_menu .dropdown-menu {
-            background-color: #76a713;
-            /* Primary green color */
-            border: none;
-            border-radius: 0;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            width: 100% !important;
+            background-color: #ffffff !important;
+            border: 1px solid #f0f0f0;
+            border-top: 3px solid #76a713;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
             left: 0 !important;
             right: 0 !important;
             margin-top: 0;
-            padding: 30px 5% !important;
-            /* Align with header padding */
+            padding: 40px 5% !important;
         }
 
         .mega_menu .h_title {
-            color: #fff !important;
-            font-weight: 800 !important;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.3) !important;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
+            color: #333333 !important;
+            font-weight: 700 !important;
+            border-bottom: 2px solid #76a713 !important;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
             display: block;
-            font-size: 14px;
+            font-size: 15px;
             letter-spacing: 0.5px;
-        }
-
-        .mega_menu .list-unstyled li a {
-            color: #fff !important;
-            padding: 6px 0;
-            display: block;
-            font-size: 13px;
             transition: all 0.3s;
-            white-space: normal;
-            /* Allow product names to wrap if needed */
         }
 
-        .mega_menu .list-unstyled li a:hover {
-            padding-left: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff !important;
+        .mega_menu .h_title a {
+            color: inherit !important;
+            text-decoration: none !important;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mega_menu .h_title:hover {
+            color: #76a713 !important;
+            padding-left: 5px;
+        }
+
+        .mega_menu .list-unstyled li {
+            margin-bottom: 10px;
         }
 
         .mega_menu .dropdown-menu .row {
@@ -914,14 +914,15 @@
                                         @if($gardenCategory && $gardenCategory->subcategories->count() > 0)
                                         @php $chunks = $gardenCategory->subcategories->chunk(ceil($gardenCategory->subcategories->count() / 3)); @endphp
                                         @foreach($chunks as $chunk)
-                                        <div class="col-lg-4 col-md-6">
+                                        <div class="col-lg-3 col-md-6 mb-3">
                                             <ul class="list-unstyled">
                                                 @foreach($chunk as $sub)
-                                                <li class="h_title text-uppercase">{{ $sub->name }}</li>
-                                                @foreach($sub->products as $product)
-                                                <li><a href="{{ route('product.show', $product->slug) }}">{{ $product->name }}</a></li>
-                                                @endforeach
-                                                <hr class="border-light opacity-25 my-2">
+                                                <li class="h_title text-uppercase">
+                                                    <a href="{{ route('subcategory.show', $sub->slug) }}">
+                                                        {{ $sub->name }}
+                                                        <i class="fas fa-chevron-right ml-2" style="font-size: 10px; opacity: 0.5;"></i>
+                                                    </a>
+                                                </li>
                                                 @endforeach
                                             </ul>
                                         </div>
@@ -945,14 +946,15 @@
                                         @if($aquariumCategory && $aquariumCategory->subcategories->count() > 0)
                                         @php $chunks = $aquariumCategory->subcategories->chunk(ceil($aquariumCategory->subcategories->count() / 2)); @endphp
                                         @foreach($chunks as $chunk)
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-4 col-md-6 mb-3">
                                             <ul class="list-unstyled">
                                                 @foreach($chunk as $sub)
-                                                <li class="h_title text-uppercase">{{ $sub->name }}</li>
-                                                @foreach($sub->products as $product)
-                                                <li><a href="{{ route('product.show', $product->slug) }}">{{ $product->name }}</a></li>
-                                                @endforeach
-                                                <hr class="border-light opacity-25 my-2">
+                                                <li class="h_title text-uppercase">
+                                                    <a href="{{ route('subcategory.show', $sub->slug) }}">
+                                                        {{ $sub->name }}
+                                                        <i class="fas fa-chevron-right ml-2" style="font-size: 10px; opacity: 0.5;"></i>
+                                                    </a>
+                                                </li>
                                                 @endforeach
                                             </ul>
                                         </div>
@@ -976,14 +978,15 @@
                                         @if($naturalCategory && $naturalCategory->subcategories->count() > 0)
                                         @php $chunks = $naturalCategory->subcategories->chunk(ceil($naturalCategory->subcategories->count() / 2)); @endphp
                                         @foreach($chunks as $chunk)
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-4 col-md-6 mb-3">
                                             <ul class="list-unstyled">
                                                 @foreach($chunk as $sub)
-                                                <li class="h_title text-uppercase">{{ $sub->name }}</li>
-                                                @foreach($sub->products as $product)
-                                                <li><a href="{{ route('product.show', $product->slug) }}">{{ $product->name }}</a></li>
-                                                @endforeach
-                                                <hr class="border-light opacity-25 my-2">
+                                                <li class="h_title text-uppercase">
+                                                    <a href="{{ route('subcategory.show', $sub->slug) }}">
+                                                        {{ $sub->name }}
+                                                        <i class="fas fa-chevron-right ml-2" style="font-size: 10px; opacity: 0.5;"></i>
+                                                    </a>
+                                                </li>
                                                 @endforeach
                                             </ul>
                                         </div>

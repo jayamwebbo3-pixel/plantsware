@@ -40,7 +40,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="sort_order" class="form-label">Sort Order</label>
-                                <input type="number" class="form-control" id="sort_order" name="sort_order" value="{{ old('sort_order', 0) }}">
+                                <input type="number" class="form-control" id="sort_order" name="sort_order" value="{{ $next_sort_order }}">
+                                <small class="text-muted">Last Order: {{ $next_sort_order - 1 }}</small>
                             </div>
                         </div>
                     </div>

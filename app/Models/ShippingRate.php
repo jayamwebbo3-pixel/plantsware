@@ -18,9 +18,9 @@ class ShippingRate extends Model
     ];
 
     protected $casts = [
-        'base_weight' => 'integer',
+        'base_weight' => 'decimal:2',
         'base_cost' => 'decimal:2',
-        'additional_weight_unit' => 'integer',
+        'additional_weight_unit' => 'decimal:2',
         'additional_cost_per_unit' => 'decimal:2',
     ];
 }

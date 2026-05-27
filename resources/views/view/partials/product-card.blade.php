@@ -1,5 +1,5 @@
 <div class="product-card">
-    <div class="product-image-container">
+    <div class="product-image-container" style="background: #ededed;">
         <a href="{{ route('product.show', $product->slug) }}">
             @php
             $mainImage = $product->image ? asset('storage/' . $product->image) : null;
@@ -7,9 +7,9 @@
             $hoverImage = !empty($galleryImages) ? asset('storage/' . $galleryImages[0]) : $mainImage;
             @endphp
             <img src="{{ $mainImage }}"
-                alt="{{ $product->name }}" class="product-image main-image w-100 h-100" style="object-fit:cover;">
+                alt="{{ $product->name }}" class="product-image main-image w-100 h-100" style="object-fit:contain; background: #ededed;">
             <img src="{{ $hoverImage }}"
-                alt="{{ $product->name }}" class="product-image hover-image w-100 h-100" style="object-fit:cover;">
+                alt="{{ $product->name }}" class="product-image hover-image w-100 h-100" style="object-fit:contain; background: #ededed;">
             @if($product->stock_quantity <= 0)
                 <span class="discount-badge" style="background-color: #dc3545 !important;">OUT OF STOCK</span>
                 @elseif($product->sale_price && $product->sale_price < $product->price)

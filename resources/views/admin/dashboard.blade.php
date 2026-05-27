@@ -247,7 +247,7 @@
         <div class="modern-card h-100">
             <div class="stat-header">
                 <div>
-                    <div class="stat-title">Pending Orders</div>
+                    <div class="stat-title">Confirmed Orders(New Orders)</div>
                 </div>
                 <div class="stat-icon icon-pending">
                     <i class="fa-solid fa-clock-rotate-left"></i>

@@ -30,7 +30,8 @@ class CategoryController extends Controller
 
     public function create()
     {
-        return view('admin.categories.create');
+        $next_sort_order = Category::max('sort_order') + 1;
+        return view('admin.categories.create', compact('next_sort_order'));
     }
 
     public function store(Request $request)
@@ -48,6 +49,15 @@ class CategoryController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        // Auto-increment sort_order if not provided
+        $validated['sort_order'] = $request->input('sort_order', Category::max('sort_order') + 1);
+
+        // Conflict handling for manual sort_order entry
+        if ($request->has('sort_order')) {
+            Category::where('sort_order', '>=', $validated['sort_order'])
+                ->increment('sort_order');
         }
 
         Category::create($validated);
@@ -78,6 +88,25 @@ class CategoryController extends Controller
                 Storage::disk('public')->delete($category->image);
             }
             $validated['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        if ($request->has('sort_order') && $validated['sort_order'] != $category->sort_order) {
+            $newOrder = $validated['sort_order'];
+            $oldOrder = $category->sort_order;
+
+            if ($newOrder < $oldOrder) {
+                // Moving up (e.g., 3 -> 1): Shift items between new and old position down
+                Category::where('sort_order', '>=', $newOrder)
+                    ->where('sort_order', '<', $oldOrder)
+                    ->where('id', '!=', $category->id)
+                    ->increment('sort_order');
+            } else {
+                // Moving down (e.g., 1 -> 3): Shift items between old and new position up
+                Category::where('sort_order', '>', $oldOrder)
+                    ->where('sort_order', '<=', $newOrder)
+                    ->where('id', '!=', $category->id)
+                    ->decrement('sort_order');
+            }
         }
 
         $category->update($validated);

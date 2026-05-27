@@ -15,7 +15,29 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Calculate core ecommerce metrics
+        // Load all products to accurately identify those with zero stock (base or attribute level)
+        $all_products = Product::with(['category', 'subcategory'])->get();
+        
+        // Define 'Out of Stock' as either base quantity being 0 or any attribute variant being 0
+        $out_of_stock_list = $all_products->filter(function($product) {
+            // Check base level stock
+            if (($product->stock_quantity ?? 0) <= 0) return true;
+            
+            // Parse attribute JSON for any variant-level stockouts
+            if ($product->size) {
+                $sizeData = is_array($product->size) ? $product->size : json_decode($product->size, true);
+                if (is_array($sizeData)) {
+                    foreach ($sizeData as $variant) {
+                        if (is_array($variant) && isset($variant['stock']) && $variant['stock'] !== '' && (int)$variant['stock'] <= 0) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        })->values();
+
+        // Calculate core dashboard metrics
         $stats = [
             'revenue' => Order::where(function($q) {
                 $q->where('payment_status', 'success')
@@ -24,14 +46,9 @@ class DashboardController extends Controller
             'total_orders' => Order::count(),
             'total_customers' => User::count(),
             'pending_orders' => Order::whereNotIn('status', ['shipped', 'delivered', 'cancelled', 'returned'])->count(),
-            'total_products' => Product::count(),
-            'out_of_stock_products' => Product::where('stock_quantity', '<=', 0)->count(),
+            'total_products' => $all_products->count(),
+            'out_of_stock_products' => $out_of_stock_list->count(),
         ];
-
-        // Out of stock list with relationships
-        $out_of_stock_list = Product::with(['category', 'subcategory'])
-            ->where('stock_quantity', '<=', 0)
-            ->get();
 
         // Retrieve top selling products (fallback to latest if none sold)
         $top_sold_ids = DB::table('order_items')

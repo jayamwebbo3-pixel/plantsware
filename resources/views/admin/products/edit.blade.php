@@ -65,28 +65,38 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
                                 <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ old('price', $product->price) }}" required>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="sale_price" class="form-label">Sale Price</label>
                                 <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" value="{{ old('sale_price', $product->sale_price) }}">
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="stock_quantity" class="form-label">Stock Quantity</label>
                                 <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', $product->stock_quantity) }}" min="0">
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="weight" class="form-label">Weight (kg)</label>
-                                <input type="number" step="0.01" class="form-control" id="weight" name="weight" value="{{ old('weight', $product->weight) }}" min="0" placeholder="e.g. 0.5">
+                                <label for="product_code" class="form-label">Product Code</label>
+                                <input type="text" class="form-control" id="product_code" name="product_code" value="{{ old('product_code', $product->product_code) }}" placeholder="e.g. PRD-001">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="batch_code" class="form-label">Batch Code</label>
+                                <input type="text" class="form-control" id="batch_code" name="batch_code" value="{{ old('batch_code', $product->batch_code) }}" placeholder="e.g. BATCH-2024-01">
                             </div>
                         </div>
                     </div>
@@ -94,8 +104,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="sku" class="form-label">SKU</label>
-                                <input type="text" class="form-control" id="sku" name="sku" value="{{ old('sku', $product->sku) }}">
+                                <label for="weight" class="form-label">Weight (grams)</label>
+                                <input type="number" step="any" class="form-control" id="weight" name="weight" value="{{ old('weight', $product->weight) }}" min="0" placeholder="e.g. 500">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -107,164 +117,323 @@
                         </div>
                     </div>
 
-                    <!-- Product Attributes Section -->
-                    <hr class="my-5">
-                    <h4 class="mb-4">Product Attributes</h4>
-
-                    <div class="row g-4">
-                        {{-- SIZE column --}}
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Size &amp; Price</label>
-                            <div id="size-checkboxes">
-                                @php
-                                    $selectedShape = old('shape', $product->shape ?? 'Circular');
-
-                                    $savedSize = $product->size;
-                                    $selectedSizes = [];
-
-                                    if (!empty($savedSize)) {
-                                        if (is_array($savedSize)) {
-                                            $selectedSizes = $savedSize;
-                                        } else {
-                                            $decoded = json_decode($savedSize, true);
-                                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                                $selectedSizes = $decoded;
-                                            } else {
-                                                // Fallback for comma separated strings
-                                                $parts = array_map('trim', explode(',', $savedSize));
-                                                foreach ($parts as $p) {
-                                                    if ($p) $selectedSizes[$p] = null;
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    // Overwrite with old input if validation failed
-                                    $oldSizes = old('sizes');
-                                    if (is_array($oldSizes)) {
-                                        $selectedSizes = [];
-                                        foreach ($oldSizes as $s => $data) {
-                                            if (!empty($data['checked'])) {
-                                                $selectedSizes[$s] = $data['price'] ?? null;
-                                            }
-                                        }
-                                    }
-
-                                    $circularSizes    = ['6x6 Inch','9x9 Inch','12x12 Inch','12x15 Inch','15x12 Inch','15x15 Inch',
-                                                         '18x6 Inch','18x9 Inch','18x18 Inch','24x6 Inch','24x24 Inch'];
-                                    $rectangularSizes = ['18x12x12 Inch','18x12x9 Inch','24x12x9 Inch','24x12x12 Inch','24x24x12 Inch','24x24x18 Inch'];
-                                @endphp
-
-                                {{-- Circular --}}
-                                <div id="circular-sizes" style="{{ $selectedShape === 'Circular' ? '' : 'display:none;' }}">
-                                    @foreach($circularSizes as $index => $size)
-                                        @php
-                                            // PHP converts spaces to underscores in form array keys
-                                            $phpKey    = str_replace(' ', '_', $size);
-                                            $isChecked = array_key_exists($phpKey, $selectedSizes)
-                                                         || array_key_exists($size, $selectedSizes);
-                                            $priceVal  = $isChecked
-                                                         ? ($selectedSizes[$phpKey] ?? $selectedSizes[$size] ?? '')
-                                                         : '';
-                                        @endphp
-                                        <div class="d-flex align-items-center mb-2 gap-3">
-                                            <div class="form-check mb-0" style="min-width: 130px;">
-                                                <input class="form-check-input size-checkbox" type="checkbox"
-                                                    name="sizes[{{ $size }}][checked]"
-                                                    id="size-circular-{{ $index }}"
-                                                    value="1" {{ $isChecked ? 'checked' : '' }}
-                                                    onchange="const inp = this.closest('.d-flex').querySelector('.size-price-input'); inp.disabled = !this.checked; if(!this.checked) inp.value='';">
-                                                <label class="form-check-label" for="size-circular-{{ $index }}">{{ $size }}</label>
-                                            </div>
-                                            <div class="input-group input-group-sm" style="max-width: 160px;">
-                                                <span class="input-group-text">₹</span>
-                                                <input type="number" class="form-control size-price-input"
-                                                    name="sizes[{{ $size }}][price]"
-                                                    value="{{ $priceVal }}"
-                                                    placeholder="Enter price"
-                                                    step="0.01"
-                                                    {{ $isChecked ? '' : 'disabled' }}>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-
-                                {{-- Rectangular --}}
-                                <div id="rectangular-sizes" style="{{ $selectedShape === 'Rectangular' ? '' : 'display:none;' }}">
-                                    @foreach($rectangularSizes as $index => $size)
-                                        @php
-                                            $phpKey    = str_replace(' ', '_', $size);
-                                            $isChecked = array_key_exists($phpKey, $selectedSizes)
-                                                         || array_key_exists($size, $selectedSizes);
-                                            $priceVal  = $isChecked
-                                                         ? ($selectedSizes[$phpKey] ?? $selectedSizes[$size] ?? '')
-                                                         : '';
-                                        @endphp
-                                        <div class="d-flex align-items-center mb-2 gap-3">
-                                            <div class="form-check mb-0" style="min-width: 150px;">
-                                                <input class="form-check-input size-checkbox" type="checkbox"
-                                                    name="sizes[{{ $size }}][checked]"
-                                                    id="size-rectangular-{{ $index }}"
-                                                    value="1" {{ $isChecked ? 'checked' : '' }}
-                                                    onchange="const inp = this.closest('.d-flex').querySelector('.size-price-input'); inp.disabled = !this.checked; if(!this.checked) inp.value='';">
-                                                <label class="form-check-label" for="size-rectangular-{{ $index }}">{{ $size }}</label>
-                                            </div>
-                                            <div class="input-group input-group-sm" style="max-width: 160px;">
-                                                <span class="input-group-text">₹</span>
-                                                <input type="number" class="form-control size-price-input"
-                                                    name="sizes[{{ $size }}][price]"
-                                                    value="{{ $priceVal }}"
-                                                    placeholder="Enter price"
-                                                    step="0.01"
-                                                    {{ $isChecked ? '' : 'disabled' }}>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-
-                                <div id="square-sizes" style="{{ $selectedShape === 'Square' ? '' : 'display:none;' }}">
-                                    <div class="text-muted">No sizes defined for Square.</div>
+                    <!-- Professional Product Attributes Section -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 mt-2 overflow-hidden">
+                        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-tags text-primary me-2"></i>Product Attributes</h5>
+                                <p class="text-muted small mb-0">Manage sizes, types, and custom price overrides</p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary btn-sm shadow-sm" onclick="addNewAttributeRow()">
+                                    <i class="fas fa-plus me-1"></i> Add Manual
+                                </button>
+                                <div class="dropdown">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle shadow-sm" data-bs-toggle="dropdown">
+                                        <i class="fas fa-magic me-1"></i> Use Presets
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2">
+                                        <li><h6 class="dropdown-header">Select a Template</h6></li>
+                                        <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="addAttributePreset('circular')"><i class="fas fa-circle-notch me-2 text-muted"></i>Grow Bag - Circular</a></li>
+                                        <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="addAttributePreset('rectangular')"><i class="fas fa-vector-square me-2 text-muted"></i>Grow Bag - Rectangular</a></li>
+                                        <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="addAttributePreset('shadenets')"><i class="fas fa-border-all me-2 text-muted"></i>Shade Net Sizes</a></li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
+                        <div class="card-body bg-light-subtle pt-0">
+                            <div id="attributes-container" class="mt-3">
+                                <div class="table-responsive rounded-3 bg-white shadow-sm border">
+                                    <table class="table table-hover align-middle mb-0" id="attributes-table">
+                                        <thead class="bg-light">
+                                                <tr>
+                                                    <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="width: 25%;">Attribute Option</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 20%;">Price Override (₹)</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 15%;">Stock</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 15%;">Weight (grams)</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 20%;">Image</th>
+                                                    <th class="text-center py-3 text-uppercase small fw-bold text-muted" style="width: 50px;">Remove</th>
+                                                </tr>
+                                        </thead>
+                                        <tbody id="attributes-body">
+                                            @php
+                                                $savedSize = $product->size;
+                                                $currentSizes = [];
 
-                        {{-- Shape & Material column --}}
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="shape" class="form-label fw-semibold">Shape</label>
-                                <select class="form-select" id="shape" name="shape">
-                                    <option value="">Select Shape</option>
-                                    <option value="Circular" {{ old('shape', $product->shape) == 'Circular' ? 'selected' : '' }}>Circular</option>
-                                    <option value="Rectangular" {{ old('shape', $product->shape) == 'Rectangular' ? 'selected' : '' }}>Rectangular</option>
-                                    {{-- <option value="Square" {{ old('shape', $product->shape) == 'Square' ? 'selected' : '' }}>Square</option> --}}
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="material" class="form-label fw-semibold">Material</label>
-                                <select class="form-select" id="material" name="material">
-                                    <option value="">Select Material</option>
-                                    <option value="HDPE" {{ old('material', $product->material) == 'HDPE' ? 'selected' : '' }}>HDPE</option>
-                                    <option value="Fabric" {{ old('material', $product->material) == 'Fabric' ? 'selected' : '' }}>Fabric</option>
-                                    <option value="Non-woven" {{ old('material', $product->material) == 'Non-woven' ? 'selected' : '' }}>Non-woven</option>
-                                </select>
+                                                if (!empty($savedSize)) {
+                                                    if (is_array($savedSize)) {
+                                                        $currentSizes = $savedSize;
+                                                    } else {
+                                                        $decoded = json_decode($savedSize, true);
+                                                        if (is_array($decoded)) {
+                                                            $currentSizes = $decoded;
+                                                        }
+                                                    }
+                                                }
+
+                                                // Overwrite with old input if validation failed
+                                                $oldSizes = old('sizes');
+                                                if (is_array($oldSizes)) {
+                                                    $currentSizes = [];
+                                                    foreach ($oldSizes as $s => $data) {
+                                                        if (!empty($data['checked'])) {
+                                                            $currentSizes[$s] = [
+                                                                'price' => $data['price'] ?? null,
+                                                                'stock' => $data['stock'] ?? null,
+                                                                'weight' => $data['weight'] ?? null,
+                                                                'image' => $data['existing_image'] ?? null
+                                                            ];
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                $hasAny = count($currentSizes) > 0;
+                                            @endphp
+
+                                            @foreach($currentSizes as $name => $data)
+                                                {{-- Handle bothold string values and new array objects for backward compatibility during migration period --}}
+                                                @php 
+                                                    $priceValue = is_array($data) ? ($data['price'] ?? '') : $data;
+                                                    $stockValue = is_array($data) ? ($data['stock'] ?? '') : '';
+                                                    $weightValue = is_array($data) ? ($data['weight'] ?? '') : '';
+                                                    $imagePath = is_array($data) ? ($data['image'] ?? null) : null;
+                                                @endphp
+                                                <tr class="attribute-row animate__animated animate__fadeIn">
+                                                    <td class="ps-4">
+                                                        <div class="d-flex align-items-center">
+                                                            <input type="hidden" name="sizes[{{ $name }}][checked]" value="1">
+                                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-3 px-2 py-1"><i class="fas fa-tag"></i></span>
+                                                            <input type="text" class="form-control form-control-sm border-0 bg-transparent fw-semibold attr-name-display" value="{{ $name }}" readonly title="Click to edit name" onclick="editAttributeName(this)" style="cursor: pointer;">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group input-group-sm w-100">
+                                                            <span class="input-group-text bg-light border-end-0">₹</span>
+                                                            <input type="number" step="0.01" name="sizes[{{ $name }}][price]" class="form-control border-start-0" value="{{ $priceValue }}" placeholder="Use Base Price">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group input-group-sm w-100">
+                                                            <input type="number" name="sizes[{{ $name }}][stock]" class="form-control" value="{{ $stockValue }}" placeholder="Qty">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group input-group-sm w-100">
+                                                            <input type="number" step="any" name="sizes[{{ $name }}][weight]" class="form-control" value="{{ $weightValue }}" placeholder="grams">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            @if($imagePath)
+                                                                <img src="{{ asset('storage/' . $imagePath) }}" class="rounded border" style="width: 40px; height: 40px; object-fit: cover;" title="Existing Image">
+                                                                <input type="hidden" name="sizes[{{ $name }}][existing_image]" value="{{ $imagePath }}">
+                                                            @endif
+                                                            <input type="file" name="sizes[{{ $name }}][image]" class="form-control form-control-sm" accept="image/*">
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="btn btn-link text-danger p-0" onclick="this.closest('tr').remove(); checkEmptyAttributes();">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+
+                                            @if(!$hasAny)
+                                                <tr id="no-attributes-msg">
+                                                    <td colspan="3" class="text-center py-5">
+                                                        <div class="empty-state">
+                                                            <i class="fas fa-layer-group fa-3x text-light mb-3"></i>
+                                                            <h6 class="text-muted">No attributes defined</h6>
+                                                            <p class="text-secondary small">Add custom sizes or use one of our predefined templates</p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Secondary Attributes (Shape / Material) -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-4 h-100">
+                                <div class="card-body p-4">
+                                    <label for="shape" class="form-label fw-bold text-dark d-flex align-items-center mb-3">
+                                        <i class="fas fa-shapes text-info me-2"></i>Product Shape
+                                    </label>
+                                    <select class="form-select border-light-subtle py-2" id="shape" name="shape">
+                                        <option value="">Standard / N/A</option>
+                                        <option value="Circular" {{ old('shape', $product->shape) == 'Circular' ? 'selected' : '' }}>Circular (Round)</option>
+                                        <option value="Rectangular" {{ old('shape', $product->shape) == 'Rectangular' ? 'selected' : '' }}>Rectangular (Wide)</option>
+                                        <option value="Square" {{ old('shape', $product->shape) == 'Square' ? 'selected' : '' }}>Square (Box)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-4 h-100">
+                                <div class="card-body p-4">
+                                    <label for="material" class="form-label fw-bold text-dark d-flex align-items-center mb-3">
+                                        <i class="fas fa-boxes-stacked text-warning me-2"></i>Primary Material
+                                    </label>
+                                    <select class="form-select border-light-subtle py-2" id="material" name="material">
+                                        <option value="">Not Specified</option>
+                                        <option value="HDPE" {{ old('material', $product->material) == 'HDPE' ? 'selected' : '' }}>HDPE (High-Density Polyethylene)</option>
+                                        <option value="Fabric" {{ old('material', $product->material) == 'Fabric' ? 'selected' : '' }}>Premium Fabric</option>
+                                        <option value="Non-woven" {{ old('material', $product->material) == 'Non-woven' ? 'selected' : '' }}>Non-Woven Geotextile</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <style>
+                        .bg-light-subtle { background-color: #f8f9fa !important; }
+                        .attr-name-display:focus { box-shadow: none !important; }
+                        .attribute-row:hover { background-color: #fcfcfc; }
+                        .attribute-row .btn-link { 
+                            transition: transform 0.2s; 
+                            opacity: 0.5;
+                        }
+                        .attribute-row:hover .btn-link { opacity: 1; }
+                        .attribute-row .btn-link:hover { transform: scale(1.2); }
+                        .empty-state h6 { font-weight: 600; letter-spacing: 0.5px; }
+                    </style>
+
                     <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            function toggleSizeCheckboxes() {
-                                var shape = document.getElementById('shape').value;
-                                document.getElementById('circular-sizes').style.display    = (shape === 'Circular')    ? '' : 'none';
-                                document.getElementById('rectangular-sizes').style.display = (shape === 'Rectangular') ? '' : 'none';
-                                document.getElementById('square-sizes').style.display      = (shape === 'Square')      ? '' : 'none';
+                        function addNewAttributeRow(name = '', price = '') {
+                            if (!name) {
+                                Swal.fire({
+                                    title: 'New Attribute',
+                                    input: 'text',
+                                    inputLabel: 'Enter Attribute Name (e.g. 12x12 Inch or 50% Shade)',
+                                    inputPlaceholder: 'Attribute name...',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#134e5e',
+                                    inputValidator: (value) => {
+                                        if (!value) return 'You need to write something!'
+                                    }
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        renderAttributeRow(result.value, price);
+                                    }
+                                });
+                            } else {
+                                renderAttributeRow(name, price);
                             }
-                            document.getElementById('shape').addEventListener('change', toggleSizeCheckboxes);
-                            toggleSizeCheckboxes();
-                        });
+                        }
+
+                        function renderAttributeRow(displayName, price) {
+                            const body = document.getElementById('attributes-body');
+                            const noMsg = document.getElementById('no-attributes-msg');
+                            if (noMsg) noMsg.remove();
+
+                            const row = document.createElement('tr');
+                            row.className = 'attribute-row animate__animated animate__fadeIn';
+                            
+                            row.innerHTML = `
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <input type="hidden" name="sizes[${displayName}][checked]" value="1">
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-3 px-2 py-1"><i class="fas fa-tag"></i></span>
+                                        <input type="text" class="form-control form-control-sm border-0 bg-transparent fw-semibold attr-name-display" value="${displayName}" readonly title="Click to edit name" onclick="editAttributeName(this)" style="cursor: pointer;">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm w-100">
+                                        <span class="input-group-text bg-light border-end-0">₹</span>
+                                        <input type="number" step="0.01" name="sizes[${displayName}][price]" class="form-control border-start-0" value="${price}" placeholder="Use Base Price">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm w-100">
+                                        <input type="number" name="sizes[${displayName}][stock]" class="form-control" placeholder="Qty">
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="input-group input-group-sm w-100">
+                                        <input type="number" step="any" name="sizes[${displayName}][weight]" class="form-control" placeholder="grams">
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="file" name="sizes[${displayName}][image]" class="form-control form-control-sm" accept="image/*">
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-link text-danger p-0" onclick="this.closest('tr').remove(); checkEmptyAttributes();">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            `;
+                            body.appendChild(row);
+                        }
+
+                        function editAttributeName(input) {
+                            Swal.fire({
+                                title: 'Edit Attribute Name',
+                                input: 'text',
+                                inputValue: input.value,
+                                showCancelButton: true,
+                                confirmButtonColor: '#134e5e',
+                                inputValidator: (value) => {
+                                    if (!value) return 'Name cannot be empty!'
+                                }
+                            }).then((result) => {
+                                if (result.isConfirmed && result.value !== input.value) {
+                                    const newName = result.value;
+                                    const row = input.closest('tr');
+                                    input.value = newName;
+                                    row.querySelector('input[name*="[checked]"]').name = `sizes[${newName}][checked]`;
+                                    row.querySelector('input[name*="[price]"]').name = `sizes[${newName}][price]`;
+                                    row.querySelector('input[name*="[stock]"]').name = `sizes[${newName}][stock]`;
+                                    row.querySelector('input[name*="[weight]"]').name = `sizes[${newName}][weight]`;
+                                    row.querySelector('input[name*="[image]"]').name = `sizes[${newName}][image]`;
+                                    const existingImg = row.querySelector('input[name*="existing_image"]');
+                                    if (existingImg) existingImg.name = `sizes[${newName}][existing_image]`;
+                                }
+                            });
+                        }
+
+                        function checkEmptyAttributes() {
+                            const body = document.getElementById('attributes-body');
+                            if (body.querySelectorAll('.attribute-row').length === 0) {
+                                body.innerHTML = `<tr id="no-attributes-msg"><td colspan="3" class="text-center py-3 text-muted">No attributes added yet. Use "Quick Add" or click "+" to add one.</td></tr>`;
+                            }
+                        }
+
+                        function addAttributePreset(type) {
+                            const presets = {
+                                'circular': ['6x6 Inch', '9x9 Inch', '12x12 Inch', '12x15 Inch', '15x12 Inch', '15x15 Inch', '18x6 Inch', '18x9 Inch', '18x18 Inch', '24x6 Inch', '24x24 Inch'],
+                                'rectangular': ['18x12x12 Inch', '18x12x9 Inch', '24x12x9 Inch', '24x12x12 Inch', '24x24x12 Inch', '24x24x18 Inch'],
+                                'shadenets': ['30% Shade', '50% Shade', '75% Shade', '90% Shade', 'Creeper Net']
+                            };
+
+                            if (presets[type]) {
+                                Swal.fire({
+                                    title: 'Add Presets?',
+                                    text: `Populate list with ${type.replace('_', ' ')} presets? This won't remove existing rows.`,
+                                    icon: 'question',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#134e5e',
+                                    confirmButtonText: 'Yes, add them'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        presets[type].forEach(name => {
+                                            const existing = Array.from(document.querySelectorAll('.attr-name')).some(el => el.value === name);
+                                            if (!existing) {
+                                                renderAttributeRow(name, '');
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }
                     </script>
 
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="color" class="form-label">Color</label>
@@ -325,7 +494,7 @@
                                 <input type="number" step="0.01" class="form-control" id="length_meters" name="length_meters" value="{{ old('length_meters', $product->length_meters) }}" min="0">
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
 
@@ -396,7 +565,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Dynamic subcategory filtering based on selected category (preserves current selection on edit)
-            const allSubcategories = @json($subcategories);
+            const allSubcategories = {!! json_encode($subcategories) !!};
             const currentCategoryId = "{{ old('category_id', $product->category_id) }}";
             const currentSubcategoryId = "{{ old('subcategory_id', $product->subcategory_id) }}";
 

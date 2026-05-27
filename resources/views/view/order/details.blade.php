@@ -93,10 +93,13 @@
             <!-- Right Items Column -->
             <div class="col-lg-7 col-md-6">
                 <!-- Items Box -->
+
                 <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
                     <div class="card-header bg-white border-bottom py-3 px-4">
                         <h6 class="fw-bold mb-0 text-muted"><i class="fas fa-shopping-basket me-2 text-custom"></i> Items ({{ $order->items->count() }})</h6>
                     </div>
+                    <!-- <div class="card-body p-0">
+                           </div> -->
                     <div class="card-body p-0">
                         @foreach($order->items as $item)
                         <div class="p-4 border-bottom item-row">
@@ -154,10 +157,26 @@
                                 {{ $order->shipping > 0 ? '₹'.number_format($order->shipping, 2) : '₹0.00' }}
                             </span>
                         </div>
+                        @if($order->igst > 0)
+                        <div class="d-flex justify-content-between mb-3 text-muted">
+                            <span class="small">IGST</span>
+                            <span class="fw-bold small text-dark">₹{{ number_format($order->igst, 2) }}</span>
+                        </div>
+                        @elseif($order->cgst > 0 || $order->sgst > 0)
+                        <div class="d-flex justify-content-between mb-2 text-muted">
+                            <span class="small">CGST</span>
+                            <span class="fw-bold small text-dark">₹{{ number_format($order->cgst, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 text-muted">
+                            <span class="small">SGST</span>
+                            <span class="fw-bold small text-dark">₹{{ number_format($order->sgst, 2) }}</span>
+                        </div>
+                        @else
                         <div class="d-flex justify-content-between mb-3 text-muted border-bottom pb-3">
-                            <span class="small">Tax (Included)</span>
+                            <span class="small">Tax (GST)</span>
                             <span class="fw-bold small text-dark">₹{{ number_format($order->tax ?? 0, 2) }}</span>
                         </div>
+                        @endif
                         @if($order->discount > 0)
                         <div class="d-flex justify-content-between mb-3 text-danger border-bottom pb-3">
                             <span class="small fw-bold">Discount</span>

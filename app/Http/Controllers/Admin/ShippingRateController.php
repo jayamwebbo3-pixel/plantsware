@@ -31,9 +31,9 @@ class ShippingRateController extends Controller
     {
         $validated = $request->validate([
             'state_name' => 'required|string|unique:shipping_rates,state_name',
-            'base_weight' => 'required|integer|min:0',
+            'base_weight' => 'required|numeric|min:0',
             'base_cost' => 'required|numeric|min:0',
-            'additional_weight_unit' => 'required|integer|min:1',
+            'additional_weight_unit' => 'required|numeric|min:0.01',
             'additional_cost_per_unit' => 'required|numeric|min:0',
         ]);
 
@@ -51,9 +51,9 @@ class ShippingRateController extends Controller
     {
         $validated = $request->validate([
             'state_name' => 'required|string|unique:shipping_rates,state_name,' . $shippingRate->id,
-            'base_weight' => 'required|integer|min:0',
+            'base_weight' => 'required|numeric|min:0',
             'base_cost' => 'required|numeric|min:0',
-            'additional_weight_unit' => 'required|integer|min:1',
+            'additional_weight_unit' => 'required|numeric|min:0.01',
             'additional_cost_per_unit' => 'required|numeric|min:0',
         ]);
 

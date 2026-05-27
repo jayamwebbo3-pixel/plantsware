@@ -225,7 +225,7 @@
                                 </div>
                                 <div class="d-flex justify-content-between mb-1">
                                     <span class="text-muted extra-small">Total Weight</span>
-                                    <span class="fw-bold extra-small text-dark">{{ number_format($totalWeight, 2) }} KG</span>
+                                    <span class="fw-bold extra-small text-dark">{{ number_format($totalWeight, 2) }} grams</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-1">
                                     <span class="text-muted extra-small">Shipping Cost</span>
@@ -237,7 +237,21 @@
                                     <span class="text-success extra-small fw-bold">-₹{{ number_format($discount, 2) }}</span>
                                 </div>
                                 @endif
-                                @if($tax > 0)
+                                @if(isset($cgst) && $cgst > 0)
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted extra-small">CGST</span>
+                                    <span class="text-danger extra-small fw-bold">+₹{{ number_format($cgst, 2) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted extra-small">SGST</span>
+                                    <span class="text-danger extra-small fw-bold">+₹{{ number_format($sgst, 2) }}</span>
+                                </div>
+                                @elseif(isset($igst) && $igst > 0)
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted extra-small">IGST</span>
+                                    <span class="text-danger extra-small fw-bold">+₹{{ number_format($igst, 2) }}</span>
+                                </div>
+                                @elseif($tax > 0)
                                 <div class="d-flex justify-content-between mb-1">
                                     <span class="text-muted extra-small">Estimated Tax (GST)</span>
                                     <span class="text-danger extra-small fw-bold">+₹{{ number_format($tax, 2) }}</span>

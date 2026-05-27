@@ -41,6 +41,8 @@ class Product extends Model
         'avg_rating',
         'total_reviews',
         'weight',
+        'product_code',
+        'batch_code',
     ];
     protected $casts = [
         'price' => 'decimal:2',
@@ -51,6 +53,7 @@ class Product extends Model
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
         'sort_order' => 'integer',
+        'weight' => 'decimal:2',
     ];
 
     public function scopeActive($query)

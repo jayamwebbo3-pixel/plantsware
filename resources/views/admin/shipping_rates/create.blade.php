@@ -54,8 +54,8 @@
 
             <div class="row mb-4">
                 <div class="col-md-6">
-                    <label for="base_weight" class="form-label fw-bold">Base Weight (KG)</label>
-                    <input type="number" name="base_weight" class="form-control rounded-3" id="base_weight" value="{{ old('base_weight', 1) }}" required>
+                    <label for="base_weight" class="form-label fw-bold">Base Weight (GRAMS)</label>
+                    <input type="number" step="any" name="base_weight" class="form-control rounded-3" id="base_weight" value="{{ old('base_weight', 500) }}" required>
                     @error('base_weight')
                         <div class="text-danger small mt-1">{{ $message }}</div>
                     @enderror
@@ -71,8 +71,8 @@
 
             <div class="row mb-4">
                 <div class="col-md-6">
-                    <label for="additional_weight_unit" class="form-label fw-bold">Additional Weight Unit (KG)</label>
-                    <input type="number" name="additional_weight_unit" class="form-control rounded-3" id="additional_weight_unit" value="{{ old('additional_weight_unit', 1) }}" required>
+                    <label for="additional_weight_unit" class="form-label fw-bold">Additional Weight Unit (GRAMS)</label>
+                    <input type="number" step="any" name="additional_weight_unit" class="form-control rounded-3" id="additional_weight_unit" value="{{ old('additional_weight_unit', 500) }}" required>
                     @error('additional_weight_unit')
                         <div class="text-danger small mt-1">{{ $message }}</div>
                     @enderror

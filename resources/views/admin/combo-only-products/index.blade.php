@@ -52,7 +52,7 @@
                                     <th>Name</th>
                                     <th>Price</th>
                                     <th>Stock</th>
-                                    <th>Weight (KG)</th>
+                                    <th>Weight (Grams)</th>
                                     <th>Status</th>
                                     <th class="text-end pe-4">Actions</th>
                                 </tr>
@@ -77,7 +77,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="text-muted small">{{ $product->weight ?? 0 }} KG</span>
+                                            <span class="text-muted small">{{ $product->weight ?? 0 }} grams</span>
                                         </td>
                                         <td>
                                             <div class="form-check form-switch p-0 m-0">
@@ -150,8 +150,8 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold">Weight (KG)</label>
-                                    <input type="number" name="weight" class="form-control" value="0" min="0" step="0.001">
+                                    <label class="form-label fw-bold">Weight (Grams)</label>
+                                    <input type="number" name="weight" class="form-control" value="0" min="0" step="any">
                                 </div>
 
                                 <div class="mb-3">

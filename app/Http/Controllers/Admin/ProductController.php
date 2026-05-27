@@ -56,7 +56,12 @@ class ProductController extends Controller
             }
         }
 
-        return view('admin.products.create', compact('categories', 'subcategories', 'selectedCategoryId', 'selectedSubcategoryId', 'selectedSubcategory'));
+        $next_sort_order = 1;
+        if ($selectedSubcategoryId) {
+            $next_sort_order = Product::where('subcategory_id', $selectedSubcategoryId)->max('sort_order') + 1;
+        }
+
+        return view('admin.products.create', compact('categories', 'subcategories', 'selectedCategoryId', 'selectedSubcategoryId', 'selectedSubcategory', 'next_sort_order'));
     }
 
     public function store(Request $request)
@@ -93,6 +98,8 @@ class ProductController extends Controller
             'pack_quantity' => 'integer|min:1',
             'warranty_months' => 'nullable|integer|min:0',
             'weight' => 'nullable|numeric|min:0',
+            'product_code' => 'nullable|string|max:100',
+            'batch_code' => 'nullable|string|max:100',
         ]);
 
         $validated['is_featured'] = $request->boolean('is_featured');
@@ -104,7 +111,20 @@ class ProductController extends Controller
         if ($request->has('sizes') && is_array($request->input('sizes'))) {
             foreach ($request->input('sizes') as $sizeKey => $sizeData) {
                 if (!empty($sizeData['checked'])) {
-                    $validatedSizes[$sizeKey] = $sizeData['price'] ?? null;
+                    $sizeEntry = [
+                        'price' => $sizeData['price'] ?? null,
+                        'stock' => $sizeData['stock'] ?? null,
+                        'weight' => $sizeData['weight'] ?? null,
+                        'image' => null
+                    ];
+
+                    // Handle size-specific image upload
+                    if ($request->hasFile("sizes.$sizeKey.image")) {
+                        $sizeEntry['image'] = $request->file("sizes.$sizeKey.image")->store('products/attributes', 'public');
+                        $this->imageService->applyWatermark($sizeEntry['image']);
+                    }
+
+                    $validatedSizes[$sizeKey] = $sizeEntry;
                 }
             }
         }
@@ -125,6 +145,29 @@ class ProductController extends Controller
                 $galleryPaths[] = $path;
             }
             $validated['gallery_images'] = $galleryPaths;
+        }
+
+        $validated['stock_quantity'] = $validated['stock_quantity'] ?? 0;
+        $validated['weight'] = $validated['weight'] ?? 0;
+
+        // Auto-increment sort_order within the subcategory
+        $query = Product::query();
+        if (isset($validated['subcategory_id'])) {
+            $query->where('subcategory_id', $validated['subcategory_id']);
+        } elseif (isset($validated['category_id'])) {
+            $query->where('category_id', $validated['category_id']);
+        }
+        $validated['sort_order'] = $request->input('sort_order', $query->max('sort_order') + 1);
+
+        // Conflict handling for manual sort_order entry within category/subcategory
+        if ($request->has('sort_order')) {
+            $shiftQuery = Product::where('sort_order', '>=', $validated['sort_order']);
+            if (isset($validated['subcategory_id'])) {
+                $shiftQuery->where('subcategory_id', $validated['subcategory_id']);
+            } elseif (isset($validated['category_id'])) {
+                $shiftQuery->where('category_id', $validated['category_id']);
+            }
+            $shiftQuery->increment('sort_order');
         }
 
         Product::create($validated);
@@ -179,6 +222,8 @@ class ProductController extends Controller
             'pack_quantity' => 'integer|min:1',
             'warranty_months' => 'nullable|integer|min:0',
             'weight' => 'nullable|numeric|min:0',
+            'product_code' => 'nullable|string|max:100',
+            'batch_code' => 'nullable|string|max:100',
         ]);
 
         $validated['is_featured'] = $request->boolean('is_featured');
@@ -187,13 +232,44 @@ class ProductController extends Controller
         $validated['uv_treated'] = $request->boolean('uv_treated');
         
         $validatedSizes = [];
+        $currentSizes = $product->size;
+        if (is_string($currentSizes)) {
+            $currentSizes = json_decode($currentSizes, true) ?? [];
+        }
+        $currentSizes = is_array($currentSizes) ? $currentSizes : [];
+        
         if ($request->has('sizes') && is_array($request->input('sizes'))) {
             foreach ($request->input('sizes') as $sizeKey => $sizeData) {
                 if (!empty($sizeData['checked'])) {
-                    $validatedSizes[$sizeKey] = $sizeData['price'] ?? null;
+                    $sizeEntry = [
+                        'price' => $sizeData['price'] ?? null,
+                        'stock' => $sizeData['stock'] ?? null,
+                        'weight' => $sizeData['weight'] ?? null,
+                        'image' => $sizeData['existing_image'] ?? null
+                    ];
+
+                    // Handle new size-specific image upload
+                    if ($request->hasFile("sizes.$sizeKey.image")) {
+                        // Delete old image if exists
+                        if ($sizeEntry['image']) {
+                            Storage::disk('public')->delete($sizeEntry['image']);
+                        }
+                        $sizeEntry['image'] = $request->file("sizes.$sizeKey.image")->store('products/attributes', 'public');
+                        $this->imageService->applyWatermark($sizeEntry['image']);
+                    }
+
+                    $validatedSizes[$sizeKey] = $sizeEntry;
                 }
             }
         }
+
+        // Cleanup: Delete images for sizes that were removed
+        foreach($currentSizes as $name => $data) {
+            if (!isset($validatedSizes[$name]) && isset($data['image']) && $data['image']) {
+                Storage::disk('public')->delete($data['image']);
+            }
+        }
+
         $validated['size'] = !empty($validatedSizes) ? $validatedSizes : null;
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -229,6 +305,34 @@ class ProductController extends Controller
             }
         }
         $validated['gallery_images'] = $currentGallery;
+
+        $validated['stock_quantity'] = $validated['stock_quantity'] ?? 0;
+        $validated['weight'] = $validated['weight'] ?? 0;
+
+        if ($request->has('sort_order') && $validated['sort_order'] != $product->sort_order) {
+            $newOrder = $validated['sort_order'];
+            $oldOrder = $product->sort_order;
+
+            $query = Product::where('id', '!=', $product->id);
+                
+            if ($product->subcategory_id) {
+                $query->where('subcategory_id', $product->subcategory_id);
+            } elseif ($product->category_id) {
+                $query->where('category_id', $product->category_id);
+            }
+
+            if ($newOrder < $oldOrder) {
+                // Moving up: Shift items between new and old position down
+                (clone $query)->where('sort_order', '>=', $newOrder)
+                    ->where('sort_order', '<', $oldOrder)
+                    ->increment('sort_order');
+            } else {
+                // Moving down: Shift items between old and new position up
+                (clone $query)->where('sort_order', '>', $oldOrder)
+                    ->where('sort_order', '<=', $newOrder)
+                    ->decrement('sort_order');
+            }
+        }
 
         $product->update($validated);
 

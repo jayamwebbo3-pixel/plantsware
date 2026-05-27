@@ -293,6 +293,7 @@
                     <div class="info-value">#{{ $order->order_number }}</div>
                 </div> -->
                 
+
                 <div class="order-info-row">
                     <div class="info-label">Product(s) Ordered</div>
                     <div class="info-value info-product">

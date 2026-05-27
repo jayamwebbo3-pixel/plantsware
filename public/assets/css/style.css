@@ -4142,14 +4142,14 @@ del {
 
 /* navbar dropdown width  */
 /* Make Garden Products dropdown wider */
-.mega_menu .dropdown-menu {
+/* .mega_menu .dropdown-menu {
     min-width: 800px !important;
     left: 0 !important;
     max-height: 500px;
     right: auto;
     overflow-y: auto;
 }
-
+ */
 /* Scrollbar width */
 .mega_menu .dropdown-menu::-webkit-scrollbar {
     width: 8px;
@@ -4511,7 +4511,7 @@ del {
 .product-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     transition: opacity 0.3s ease;
 }
 
@@ -5012,7 +5012,7 @@ del {
     position: absolute;
     top: 15px;
     left: 15px;
-    background: var(--accent-color);
+    background: #ef4444;
     color: white;
     padding: 8px 15px;
     border-radius: 20px;
@@ -8622,8 +8622,8 @@ body.sticky-nav-active {
 .product-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: bottom right !important;
+    object-fit: contain;
+    object-position: center !important;
     transition: transform 0.5s ease;
 }
 
@@ -8895,3 +8895,115 @@ body.sticky-nav-active {
         width: 100% !important;
     }
 }
+
+
+/* navdropdown */
+/* ===== MEGA MENU: SINGLE COLUMN + PROPER HEIGHT + SCROLL ===== */
+
+.mega_menu .dropdown-menu {
+    width: max-content !important;
+    min-width: 200px !important;
+    max-width: 450px !important;
+    left: 0 !important;
+    right: auto !important;
+    top: 100% !important;
+    margin-top: 0 !important;
+    max-height: 320px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    background-color: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+    border-top: 3px solid #6ea820 !important;
+    border-radius: 0 0 6px 6px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+    padding: 6px 0 !important;
+    z-index: 9999 !important;
+    position: absolute !important;
+}
+
+.mega_menu .dropdown-menu .row {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.mega_menu .dropdown-menu .mg_menu,
+.mega_menu .dropdown-menu [class*="col-"] {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    padding: 0 !important;
+    float: none !important;
+}
+
+.mega_menu .dropdown-menu ul {
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+}
+
+.mega_menu .dropdown-menu ul li {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #f2f2f2 !important;
+}
+
+.mega_menu .dropdown-menu ul li:last-child {
+    border-bottom: none !important;
+}
+
+.mega_menu .dropdown-menu ul li a {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 11px 18px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #2c2c2c !important;
+    white-space: nowrap !important;
+    background-color: transparent !important;
+    transition: background 0.2s ease, color 0.2s ease, padding-left 0.2s ease !important;
+}
+
+.mega_menu .dropdown-menu ul li a:hover {
+    background-color: #f4f9ec !important;
+    color: #6ea820 !important;
+    padding-left: 22px !important;
+}
+
+.mega_menu .dropdown-menu ul li a:hover::after {
+    color: #6ea820 !important;
+}
+
+.mega_menu .dropdown-menu::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+.mega_menu .dropdown-menu::-webkit-scrollbar-track {
+    background: #f5f5f5 !important;
+    border-radius: 0 0 6px 0 !important;
+}
+
+.mega_menu .dropdown-menu::-webkit-scrollbar-thumb {
+    background: #6ea820 !important;
+    border-radius: 4px !important;
+}
+
+.mega_menu .dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: #5a8a1a !important;
+}
+
+.mega_menu,
+.main-menu li.mega_menu {
+    overflow: visible !important;
+    position: relative !important;
+}
+
+.header_bottom {
+    overflow: visible !important;
+}
+/* ===== END MEGA MENU ===== */

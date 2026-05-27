@@ -92,7 +92,7 @@
                                                     <div>
                                                         <div class="fw-bold text-dark fs-7 mb-1 line-clamp-1" title="{{ $p->name }}">{{ $p->name }}</div>
                                                         <div class="text-muted small">
-                                                            W: {{ $p->weight ?? 0 }} KG
+                                                            W: {{ number_format($item->calculated_weight, 2) }} grams
                                                             @if($isCombo) <span class="badge bg-danger-soft text-danger ms-1">COMBO</span> @endif
                                                         </div>
                                                     </div>
@@ -192,7 +192,7 @@
                             </div>
                             <div class="summary-line d-flex justify-content-between mb-2">
                                 <span class="text-muted">Total Weight</span>
-                                <span class="fw-medium text-dark">{{ number_format($totalWeight, 2) }} KG</span>
+                                <span class="fw-medium text-dark">{{ number_format($totalWeight, 2) }} grams</span>
                             </div>
                             <div class="summary-line d-flex justify-content-between mb-2">
                                 <span class="text-muted">Shipping Fee</span>
@@ -200,10 +200,26 @@
                             </div>
 
                             @if(isset($gstSettings) && $gstSettings->gst_status)
-                            <div class="summary-line d-flex justify-content-between mb-2">
-                                <span class="text-muted">GST ({{ number_format($gstSettings->gst_percentage, 1) }}%)</span>
-                                <span class="fw-medium text-danger">+₹{{ number_format($tax, 2) }}</span>
-                            </div>
+                                @if($igst > 0)
+                                <div class="summary-line d-flex justify-content-between mb-2">
+                                    <span class="text-muted">IGST ({{ number_format($gstSettings->gst_percentage, 1) }}%)</span>
+                                    <span class="fw-medium text-danger">+₹{{ number_format($igst, 2) }}</span>
+                                </div>
+                                @elseif($cgst > 0 || $sgst > 0)
+                                <div class="summary-line d-flex justify-content-between mb-1">
+                                    <span class="text-muted">CGST ({{ number_format($gstSettings->gst_percentage/2, 1) }}%)</span>
+                                    <span class="fw-medium text-danger">+₹{{ number_format($cgst, 2) }}</span>
+                                </div>
+                                <div class="summary-line d-flex justify-content-between mb-2">
+                                    <span class="text-muted">SGST ({{ number_format($gstSettings->gst_percentage/2, 1) }}%)</span>
+                                    <span class="fw-medium text-danger">+₹{{ number_format($sgst, 2) }}</span>
+                                </div>
+                                @else
+                                <div class="summary-line d-flex justify-content-between mb-2">
+                                    <span class="text-muted">GST ({{ number_format($gstSettings->gst_percentage, 1) }}%)</span>
+                                    <span class="fw-medium text-danger">+₹{{ number_format($tax, 2) }}</span>
+                                </div>
+                                @endif
                             @else
                             <div class="summary-line d-flex justify-content-between mb-2">
                                 <span class="text-muted">Estimated Tax</span>

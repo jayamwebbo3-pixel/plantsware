@@ -49,15 +49,23 @@
                                     <img src="{{ asset('assets/images/product/product1.jpg') }}" style="width:100%; height:100%; object-fit:cover;">
                                     @endif
                                 </div>
-                                {{ $item->product_name }}
-                                @if($item->options)
-                                @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
-                                @if(is_array($options) && isset($options['size']))
-                                <br><small class="text-muted">Size: {{ $options['size'] }}</small>
-                                @elseif(is_string($options) && !empty($options))
-                                <br><small class="text-muted">Size: {{ $options }}</small>
+                                @php 
+                                    $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; 
+                                    $sizeParam = is_array($options) ? ($options['size'] ?? null) : (is_string($options) ? $options : null);
+                                @endphp
+
+                                @if($item->product && !$item->combo_pack_id)
+                                    <a href="{{ route('product.show', ['slug' => $item->product->slug, 'size' => $sizeParam]) }}" target="_blank" class="text-decoration-none fw-bold" style="color: #72a420;">
+                                        {{ $item->product_name }}
+                                    </a>
+                                @else
+                                    {{ $item->product_name }}
                                 @endif
+
+                                @if($sizeParam)
+                                    <br><small class="text-muted">Size: {{ $sizeParam }}</small>
                                 @endif
+
                                 @if($item->combo_pack_id)
                                 <span class="badge bg-danger ms-1">COMBO</span>
                                 @endif
@@ -73,7 +81,14 @@
                 <div class="text-end">
                     <h5>Subtotal: ₹{{ number_format($order->subtotal, 2) }}</h5>
                     <h5>Shipping: ₹{{ number_format($order->shipping, 2) }}</h5>
+                    @if($order->igst > 0)
+                    <h5>IGST: ₹{{ number_format($order->igst, 2) }}</h5>
+                    @elseif($order->cgst > 0 || $order->sgst > 0)
+                    <h5>CGST: ₹{{ number_format($order->cgst, 2) }}</h5>
+                    <h5>SGST: ₹{{ number_format($order->sgst, 2) }}</h5>
+                    @else
                     <h5>Tax: ₹{{ number_format($order->tax, 2) }}</h5>
+                    @endif
                     <h4>Total: ₹{{ number_format($order->total, 2) }}</h4>
                 </div>
             </div>

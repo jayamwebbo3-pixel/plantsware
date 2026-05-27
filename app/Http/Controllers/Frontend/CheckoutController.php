@@ -33,8 +33,7 @@ class CheckoutController extends Controller
         });
         $itemCount = $cartItems->sum('quantity');
         $totalWeight = $cartItems->sum(function ($item) {
-            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
-            return ($p->weight ?? 0) * $item->quantity;
+            return $item->calculated_weight * $item->quantity;
         });
 
         // Calculate Total Savings/Discount
@@ -48,15 +47,36 @@ class CheckoutController extends Controller
         // Get shipping (use a dummy state like 'Default' or empty string for initial calculation)
         $shipping = 0; // Default to 0 until address is selected
         $tax = 0;
+        $cgst = 0;
+        $sgst = 0;
+        $igst = 0;
         $gstSettings = \App\Models\HeaderFooter::first();
         if ($gstSettings && $gstSettings->gst_status) {
             $tax = ($subtotal * $gstSettings->gst_percentage) / 100;
+            // Initially we don't know the state, so we won't split until state is known
+            // But if we have saved logic below, it will recalculate
         }
         $total = $subtotal + $shipping + $tax;
 
         // Pre-fill address if user has one saved
         $savedAddress = [];
         $userAddresses = collect();
+
+        // Helper to update GST split if state is known
+        $updateGstSplit = function($state) use ($gstSettings, $tax, &$cgst, &$sgst, &$igst) {
+            if ($gstSettings && $gstSettings->gst_status) {
+                $sellerState = trim($gstSettings->business_state ?? 'Tamil Nadu');
+                if (strcasecmp($sellerState, trim($state)) === 0) {
+                    $cgst = $tax / 2;
+                    $sgst = $tax / 2;
+                    $igst = 0;
+                } else {
+                    $igst = $tax;
+                    $cgst = 0;
+                    $sgst = 0;
+                }
+            }
+        };
 
         // Check if user is logged in and has address
         if (Auth::check()) {
@@ -78,12 +98,14 @@ class CheckoutController extends Controller
 
                 // If we have a saved state, recalculate shipping for better accuracy
                 $shipping = $this->calculateShipping($cartItems, $defaultAddress->state);
+                $updateGstSplit($defaultAddress->state);
                 $total = $subtotal + $shipping + $tax;
             } else {
                 if (!empty($user->address) && is_array($user->address)) {
                     $savedAddress = $user->address;
                     if (!empty($savedAddress['state'])) {
                         $shipping = $this->calculateShipping($cartItems, $savedAddress['state']);
+                        $updateGstSplit($savedAddress['state']);
                         $total = $subtotal + $shipping + $tax;
                     }
                 }
@@ -96,11 +118,12 @@ class CheckoutController extends Controller
             $savedAddress = array_merge($savedAddress, $sessAddr);
             if (!empty($sessAddr['state'])) {
                 $shipping = $this->calculateShipping($cartItems, $sessAddr['state']);
+                $updateGstSplit($sessAddr['state']);
                 $total = $subtotal + $shipping + $tax;
             }
         }
 
-        return view('view.checkout.address', compact('cartItems', 'savedAddress', 'userAddresses', 'subtotal', 'shipping', 'tax', 'total', 'itemCount', 'totalWeight', 'discount'));
+        return view('view.checkout.address', compact('cartItems', 'savedAddress', 'userAddresses', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'itemCount', 'totalWeight', 'discount'));
     }
 
     // Save address and redirect to checkout
@@ -199,22 +222,35 @@ class CheckoutController extends Controller
 
         // Calculate Total Weight
         $totalWeight = $cartItems->sum(function ($item) {
-            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
-            return ($p->weight ?? 0) * $item->quantity;
+            return $item->calculated_weight * $item->quantity;
         });
 
         $shipping = $this->calculateShipping($cartItems, $shippingAddress['state']);
 
         // ---- GST CALCULATION ----
         $tax = 0;
+        $cgst = 0;
+        $sgst = 0;
+        $igst = 0;
         $gstSettings = \App\Models\HeaderFooter::first();
+        
         if ($gstSettings && $gstSettings->gst_status) {
             $tax = ($subtotal * $gstSettings->gst_percentage) / 100;
+            
+            $sellerState = trim($gstSettings->business_state ?? 'Tamil Nadu');
+            $customerState = trim($shippingAddress['state'] ?? '');
+            
+            if (strcasecmp($sellerState, $customerState) === 0) {
+                $cgst = $tax / 2;
+                $sgst = $tax / 2;
+            } else {
+                $igst = $tax;
+            }
         }
 
         $total = $subtotal + $shipping + $tax;
 
-        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'total', 'discount', 'totalWeight', 'itemCount', 'gstSettings'));
+        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'discount', 'totalWeight', 'itemCount', 'gstSettings'));
     }
 
     // Place order (confirm and save)
@@ -244,17 +280,29 @@ class CheckoutController extends Controller
 
         // Calculate Total Weight
         $totalWeight = $cartItems->sum(function ($item) {
-            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
-            return ($p->weight ?? 0) * $item->quantity;
+            return $item->calculated_weight * $item->quantity;
         });
 
         $shipping = $this->calculateShipping($cartItems, $shippingAddress['state']);
 
         // ---- GST CALCULATION ----
         $tax = 0;
+        $cgst = 0;
+        $sgst = 0;
+        $igst = 0;
         $gstSettings = \App\Models\HeaderFooter::first();
         if ($gstSettings && $gstSettings->gst_status) {
             $tax = ($subtotal * $gstSettings->gst_percentage) / 100;
+            
+            $sellerState = trim($gstSettings->business_state ?? 'Tamil Nadu');
+            $customerState = trim($shippingAddress['state'] ?? '');
+            
+            if (strcasecmp($sellerState, $customerState) === 0) {
+                $cgst = $tax / 2;
+                $sgst = $tax / 2;
+            } else {
+                $igst = $tax;
+            }
         }
 
         $total = $subtotal + $shipping + $tax;
@@ -277,7 +325,7 @@ class CheckoutController extends Controller
                 'product_image' => $firstImg,
                 'price' => $price,
                 'quantity' => $item->quantity,
-                'weight' => ($p->weight ?? 0),
+                'weight' => $item->calculated_weight,
                 'discount' => $unitDiscount,
                 'total' => $price * $item->quantity,
                 'options' => $item->options,
@@ -297,6 +345,9 @@ class CheckoutController extends Controller
                 'subtotal' => $subtotal,
                 'shipping' => $shipping,
                 'tax' => $tax,
+                'cgst' => $cgst,
+                'sgst' => $sgst,
+                'igst' => $igst,
                 'total' => $total,
                 'total_weight' => $totalWeight,
                 'total_discount' => $discount,
@@ -310,8 +361,7 @@ class CheckoutController extends Controller
     private function calculateShipping($cartItems, $state)
     {
         $totalWeight = $cartItems->sum(function ($item) {
-            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
-            return ($p->weight ?? 0) * $item->quantity;
+            return $item->calculated_weight * $item->quantity;
         });
 
         $rate = \App\Models\ShippingRate::where('state_name', $state)->first();

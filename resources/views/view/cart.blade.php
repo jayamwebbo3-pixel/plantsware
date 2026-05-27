@@ -43,6 +43,29 @@
                                     @endphp
                                     @if($p)
                                     <div class="cart-item" id="cartItem_{{ $item->id }}">
+                                        @php
+                                            $stock = 0;
+                                            if ($p) {
+                                                if ($isCombo) {
+                                                    $stock = $p->stock_quantity ?? 0;
+                                                } else {
+                                                    $stock = $p->stock_quantity ?? 0;
+                                                    if ($item->options) {
+                                                        $options = is_string($item->options) ? json_decode($item->options, true) : $item->options;
+                                                        if (is_array($options) && isset($options['size']) && $p->size) {
+                                                            $sizes = is_string($p->size) ? json_decode($p->size, true) : $p->size;
+                                                            if (is_array($sizes) && isset($sizes[$options['size']])) {
+                                                                $sizeData = $sizes[$options['size']];
+                                                                $sizeStock = is_array($sizeData) ? ($sizeData['stock'] ?? null) : null;
+                                                                if ($sizeStock !== null) {
+                                                                    $stock = $sizeStock;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        @endphp
                                         <div class="item-image position-relative d-flex align-items-center justify-content-center" style="background: #fdfdfd; border-radius: 8px; overflow: hidden; width: 80px; height: 80px;">
                                             @php
                                             $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
@@ -81,7 +104,7 @@
                                             @endphp
                                             <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
                                             <div class="item-meta small text-muted mb-1">
-                                                <span>Weight: {{ $p->weight ?? 0 }} KG</span>
+                                                <span>Weight: {{ number_format($item->calculated_weight, 2) }} grams</span>
                                                 @php
                                                 $regularPrice = $isCombo ? $p->total_price : $p->price;
                                                 $savings = max(0, $regularPrice - $priceToUse);
@@ -110,7 +133,8 @@
                                                         class="qty-number-input" readonly>
 
                                                     <button type="button" class="qty-btn-inline increment-btn"
-                                                        data-item-id="{{ $item->id }}">
+                                                        data-item-id="{{ $item->id }}"
+                                                        data-stock="{{ $stock }}">
                                                         <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
@@ -138,7 +162,7 @@
                                     </div>
                                     <div class="summary-row">
                                         <span>Total Weight:</span>
-                                        <span class="summary-amount" id="cartWeight">{{ $totalWeight ?? 0 }} KG</span>
+                                        <span class="summary-amount" id="cartWeight">{{ number_format($totalWeight, 2) }} grams</span>
                                     </div>
                                     <div class="summary-row">
                                         <span>Shipping:</span>
@@ -223,6 +247,22 @@
         let newQuantity = parseInt(input.value) + change;
         if (isNaN(newQuantity) || newQuantity < 1) newQuantity = 1;
 
+        if (change > 0) {
+            const btn = document.querySelector(`.increment-btn[data-item-id="${itemId}"]`);
+            if (btn) {
+                const stock = parseInt(btn.getAttribute('data-stock') || 0);
+                if (newQuantity > stock) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Stock Limit',
+                        text: `Only ${stock} of stock only available`,
+                        confirmButtonColor: '#72a420'
+                    });
+                    return;
+                }
+            }
+        }
+
         console.log('Current:', input.value, 'New:', newQuantity);
         input.disabled = true;
 
@@ -281,7 +321,7 @@
                             `-₹${parseFloat(data.discount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
                     }
                     if (data.totalWeight !== undefined) {
-                        document.getElementById('cartWeight').textContent = `${data.totalWeight} KG`;
+                        document.getElementById('cartWeight').textContent = `${data.totalWeight} grams`;
                     }
                     if (data.tax !== undefined) {
                         const taxEl = document.getElementById('cartTax');
@@ -395,7 +435,7 @@
             document.getElementById('cartDiscount').textContent = `-₹${parseFloat(data.discount).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
         }
         if (data.totalWeight !== undefined) {
-            document.getElementById('cartWeight').textContent = `${data.totalWeight} KG`;
+            document.getElementById('cartWeight').textContent = `${data.totalWeight} grams`;
         }
         if (data.shipping !== undefined) {
             const shipEl = document.getElementById('cartShipping');

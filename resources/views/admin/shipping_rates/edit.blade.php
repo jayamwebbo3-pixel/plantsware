@@ -40,8 +40,8 @@
 
             <div class="row mb-4">
                 <div class="col-md-6">
-                    <label for="base_weight" class="form-label fw-bold small text-muted text-uppercase">Base Weight (KG)</label>
-                    <input type="number" name="base_weight" class="form-control rounded-3" id="base_weight" value="{{ old('base_weight', $shippingRate->base_weight) }}" required>
+                    <label for="base_weight" class="form-label fw-bold small text-muted text-uppercase">Base Weight (GRAMS)</label>
+                    <input type="number" step="any" name="base_weight" class="form-control rounded-3" id="base_weight" value="{{ old('base_weight', $shippingRate->base_weight) }}" required>
                     @error('base_weight')
                         <div class="text-danger small mt-1">{{ $message }}</div>
                     @enderror
@@ -57,8 +57,8 @@
 
             <div class="row mb-4">
                 <div class="col-md-6">
-                    <label for="additional_weight_unit" class="form-label fw-bold small text-muted text-uppercase">Additional Weight Unit (KG)</label>
-                    <input type="number" name="additional_weight_unit" class="form-control rounded-3" id="additional_weight_unit" value="{{ old('additional_weight_unit', $shippingRate->additional_weight_unit) }}" required>
+                    <label for="additional_weight_unit" class="form-label fw-bold small text-muted text-uppercase">Additional Weight Unit (GRAMS)</label>
+                    <input type="number" step="any" name="additional_weight_unit" class="form-control rounded-3" id="additional_weight_unit" value="{{ old('additional_weight_unit', $shippingRate->additional_weight_unit) }}" required>
                     @error('additional_weight_unit')
                         <div class="text-danger small mt-1">{{ $message }}</div>
                     @enderror

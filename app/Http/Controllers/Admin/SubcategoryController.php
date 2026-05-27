@@ -32,12 +32,13 @@ class SubcategoryController extends Controller
     }
 
     public function create()
-{
-    $categories = Category::where('is_active', true)->get();
-    $category = null; // Explicitly define it
+    {
+        $categories = Category::where('is_active', true)->get();
+        $category = null;
+        $next_sort_order = 1;
 
-    return view('admin.products-management.subcategories-create', compact('categories', 'category'));
-}
+        return view('admin.products-management.subcategories-create', compact('categories', 'category', 'next_sort_order'));
+    }
 
     public function store(Request $request)
     {
@@ -54,6 +55,16 @@ class SubcategoryController extends Controller
         
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('subcategories', 'public');
+        }
+
+        // Auto-increment sort_order within the category
+        $validated['sort_order'] = $request->input('sort_order', Subcategory::where('category_id', $validated['category_id'])->max('sort_order') + 1);
+
+        // Conflict handling for manual sort_order entry within category
+        if ($request->has('sort_order')) {
+            Subcategory::where('category_id', $validated['category_id'])
+                ->where('sort_order', '>=', $validated['sort_order'])
+                ->increment('sort_order');
         }
 
         Subcategory::create($validated);
@@ -85,6 +96,27 @@ class SubcategoryController extends Controller
                 Storage::disk('public')->delete($subcategory->image);
             }
             $validated['image'] = $request->file('image')->store('subcategories', 'public');
+        }
+
+        if ($request->has('sort_order') && $validated['sort_order'] != $subcategory->sort_order) {
+            $newOrder = $validated['sort_order'];
+            $oldOrder = $subcategory->sort_order;
+
+            if ($newOrder < $oldOrder) {
+                // Moving up: Shift items between new and old position down
+                Subcategory::where('category_id', $validated['category_id'])
+                    ->where('sort_order', '>=', $newOrder)
+                    ->where('sort_order', '<', $oldOrder)
+                    ->where('id', '!=', $subcategory->id)
+                    ->increment('sort_order');
+            } else {
+                // Moving down: Shift items between old and new position up
+                Subcategory::where('category_id', $validated['category_id'])
+                    ->where('sort_order', '>', $oldOrder)
+                    ->where('sort_order', '<=', $newOrder)
+                    ->where('id', '!=', $subcategory->id)
+                    ->decrement('sort_order');
+            }
         }
 
         $subcategory->update($validated);

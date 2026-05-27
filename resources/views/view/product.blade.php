@@ -86,8 +86,8 @@
                                 <div class="share-dropdown" id="shareDropdown">
                                     <a href="https://wa.me/?text={{ urlencode($product->name . ' - ' . url()->current()) }}" target="_blank" class="share-item whatsapp"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
                                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" target="_blank" class="share-item facebook"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>
-                                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->name) }}" target="_blank" class="share-item twitter"><i class="fab fa-twitter"></i><span>Twitter</span></a>
-                                    <a href="https://www.instagram.com/" target="_blank" class="share-item instagram"><i class="fab fa-instagram"></i><span>Instagram</span></a>
+                                    <!-- <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->name) }}" target="_blank" class="share-item twitter"><i class="fab fa-twitter"></i><span>Twitter</span></a>
+                                    <a href="https://www.instagram.com/" target="_blank" class="share-item instagram"><i class="fab fa-instagram"></i><span>Instagram</span></a> -->
                                 </div>
                             </div>
 
@@ -245,18 +245,12 @@
                         <div class="product-page-price mb-4">
                             @if($product->stock_quantity > 0)
                             @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                <span class="product-page-current-price h3">₹{{ number_format($product->sale_price, 2) }}</span>
-                                <span class="product-page-original-price ms-3 text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</span>
+                                <span class="product-page-current-price h3" data-default="₹{{ number_format($product->sale_price, 2) }}">₹{{ number_format($product->sale_price, 2) }}</span>
+                                <span class="product-page-original-price ms-3 text-muted text-decoration-line-through" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
                                 @else
-                                <span class="product-page-current-price h3">₹{{ number_format($product->price, 2) }}</span>
                                 @endif
                                 @endif
                         </div>
-                        <!-- Description -->
-                        <p class="product-page-description mb-4">
-                            {{ $product->description ? $product->description : ($product->short_description ? $product->short_description : 'No description available.') }}
-                        </p>
-                        <!-- Attributes Selector -->
                         @if($product->size)
                         @php
                         $sizeData = [];
@@ -282,14 +276,27 @@
                         @endphp
                         @if(count($sizeData) > 0)
                         <div class="product-page-attributes mb-4">
-                            <label class="fw-bold mb-2">Select Size:</label>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-bold m-0 text-dark">Select Size:</label>
+                            </div>
                             <div class="d-flex flex-wrap gap-2" id="sizeSelectorContainer">
                                 @php $loopIndex = 0; @endphp
-                                @foreach($sizeData as $sizeName => $sizePrice)
-                                <input type="radio" class="btn-check size-radio" name="size" id="size-{{ $loopIndex }}" value="{{ $sizeName }}" autocomplete="off" form="mainCartForm" {{ $loopIndex === 0 ? 'checked' : '' }} required data-price="{{ $sizePrice ?? '' }}" onchange="updateProductPrice(this)">
+                                @foreach($sizeData as $sizeName => $sizeValue)
+                                @php 
+                                    $price = is_array($sizeValue) ? ($sizeValue['price'] ?? null) : $sizeValue;
+                                    $image = is_array($sizeValue) ? ($sizeValue['image'] ?? null) : null;
+                                    $stock = is_array($sizeValue) ? ($sizeValue['stock'] ?? null) : null;
+                                    $weight = is_array($sizeValue) ? ($sizeValue['weight'] ?? null) : null;
+                                @endphp
+                                <input type="radio" class="btn-check size-radio" name="size" id="size-{{ $loopIndex }}" value="{{ $sizeName }}" autocomplete="off" form="mainCartForm" {{ $loopIndex === 0 ? 'checked' : '' }} required 
+                                    data-price="{{ $price ?? '' }}" 
+                                    data-image="{{ $image ? asset('storage/' . $image) : '' }}"
+                                    data-stock="{{ $stock ?? '' }}"
+                                    data-weight="{{ $weight ?? '' }}"
+                                    onchange="updateProductPrice(this)">
                                 <label class="btn btn-outline-success" for="size-{{ $loopIndex }}">
                                     {{ $sizeName }}
-                                    @if($sizePrice) <small>(₹{{ $sizePrice }})</small> @endif
+                                    @if($price) <small>(₹{{ $price }})</small> @endif
                                 </label>
                                 @php $loopIndex++; @endphp
                                 @endforeach
@@ -297,7 +304,31 @@
                         </div>
                         <script>
                             function updateProductPrice(radio) {
+                                let qtyInput = document.getElementById('quantityInput');
+                                
+                                // Reset Quantity to 1 on size change (User Request: "quantity will be restart to 1")
+                                if (qtyInput) {
+                                    qtyInput.value = 1;
+                                    if (document.getElementById('cartQuantity')) document.getElementById('cartQuantity').value = 1;
+                                    if (document.getElementById('buyNowQuantity')) document.getElementById('buyNowQuantity').value = 1;
+                                    
+                                    // Hide minus button for quantity 1
+                                    const minusBtn = document.querySelector('.qty-btn-inline:first-child');
+                                    if (minusBtn) minusBtn.style.visibility = 'hidden';
+                                }
+
+                                // Update URL to reflect selection (Size and Reset Quantity)
+                                const url = new URL(window.location);
+                                url.searchParams.set('size', radio.value);
+                                url.searchParams.set('qty', 1);
+                                window.history.replaceState({}, '', url);
+
                                 let newPrice = radio.getAttribute('data-price');
+                                let newStock = radio.getAttribute('data-stock');
+                                let stockVal = parseInt(newStock) || 0;
+                                
+                                let addCartBtn = document.querySelector('.product-page-btn-add-cart');
+                                let buyNowBtn = document.querySelector('.product-page-btn-buy-now');
                                 let currentPriceEl = document.querySelector('.product-page-current-price');
                                 let originalPriceEl = document.querySelector('.product-page-original-price');
 
@@ -305,26 +336,94 @@
                                     if (currentPriceEl) currentPriceEl.innerText = '₹' + parseFloat(newPrice).toFixed(2);
                                     if (originalPriceEl) originalPriceEl.style.display = 'none';
                                 } else {
-                                    // Restore default prices
-                                    @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                    if (currentPriceEl) currentPriceEl.innerText = '₹{{ number_format($product->sale_price, 2) }}';
-                                    if (originalPriceEl) {
-                                        originalPriceEl.style.display = 'inline';
-                                        originalPriceEl.innerText = '₹{{ number_format($product->price, 2) }}';
+                                    // Restore default prices from data attributes
+                                    if (currentPriceEl) {
+                                        currentPriceEl.innerText = currentPriceEl.getAttribute('data-default');
                                     }
-                                    @else
-                                    if (currentPriceEl) currentPriceEl.innerText = '₹{{ number_format($product->price, 2) }}';
-                                    if (originalPriceEl) originalPriceEl.style.display = 'none';
-                                    @endif
+                                    if (originalPriceEl) {
+                                        const defaultOrig = originalPriceEl.getAttribute('data-default');
+                                        if (defaultOrig) {
+                                            originalPriceEl.style.display = 'inline';
+                                            originalPriceEl.innerText = defaultOrig;
+                                        } else {
+                                            originalPriceEl.style.display = 'none';
+                                        }
+                                    }
+                                }
+
+                                // Sync with image and zoom
+                                let mainImageEl = document.getElementById('mainProductImage');
+                                let newImage = radio.getAttribute('data-image');
+                                if (newImage && mainImageEl) {
+                                    mainImageEl.src = newImage;
+                                } else if (mainImageEl) {
+                                    // Fallback to default product image
+                                    mainImageEl.src = "{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}";
+                                }
+
+                                let preview = document.getElementById('dpzPreview');
+                                if (preview && mainImageEl) {
+                                    preview.style.backgroundImage = 'url("' + mainImageEl.src + '")';
+                                }
+                                if (typeof window.attachZoom === 'function') {
+                                    window.attachZoom();
+                                }
+
+                                // Stock Status logic removed as requested
+
+                                if (newStock !== '' && newStock !== null && stockVal <= 0) {
+                                    if (addCartBtn) {
+                                        addCartBtn.disabled = true;
+                                        addCartBtn.innerHTML = 'Out of Stock';
+                                        addCartBtn.classList.remove('btn-primary');
+                                        addCartBtn.classList.add('btn-secondary');
+                                    }
+                                    if (buyNowBtn) buyNowBtn.style.setProperty('display', 'none', 'important');
+                                } else {
+                                    if (addCartBtn) {
+                                        addCartBtn.disabled = false;
+                                        addCartBtn.innerHTML = '<i class="fas fa-shopping-bag"></i> Add to Cart';
+                                        addCartBtn.classList.remove('btn-secondary');
+                                        addCartBtn.classList.add('btn-primary');
+                                    }
+                                    if (buyNowBtn) buyNowBtn.style.setProperty('display', 'flex', 'important');
                                 }
                             }
                             document.addEventListener('DOMContentLoaded', function() {
-                                let firstRadio = document.querySelector('.size-radio:checked');
-                                if (firstRadio) updateProductPrice(firstRadio);
+                                // Handle pre-selection from URL
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const sizeParam = urlParams.get('size');
+                                const qtyParam = urlParams.get('qty');
+
+                                if (sizeParam) {
+                                    const targetRadio = document.querySelector(`.size-radio[value="${CSS.escape(sizeParam)}"]`);
+                                    if (targetRadio) {
+                                        targetRadio.checked = true;
+                                    }
+                                }
+
+                                if (qtyParam) {
+                                    let qtyInput = document.getElementById('quantityInput');
+                                    if (qtyInput) {
+                                        qtyInput.value = Math.max(1, parseInt(qtyParam) || 1);
+                                        if (document.getElementById('cartQuantity')) document.getElementById('cartQuantity').value = qtyInput.value;
+                                        if (document.getElementById('buyNowQuantity')) document.getElementById('buyNowQuantity').value = qtyInput.value;
+                                    }
+                                }
+
+                                let activeRadio = document.querySelector('.size-radio:checked');
+                                if (activeRadio) {
+                                    updateProductPrice(activeRadio);
+                                }
                             });
                         </script>
                         @endif
                         @endif
+
+                        <!-- Description -->
+                        <p class="product-page-description mb-4">
+                            {{ $product->description ? $product->description : ($product->short_description ? $product->short_description : 'No description available.') }}
+                        </p>
 
                         <!-- Quantity Selector and Action Buttons inside Single Form -->
                         @if($product->stock_quantity > 0)
@@ -341,10 +440,14 @@
                             <div class="d-flex align-items-center mb-4 flex-nowrap" style="gap: 15px;">
                                 <div class="product-page-quantity-selector d-flex align-items-center mb-0 pe-2">
                                     <label class="product-page-qty-label me-3 fw-bold text-nowrap" for="quantityInput">Quantity:</label>
-                                    <div class="product-page-qty-control d-flex align-items-center border rounded">
-                                        <button type="button" class="product-page-qty-btn border-0 bg-transparent px-3" onclick="updateQty(-1)">−</button>
-                                        <input type="number" id="quantityInput" name="quantity" class="product-page-qty-input border-0 text-center" value="1" min="1" readonly style="width: 50px;">
-                                        <button type="button" class="product-page-qty-btn border-0 bg-transparent px-3" onclick="updateQty(1)">+</button>
+                                    <div class="product-page-qty-control qty-pill-control d-flex align-items-center">
+                                        <button type="button" class="qty-btn-inline border-0 bg-transparent" onclick="updateQty(-1)">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" id="quantityInput" name="quantity" class="product-page-qty-input border-0 text-center" value="1" min="1" readonly style="width: 40px; font-weight: 700;">
+                                        <button type="button" class="qty-btn-inline border-0 bg-transparent" onclick="updateQty(1)">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
                                 </div>
 
@@ -504,11 +607,57 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+            background: #ededed;
         }
 
         .dpz-thumb.active,
         .dpz-thumb:hover {
             border-color: #6EA820;
+        }
+
+        /* Pill-style Quantity Control */
+        .qty-pill-control {
+            display: inline-flex;
+            align-items: center;
+            background: #ffffff;
+            border: 2px solid #6EA820;
+            border-radius: 50px;
+            padding: 2px 5px;
+            height: 38px;
+            min-width: 100px;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(110, 168, 32, 0.1);
+        }
+
+        .qty-btn-inline {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .qty-btn-inline:hover {
+            background-color: #f3f7ed;
+            color: #6EA820;
+        }
+
+        .product-page-qty-input {
+            width: 35px;
+            border: none;
+            text-align: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: #1e293b;
+            background: transparent;
+            outline: none !important;
         }
 
         /* Main image panel */
@@ -532,10 +681,11 @@
         .dpz-img {
             display: block;
             width: 100%;
-            min-height: 420px;
-            max-height: 600px;
+            height: auto;
+            aspect-ratio: 1 / 1;
             object-fit: contain;
-            object-position: bottom right;
+            object-position: center;
+            background: #ededed;
             border-radius: 7px;
         }
 
@@ -663,13 +813,39 @@
             // ─── Quantity update ─────────────────────────────────────
             window.updateQty = function(change) {
                 var input = document.getElementById('quantityInput');
-                var value = Math.max(1, (parseInt(input.value) || 1) + change);
-                input.value = value;
-                
+                var currentVal = parseInt(input.value) || 1;
+                var newVal = Math.max(1, currentVal + change);
+
+                if (change > 0) {
+                    // Get base stock
+                    let stock = parseInt('{{ $product->stock_quantity ?? 0 }}') || 0;
+                    
+                    // Check if a specific variant is selected and has its own stock
+                    let activeRadio = document.querySelector('.size-radio:checked');
+                    if (activeRadio) {
+                        let sizeStock = activeRadio.getAttribute('data-stock');
+                        if (sizeStock !== '' && sizeStock !== null) {
+                            stock = parseInt(sizeStock);
+                        }
+                    }
+
+                    if (newVal > stock) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Stock Limit',
+                            text: `Only ${stock} of stock only available`,
+                            confirmButtonColor: '#6EA820'
+                        });
+                        return;
+                    }
+                }
+
+                input.value = newVal;
+
                 // Hide minus button if quantity is 1
-                var minusBtn = document.querySelector('.product-page-qty-btn:first-child');
+                var minusBtn = document.querySelector('.qty-btn-inline:first-child');
                 if (minusBtn) {
-                    if (value <= 1) {
+                    if (newVal <= 1) {
                         minusBtn.style.visibility = 'hidden';
                     } else {
                         minusBtn.style.visibility = 'visible';
@@ -677,9 +853,14 @@
                 }
 
                 var cartQty = document.getElementById('cartQuantity');
-                if (cartQty) cartQty.value = value;
+                if (cartQty) cartQty.value = newVal;
                 var buyNow = document.getElementById('buyNowQuantity');
-                if (buyNow) buyNow.value = value;
+                if (buyNow) buyNow.value = newVal;
+
+                // Update URL to reflect quantity
+                const url = new URL(window.location);
+                url.searchParams.set('qty', newVal);
+                window.history.replaceState({}, '', url);
             };
 
             // ─── Share toggle ────────────────────────────────────────
@@ -781,17 +962,21 @@
             var lbImg = document.getElementById('lbImg');
             var lbClose = document.getElementById('lbClose');
 
-            if (container && lightbox) {
-                container.addEventListener('click', function() {
-                    lbImg.src = mainImg.src;
-                    lightbox.classList.add('open');
+            if (dpzWrap && lightbox) {
+                dpzWrap.addEventListener('click', function() {
+                    if (lbImg && dpzImg) {
+                        lbImg.src = dpzImg.src;
+                        lightbox.classList.add('open');
+                    }
                 });
-                [lbClose, lightbox].forEach(function(el) {
-                    el.addEventListener('click', function(e) {
-                        if (e.target === lightbox || e.target === lbClose)
-                            lightbox.classList.remove('open');
+                if (lbClose && lightbox) {
+                    [lbClose, lightbox].forEach(function(el) {
+                        el.addEventListener('click', function(e) {
+                            if (e.target === lightbox || e.target === lbClose)
+                                lightbox.classList.remove('open');
+                        });
                     });
-                });
+                }
             }
         });
     </script>

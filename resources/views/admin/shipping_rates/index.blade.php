@@ -49,9 +49,9 @@
                     <tr>
                         <th class="text-center">S.NO</th>
                         <th>STATE NAME</th>
-                        <th class="text-center">BASE WEIGHT (KG)</th>
+                        <th class="text-center">BASE WEIGHT (GRAMS)</th>
                         <th class="text-center">BASE COST (₹)</th>
-                        <th class="text-center">ADDITIONAL WEIGHT UNIT (KG)</th>
+                        <th class="text-center">ADDITIONAL WEIGHT UNIT (GRAMS)</th>
                         <th class="text-center">ADDITIONAL COST PER UNIT (₹)</th>
                         <th class="text-center">ACTIONS</th>
                     </tr>

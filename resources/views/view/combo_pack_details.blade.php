@@ -187,8 +187,13 @@ $(document).ready(function() {
         // Check max stock if available
         var maxStock = {{ $comboPack->stock_quantity ?? 0 }};
         if (value > maxStock) {
-            value = maxStock;
-            alert("Only " + maxStock + " items available in stock.");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Stock Limit',
+                text: `Only ${maxStock} of stock only available`,
+                confirmButtonColor: '#6EA820'
+            });
+            return;
         }
         
         input.value = value;

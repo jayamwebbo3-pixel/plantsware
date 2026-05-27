@@ -173,8 +173,8 @@
 
                     <div class="mb-3">
                         <label for="sort_order" class="form-label">Sort Order</label>
-                        <input type="number" class="form-control" name="sort_order" id="sort_order" value="{{ old('sort_order') }}">
-                        <small class="text-muted">Lower numbers appear first (default: 0)</small>
+                        <input type="number" class="form-control" name="sort_order" id="sort_order" value="{{ $next_sort_order }}">
+                        <small class="text-primary fw-bold">Next available: {{ $next_sort_order }} (Last: {{ $next_sort_order - 1 }})</small>
                     </div>
                 </div>
 

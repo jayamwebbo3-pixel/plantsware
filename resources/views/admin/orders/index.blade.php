@@ -121,10 +121,10 @@
                             <h4 class="mb-0">{{ $stats['total'] ?? 0 }}</h4>
                             <small class="text-muted">Total Orders</small>
                         </div>
-                        <!-- <div class="col-lg-2 col-md-4 col-6 mb-3">
+                        <div class="col-lg-2 col-md-4 col-6 mb-3">
                             <h4 class="mb-0 text-warning">{{ $stats['pending'] ?? 0 }}</h4>
                             <small class="text-muted">Pending</small>
-                        </div> -->
+                        </div>
                         <div class="col-lg-2 col-md-4 col-6 mb-3">
                             <h4 class="mb-0 text-success">{{ $stats['confirmed'] ?? 0 }}</h4>
                             <small class="text-muted">Confirmed</small>
@@ -145,8 +145,7 @@
                             <h4 class="mb-0 text-danger">{{ $stats['cancelled'] ?? 0 }}</h4>
                             <small class="text-muted">Cancelled</small>
                         </div>
-                    </div>
-                    <div class="row text-center mt-2">
+
                         <div class="col-lg-2 col-md-4 col-6 mb-3">
                             <h4 class="mb-0 text-secondary">{{ $stats['returned'] ?? 0 }}</h4>
                             <small class="text-muted">Returned</small>
@@ -296,21 +295,21 @@
                             </td>
                             @endif
                             <td class="align-middle small">
+                                @php
+                                $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options;
+                                $sizeParam = is_array($options) ? ($options['size'] ?? null) : (is_string($options) ? $options : null);
+                                @endphp
+
                                 @if($item->product && !$item->combo_pack_id)
-                                <a href="{{ route('product.show', $item->product->slug ?? '') }}" target="_blank" style="color:#2ea25a;">{{ $item->product_name }}</a>
+                                <a href="{{ route('product.show', ['slug' => $item->product->slug ?? '', 'size' => $sizeParam]) }}" target="_blank" style="color:#2ea25a; font-weight: bold;">{{ $item->product_name }}</a>
                                 @elseif($item->comboPack)
-                                <a href="{{ route('combo_packs.frontend_show', $item->comboPack->slug ?? '') }}" target="_blank" style="color:#2ea25a;">{{ $item->product_name }}</a> <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">COMBO</span>
+                                <a href="{{ route('combo_packs.frontend_show', $item->comboPack->slug ?? '') }}" target="_blank" style="color:#2ea25a; font-weight: bold;">{{ $item->product_name }}</a> <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">COMBO</span>
                                 @else
                                 <span class="fw-bold">{{ $item->product_name }}</span>
                                 @endif
 
-                                @if($item->options)
-                                @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
-                                @if(is_array($options) && isset($options['size']))
-                                <br><small class="text-muted">Size: {{ $options['size'] }}</small>
-                                @elseif(is_string($options) && !empty($options))
-                                <br><small class="text-muted">Size: {{ $options }}</small>
-                                @endif
+                                @if($sizeParam)
+                                <br><small class="text-muted">Size: {{ $sizeParam }}</small>
                                 @endif
                             </td>
                             <td class="align-middle text-center">{{ $item->quantity }}</td>

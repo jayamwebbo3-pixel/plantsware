@@ -36,6 +36,7 @@ class HeaderFooterController extends Controller
             'insta_link' => 'nullable|url',
             'email' => 'nullable|email',
             'address' => 'nullable|string',
+            'business_state' => 'nullable|string|max:255',
             'mobile_no' => 'nullable|string',
             'whatsapp_no' => 'nullable|string',
             'whatsapp_msg_1' => 'nullable|string',

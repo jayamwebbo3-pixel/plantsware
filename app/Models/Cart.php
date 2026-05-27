@@ -48,12 +48,74 @@ class Cart extends Model
             $optionsObj = is_string($this->options) ? json_decode($this->options, true) : $this->options;
             if (isset($optionsObj['size']) && $p->size) {
                 $sizesObj = is_string($p->size) ? json_decode($p->size, true) : $p->size;
-                if (is_array($sizesObj) && isset($sizesObj[$optionsObj['size']]) && $sizesObj[$optionsObj['size']] > 0) {
-                    $price = $sizesObj[$optionsObj['size']];
+                if (is_array($sizesObj)) {
+                    $selectedSize = $optionsObj['size'];
+                    // Case-insensitive lookup
+                    $foundSize = null;
+                    if (isset($sizesObj[$selectedSize])) {
+                        $foundSize = $sizesObj[$selectedSize];
+                    } else {
+                        foreach ($sizesObj as $key => $val) {
+                            if (strcasecmp($key, $selectedSize) === 0) {
+                                $foundSize = $val;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ($foundSize) {
+                        $sizePrice = is_array($foundSize) ? ($foundSize['price'] ?? null) : $foundSize;
+                        if ($sizePrice !== null && $sizePrice > 0) {
+                            $price = $sizePrice;
+                        }
+                    }
                 }
             }
         }
 
         return $price;
+    }
+
+    public function getCalculatedWeightAttribute()
+    {
+        if ($this->combo_pack_id) {
+            return $this->comboPack->weight ?? 0;
+        }
+
+        $p = $this->product;
+        if (!$p) return 0;
+
+        $weight = $p->weight ?? 0;
+
+        if ($this->options) {
+            $optionsObj = is_string($this->options) ? json_decode($this->options, true) : $this->options;
+            if (isset($optionsObj['size']) && $p->size) {
+                $sizesObj = is_string($p->size) ? json_decode($p->size, true) : $p->size;
+                if (is_array($sizesObj)) {
+                    $selectedSize = $optionsObj['size'];
+                    // Case-insensitive lookup
+                    $foundSize = null;
+                    if (isset($sizesObj[$selectedSize])) {
+                        $foundSize = $sizesObj[$selectedSize];
+                    } else {
+                        foreach ($sizesObj as $key => $val) {
+                            if (strcasecmp($key, $selectedSize) === 0) {
+                                $foundSize = $val;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ($foundSize) {
+                        $sizeWeight = is_array($foundSize) ? ($foundSize['weight'] ?? null) : null;
+                        if ($sizeWeight !== null && $sizeWeight > 0) {
+                            $weight = $sizeWeight;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $weight;
     }
 }

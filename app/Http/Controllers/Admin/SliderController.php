@@ -30,7 +30,8 @@ class SliderController extends Controller
 
     public function create()
     {
-        return view('admin.sliders.create');
+        $next_sort_order = Slider::max('sort_order') + 1;
+        return view('admin.sliders.create', compact('next_sort_order'));
     }
 
     public function store(Request $request)
@@ -51,7 +52,7 @@ class SliderController extends Controller
         $slider->description = $validated['description'] ?? null;
         $slider->button_text = $validated['button_text'] ?? null;
         $slider->button_link = $validated['button_link'] ?? null;
-        $slider->sort_order = $validated['sort_order'] ?? 0;
+        $slider->sort_order = $request->input('sort_order', Slider::max('sort_order') + 1);
         $slider->is_active = $request->boolean('is_active', true);
 
         if ($request->hasFile('image')) {
@@ -86,8 +87,27 @@ class SliderController extends Controller
         $slider->description = $validated['description'] ?? $slider->description;
         $slider->button_text = $validated['button_text'] ?? $slider->button_text;
         $slider->button_link = $validated['button_link'] ?? $slider->button_link;
+        if ($request->has('sort_order') && $validated['sort_order'] != $slider->sort_order) {
+            $newOrder = (int)$validated['sort_order'];
+            $oldOrder = (int)$slider->sort_order;
+
+            if ($newOrder < $oldOrder) {
+                // Moving up: Shift items between new and old position down
+                Slider::where('sort_order', '>=', $newOrder)
+                    ->where('sort_order', '<', $oldOrder)
+                    ->where('id', '!=', $slider->id)
+                    ->increment('sort_order');
+            } else {
+                // Moving down: Shift items between old and new position up
+                Slider::where('sort_order', '>', $oldOrder)
+                    ->where('sort_order', '<=', $newOrder)
+                    ->where('id', '!=', $slider->id)
+                    ->decrement('sort_order');
+            }
+        }
+
         $slider->sort_order = $validated['sort_order'] ?? $slider->sort_order;
-        $slider->is_active = $request->boolean('is_active');
+        $slider->is_active = $request->boolean('is_active', $slider->is_active);
 
         if ($request->hasFile('image')) {
             // Delete old image
