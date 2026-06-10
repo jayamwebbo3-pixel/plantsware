@@ -15,9 +15,9 @@
                                 @endif
                                 <div class="plant-category-image">
                                     @if($category->image)
-                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}">
+                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" loading="lazy" decoding="async">
                                     @else
-                                        <img src="{{ asset('assets/images/category-placeholder.jpg') }}" alt="{{ $category->name }}">
+                                        <img src="{{ asset('assets/images/category-placeholder.jpg') }}" alt="{{ $category->name }}" loading="lazy" decoding="async">
                                     @endif
                                 </div>
                             </div>
@@ -115,7 +115,11 @@
                     <div class="carousel-inner">
                         @foreach($sliders as $index => $slider)
                             <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}">
+                                @if($index === 0)
+                                    <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}" fetchpriority="high" decoding="sync">
+                                @else
+                                    <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}" loading="lazy" decoding="async">
+                                @endif
                                 <div class="carousel-caption container silder_text">
                                     @if($slider->subtitle)<p class="arrival">{{ $slider->subtitle }}</p>@endif
                                     @if($slider->title)<h5 class="headding">{{ $slider->title }}</h5>@endif
@@ -130,7 +134,7 @@
                     </ol>
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img src="{{ asset('uploads/img2/slider/11.png') }}" class="d-block w-100 img-fluid" alt="s1">
+                            <img src="{{ asset('uploads/img2/slider/11.png') }}" class="d-block w-100 img-fluid" alt="s1" fetchpriority="high" decoding="sync">
                             <div class="carousel-caption container silder_text">
                                 <p class="arrival">Complete Care for Every Plant</p>
                                 <h5 class="headding">From Soil to<br>Bloom Naturally</h5>
@@ -404,9 +408,9 @@
                             <div class="blog-card">
                                 <div class="blog-card-image">
                                     @if(isset($blog->image) && $blog->image)
-                                        <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}">
+                                        <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}" loading="lazy" decoding="async">
                                     @else
-                                        <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="{{ $blog->title }}">
+                                        <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="{{ $blog->title }}" loading="lazy" decoding="async">
                                     @endif
                                     <span class="blog-card-category">{{ $blog->category->name ?? 'General' }}</span>
                                 </div>
@@ -428,7 +432,7 @@
                         <div class="col-md-6 col-lg-4">
                             <div class="blog-card">
                                 <div class="blog-card-image">
-                                    <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="Indoor plant care">
+                                    <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="Indoor plant care" loading="lazy" decoding="async">
                                     <span class="blog-card-category">Plant Care</span>
                                 </div>
                                 <div class="blog-card-content">

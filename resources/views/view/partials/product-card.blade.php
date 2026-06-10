@@ -7,9 +7,9 @@
             $hoverImage = !empty($galleryImages) ? asset('storage/' . $galleryImages[0]) : $mainImage;
             @endphp
             <img src="{{ $mainImage }}"
-                 alt="{{ $product->name }}" class="product-image main-image w-100 h-100" style="object-fit: contain; background: #ffffff;">
+                 alt="{{ $product->name }}" class="product-image main-image w-100 h-100" style="object-fit: contain; background: #ffffff;" loading="lazy" decoding="async">
             <img src="{{ $hoverImage }}"
-                 alt="{{ $product->name }}" class="product-image hover-image w-100 h-100" style="object-fit: contain; background: #ffffff;">
+                 alt="{{ $product->name }}" class="product-image hover-image w-100 h-100" style="object-fit: contain; background: #ffffff;" loading="lazy" decoding="async">
             @if($product->stock_quantity <= 0)
                 <span class="discount-badge" style="background-color: #dc3545 !important;">OUT OF STOCK</span>
             @elseif($product->sale_price && $product->sale_price < $product->price)

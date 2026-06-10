@@ -53,27 +53,26 @@
 
     <!--end here-->
 
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/fav-icon.png') }}">
 
     <!-- CSS Libraries -->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/all.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/fontawesome.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/fontawesome.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/owl.carousel.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/jquery.fancybox.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/animate.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/media.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.css') }}">
 
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CDN Libraries -->
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
@@ -81,6 +80,35 @@
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
+        /* Prevent CLS (Layout Shift) on the plant categories carousel before Slick loads */
+        .plant-categories-carousel:not(.slick-initialized) {
+            display: flex !important;
+            overflow: hidden !important;
+            flex-wrap: nowrap !important;
+        }
+        .plant-categories-carousel:not(.slick-initialized) .plant-category-item {
+            flex: 0 0 16.666% !important;
+            max-width: 16.666% !important;
+        }
+        @media (max-width: 1024px) {
+            .plant-categories-carousel:not(.slick-initialized) .plant-category-item {
+                flex: 0 0 25% !important;
+                max-width: 25% !important;
+            }
+        }
+        @media (max-width: 768px) {
+            .plant-categories-carousel:not(.slick-initialized) .plant-category-item {
+                flex: 0 0 33.333% !important;
+                max-width: 33.333% !important;
+            }
+        }
+        @media (max-width: 576px) {
+            .plant-categories-carousel:not(.slick-initialized) .plant-category-item {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+        }
+
         /* Global override to reliably locate Wishlist and Cart icons, bypassing style.css nth-child issues entirely */
         .wishlist-icon-link .Price-amount::before {
             background: url("{{ asset('uploads/img/svg/heart.svg') }}") no-repeat center !important;

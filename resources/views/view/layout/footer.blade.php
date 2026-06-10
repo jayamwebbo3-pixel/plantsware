@@ -265,10 +265,17 @@
 <script src="{{ asset('assets/js/jquery-3.4.1.min.js') }}"></script>
 <script src="{{ asset('assets/js/popper.min.js') }}"></script>
 <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
-<script src="{{ asset('assets/js/owl.carousel.js') }}"></script>
 <script src="{{ asset('assets/js/wow.min.js') }}"></script>
-<script src="{{ asset('assets/js/all.min.js') }}"></script>
-<script src="{{ asset('assets/js/jquery.fancybox.min.js') }}"></script>
+<script>
+    // Fallback stubs for unused/removed jQuery plugins in custom.js to prevent JS errors
+    (function($) {
+        if ($) {
+            if (!$.fn.owlCarousel) $.fn.owlCarousel = function() { return this; };
+            if (!$.fn.fancybox) $.fn.fancybox = function() { return this; };
+            if (!$.fn.magnificPopup) $.fn.magnificPopup = function() { return this; };
+        }
+    })(window.jQuery);
+</script>
 <script src="{{ asset('assets/js/custom.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
