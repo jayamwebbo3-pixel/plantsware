@@ -116,8 +116,107 @@
                             </div>
                         </div>
                     </div>
+                    <!-- End row (Weight/Sort) -->
+                </div>
+                <!-- End left col-md-8 -->
+
+                <!-- Right Column: Images & Flags -->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Main Product Image</label>
+                            @if($product->image)
+                                <div class="mb-2">
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-thumbnail" style="max-width: 200px; height: auto;">
+                                    <small class="text-muted d-block mt-1">Current image</small>
+                                </div>
+                            @endif
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*" onchange="if(this.files[0]) { document.getElementById('imagePreview').src = window.URL.createObjectURL(this.files[0]); document.getElementById('previewContainer').style.display = 'block'; } else { document.getElementById('previewContainer').style.display = 'none'; }">
+                            <div id="previewContainer" class="mt-2 text-center" style="display: none;">
+                                <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-height: 200px;">
+                                <small class="text-success d-block mt-1">New Image Preview</small>
+                            </div>
+                            <small class="text-muted">Leave empty to keep current image</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Current Gallery Images</label>
+                            <div id="existingGalleryContainer" class="d-flex flex-wrap gap-2 mb-2">
+                                @if($product->gallery_images && count($product->gallery_images) > 0)
+                                    @foreach($product->gallery_images as $index => $imagePath)
+                                        <div class="position-relative d-inline-block existing-gallery-item" data-path="{{ $imagePath }}">
+                                            <img src="{{ asset('storage/' . $imagePath) }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle remove-existing-gallery" 
+                                                    style="width: 20px; height: 20px; padding: 0; transform: translate(30%, -30%);"
+                                                    onclick="removeExistingImage(this, '{{ $imagePath }}')">
+                                                &times;
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <p class="text-muted small">No gallery images uploaded yet.</p>
+                                @endif
+                            </div>
+                            {{-- Hidden input to store paths of images to be deleted --}}
+                            <div id="deletedImagesContainer"></div>
+
+                            <label for="gallery_images" class="form-label">Add More Gallery Images</label>
+                            <input type="file" class="form-control" id="gallery_images" name="gallery_images[]" accept="image/*" multiple>
+                            <div id="galleryPreviewContainer" class="d-flex flex-wrap mt-2"></div>
+                            <small class="text-muted">Hold Ctrl/Cmd to select multiple. These will be added to your current gallery.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_featured">Mark as Featured Product</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="combo_pack_eligible" class="form-label fw-bold">Combo Pack Eligible</label>
+                            <select name="combo_pack_eligible" id="combo_pack_eligible" class="form-select">
+                                <option value="No" {{ old('combo_pack_eligible', $product->combo_pack_eligible) == 'No' ? 'selected' : '' }}>No</option>
+                                <option value="Yes" {{ old('combo_pack_eligible', $product->combo_pack_eligible) == 'Yes' ? 'selected' : '' }}>Yes</option>
+                            </select>
+                            <small class="text-muted">If 'Yes', this product can be added to custom customer-created combo packs.</small>
+                        </div>
+                    </div>
+                    <!-- End right col-md-4 -->
+
+                </div>
+                <!-- End top 2-col row -->
+
+                <!-- Full-Width: Product Attributes Section -->
+                <div class="row mt-2">
+                    <div class="col-12">
+
+                    {{-- has_variants flag: always submit true so controller saves sizes --}}
+                    <input type="hidden" name="has_variants" value="{{ $product->has_variants ? '1' : '0' }}" id="has_variants_input">
+
+                    <!-- Product has size/color variants toggle -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-3 overflow-hidden">
+                        <div class="card-body py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0 fw-semibold text-dark">Product has size / color variants?</h6>
+                                <small class="text-muted" id="variants-toggle-label">
+                                    {{ $product->has_variants ? 'ON — Add multiple variants with color, size options' : 'OFF — Single product, no size/color options' }}
+                                </small>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="has_variants_toggle"
+                                    {{ old('has_variants', $product->has_variants) ? 'checked' : '' }}
+                                    onchange="
+                                        document.getElementById('has_variants_input').value = this.checked ? '1' : '0';
+                                        document.getElementById('attributes-section').style.display = this.checked ? '' : 'none';
+                                        document.getElementById('variants-toggle-label').textContent = this.checked ? 'ON — Add multiple variants with color, size options' : 'OFF — Single product, no size/color options';
+                                    "
+                                    style="width: 3rem; height: 1.5rem; cursor: pointer;">
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Professional Product Attributes Section -->
+                    <div id="attributes-section" style="{{ old('has_variants', $product->has_variants) ? '' : 'display:none;' }}">
                     <div class="card border-0 shadow-sm rounded-4 mb-4 mt-2 overflow-hidden">
                         <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
                             <div>
@@ -147,12 +246,13 @@
                                     <table class="table table-hover align-middle mb-0" id="attributes-table">
                                         <thead class="bg-light">
                                                 <tr>
-                                                    <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="width: 25%;">Attribute Option</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 20%;">Price Override (₹)</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 15%;">Stock</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 15%;">Weight (grams)</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 20%;">Image</th>
-                                                    <th class="text-center py-3 text-uppercase small fw-bold text-muted" style="width: 50px;">Remove</th>
+                                                    <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="min-width: 110px;">Attribute Option</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 90px;">Price Override (₹)</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 65px;">Stock</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 80px;">Weight (grams)</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 95px;">Combo Eligible</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 140px;">Image</th>
+                                                    <th class="text-center py-3 text-uppercase small fw-bold text-muted" style="width: 50px; min-width: 50px;">Remove</th>
                                                 </tr>
                                         </thead>
                                         <tbody id="attributes-body">
@@ -178,10 +278,11 @@
                                                     foreach ($oldSizes as $s => $data) {
                                                         if (!empty($data['checked'])) {
                                                             $currentSizes[$s] = [
-                                                                'price' => $data['price'] ?? null,
-                                                                'stock' => $data['stock'] ?? null,
-                                                                'weight' => $data['weight'] ?? null,
-                                                                'image' => $data['existing_image'] ?? null
+                                                                'price'          => $data['price'] ?? null,
+                                                                'stock'          => $data['stock'] ?? null,
+                                                                'weight'         => $data['weight'] ?? null,
+                                                                'combo_eligible' => $data['combo_eligible'] ?? 'No',
+                                                                'image'          => $data['existing_image'] ?? null
                                                             ];
                                                         }
                                                     }
@@ -193,10 +294,11 @@
                                             @foreach($currentSizes as $name => $data)
                                                 {{-- Handle bothold string values and new array objects for backward compatibility during migration period --}}
                                                 @php 
-                                                    $priceValue = is_array($data) ? ($data['price'] ?? '') : $data;
-                                                    $stockValue = is_array($data) ? ($data['stock'] ?? '') : '';
-                                                    $weightValue = is_array($data) ? ($data['weight'] ?? '') : '';
-                                                    $imagePath = is_array($data) ? ($data['image'] ?? null) : null;
+                                                    $priceValue          = is_array($data) ? ($data['price'] ?? '') : $data;
+                                                    $stockValue          = is_array($data) ? ($data['stock'] ?? '') : '';
+                                                    $weightValue         = is_array($data) ? ($data['weight'] ?? '') : '';
+                                                    $comboEligibleValue  = is_array($data) ? ($data['combo_eligible'] ?? 'No') : 'No';
+                                                    $imagePath           = is_array($data) ? ($data['image'] ?? null) : null;
                                                 @endphp
                                                 <tr class="attribute-row animate__animated animate__fadeIn">
                                                     <td class="ps-4">
@@ -223,12 +325,18 @@
                                                         </div>
                                                     </td>
                                                     <td>
+                                                        <select name="sizes[{{ $name }}][combo_eligible]" class="form-select form-select-sm" required>
+                                                            <option value="No" {{ $comboEligibleValue === 'No' ? 'selected' : '' }}>No</option>
+                                                            <option value="Yes" {{ $comboEligibleValue === 'Yes' ? 'selected' : '' }}>Yes</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
                                                         <div class="d-flex align-items-center gap-2">
                                                             @if($imagePath)
                                                                 <img src="{{ asset('storage/' . $imagePath) }}" class="rounded border" style="width: 40px; height: 40px; object-fit: cover;" title="Existing Image">
                                                                 <input type="hidden" name="sizes[{{ $name }}][existing_image]" value="{{ $imagePath }}">
                                                             @endif
-                                                            <input type="file" name="sizes[{{ $name }}][image]" class="form-control form-control-sm" accept="image/*">
+                                                            <input type="file" name="sizes[{{ $name }}][image]" class="form-control form-control-sm" accept="image/*" style="max-width: 120px;">
                                                         </div>
                                                     </td>
                                                     <td class="text-center">
@@ -360,7 +468,13 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <input type="file" name="sizes[${displayName}][image]" class="form-control form-control-sm" accept="image/*">
+                                    <select name="sizes[${displayName}][combo_eligible]" class="form-select form-select-sm" required>
+                                        <option value="No" selected>No</option>
+                                        <option value="Yes">Yes</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="file" name="sizes[${displayName}][image]" class="form-control form-control-sm" accept="image/*" style="max-width: 120px;">
                                 </td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-link text-danger p-0" onclick="this.closest('tr').remove(); checkEmptyAttributes();">
@@ -390,7 +504,10 @@
                                     row.querySelector('input[name*="[price]"]').name = `sizes[${newName}][price]`;
                                     row.querySelector('input[name*="[stock]"]').name = `sizes[${newName}][stock]`;
                                     row.querySelector('input[name*="[weight]"]').name = `sizes[${newName}][weight]`;
-                                    row.querySelector('input[name*="[image]"]').name = `sizes[${newName}][image]`;
+                                    const comboSel = row.querySelector('select[name*="[combo_eligible]"]');
+                                    if (comboSel) comboSel.name = `sizes[${newName}][combo_eligible]`;
+                                    const imgInput = row.querySelector('input[name*="[image]"]');
+                                    if (imgInput) imgInput.name = `sizes[${newName}][image]`;
                                     const existingImg = row.querySelector('input[name*="existing_image"]');
                                     if (existingImg) existingImg.name = `sizes[${newName}][existing_image]`;
                                 }
@@ -400,7 +517,7 @@
                         function checkEmptyAttributes() {
                             const body = document.getElementById('attributes-body');
                             if (body.querySelectorAll('.attribute-row').length === 0) {
-                                body.innerHTML = `<tr id="no-attributes-msg"><td colspan="3" class="text-center py-3 text-muted">No attributes added yet. Use "Quick Add" or click "+" to add one.</td></tr>`;
+                                body.innerHTML = `<tr id="no-attributes-msg"><td colspan="7" class="text-center py-5"><div class="empty-state"><i class="fas fa-layer-group fa-3x text-light mb-3"></i><h6 class="text-muted">No attributes defined</h6><p class="text-secondary small">Add custom sizes or use one of our predefined templates</p></div></td></tr>`;
                             }
                         }
 
@@ -496,61 +613,13 @@
                         </div>
                     </div> -->
 
+                    </div>
+                    {{-- End attributes-section wrapper --}}
+
+                    </div>
+                    <!-- End attributes col-12 -->
                 </div>
-
-                <!-- Right Column: Images & Flags -->
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Main Product Image</label>
-                        @if($product->image)
-                            <div class="mb-2">
-                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-thumbnail" style="max-width: 200px; height: auto;">
-                                <small class="text-muted d-block mt-1">Current image</small>
-                            </div>
-                        @endif
-                        <input type="file" class="form-control" id="image" name="image" accept="image/*" onchange="if(this.files[0]) { document.getElementById('imagePreview').src = window.URL.createObjectURL(this.files[0]); document.getElementById('previewContainer').style.display = 'block'; } else { document.getElementById('previewContainer').style.display = 'none'; }">
-                        <div id="previewContainer" class="mt-2 text-center" style="display: none;">
-                            <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-height: 200px;">
-                            <small class="text-success d-block mt-1">New Image Preview</small>
-                        </div>
-                        <small class="text-muted">Leave empty to keep current image</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Current Gallery Images</label>
-                        <div id="existingGalleryContainer" class="d-flex flex-wrap gap-2 mb-2">
-                            @if($product->gallery_images && count($product->gallery_images) > 0)
-                                @foreach($product->gallery_images as $index => $imagePath)
-                                    <div class="position-relative d-inline-block existing-gallery-item" data-path="{{ $imagePath }}">
-                                        <img src="{{ asset('storage/' . $imagePath) }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
-                                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle remove-existing-gallery" 
-                                                style="width: 20px; height: 20px; padding: 0; transform: translate(30%, -30%);"
-                                                onclick="removeExistingImage(this, '{{ $imagePath }}')">
-                                            &times;
-                                        </button>
-                                    </div>
-                                @endforeach
-                            @else
-                                <p class="text-muted small">No gallery images uploaded yet.</p>
-                            @endif
-                        </div>
-                        {{-- Hidden input to store paths of images to be deleted --}}
-                        <div id="deletedImagesContainer"></div>
-
-                        <label for="gallery_images" class="form-label">Add More Gallery Images</label>
-                        <input type="file" class="form-control" id="gallery_images" name="gallery_images[]" accept="image/*" multiple>
-                        <div id="galleryPreviewContainer" class="d-flex flex-wrap mt-2"></div>
-                        <small class="text-muted">Hold Ctrl/Cmd to select multiple. These will be added to your current gallery.</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_featured">Mark as Featured Product</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <!-- End full-width attributes row -->
 
             <!-- Submit Buttons -->
             <div class="mt-5 text-end">

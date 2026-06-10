@@ -52,8 +52,8 @@ class ComboOnlyProductController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('combo-only-products', 'public');
-            $this->imageService->applyWatermark($imagePath);
+            $tempPath = $request->file('image')->store('combo-only-products', 'public');
+            $imagePath = $this->imageService->applyWatermark($tempPath);
         }
 
         ComboOnlyProduct::create([
@@ -93,8 +93,8 @@ class ComboOnlyProductController extends Controller
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
-            $product->image = $request->file('image')->store('combo-only-products', 'public');
-            $this->imageService->applyWatermark($product->image);
+            $tempPath = $request->file('image')->store('combo-only-products', 'public');
+            $product->image = $this->imageService->applyWatermark($tempPath);
         }
 
         $product->update([

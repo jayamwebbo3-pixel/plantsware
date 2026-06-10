@@ -328,8 +328,8 @@ public function ckeditorUpload(Request $request)
 
     public function destroy(Blog $blog)
     {
-        if ($blog->image) {
-            Storage::disk('public')->delete($blog->image);
+        if ($blog->image && file_exists(public_path($blog->image))) {
+            unlink(public_path($blog->image));
         }
 
         $blog->tags()->detach(); // Clean up pivot table

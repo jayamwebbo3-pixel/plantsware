@@ -76,7 +76,56 @@ class TempCartService
             }
         } else {
             $product = Product::lockForUpdate()->find($cart->product_id);
-            if (!$product || $product->stock_quantity < $quantity) {
+            if (!$product) {
+                throw new Exception("Product not found.");
+            }
+
+            $selectedSize = null;
+            if ($cart->options) {
+                $optionsObj = is_string($cart->options) ? json_decode($cart->options, true) : $cart->options;
+                if (isset($optionsObj['size'])) {
+                    $selectedSize = $optionsObj['size'];
+                }
+            }
+
+            if (!$selectedSize && $product->size) {
+                $sizesObj = is_string($product->size) ? json_decode($product->size, true) : $product->size;
+                if (is_array($sizesObj) && count($sizesObj) > 0) {
+                    $selectedSize = array_key_first($sizesObj);
+                }
+            }
+
+            if ($selectedSize && $product->size) {
+                $sizesObj = is_string($product->size) ? json_decode($product->size, true) : $product->size;
+                if (is_array($sizesObj)) {
+                    $foundKey = null;
+                    if (isset($sizesObj[$selectedSize])) {
+                        $foundKey = $selectedSize;
+                    } else {
+                        foreach ($sizesObj as $key => $val) {
+                            if (strcasecmp($key, $selectedSize) === 0) {
+                                $foundKey = $key;
+                                break;
+                            }
+                        }
+                    }
+                    if ($foundKey && isset($sizesObj[$foundKey]['stock'])) {
+                        $sizeStock = $sizesObj[$foundKey]['stock'];
+                        if ($sizeStock !== null && $sizeStock !== '') {
+                            $sizeStock = (int)$sizeStock;
+                            if ($sizeStock < $quantity) {
+                                throw new Exception("Insufficient stock for {$product->name} ({$selectedSize}).");
+                            }
+                            $sizesObj[$foundKey]['stock'] = $sizeStock - $quantity;
+                            $product->size = $sizesObj;
+                            $product->save();
+                            return;
+                        }
+                    }
+                }
+            }
+
+            if ($product->stock_quantity < $quantity) {
                 throw new Exception("Insufficient stock for {$product->name}.");
             }
             $product->decrement('stock_quantity', $quantity);
@@ -139,6 +188,45 @@ class TempCartService
         } else {
             $product = Product::find($tempCart->product_id);
             if ($product) {
+                $selectedSize = null;
+                if ($tempCart->options) {
+                    $optionsObj = is_string($tempCart->options) ? json_decode($tempCart->options, true) : $tempCart->options;
+                    if (isset($optionsObj['size'])) {
+                        $selectedSize = $optionsObj['size'];
+                    }
+                }
+                if (!$selectedSize && $product->size) {
+                    $sizesObj = is_string($product->size) ? json_decode($product->size, true) : $product->size;
+                    if (is_array($sizesObj) && count($sizesObj) > 0) {
+                        $selectedSize = array_key_first($sizesObj);
+                    }
+                }
+                if ($selectedSize && $product->size) {
+                    $sizesObj = is_string($product->size) ? json_decode($product->size, true) : $product->size;
+                    if (is_array($sizesObj)) {
+                        $foundKey = null;
+                        if (isset($sizesObj[$selectedSize])) {
+                            $foundKey = $selectedSize;
+                        } else {
+                            foreach ($sizesObj as $key => $val) {
+                                if (strcasecmp($key, $selectedSize) === 0) {
+                                    $foundKey = $key;
+                                    break;
+                                }
+                            }
+                        }
+                        if ($foundKey && isset($sizesObj[$foundKey]['stock'])) {
+                            $sizeStock = $sizesObj[$foundKey]['stock'];
+                            if ($sizeStock !== null && $sizeStock !== '') {
+                                $sizesObj[$foundKey]['stock'] = (int)$sizeStock + $quantity;
+                                $product->size = $sizesObj;
+                                $product->save();
+                                return;
+                            }
+                        }
+                    }
+                }
+
                 $product->increment('stock_quantity', $quantity);
             }
         }

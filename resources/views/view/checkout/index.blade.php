@@ -66,52 +66,139 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($cartItems as $item)
                                         @php
-                                        $isCombo = (bool) $item->combo_pack_id;
-                                        $p = $isCombo ? $item->comboPack : $item->product;
-                                        $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
-                                        $priceToUse = $item->calculated_price;
+                                        $groupedCheckoutItems = $cartItems->groupBy(function($item) {
+                                            return $item->custom_combo_id ?? 'single';
+                                        });
                                         @endphp
-                                        <tr>
-                                            <td class="ps-4 py-3">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="product-thumb-sm me-4 bg-white border rounded">
-                                                        @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
-                                                        <div class="dual-images">
-                                                            <img src="{{ asset('storage/' . $imgData[0]) }}" alt="">
-                                                            <img src="{{ asset('storage/' . $imgData[1]) }}" alt="">
+                                        @foreach($groupedCheckoutItems as $comboId => $groupItems)
+                                            @if($comboId === 'single')
+                                                @foreach($groupItems as $item)
+                                                    @php
+                                                    $isCombo = (bool) $item->combo_pack_id;
+                                                    $p = $isCombo ? $item->comboPack : $item->product;
+                                                    $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+                                                    $priceToUse = $item->calculated_price;
+                                                    @endphp
+                                                    <tr>
+                                                        <td class="ps-4 py-3">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="product-thumb-sm me-4 bg-white border rounded">
+                                                                    @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
+                                                                    <div class="dual-images">
+                                                                        <img src="{{ asset('storage/' . $imgData[0]) }}" alt="">
+                                                                        <img src="{{ asset('storage/' . $imgData[1]) }}" alt="">
+                                                                    </div>
+                                                                    @else
+                                                                    @php
+                                                                    $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
+                                                                    @endphp
+                                                                    <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}" alt="{{ $p->name }}">
+                                                                    @endif
+                                                                </div>
+                                                                <div>
+                                                                    <div class="fw-bold text-dark fs-7 mb-1 line-clamp-1" title="{{ $p->name }}">{{ $p->name }}</div>
+                                                                    @if($item->options)
+                                                                    @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
+                                                                    @if(is_array($options) && isset($options['size']))
+                                                                    <div class="text-muted extra-small mb-1">Size: {{ $options['size'] }}</div>
+                                                                    @elseif(is_string($options) && !empty($options))
+                                                                    <div class="text-muted extra-small mb-1">Size: {{ $options }}</div>
+                                                                    @endif
+                                                                    @endif
+                                                                    <div class="text-muted small">
+                                                                        W: {{ number_format($item->calculated_weight, 2) }} grams
+                                                                        @if($isCombo) <span class="badge bg-danger-soft text-danger ms-1">COMBO</span> @endif
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center py-3">
+                                                            <span class="badge bg-light text-dark border fw-medium px-3 py-2">× {{ $item->quantity }}</span>
+                                                        </td>
+                                                        <td class="text-end py-3">
+                                                            <div class="fw-bold">₹{{ number_format($priceToUse * $item->quantity, 2) }}</div>
+                                                            <div class="text-muted extra-small">₹{{ number_format($priceToUse, 2) }} / unit</div>
+                                                        </td>
+                                                        <td class="pe-4 py-3 text-end">
+                                                            <button type="button" class="btn-close-style" 
+                                                                    onclick="removeFromCartSummary('{{ $item->id }}')" title="Remove Item">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                @php
+                                                $comboSubtotal = $groupItems->sum(function($item) {
+                                                    return $item->calculated_price * $item->quantity;
+                                                });
+                                                $slabs = \App\Models\ComboPackDiscountSlab::where('status', true)->orderBy('min_amount', 'asc')->get();
+                                                $pct = 0;
+                                                foreach($slabs as $slab) {
+                                                    if ($comboSubtotal >= $slab->min_amount) {
+                                                        $pct = (float)$slab->discount_percentage;
+                                                    }
+                                                }
+                                                $comboDiscount = $comboSubtotal * ($pct / 100);
+                                                @endphp
+                                                <tr style="background-color: #f7f9f6; border-top: 2px solid #d2e1cd; border-bottom: 1px solid #d2e1cd;">
+                                                    <td colspan="2" class="ps-4 py-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="badge badge-success me-2" style="background-color: #2e7d32; font-size: 10px; font-weight: 600; padding: 3px 6px;">CUSTOM COMBO PACK</span>
+                                                            @if($pct > 0)
+                                                            <span class="badge bg-danger text-white font-weight-bold" style="font-size: 10px; padding: 3px 6px;">{{ $pct }}% OFF APPLIED</span>
+                                                            @endif
                                                         </div>
-                                                        @else
-                                                        @php
-                                                        $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
-                                                        @endphp
-                                                        <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}" alt="{{ $p->name }}">
-                                                        @endif
-                                                    </div>
-                                                    <div>
-                                                        <div class="fw-bold text-dark fs-7 mb-1 line-clamp-1" title="{{ $p->name }}">{{ $p->name }}</div>
-                                                        <div class="text-muted small">
-                                                            W: {{ number_format($item->calculated_weight, 2) }} grams
-                                                            @if($isCombo) <span class="badge bg-danger-soft text-danger ms-1">COMBO</span> @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-center py-3">
-                                                <span class="badge bg-light text-dark border fw-medium px-3 py-2">× {{ $item->quantity }}</span>
-                                            </td>
-                                            <td class="text-end py-3">
-                                                <div class="fw-bold">₹{{ number_format($priceToUse * $item->quantity, 2) }}</div>
-                                                <div class="text-muted extra-small">₹{{ number_format($priceToUse, 2) }} / unit</div>
-                                            </td>
-                                            <td class="pe-4 py-3 text-end">
-                                                <button type="button" class="btn-close-style" 
-                                                        onclick="removeFromCartSummary('{{ $item->id }}')" title="Remove Item">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                                    </td>
+                                                    <td class="text-end py-2">
+                                                        <span class="fw-bold text-success" style="font-size: 14px;">₹{{ number_format($comboSubtotal - $comboDiscount, 2) }}</span>
+                                                    </td>
+                                                    <td class="pe-4 py-2 text-end">
+                                                        <button type="button" class="btn-close-style" 
+                                                                onclick="removeFromCartSummary('{{ $groupItems->first()->id }}')" title="Remove Bundle">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                @foreach($groupItems as $item)
+                                                    @php
+                                                    $p = $item->product;
+                                                    $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+                                                    @endphp
+                                                    <tr style="background-color: #fcfdfc; border-bottom: 1px solid #f2f2f2; {{ $loop->last ? 'border-bottom: 2px solid #d2e1cd;' : '' }}">
+                                                        <td class="ps-5 py-2">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="product-thumb-sm me-3 bg-white border rounded" style="width: 45px; height: 45px;">
+                                                                    @php
+                                                                    $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
+                                                                    @endphp
+                                                                    <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}" alt="{{ $p->name }}">
+                                                                </div>
+                                                                <div>
+                                                                    <div class="fw-medium text-dark small">{{ $p->name }}</div>
+                                                                    @if($item->options)
+                                                                    @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
+                                                                    @if(is_array($options) && isset($options['size']))
+                                                                    <div class="text-muted extra-small mb-1">Size: {{ $options['size'] }}</div>
+                                                                    @elseif(is_string($options) && !empty($options))
+                                                                    <div class="text-muted extra-small mb-1">Size: {{ $options }}</div>
+                                                                    @endif
+                                                                    @endif
+                                                                    <div class="text-muted extra-small">W: {{ number_format($item->calculated_weight, 2) }} grams</div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center py-2">
+                                                            <span class="text-muted extra-small">1 (custom combo pack)</span>
+                                                        </td>
+                                                        <td class="text-end py-2 pe-3">
+                                                            <span class="text-muted small">₹{{ number_format($item->calculated_price, 2) }}</span>
+                                                        </td>
+                                                        <td class="pe-4 py-2"></td>
+                                                    </tr>
+                                                @endforeach
+                                            @endif
                                         @endforeach
                                     </tbody>
                                 </table>

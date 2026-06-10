@@ -126,9 +126,13 @@
                                         @php $options = is_string($item->options) ? json_decode($item->options, true) : $item->options; @endphp
                                         @if(is_array($options))
                                             <p class="small mb-0 text-muted">
+                                                @php $displayed = []; @endphp
                                                 @foreach($options as $k => $v)
-                                                    {{ ucfirst($k) }}: <span class="text-dark fw-medium">{{ $v }}</span> @if(!$loop->last) • @endif
+                                                    @if(!is_array($v) && !is_object($v) && $k !== 'custom_combo_id' && $k !== 'combo_products')
+                                                        @php $displayed[] = ucfirst($k) . ': <span class="text-dark fw-medium">' . e($v) . '</span>'; @endphp
+                                                    @endif
                                                 @endforeach
+                                                {!! implode(' • ', $displayed) !!}
                                             </p>
                                         @endif
                                     @endif

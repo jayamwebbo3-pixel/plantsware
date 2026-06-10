@@ -107,6 +107,10 @@ Route::get('combo-packs/{slug}', [App\Http\Controllers\Frontend\ComboPackControl
 // Cart & Wishlist for Combo Packs
 Route::post('/cart/add-combo/{combo}', [App\Http\Controllers\Frontend\CartController::class, 'addCombo'])->name('cart.add_combo');
 
+// ================= CUSTOM COMBO BUILDER ROUTES =================
+Route::get('combo-builder', [\App\Http\Controllers\Frontend\ComboBuilderController::class, 'index'])->name('combo-builder.index');
+Route::post('cart/add-custom-combo', [\App\Http\Controllers\Frontend\CartController::class, 'addCustomCombo'])->name('cart.add_custom_combo');
+
 // ================= USER DASHBOARD =================
 
 Route::middleware('auth')->group(function () {
@@ -251,6 +255,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('combo-packs/{combo}/status', [ComboPackController::class, 'updateStatus'])->name('combo-packs.update-status');
         Route::get('combo-packs/get-items', [ComboPackController::class, 'getItems'])->name('combo-packs.get-items');
 
+        // Custom Combo Pack Settings & Slabs
+        Route::prefix('custom-combo')->name('custom-combo.')->group(function () {
+            Route::get('/settings', [\App\Http\Controllers\Admin\ComboPackSettingsController::class, 'settings'])->name('settings');
+            Route::post('/settings', [\App\Http\Controllers\Admin\ComboPackSettingsController::class, 'updateSettings'])->name('settings.update');
+            Route::post('/slabs', [\App\Http\Controllers\Admin\ComboPackSettingsController::class, 'storeSlab'])->name('slabs.store');
+            Route::put('/slabs/{id}', [\App\Http\Controllers\Admin\ComboPackSettingsController::class, 'updateSlab'])->name('slabs.update');
+            Route::delete('/slabs/{id}', [\App\Http\Controllers\Admin\ComboPackSettingsController::class, 'deleteSlab'])->name('slabs.delete');
+        });
+
         Route::resource('shipping-rates', ShippingRateController::class);
 
         // Combo Only Products
@@ -268,4 +281,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/reviews/{id}/toggle', [App\Http\Controllers\Admin\ReviewController::class, 'toggleApproval'])->name('reviews.toggle');
         Route::delete('/reviews/{id}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
+});
+
+Route::get('/clear-cache', function () {
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    \Illuminate\Support\Facades\Artisan::call('route:clear');
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    return response()->json([
+        'status' => 'success',
+        'message' => 'All caches cleared successfully (Cache, Config, Route, and View).'
+    ]);
 });

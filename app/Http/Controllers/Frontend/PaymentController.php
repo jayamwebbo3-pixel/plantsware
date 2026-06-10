@@ -131,6 +131,13 @@ class PaymentController extends Controller
                     OrderItem::create(array_merge($itemData, ['order_id' => $order->id]));
                 }
 
+                // 2b. Create Order Combo Details if present
+                if (!empty($checkoutData['custom_combos'])) {
+                    foreach ($checkoutData['custom_combos'] as $comboDetail) {
+                        \App\Models\OrderComboDetail::create(array_merge($comboDetail, ['order_id' => $order->id]));
+                    }
+                }
+
                 // 3. Link transaction back to order
                 $transaction->update([
                     'status' => 'SUCCESS',

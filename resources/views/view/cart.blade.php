@@ -36,118 +36,215 @@
                             <!-- CART ITEMS -->
                             <div class="col-lg-8">
                                 <div class="cart-items-wrapper" id="cartItemsWrapper">
-                                    @foreach($cartItems as $item)
                                     @php
-                                    $isCombo = (bool) $item->combo_pack_id;
-                                    $p = $isCombo ? $item->comboPack : $item->product;
+                                    $groupedCartItems = $cartItems->groupBy(function($item) {
+                                        return $item->custom_combo_id ?? 'single';
+                                    });
                                     @endphp
-                                    @if($p)
-                                    <div class="cart-item" id="cartItem_{{ $item->id }}">
-                                        @php
-                                            $stock = 0;
-                                            if ($p) {
-                                                if ($isCombo) {
-                                                    $stock = $p->stock_quantity ?? 0;
-                                                } else {
-                                                    $stock = $p->stock_quantity ?? 0;
-                                                    if ($item->options) {
-                                                        $options = is_string($item->options) ? json_decode($item->options, true) : $item->options;
-                                                        if (is_array($options) && isset($options['size']) && $p->size) {
-                                                            $sizes = is_string($p->size) ? json_decode($p->size, true) : $p->size;
-                                                            if (is_array($sizes) && isset($sizes[$options['size']])) {
-                                                                $sizeData = $sizes[$options['size']];
-                                                                $sizeStock = is_array($sizeData) ? ($sizeData['stock'] ?? null) : null;
-                                                                if ($sizeStock !== null) {
-                                                                    $stock = $sizeStock;
+                                    @foreach($groupedCartItems as $comboId => $groupItems)
+                                        @if($comboId === 'single')
+                                            @foreach($groupItems as $item)
+                                                @php
+                                                $isCombo = (bool) $item->combo_pack_id;
+                                                $p = $isCombo ? $item->comboPack : $item->product;
+                                                @endphp
+                                                @if($p)
+                                                <div class="cart-item" id="cartItem_{{ $item->id }}">
+                                                    @php
+                                                        $stock = 0;
+                                                        if ($p) {
+                                                            if ($isCombo) {
+                                                                $stock = $p->stock_quantity ?? 0;
+                                                            } else {
+                                                                $stock = $p->stock_quantity ?? 0;
+                                                                if ($item->options) {
+                                                                    $options = is_string($item->options) ? json_decode($item->options, true) : $item->options;
+                                                                    if (is_array($options) && isset($options['size']) && $p->size) {
+                                                                        $sizes = is_string($p->size) ? json_decode($p->size, true) : $p->size;
+                                                                        if (is_array($sizes) && isset($sizes[$options['size']])) {
+                                                                            $sizeData = $sizes[$options['size']];
+                                                                            $sizeStock = is_array($sizeData) ? ($sizeData['stock'] ?? null) : null;
+                                                                            if ($sizeStock !== null) {
+                                                                                $stock = $sizeStock;
+                                                                            }
+                                                                        }
+                                                                    }
                                                                 }
                                                             }
                                                         }
-                                                    }
-                                                }
-                                            }
-                                        @endphp
-                                        <div class="item-image position-relative d-flex align-items-center justify-content-center" style="background: #fdfdfd; border-radius: 8px; overflow: hidden; width: 80px; height: 80px;">
+                                                    @endphp
+                                                    <div class="item-image position-relative d-flex align-items-center justify-content-center" style="background: #fdfdfd; border-radius: 8px; overflow: hidden; width: 80px; height: 80px;">
+                                                        @php
+                                                        $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+                                                        @endphp
+
+                                                        @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
+                                                        <div class="cart-dual-image d-flex align-items-center justify-content-center w-100 h-100 p-1">
+                                                            <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
+                                                            <span style="font-size: 12px; font-weight: bold; color: #72a420; margin: 0 2px;">+</span>
+                                                            <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
+                                                        </div>
+                                                        @else
+                                                        @php
+                                                        $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
+                                                        @endphp
+                                                        <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}"
+                                                            alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                                        @endif
+
+                                                        @if($isCombo)
+                                                        <span class="badge badge-danger position-absolute" style="top:2px; left:2px; font-size: 8px; padding: 2px 4px;">COMBO</span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="item-details">
+                                                        <h3 class="item-name mb-1">{{ $p->name }}</h3>
+                                                        @if($item->options)
+                                                        @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
+                                                        @if(is_array($options) && isset($options['size']))
+                                                        <div class="text-muted small mb-2">Size: {{ $options['size'] }}</div>
+                                                        @elseif(is_string($options) && !empty($options))
+                                                        <div class="text-muted small mb-2">Size: {{ $options }}</div>
+                                                        @endif
+                                                        @endif
+                                                        @php
+                                                        $priceToUse = $item->calculated_price;
+                                                        @endphp
+                                                        <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
+                                                        <div class="item-meta small text-muted mb-1">
+                                                            <span>Weight: {{ number_format($item->calculated_weight, 2) }} grams</span>
+                                                            @php
+                                                            $regularPrice = $isCombo ? $p->total_price : $p->price;
+                                                            $savings = max(0, $regularPrice - $priceToUse);
+                                                            @endphp
+                                                        </div>
+                                                        <div class="item-total" id="itemTotal_{{ $item->id }}">
+                                                            ₹{{ number_format($priceToUse * $item->quantity, 2) }}
+                                                        </div>
+                                                        <div class="quantity-controls">
+                                                            <span class="qty-label">Quantity:</span>
+                                                            <div class="qty-pill-control">
+                                                                <button type="button" class="qty-btn-inline decrement-btn {{ $item->quantity <= 1 ? 'd-none' : '' }}"
+                                                                    id="minus_{{ $item->id }}" data-item-id="{{ $item->id }}">
+                                                                    <i class="fas fa-minus"></i>
+                                                                </button>
+                                                                <button type="button" class="qty-btn-inline delete-btn {{ $item->quantity > 1 ? 'd-none' : '' }}"
+                                                                    id="trash_{{ $item->id }}" onclick="removeCartItem('{{ $item->id }}')">
+                                                                    <i class="fas fa-trash-alt"></i>
+                                                                </button>
+
+                                                                <input type="number" id="quantity_{{ $item->id }}"
+                                                                    value="{{ $item->quantity }}" min="1"
+                                                                    class="qty-number-input" readonly>
+
+                                                                <button type="button" class="qty-btn-inline increment-btn"
+                                                                    data-item-id="{{ $item->id }}"
+                                                                    data-stock="{{ $stock }}">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item-actions">
+                                                            <button type="button" class="action-btn top-right-remove"
+                                                                data-item-id="{{ $item->id }}" title="Remove from Cart">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @endif
+                                            @endforeach
+                                        @else
                                             @php
-                                            $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
-                                            @endphp
+                                             $comboSubtotal = $groupItems->sum(function($item) {
+                                                 return $item->calculated_price * $item->quantity;
+                                             });
+                                             $comboOriginalSubtotal = $groupItems->sum(function($item) {
+                                                 return $item->original_price * $item->quantity;
+                                             });
+                                             $slabs = \App\Models\ComboPackDiscountSlab::where('status', true)->orderBy('min_amount', 'asc')->get();
+                                             $pct = 0;
+                                             foreach($slabs as $slab) {
+                                                 if ($comboSubtotal >= $slab->min_amount) {
+                                                     $pct = (float)$slab->discount_percentage;
+                                                 }
+                                             }
+                                             $comboDiscount = $comboSubtotal * ($pct / 100);
+                                             @endphp
+                                            <div class="custom-combo-block mb-4" id="cartItem_{{ $groupItems->first()->id }}" style="border: 1px solid #d2e1cd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                                                <div class="custom-combo-group-header d-flex justify-content-between align-items-center p-3" style="background: linear-gradient(135deg, #f7f9f6 0%, #eef3eb 100%); border-bottom: 1px solid #d2e1cd;">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="badge badge-success me-2" style="background-color: #2e7d32; font-size: 11px; font-weight: 600; padding: 4px 8px;">CUSTOM COMBO PACK</span>
+                                                        @if($pct > 0)
+                                                        <span class="badge bg-danger text-white font-weight-bold" style="font-size: 11px; padding: 4px 8px;">{{ $pct }}% OFF</span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <a href="{{ route('combo-builder.index', ['edit_combo' => $comboId]) }}" class="btn btn-sm btn-outline-success" title="Edit this combo pack" style="font-size: 12px; border-radius: 4px; padding: 4px 8px; margin-right: 8px; border-color: #72a420; color: #72a420; text-decoration: none;">
+                                                            <i class="fas fa-edit me-1"></i> Edit Bundle
+                                                        </a>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCartItem('{{ $groupItems->first()->id }}')" title="Remove entire combo pack" style="font-size: 12px; border-radius: 4px; padding: 4px 8px;">
+                                                            <i class="fas fa-trash-alt me-1"></i> Remove Bundle
+                                                        </button>
+                                                    </div>
+                                                </div>
 
-                                            @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
-                                            <div class="cart-dual-image d-flex align-items-center justify-content-center w-100 h-100 p-1">
-                                                <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
-                                                <span style="font-size: 12px; font-weight: bold; color: #72a420; margin: 0 2px;">+</span>
-                                                <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}" style="width: 40%; height: auto; object-fit: contain;">
-                                            </div>
-                                            @else
-                                            @php
-                                            $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
-                                            @endphp
-                                            <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}"
-                                                alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                                            @endif
+                                                <div class="custom-combo-group-body p-3" style="background-color: #ffffff;">
+                                                    @foreach($groupItems as $item)
+                                                        @php
+                                                        $p = $item->product;
+                                                        @endphp
+                                                        @if($p)
+                                                        <div class="cart-item py-3" style="border-bottom: 1px solid #f2f2f2; margin-bottom: 0; padding-bottom: 1rem; {{ $loop->last ? 'border-bottom: none; padding-bottom: 0;' : '' }}">
+                                                            <div class="item-image position-relative d-flex align-items-center justify-content-center" style="background: #fdfdfd; border-radius: 8px; overflow: hidden; width: 70px; height: 70px;">
+                                                                @php
+                                                                $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+                                                                $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
+                                                                @endphp
+                                                                <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}" alt="{{ $p->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                                            </div>
+                                                            <div class="item-details ms-3 flex-grow-1">
+                                                                <h3 class="item-name mb-1" style="font-size: 15px; font-weight: 600; color: #333;">{{ $p->name }}</h3>
+                                                                @if($item->options)
+                                                                @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
+                                                                @if(is_array($options) && isset($options['size']))
+                                                                <div class="text-muted small mb-1" style="font-size: 12px;">Size: {{ $options['size'] }}</div>
+                                                                @elseif(is_string($options) && !empty($options))
+                                                                <div class="text-muted small mb-1" style="font-size: 12px;">Size: {{ $options }}</div>
+                                                                @endif
+                                                                @endif
+                                                                <div class="item-price" style="font-size: 14px; font-weight: 500; color: #555;">₹{{ number_format($item->calculated_price, 2) }}</div>
+                                                                <div class="item-meta small text-muted mb-1">
+                                                                    <span>Weight: {{ number_format($item->calculated_weight, 2) }} grams</span>
+                                                                </div>
+                                                                <div class="quantity-controls mt-1">
+                                                                    <span class="badge bg-light text-dark border" style="font-size: 11px; padding: 4px 8px; font-weight: 500;">Qty: 1 (custom combo pack)</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @endif
+                                                    @endforeach
 
-                                            @if($isCombo)
-                                            <span class="badge badge-danger position-absolute" style="top:2px; left:2px; font-size: 8px; padding: 2px 4px;">COMBO</span>
-                                            @endif
-                                        </div>
-                                        <div class="item-details">
-                                            <h3 class="item-name mb-1">{{ $p->name }}</h3>
-                                            @if($item->options)
-                                            @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
-                                            @if(is_array($options) && isset($options['size']))
-                                            <div class="text-muted small mb-2">Size: {{ $options['size'] }}</div>
-                                            @elseif(is_string($options) && !empty($options))
-                                            <div class="text-muted small mb-2">Size: {{ $options }}</div>
-                                            @endif
-                                            @endif
-                                            @php
-                                            $priceToUse = $item->calculated_price;
-                                            @endphp
-                                            <div class="item-price">₹{{ number_format($priceToUse ?? 0, 2) }}</div>
-                                            <div class="item-meta small text-muted mb-1">
-                                                <span>Weight: {{ number_format($item->calculated_weight, 2) }} grams</span>
-                                                @php
-                                                $regularPrice = $isCombo ? $p->total_price : $p->price;
-                                                $savings = max(0, $regularPrice - $priceToUse);
-                                                @endphp
-                                                <!-- @if($savings > 0)
-                                                                <span class="ms-2 text-success">Saved: ₹{{ number_format($savings, 2) }}</span>
-                                                            @endif -->
-                                            </div>
-                                            <div class="item-total" id="itemTotal_{{ $item->id }}">
-                                                ₹{{ number_format($priceToUse * $item->quantity, 2) }}
-                                            </div>
-                                            <div class="quantity-controls">
-                                                <span class="qty-label">Quantity:</span>
-                                                <div class="qty-pill-control">
-                                                    <button type="button" class="qty-btn-inline decrement-btn {{ $item->quantity <= 1 ? 'd-none' : '' }}"
-                                                        id="minus_{{ $item->id }}" data-item-id="{{ $item->id }}">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                    <button type="button" class="qty-btn-inline delete-btn {{ $item->quantity > 1 ? 'd-none' : '' }}"
-                                                        id="trash_{{ $item->id }}" onclick="removeCartItem('{{ $item->id }}')">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </button>
-
-                                                    <input type="number" id="quantity_{{ $item->id }}"
-                                                        value="{{ $item->quantity }}" min="1"
-                                                        class="qty-number-input" readonly>
-
-                                                    <button type="button" class="qty-btn-inline increment-btn"
-                                                        data-item-id="{{ $item->id }}"
-                                                        data-stock="{{ $stock }}">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
+                                                    @if($pct > 0 || $comboOriginalSubtotal > $comboSubtotal)
+                                                     <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center" style="background-color: #fcfdfc; margin: 0 -15px -15px -15px; padding: 15px;">
+                                                         <div class="small text-success font-weight-bold">
+                                                             <i class="fas fa-tags me-1"></i> 
+                                                             @if($pct > 0)
+                                                             Combo Discount Applied ({{ $pct }}%)
+                                                             @else
+                                                             Bundle Discount Applied
+                                                             @endif
+                                                         </div>
+                                                         <div class="text-right">
+                                                             @if($comboOriginalSubtotal > ($comboSubtotal - $comboDiscount))
+                                                             <span class="text-muted small" style="text-decoration: line-through; margin-right: 8px;">₹{{ number_format($comboOriginalSubtotal, 2) }}</span>
+                                                             @endif
+                                                             <span class="font-weight-bold text-success" style="font-size: 16px;">₹{{ number_format($comboSubtotal - $comboDiscount, 2) }}</span>
+                                                         </div>
+                                                     </div>
+                                                     @endif
                                                 </div>
                                             </div>
-                                            <div class="item-actions">
-                                                <button type="button" class="action-btn top-right-remove"
-                                                    data-item-id="{{ $item->id }}" title="Remove from Cart">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endif
+                                        @endif
                                     @endforeach
                                 </div>
                             </div>
@@ -395,21 +492,34 @@
                     })
                     .then(data => {
                         if (data.success) {
-                            const cartItem = document.getElementById(`cartItem_${itemId}`);
-                            if (cartItem) {
-                                cartItem.style.transition = 'opacity 0.3s';
-                                cartItem.style.opacity = '0';
-                                setTimeout(() => {
-                                    cartItem.remove();
-                                    // ... (rest of the update logic remains same)
-                                    updateTotals(data);
-                                    // Check if cart is empty
-                                    const cartItemsWrapper = document.getElementById('cartItemsWrapper');
-                                    if ((cartItemsWrapper && cartItemsWrapper.children.length === 0) || !document.querySelector('.cart-item')) {
-                                        showEmptyCart();
-                                    }
-                                    showMessage(data.message || 'Item removed!', 'success');
-                                }, 300);
+                            const idsToDelete = data.deleted_ids || [itemId];
+                            let transitionCount = 0;
+                            idsToDelete.forEach(id => {
+                                const cartItem = document.getElementById(`cartItem_${id}`);
+                                if (cartItem) {
+                                    transitionCount++;
+                                    cartItem.style.transition = 'opacity 0.3s';
+                                    cartItem.style.opacity = '0';
+                                    setTimeout(() => {
+                                        cartItem.remove();
+                                        
+                                        transitionCount--;
+                                        if (transitionCount === 0) {
+                                            updateTotals(data);
+                                            // Check if cart is empty
+                                            const cartItemsWrapper = document.getElementById('cartItemsWrapper');
+                                            if ((cartItemsWrapper && cartItemsWrapper.children.length === 0) || (!document.querySelector('.cart-item') && !document.querySelector('.custom-combo-block'))) {
+                                                showEmptyCart();
+                                            }
+                                            showMessage(data.message || 'Item removed!', 'success');
+                                        }
+                                    }, 300);
+                                }
+                            });
+                            if (transitionCount === 0) {
+                                updateTotals(data);
+                                showEmptyCart();
+                                showMessage(data.message || 'Item removed!', 'success');
                             }
                         } else {
                             showMessage(data.message || 'Failed to remove item', 'error');

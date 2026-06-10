@@ -66,7 +66,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
             'subcategory_id' => 'nullable|exists:subcategories,id',
@@ -85,7 +85,6 @@ class ProductController extends Controller
             'meta_title' => 'nullable|string',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
-            'sizes' => 'nullable|array',
             'shape' => 'nullable|string|in:Circular,Rectangular,Square',
             'material' => 'nullable|string|in:HDPE,Fabric,Non-woven',
             'color' => 'nullable|string|max:50',
@@ -100,28 +99,59 @@ class ProductController extends Controller
             'weight' => 'nullable|numeric|min:0',
             'product_code' => 'nullable|string|max:100',
             'batch_code' => 'nullable|string|max:100',
+            'combo_pack_eligible' => 'nullable|in:Yes,No',
+        ];
+
+        if ($request->boolean('has_variants')) {
+            $rules['sizes'] = 'required|array|min:1';
+            $rules['sizes.*.price'] = 'required|numeric|min:0';
+            $rules['sizes.*.stock'] = 'required|integer|min:0';
+            $rules['sizes.*.weight'] = 'required|numeric|min:0';
+        }
+
+        $validated = $request->validate($rules, [
+            'sizes.required' => 'At least one product attribute/variant must be added when variants are enabled.',
+            'sizes.*.price.required' => 'Price override is required for all added variants.',
+            'sizes.*.stock.required' => 'Stock quantity is required for all added variants.',
+            'sizes.*.weight.required' => 'Weight is required for all added variants.',
         ]);
+
+        if ($request->boolean('has_variants') && $request->input('combo_pack_eligible') === 'Yes') {
+            $sizes = $request->input('sizes', []);
+            $hasEligibleVariant = false;
+            foreach ($sizes as $sizeData) {
+                if (!empty($sizeData['checked']) && ($sizeData['combo_eligible'] ?? 'No') === 'Yes') {
+                    $hasEligibleVariant = true;
+                    break;
+                }
+            }
+            if (!$hasEligibleVariant) {
+                return back()->withErrors(['sizes' => 'At least one attribute variant must be marked as Combo Eligible when the product itself is Combo Pack Eligible.'])->withInput();
+            }
+        }
 
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active', true); // Default true if not in form
         $validated['has_handles'] = $request->boolean('has_handles');
         $validated['uv_treated'] = $request->boolean('uv_treated');
         
+        $validated['has_variants'] = $request->boolean('has_variants');
         $validatedSizes = [];
-        if ($request->has('sizes') && is_array($request->input('sizes'))) {
+        if ($validated['has_variants'] && $request->has('sizes') && is_array($request->input('sizes'))) {
             foreach ($request->input('sizes') as $sizeKey => $sizeData) {
                 if (!empty($sizeData['checked'])) {
                     $sizeEntry = [
                         'price' => $sizeData['price'] ?? null,
                         'stock' => $sizeData['stock'] ?? null,
                         'weight' => $sizeData['weight'] ?? null,
+                        'combo_eligible' => $sizeData['combo_eligible'] ?? 'No',
                         'image' => null
                     ];
 
                     // Handle size-specific image upload
                     if ($request->hasFile("sizes.$sizeKey.image")) {
-                        $sizeEntry['image'] = $request->file("sizes.$sizeKey.image")->store('products/attributes', 'public');
-                        $this->imageService->applyWatermark($sizeEntry['image']);
+                        $tempPath = $request->file("sizes.$sizeKey.image")->store('products/attributes', 'public');
+                        $sizeEntry['image'] = $this->imageService->applyWatermark($tempPath);
                     }
 
                     $validatedSizes[$sizeKey] = $sizeEntry;
@@ -133,16 +163,15 @@ class ProductController extends Controller
         $validated['slug'] = Str::slug($validated['name']);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('products', 'public');
-            $this->imageService->applyWatermark($validated['image']);
+            $tempPath = $request->file('image')->store('products', 'public');
+            $validated['image'] = $this->imageService->applyWatermark($tempPath);
         }
 
         if ($request->hasFile('gallery_images')) {
             $galleryPaths = [];
             foreach ($request->file('gallery_images') as $image) {
-                $path = $image->store('products/gallery', 'public');
-                $this->imageService->applyWatermark($path);
-                $galleryPaths[] = $path;
+                $tempPath = $image->store('products/gallery', 'public');
+                $galleryPaths[] = $this->imageService->applyWatermark($tempPath);
             }
             $validated['gallery_images'] = $galleryPaths;
         }
@@ -190,7 +219,7 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        $validated = $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
             'subcategory_id' => 'nullable|exists:subcategories,id',
@@ -209,7 +238,6 @@ class ProductController extends Controller
             'meta_title' => 'nullable|string',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
-            'sizes' => 'nullable|array',
             'shape' => 'nullable|string|in:Circular,Rectangular,Square',  // Enforce options
             'material' => 'nullable|string|in:HDPE,Fabric,Non-woven',
             'color' => 'nullable|string|max:50',
@@ -224,13 +252,43 @@ class ProductController extends Controller
             'weight' => 'nullable|numeric|min:0',
             'product_code' => 'nullable|string|max:100',
             'batch_code' => 'nullable|string|max:100',
+            'combo_pack_eligible' => 'nullable|in:Yes,No',
+        ];
+
+        if ($request->boolean('has_variants')) {
+            $rules['sizes'] = 'required|array|min:1';
+            $rules['sizes.*.price'] = 'required|numeric|min:0';
+            $rules['sizes.*.stock'] = 'required|integer|min:0';
+            $rules['sizes.*.weight'] = 'required|numeric|min:0';
+        }
+
+        $validated = $request->validate($rules, [
+            'sizes.required' => 'At least one product attribute/variant must be added when variants are enabled.',
+            'sizes.*.price.required' => 'Price override is required for all added variants.',
+            'sizes.*.stock.required' => 'Stock quantity is required for all added variants.',
+            'sizes.*.weight.required' => 'Weight is required for all added variants.',
         ]);
+
+        if ($request->boolean('has_variants') && $request->input('combo_pack_eligible') === 'Yes') {
+            $sizes = $request->input('sizes', []);
+            $hasEligibleVariant = false;
+            foreach ($sizes as $sizeData) {
+                if (!empty($sizeData['checked']) && ($sizeData['combo_eligible'] ?? 'No') === 'Yes') {
+                    $hasEligibleVariant = true;
+                    break;
+                }
+            }
+            if (!$hasEligibleVariant) {
+                return back()->withErrors(['sizes' => 'At least one attribute variant must be marked as Combo Eligible when the product itself is Combo Pack Eligible.'])->withInput();
+            }
+        }
 
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_active'] = $request->boolean('is_active', $product->is_active);
         $validated['has_handles'] = $request->boolean('has_handles');
         $validated['uv_treated'] = $request->boolean('uv_treated');
         
+        $validated['has_variants'] = $request->boolean('has_variants');
         $validatedSizes = [];
         $currentSizes = $product->size;
         if (is_string($currentSizes)) {
@@ -238,13 +296,14 @@ class ProductController extends Controller
         }
         $currentSizes = is_array($currentSizes) ? $currentSizes : [];
         
-        if ($request->has('sizes') && is_array($request->input('sizes'))) {
+        if ($validated['has_variants'] && $request->has('sizes') && is_array($request->input('sizes'))) {
             foreach ($request->input('sizes') as $sizeKey => $sizeData) {
                 if (!empty($sizeData['checked'])) {
                     $sizeEntry = [
                         'price' => $sizeData['price'] ?? null,
                         'stock' => $sizeData['stock'] ?? null,
                         'weight' => $sizeData['weight'] ?? null,
+                        'combo_eligible' => $sizeData['combo_eligible'] ?? 'No',
                         'image' => $sizeData['existing_image'] ?? null
                     ];
 
@@ -254,8 +313,8 @@ class ProductController extends Controller
                         if ($sizeEntry['image']) {
                             Storage::disk('public')->delete($sizeEntry['image']);
                         }
-                        $sizeEntry['image'] = $request->file("sizes.$sizeKey.image")->store('products/attributes', 'public');
-                        $this->imageService->applyWatermark($sizeEntry['image']);
+                        $tempPath = $request->file("sizes.$sizeKey.image")->store('products/attributes', 'public');
+                        $sizeEntry['image'] = $this->imageService->applyWatermark($tempPath);
                     }
 
                     $validatedSizes[$sizeKey] = $sizeEntry;
@@ -263,14 +322,14 @@ class ProductController extends Controller
             }
         }
 
-        // Cleanup: Delete images for sizes that were removed
+        // Cleanup: Delete images for sizes that were removed or if variants were completely disabled
         foreach($currentSizes as $name => $data) {
-            if (!isset($validatedSizes[$name]) && isset($data['image']) && $data['image']) {
+            if ((!$validated['has_variants'] || !isset($validatedSizes[$name])) && isset($data['image']) && $data['image']) {
                 Storage::disk('public')->delete($data['image']);
             }
         }
 
-        $validated['size'] = !empty($validatedSizes) ? $validatedSizes : null;
+        $validated['size'] = $validated['has_variants'] && !empty($validatedSizes) ? $validatedSizes : null;
 
         $validated['slug'] = Str::slug($validated['name']);
 
@@ -278,8 +337,8 @@ class ProductController extends Controller
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
-            $validated['image'] = $request->file('image')->store('products', 'public');
-            $this->imageService->applyWatermark($validated['image']);
+            $tempPath = $request->file('image')->store('products', 'public');
+            $validated['image'] = $this->imageService->applyWatermark($tempPath);
         }
 
         // Handle Gallery Images (Append new, Delete selected)
@@ -299,9 +358,8 @@ class ProductController extends Controller
         // 2. Add new images
         if ($request->hasFile('gallery_images')) {
             foreach ($request->file('gallery_images') as $image) {
-                $path = $image->store('products/gallery', 'public');
-                $this->imageService->applyWatermark($path);
-                $currentGallery[] = $path;
+                $tempPath = $image->store('products/gallery', 'public');
+                $currentGallery[] = $this->imageService->applyWatermark($tempPath);
             }
         }
         $validated['gallery_images'] = $currentGallery;
@@ -368,6 +426,13 @@ class ProductController extends Controller
         if ($product->gallery_images) {
             foreach ($product->gallery_images as $image) {
                 Storage::disk('public')->delete($image);
+            }
+        }
+        if ($product->size && is_array($product->size)) {
+            foreach ($product->size as $sizeData) {
+                if (isset($sizeData['image']) && $sizeData['image']) {
+                    Storage::disk('public')->delete($sizeData['image']);
+                }
             }
         }
 

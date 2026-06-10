@@ -127,10 +127,20 @@ return [
     |
     */
 
-    'cookie' => env(
-        'SESSION_COOKIE',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_session'
-    ),
+    'cookie' => (function () {
+        $cookieName = env('SESSION_COOKIE', Str::slug(env('APP_NAME', 'laravel'), '_').'_session');
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '';
+            $normalizedPath = '/' . trim($path, '/') . '/';
+            if (str_contains($normalizedPath, '/admin/') || $path === '/admin') {
+                return $cookieName . '_admin';
+            }
+            if (str_contains($normalizedPath, '/seller/') || $path === '/seller') {
+                return $cookieName . '_seller';
+            }
+        }
+        return $cookieName;
+    })(),
 
     /*
     |--------------------------------------------------------------------------

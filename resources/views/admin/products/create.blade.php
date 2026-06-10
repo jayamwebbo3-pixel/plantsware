@@ -105,125 +105,151 @@
                         </div>
 
                         <div class="row">
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="weight" class="form-label">Weight (grams)</label>
                                     <input type="number" step="any" class="form-control" id="weight" name="weight" value="{{ old('weight') }}" min="0" placeholder="e.g. 500">
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="sort_order" class="form-label">Sort Order</label>
                                     <input type="number" class="form-control" id="sort_order" name="sort_order" value="{{ $next_sort_order }}">
-                           
                                     <small class="text-muted d-block mt-1">Last Order: {{ $next_sort_order - 1 }}</small>
                                 </div>
                             </div>
                         </div>
                         
 
-                        <!-- Professional Product Attributes Section -->
-                        <div class="card border-0 shadow-sm rounded-4 mb-4 mt-5 overflow-hidden">
-                            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                        @php
+                            $hasVariants = old('has_variants') || count(old('sizes', [])) > 0;
+                        @endphp
+                        
+                        <!-- Toggle Switch for Product has size / color variants? -->
+                        <div class="card border-0 shadow-sm rounded-4 mb-4 mt-5 p-3">
+                            <div class="d-flex align-items-center justify-content-between">
                                 <div>
-                                    <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-tags text-primary me-2"></i>Product Attributes</h5>
-                                    <p class="text-muted small mb-0">Define sizes, types, and custom price overrides</p>
+                                    <h6 class="mb-1 fw-bold text-dark">Product has size / color variants?</h6>
+                                    <small class="text-muted d-block" id="variants-help-text">OFF — Single product options (no variants)</small>
                                 </div>
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-primary btn-sm shadow-sm" onclick="addNewAttributeRow()">
-                                        <i class="fas fa-plus me-1"></i> Add Manual
-                                    </button>
-                                    <div class="dropdown">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle shadow-sm" data-bs-toggle="dropdown">
-                                            <i class="fas fa-magic me-1"></i> Use Presets
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2">
-                                            <li><h6 class="dropdown-header">Select a Template</h6></li>
-                                            <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="addAttributePreset('circular')"><i class="fas fa-circle-notch me-2 text-muted"></i>Grow Bag - Circular</a></li>
-                                            <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="addAttributePreset('rectangular')"><i class="fas fa-vector-square me-2 text-muted"></i>Grow Bag - Rectangular</a></li>
-                                            <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="addAttributePreset('shadenets')"><i class="fas fa-border-all me-2 text-muted"></i>Shade Net Sizes</a></li>
-                                        </ul>
-                                    </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="has_variants" name="has_variants" value="1" {{ $hasVariants ? 'checked' : '' }} onchange="toggleVariantsSection()">
                                 </div>
                             </div>
-                            <div class="card-body bg-light-subtle pt-0">
-                                <div id="attributes-container" class="mt-3">
-                                    <div class="table-responsive rounded-3 bg-white shadow-sm border">
-                                        <table class="table table-hover align-middle mb-0" id="attributes-table">
-                                            <thead class="bg-light">
-                                                <tr>
-                                                    <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="width: 25%;">Attribute Option</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 20%;">Price Override (₹)</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 15%;">Stock</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 15%;">Weight (grams)</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="width: 20%;">Image</th>
-                                                    <th class="text-center py-3 text-uppercase small fw-bold text-muted" style="width: 50px;">Remove</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="attributes-body">
-                                                @php
-                                                    $oldSizes = old('sizes', []);
-                                                    $hasOldAttributes = false;
-                                                @endphp
+                        </div>
 
-                                                @foreach($oldSizes as $name => $data)
-                                                    @if(!empty($data['checked']))
-                                                        @php $hasOldAttributes = true; @endphp
-                                                        <tr class="attribute-row animate__animated animate__fadeIn">
-                                                            <td class="ps-4">
-                                                                <div class="d-flex align-items-center">
-                                                                    <input type="hidden" name="sizes[{{ $name }}][checked]" value="1">
-                                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-3 px-2 py-1"><i class="fas fa-tag"></i></span>
-                                                                    <input type="text" class="form-control form-control-sm border-0 bg-transparent fw-semibold attr-name-display" value="{{ $name }}" readonly title="Click to edit name" onclick="editAttributeName(this)" style="cursor: pointer;">
+                        <!-- Professional Product Attributes Section -->
+                        <div id="variants-section" style="display: {{ $hasVariants ? 'block' : 'none' }};">
+                            <div class="card border-0 shadow-sm rounded-4 mb-4 mt-2 overflow-hidden">
+                                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-tags text-primary me-2"></i>Product Attributes</h5>
+                                        <p class="text-muted small mb-0">Define sizes, types, and custom price overrides</p>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-primary btn-sm shadow-sm" onclick="addNewAttributeRow()">
+                                            <i class="fas fa-plus me-1"></i> Add Manual
+                                        </button>
+                                        <div class="dropdown">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle shadow-sm" data-bs-toggle="dropdown">
+                                                <i class="fas fa-magic me-1"></i> Use Presets
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2">
+                                                <li><h6 class="dropdown-header">Select a Template</h6></li>
+                                                <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="addAttributePreset('circular')"><i class="fas fa-circle-notch me-2 text-muted"></i>Grow Bag - Circular</a></li>
+                                                <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="addAttributePreset('rectangular')"><i class="fas fa-vector-square me-2 text-muted"></i>Grow Bag - Rectangular</a></li>
+                                                <li><a class="dropdown-item py-2" href="javascript:void(0)" onclick="addAttributePreset('shadenets')"><i class="fas fa-border-all me-2 text-muted"></i>Shade Net Sizes</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body bg-light-subtle pt-0">
+                                    <div id="attributes-container" class="mt-3">
+                                        <div class="table-responsive rounded-3 bg-white shadow-sm border">
+                                            <table class="table table-hover align-middle mb-0" id="attributes-table">
+                                                <thead class="bg-light">
+                                                    <tr>
+                                                        <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="min-width: 180px;">Attribute Option</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 130px;">Price Override (₹)</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 90px;">Stock</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 110px;">Weight (grams)</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 120px;">Combo Eligible</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 220px;">Image</th>
+                                                        <th class="text-center py-3 text-uppercase small fw-bold text-muted" style="width: 70px; min-width: 70px;">Remove</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="attributes-body">
+                                                    @php
+                                                        $oldSizes = old('sizes', []);
+                                                        $hasOldAttributes = false;
+                                                    @endphp
+
+                                                    @foreach($oldSizes as $name => $data)
+                                                        @if(!empty($data['checked']))
+                                                            @php $hasOldAttributes = true; @endphp
+                                                            <tr class="attribute-row animate__animated animate__fadeIn">
+                                                                <td class="ps-4">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <input type="hidden" name="sizes[{{ $name }}][checked]" value="1">
+                                                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-3 px-2 py-1"><i class="fas fa-tag"></i></span>
+                                                                        <input type="text" class="form-control form-control-sm border-0 bg-transparent fw-semibold attr-name-display" value="{{ $name }}" readonly title="Click to edit name" onclick="editAttributeName(this)" style="cursor: pointer;">
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="input-group input-group-sm w-100">
+                                                                        <span class="input-group-text bg-light border-end-0">₹</span>
+                                                                        <input type="number" step="0.01" name="sizes[{{ $name }}][price]" class="form-control border-start-0" value="{{ $data['price'] ?? '' }}" placeholder="Price Override" required>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="input-group input-group-sm w-100">
+                                                                        <input type="number" name="sizes[{{ $name }}][stock]" class="form-control" value="{{ $data['stock'] ?? '' }}" placeholder="Qty" required>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="input-group input-group-sm w-100">
+                                                                        <input type="number" step="any" name="sizes[{{ $name }}][weight]" class="form-control" value="{{ $data['weight'] ?? '' }}" placeholder="grams" required>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <select name="sizes[{{ $name }}][combo_eligible]" class="form-select form-select-sm" required>
+                                                                        <option value="No" {{ ($data['combo_eligible'] ?? 'No') === 'No' ? 'selected' : '' }}>No</option>
+                                                                        <option value="Yes" {{ ($data['combo_eligible'] ?? 'No') === 'Yes' ? 'selected' : '' }}>Yes</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    <input type="file" name="sizes[{{ $name }}][image]" class="form-control form-control-sm" accept="image/*">
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <button type="button" class="btn btn-link text-danger p-0" onclick="this.closest('tr').remove(); checkEmptyAttributes();">
+                                                                        <i class="fas fa-trash-alt"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+                                                    @endforeach
+
+                                                    @if(!$hasOldAttributes)
+                                                        <tr id="no-attributes-msg">
+                                                            <td colspan="7" class="text-center py-5">
+                                                                <div class="empty-state">
+                                                                    <i class="fas fa-layer-group fa-3x text-light mb-3"></i>
+                                                                    <h6 class="text-muted">No attributes defined</h6>
+                                                                    <p class="text-secondary small">Add custom sizes or use one of our predefined templates</p>
                                                                 </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="input-group input-group-sm w-100">
-                                                                    <span class="input-group-text bg-light border-end-0">₹</span>
-                                                                    <input type="number" step="0.01" name="sizes[{{ $name }}][price]" class="form-control border-start-0" value="{{ $data['price'] ?? '' }}" placeholder="Use Base Price">
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="input-group input-group-sm w-100">
-                                                                    <input type="number" name="sizes[{{ $name }}][stock]" class="form-control" value="{{ $data['stock'] ?? '' }}" placeholder="Qty">
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="input-group input-group-sm w-100">
-                                                                    <input type="number" step="any" name="sizes[{{ $name }}][weight]" class="form-control" value="{{ $data['weight'] ?? '' }}" placeholder="grams">
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <input type="file" name="sizes[{{ $name }}][image]" class="form-control form-control-sm" accept="image/*">
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <button type="button" class="btn btn-link text-danger p-0" onclick="this.closest('tr').remove(); checkEmptyAttributes();">
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                </button>
                                                             </td>
                                                         </tr>
                                                     @endif
-                                                @endforeach
-
-                                                @if(!$hasOldAttributes)
-                                                    <tr id="no-attributes-msg">
-                                                        <td colspan="3" class="text-center py-5">
-                                                            <div class="empty-state">
-                                                                <i class="fas fa-layer-group fa-3x text-light mb-3"></i>
-                                                                <h6 class="text-muted">No attributes defined</h6>
-                                                                <p class="text-secondary small">Add custom sizes or use one of our predefined templates</p>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endif
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Secondary Attributes (Shape / Material) -->
-                        <div class="row g-4 mb-4">
+                        <!-- <div class="row g-4 mb-4">
                             <div class="col-md-6">
                                 <div class="card border-0 shadow-sm rounded-4 h-100">
                                     <div class="card-body p-4">
@@ -254,7 +280,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <style>
                             .bg-light-subtle { background-color: #f8f9fa !important; }
@@ -311,18 +337,24 @@
                                     <td>
                                         <div class="input-group input-group-sm w-100">
                                             <span class="input-group-text bg-light border-end-0">₹</span>
-                                            <input type="number" step="0.01" name="sizes[${displayName}][price]" class="form-control border-start-0" value="${price}" placeholder="Use Base Price">
+                                            <input type="number" step="0.01" name="sizes[${displayName}][price]" class="form-control border-start-0" value="${price}" placeholder="Price Override" required>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="input-group input-group-sm w-100">
-                                            <input type="number" name="sizes[${displayName}][stock]" class="form-control" placeholder="Qty">
+                                            <input type="number" name="sizes[${displayName}][stock]" class="form-control" placeholder="Qty" required>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="input-group input-group-sm w-100">
-                                            <input type="number" step="any" name="sizes[${displayName}][weight]" class="form-control" placeholder="grams">
+                                            <input type="number" step="any" name="sizes[${displayName}][weight]" class="form-control" placeholder="grams" required>
                                         </div>
+                                    </td>
+                                    <td>
+                                        <select name="sizes[${displayName}][combo_eligible]" class="form-select form-select-sm" required>
+                                            <option value="No" selected>No</option>
+                                            <option value="Yes">Yes</option>
+                                        </select>
                                     </td>
                                     <td>
                                         <input type="file" name="sizes[${displayName}][image]" class="form-control form-control-sm" accept="image/*">
@@ -355,6 +387,7 @@
                                         row.querySelector('input[name*="[price]"]').name = `sizes[${newName}][price]`;
                                         row.querySelector('input[name*="[stock]"]').name = `sizes[${newName}][stock]`;
                                         row.querySelector('input[name*="[weight]"]').name = `sizes[${newName}][weight]`;
+                                        row.querySelector('select[name*="[combo_eligible]"]').name = `sizes[${newName}][combo_eligible]`;
                                         row.querySelector('input[name*="[image]"]').name = `sizes[${newName}][image]`;
                                     }
                                 });
@@ -363,7 +396,7 @@
                             function checkEmptyAttributes() {
                                 const body = document.getElementById('attributes-body');
                                 if (body.querySelectorAll('.attribute-row').length === 0) {
-                                    body.innerHTML = `<tr id="no-attributes-msg"><td colspan="3" class="text-center py-3 text-muted">No attributes added yet. Use "Quick Add" or click "+" to add one.</td></tr>`;
+                                    body.innerHTML = `<tr id="no-attributes-msg"><td colspan="7" class="text-center py-5"><div class="empty-state"><i class="fas fa-layer-group fa-3x text-light mb-3"></i><h6 class="text-muted">No attributes defined</h6><p class="text-secondary small">Add custom sizes or use one of our predefined templates</p></div></td></tr>`;
                                 }
                             }
 
@@ -485,6 +518,15 @@
                                 <label class="form-check-label" for="is_featured">Mark as Featured Product</label>
                             </div>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="combo_pack_eligible" class="form-label fw-bold">Combo Pack Eligible</label>
+                            <select name="combo_pack_eligible" id="combo_pack_eligible" class="form-select">
+                                <option value="No" {{ old('combo_pack_eligible') == 'No' ? 'selected' : '' }}>No</option>
+                                <option value="Yes" {{ old('combo_pack_eligible') == 'Yes' ? 'selected' : '' }}>Yes</option>
+                            </select>
+                            <small class="text-muted">If 'Yes', this product can be added to custom customer-created combo packs.</small>
+                        </div>
                     </div>
                 </div>
 
@@ -500,7 +542,29 @@
 
 @push('scripts')
     <script>
+        window.toggleVariantsSection = function() {
+            const hasVariants = document.getElementById('has_variants').checked;
+            const variantsSection = document.getElementById('variants-section');
+            const helpText = document.getElementById('variants-help-text');
+            
+            if (hasVariants) {
+                variantsSection.style.display = 'block';
+                helpText.innerText = 'ON — Add multiple variants with color, size options';
+                variantsSection.querySelectorAll('input, select, textarea').forEach(el => {
+                    el.removeAttribute('disabled');
+                });
+            } else {
+                variantsSection.style.display = 'none';
+                helpText.innerText = 'OFF — Single product options (no variants)';
+                variantsSection.querySelectorAll('input, select, textarea').forEach(el => {
+                    el.setAttribute('disabled', 'disabled');
+                });
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
+            toggleVariantsSection();
+
             // Dynamic subcategory filtering based on selected category
             const allSubcategories = @json($subcategories);
             const categorySelect = document.getElementById('category_id');

@@ -27,58 +27,11 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', $e->getMessage());
         }
 
-        // Calculate Summary for Sidebar
-        $subtotal = $cartItems->sum(function ($item) {
-            return $item->calculated_price * $item->quantity;
-        });
-        $itemCount = $cartItems->sum('quantity');
-        $totalWeight = $cartItems->sum(function ($item) {
-            return $item->calculated_weight * $item->quantity;
-        });
-
-        // Calculate Total Savings/Discount
-        $discount = $cartItems->sum(function ($item) {
-            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
-            $regularPrice = $item->combo_pack_id ? $p->total_price : $p->price;
-            $savingsPerItem = max(0, $regularPrice - $item->calculated_price);
-            return $savingsPerItem * $item->quantity;
-        });
-
-        // Get shipping (use a dummy state like 'Default' or empty string for initial calculation)
-        $shipping = 0; // Default to 0 until address is selected
-        $tax = 0;
-        $cgst = 0;
-        $sgst = 0;
-        $igst = 0;
-        $gstSettings = \App\Models\HeaderFooter::first();
-        if ($gstSettings && $gstSettings->gst_status) {
-            $tax = ($subtotal * $gstSettings->gst_percentage) / 100;
-            // Initially we don't know the state, so we won't split until state is known
-            // But if we have saved logic below, it will recalculate
-        }
-        $total = $subtotal + $shipping + $tax;
-
-        // Pre-fill address if user has one saved
+        // Determine state for initial shipping/tax calculation
+        $state = null;
         $savedAddress = [];
         $userAddresses = collect();
 
-        // Helper to update GST split if state is known
-        $updateGstSplit = function($state) use ($gstSettings, $tax, &$cgst, &$sgst, &$igst) {
-            if ($gstSettings && $gstSettings->gst_status) {
-                $sellerState = trim($gstSettings->business_state ?? 'Tamil Nadu');
-                if (strcasecmp($sellerState, trim($state)) === 0) {
-                    $cgst = $tax / 2;
-                    $sgst = $tax / 2;
-                    $igst = 0;
-                } else {
-                    $igst = $tax;
-                    $cgst = 0;
-                    $sgst = 0;
-                }
-            }
-        };
-
-        // Check if user is logged in and has address
         if (Auth::check()) {
             $user = Auth::user();
             $userAddresses = $user->addresses;
@@ -95,33 +48,33 @@ class CheckoutController extends Controller
                     'pincode' => $defaultAddress->post_code,
                     'phone' => $defaultAddress->phone_number,
                 ];
-
-                // If we have a saved state, recalculate shipping for better accuracy
-                $shipping = $this->calculateShipping($cartItems, $defaultAddress->state);
-                $updateGstSplit($defaultAddress->state);
-                $total = $subtotal + $shipping + $tax;
+                $state = $defaultAddress->state;
             } else {
                 if (!empty($user->address) && is_array($user->address)) {
                     $savedAddress = $user->address;
-                    if (!empty($savedAddress['state'])) {
-                        $shipping = $this->calculateShipping($cartItems, $savedAddress['state']);
-                        $updateGstSplit($savedAddress['state']);
-                        $total = $subtotal + $shipping + $tax;
-                    }
+                    $state = $savedAddress['state'] ?? null;
                 }
             }
         }
 
-        // Also check session for previously entered address
         if (session()->has('shipping_address')) {
             $sessAddr = session('shipping_address');
             $savedAddress = array_merge($savedAddress, $sessAddr);
-            if (!empty($sessAddr['state'])) {
-                $shipping = $this->calculateShipping($cartItems, $sessAddr['state']);
-                $updateGstSplit($sessAddr['state']);
-                $total = $subtotal + $shipping + $tax;
-            }
+            $state = $sessAddr['state'] ?? $state;
         }
+
+        $totals = $this->calculateTotalsForCheckout($cartItems, $state);
+
+        $subtotal = $totals['subtotal'];
+        $discount = $totals['discount'];
+        $totalWeight = $totals['totalWeight'];
+        $shipping = $totals['shipping'];
+        $tax = $totals['tax'];
+        $cgst = $totals['cgst'];
+        $sgst = $totals['sgst'];
+        $igst = $totals['igst'];
+        $total = $totals['total'];
+        $itemCount = $totals['itemCount'];
 
         return view('view.checkout.address', compact('cartItems', 'savedAddress', 'userAddresses', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'itemCount', 'totalWeight', 'discount'));
     }
@@ -206,49 +159,20 @@ class CheckoutController extends Controller
             return redirect()->route('checkout.address')->with('error', 'Please provide shipping address.');
         }
 
-        $subtotal = $cartItems->sum(function ($item) {
-            return $item->calculated_price * $item->quantity;
-        });
+        $totals = $this->calculateTotalsForCheckout($cartItems, $shippingAddress['state']);
 
-        $itemCount = $cartItems->sum('quantity');
+        $subtotal = $totals['subtotal'];
+        $discount = $totals['discount'];
+        $totalWeight = $totals['totalWeight'];
+        $shipping = $totals['shipping'];
+        $tax = $totals['tax'];
+        $cgst = $totals['cgst'];
+        $sgst = $totals['sgst'];
+        $igst = $totals['igst'];
+        $total = $totals['total'];
+        $itemCount = $totals['itemCount'];
 
-        // Calculate Total Savings/Discount
-        $discount = $cartItems->sum(function ($item) {
-            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
-            $regularPrice = $item->combo_pack_id ? $p->total_price : $p->price;
-            $savingsPerItem = max(0, $regularPrice - $item->calculated_price);
-            return $savingsPerItem * $item->quantity;
-        });
-
-        // Calculate Total Weight
-        $totalWeight = $cartItems->sum(function ($item) {
-            return $item->calculated_weight * $item->quantity;
-        });
-
-        $shipping = $this->calculateShipping($cartItems, $shippingAddress['state']);
-
-        // ---- GST CALCULATION ----
-        $tax = 0;
-        $cgst = 0;
-        $sgst = 0;
-        $igst = 0;
         $gstSettings = \App\Models\HeaderFooter::first();
-        
-        if ($gstSettings && $gstSettings->gst_status) {
-            $tax = ($subtotal * $gstSettings->gst_percentage) / 100;
-            
-            $sellerState = trim($gstSettings->business_state ?? 'Tamil Nadu');
-            $customerState = trim($shippingAddress['state'] ?? '');
-            
-            if (strcasecmp($sellerState, $customerState) === 0) {
-                $cgst = $tax / 2;
-                $sgst = $tax / 2;
-            } else {
-                $igst = $tax;
-            }
-        }
-
-        $total = $subtotal + $shipping + $tax;
 
         return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'discount', 'totalWeight', 'itemCount', 'gstSettings'));
     }
@@ -266,46 +190,17 @@ class CheckoutController extends Controller
             return redirect()->route('checkout.address')->with('error', 'Please provide shipping address.');
         }
 
-        $subtotal = $cartItems->sum(function ($item) {
-            return $item->calculated_price * $item->quantity;
-        });
+        $totals = $this->calculateTotalsForCheckout($cartItems, $shippingAddress['state']);
 
-        // Calculate Total Savings/Discount
-        $discount = $cartItems->sum(function ($item) {
-            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
-            $regularPrice = $item->combo_pack_id ? $p->total_price : $p->price;
-            $savingsPerItem = max(0, $regularPrice - $item->calculated_price);
-            return $savingsPerItem * $item->quantity;
-        });
-
-        // Calculate Total Weight
-        $totalWeight = $cartItems->sum(function ($item) {
-            return $item->calculated_weight * $item->quantity;
-        });
-
-        $shipping = $this->calculateShipping($cartItems, $shippingAddress['state']);
-
-        // ---- GST CALCULATION ----
-        $tax = 0;
-        $cgst = 0;
-        $sgst = 0;
-        $igst = 0;
-        $gstSettings = \App\Models\HeaderFooter::first();
-        if ($gstSettings && $gstSettings->gst_status) {
-            $tax = ($subtotal * $gstSettings->gst_percentage) / 100;
-            
-            $sellerState = trim($gstSettings->business_state ?? 'Tamil Nadu');
-            $customerState = trim($shippingAddress['state'] ?? '');
-            
-            if (strcasecmp($sellerState, $customerState) === 0) {
-                $cgst = $tax / 2;
-                $sgst = $tax / 2;
-            } else {
-                $igst = $tax;
-            }
-        }
-
-        $total = $subtotal + $shipping + $tax;
+        $subtotal = $totals['subtotal'];
+        $discount = $totals['discount'];
+        $totalWeight = $totals['totalWeight'];
+        $shipping = $totals['shipping'];
+        $tax = $totals['tax'];
+        $cgst = $totals['cgst'];
+        $sgst = $totals['sgst'];
+        $igst = $totals['igst'];
+        $total = $totals['total'];
 
         // Prepare Item Data for serialization to Transaction record
         $itemsData = [];
@@ -332,6 +227,56 @@ class CheckoutController extends Controller
             ];
         }
 
+        // Prepare Custom Combo Details for order_combo_details
+        $customComboDetails = [];
+        $customComboGroups = $cartItems->filter(function($item) {
+            return !empty($item->custom_combo_id);
+        })->groupBy('custom_combo_id');
+
+        $slabs = \App\Models\ComboPackDiscountSlab::where('status', true)->orderBy('min_amount', 'asc')->get();
+        $gstSettings = \App\Models\HeaderFooter::first();
+        $gstPercentage = $gstSettings && $gstSettings->gst_status ? (float)$gstSettings->gst_percentage : 0;
+
+        foreach ($customComboGroups as $comboId => $items) {
+            $comboSubtotal = $items->sum(function($item) {
+                return $item->calculated_price * $item->quantity;
+            });
+
+            $applicableDiscountPercent = 0;
+            foreach ($slabs as $slab) {
+                if ($comboSubtotal >= $slab->min_amount) {
+                    $applicableDiscountPercent = (float) $slab->discount_percentage;
+                }
+            }
+
+            $comboDiscount = $comboSubtotal * ($applicableDiscountPercent / 100);
+            $comboDiscountedTotal = $comboSubtotal - $comboDiscount;
+            
+            // GST and Shipping proportionate weight share
+            $comboGst = ($comboDiscountedTotal * $gstPercentage) / 100;
+            
+            $comboWeight = $items->sum(function($item) {
+                return $item->calculated_weight * $item->quantity;
+            });
+            $comboShipping = 0;
+            if ($totalWeight > 0) {
+                $comboShipping = ($comboWeight / $totalWeight) * $shipping;
+            }
+
+            $comboFinal = $comboDiscountedTotal + $comboGst + $comboShipping;
+
+            $customComboDetails[] = [
+                'custom_combo_id' => $comboId,
+                'product_total' => $comboSubtotal,
+                'discount_percentage' => $applicableDiscountPercent,
+                'discount_amount' => $comboDiscount,
+                'discounted_total' => $comboDiscountedTotal,
+                'gst_amount' => $comboGst,
+                'shipping_amount' => $comboShipping,
+                'final_amount' => $comboFinal,
+            ];
+        }
+
         // Online Payment Flow - Store all order details in transaction to wait for success
         $transaction = \App\Models\PaymentTransaction::create([
             'user_id' => auth()->id(),
@@ -351,11 +296,107 @@ class CheckoutController extends Controller
                 'total' => $total,
                 'total_weight' => $totalWeight,
                 'total_discount' => $discount,
-                'items' => $itemsData
+                'items' => $itemsData,
+                'custom_combos' => $customComboDetails
             ]
         ]);
 
         return redirect()->route('payment.gateway', ['transaction_ref' => $transaction->transaction_ref]);
+    }
+
+    private function calculateTotalsForCheckout($cartItems, $state = null)
+    {
+        $customComboGroups = $cartItems->filter(function($item) {
+            return !empty($item->custom_combo_id);
+        })->groupBy('custom_combo_id');
+
+        $normalItems = $cartItems->filter(function($item) {
+            return empty($item->custom_combo_id);
+        });
+
+        $subtotal = 0;
+        $discount = 0;
+        $totalWeight = 0;
+
+        // Normal items
+        foreach ($normalItems as $item) {
+            $price = $item->calculated_price;
+            $origPrice = $item->original_price;
+            
+            $subtotal += $origPrice * $item->quantity;
+            $discount += max(0, $origPrice - $price) * $item->quantity;
+            
+            $totalWeight += $item->calculated_weight * $item->quantity;
+        }
+
+        // Custom combo groups
+        $slabs = \App\Models\ComboPackDiscountSlab::where('status', true)->orderBy('min_amount', 'asc')->get();
+
+        foreach ($customComboGroups as $comboId => $items) {
+            $comboSubtotal = $items->sum(function($item) {
+                return $item->calculated_price * $item->quantity;
+            });
+
+            $comboOriginalSubtotal = $items->sum(function($item) {
+                return $item->original_price * $item->quantity;
+            });
+
+            $applicableDiscountPercent = 0;
+            foreach ($slabs as $slab) {
+                if ($comboSubtotal >= $slab->min_amount) {
+                    $applicableDiscountPercent = (float) $slab->discount_percentage;
+                }
+            }
+
+            $comboDiscount = $comboSubtotal * ($applicableDiscountPercent / 100);
+
+            $subtotal += $comboOriginalSubtotal;
+            $discount += $comboDiscount + ($comboOriginalSubtotal - $comboSubtotal);
+
+            $totalWeight += $items->sum(function($item) {
+                return $item->calculated_weight * $item->quantity;
+            });
+        }
+
+        // Shipping
+        $shipping = 0;
+        if ($state) {
+            $shipping = $this->calculateShipping($cartItems, $state);
+        }
+
+        // Tax
+        $tax = 0;
+        $cgst = 0;
+        $sgst = 0;
+        $igst = 0;
+        $gstSettings = \App\Models\HeaderFooter::first();
+        if ($gstSettings && $gstSettings->gst_status) {
+            $tax = (($subtotal - $discount) * $gstSettings->gst_percentage) / 100;
+            if ($state) {
+                $sellerState = trim($gstSettings->business_state ?? 'Tamil Nadu');
+                if (strcasecmp($sellerState, trim($state)) === 0) {
+                    $cgst = $tax / 2;
+                    $sgst = $tax / 2;
+                } else {
+                    $igst = $tax;
+                }
+            }
+        }
+
+        $total = ($subtotal - $discount) + $shipping + $tax;
+
+        return [
+            'subtotal' => $subtotal,
+            'discount' => $discount,
+            'totalWeight' => $totalWeight,
+            'shipping' => $shipping,
+            'tax' => $tax,
+            'cgst' => $cgst,
+            'sgst' => $sgst,
+            'igst' => $igst,
+            'total' => $total,
+            'itemCount' => $cartItems->sum('quantity')
+        ];
     }
 
     private function calculateShipping($cartItems, $state)

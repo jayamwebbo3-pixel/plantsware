@@ -32,4 +32,13 @@ class OrderItem extends Model
     {
         return $this->belongsTo(ComboPack::class);
     }
+
+    public function getCustomComboIdAttribute()
+    {
+        if ($this->options) {
+            $optionsObj = is_string($this->options) ? json_decode($this->options, true) : $this->options;
+            return $optionsObj['custom_combo_id'] ?? null;
+        }
+        return null;
+    }
 }

@@ -339,10 +339,31 @@
                                     @endphp
                                     <div class="product-price" style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">₹{{ number_format($dashPriceToUse, 2) }}</div>
 
+                                    @php
+                                    $hasAttributes = false;
+                                    if (!empty($item->product->size)) {
+                                        if (is_array($item->product->size)) {
+                                            $hasAttributes = count($item->product->size) > 0;
+                                        } else {
+                                            $decoded = json_decode($item->product->size, true);
+                                            if (is_array($decoded)) {
+                                                $hasAttributes = count($decoded) > 0;
+                                            } else {
+                                                $parts = array_filter(array_map('trim', explode(',', $item->product->size)));
+                                                $hasAttributes = count($parts) > 0;
+                                            }
+                                        }
+                                    }
+                                    @endphp
+
+                                    @if($hasAttributes)
+                                    <a href="{{ route('product.show', $item->product->slug) }}" class="add-to-cart-btn text-decoration-none text-center d-block" style="width: 100%; padding: 8px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s;">View Options</a>
+                                    @else
                                     <form action="{{ route('cart.add', $item->product->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="add-to-cart-btn" style="width: 100%; padding: 8px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s;">Add to Cart</button>
                                     </form>
+                                    @endif
                             </div>
                         </div>
                         @endif

@@ -1001,6 +1001,12 @@
                             </li>
 
                             <li><a href="{{ route('combo_packs.frontend_index') }}">Combo Packs</a></li>
+                            @php
+                            $customComboSetting = \App\Models\ComboPackSetting::first();
+                            @endphp
+                            @if($customComboSetting && $customComboSetting->is_enabled)
+                            <li><a href="{{ route('combo-builder.index') }}">Build a Combo</a></li>
+                            @endif
                             <li><a href="{{ url('about') }}">About Plantsware</a></li>
                             <li><a href="{{ route('blog.categories') }}">Blog</a></li>
                         </ul>

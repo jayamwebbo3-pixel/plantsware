@@ -29,20 +29,57 @@ class CartController extends Controller
 
     private function calculateCartTotals($cartItems)
     {
-        $subtotal = $cartItems->sum(function ($item) {
-            return $item->calculated_price * $item->quantity;
+        $customComboGroups = $cartItems->filter(function($item) {
+            return !empty($item->custom_combo_id);
+        })->groupBy('custom_combo_id');
+
+        $normalItems = $cartItems->filter(function($item) {
+            return empty($item->custom_combo_id);
         });
 
-        $discount = $cartItems->sum(function ($item) {
-            $p = $item->combo_pack_id ? $item->comboPack : $item->product;
-            $regularPrice = $item->combo_pack_id ? $p->total_price : $p->price;
-            $savingsPerItem = max(0, $regularPrice - $item->calculated_price);
-            return $savingsPerItem * $item->quantity;
-        });
+        $subtotal = 0;
+        $discount = 0;
+        $totalWeight = 0;
 
-        $totalWeight = $cartItems->sum(function ($item) {
-            return $item->calculated_weight * $item->quantity;
-        });
+        // Process normal items
+        foreach ($normalItems as $item) {
+            $price = $item->calculated_price;
+            $origPrice = $item->original_price;
+            
+            $subtotal += $origPrice * $item->quantity;
+            $discount += max(0, $origPrice - $price) * $item->quantity;
+            
+            $totalWeight += $item->calculated_weight * $item->quantity;
+        }
+
+        // Process custom combo groups
+        $slabs = \App\Models\ComboPackDiscountSlab::where('status', true)->orderBy('min_amount', 'asc')->get();
+
+        foreach ($customComboGroups as $comboId => $items) {
+            $comboSubtotal = $items->sum(function($item) {
+                return $item->calculated_price * $item->quantity;
+            });
+
+            $comboOriginalSubtotal = $items->sum(function($item) {
+                return $item->original_price * $item->quantity;
+            });
+
+            $applicableDiscountPercent = 0;
+            foreach ($slabs as $slab) {
+                if ($comboSubtotal >= $slab->min_amount) {
+                    $applicableDiscountPercent = (float) $slab->discount_percentage;
+                }
+            }
+
+            $comboDiscount = $comboSubtotal * ($applicableDiscountPercent / 100);
+
+            $subtotal += $comboOriginalSubtotal;
+            $discount += $comboDiscount + ($comboOriginalSubtotal - $comboSubtotal);
+
+            $totalWeight += $items->sum(function($item) {
+                return $item->calculated_weight * $item->quantity;
+            });
+        }
 
         $shipping = 0;
         $defaultRate = \App\Models\ShippingRate::where('state_name', 'Default')->first()
@@ -64,10 +101,10 @@ class CartController extends Controller
         $taxPercentage = 0;
         if ($settings && $settings->gst_status) {
             $taxPercentage = (float)$settings->gst_percentage;
-            $tax = ($subtotal * $taxPercentage) / 100;
+            $tax = (($subtotal - $discount) * $taxPercentage) / 100;
         }
 
-        $total = $subtotal + $shipping + $tax;
+        $total = ($subtotal - $discount) + $shipping + $tax;
 
         return [
             'subtotal' => $subtotal,
@@ -79,6 +116,7 @@ class CartController extends Controller
             'total' => $total,
         ];
     }
+
 
     public function add(Request $request, Product $product)
     {
@@ -113,6 +151,43 @@ class CartController extends Controller
         $name = $item->name;
         $stock = $item->stock_quantity;
 
+        $selectedSize = null;
+        if ($type === 'product' && $item->has_variants) {
+            if ($options) {
+                $optionsObj = json_decode($options, true);
+                if (isset($optionsObj['size'])) {
+                    $selectedSize = $optionsObj['size'];
+                }
+            }
+            if (!$selectedSize && $item->size) {
+                $sizesObj = is_string($item->size) ? json_decode($item->size, true) : $item->size;
+                if (is_array($sizesObj) && count($sizesObj) > 0) {
+                    $selectedSize = array_key_first($sizesObj);
+                }
+            }
+            if ($selectedSize && $item->size) {
+                $sizesObj = is_string($item->size) ? json_decode($item->size, true) : $item->size;
+                if (is_array($sizesObj)) {
+                    $foundSize = null;
+                    if (isset($sizesObj[$selectedSize])) {
+                        $foundSize = $sizesObj[$selectedSize];
+                    } else {
+                        foreach ($sizesObj as $key => $val) {
+                            if (strcasecmp($key, $selectedSize) === 0) {
+                                $foundSize = $val;
+                                break;
+                            }
+                        }
+                    }
+                    if ($foundSize && is_array($foundSize) && isset($foundSize['stock'])) {
+                        if ($foundSize['stock'] !== null && $foundSize['stock'] !== '') {
+                            $stock = (int)$foundSize['stock'];
+                        }
+                    }
+                }
+            }
+        }
+
         if ($stock < $quantity) {
             $msg = "Only {$stock} item(s) left in stock!";
             return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : back()->with('error', $msg);
@@ -137,7 +212,7 @@ class CartController extends Controller
         $newTotalQuantity = $currentQuantity + $quantity;
 
         if ($newTotalQuantity > $stock) {
-            $canAdd = $stock - $currentQuantity;
+            $canAdd = max(0, $stock - $currentQuantity);
             $msg = "You can only add {$canAdd} more item(s) of this item.";
             return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : back()->with('error', $msg);
         }
@@ -194,6 +269,45 @@ class CartController extends Controller
 
         $stock = $cartItem->combo_pack_id ? $cartItem->comboPack->stock_quantity : $cartItem->product->stock_quantity;
 
+        if (!$cartItem->combo_pack_id && $cartItem->product) {
+            $selectedSize = null;
+            if ($cartItem->product->has_variants) {
+                if ($cartItem->options) {
+                    $optionsObj = is_string($cartItem->options) ? json_decode($cartItem->options, true) : $cartItem->options;
+                    if (isset($optionsObj['size'])) {
+                        $selectedSize = $optionsObj['size'];
+                    }
+                }
+                if (!$selectedSize && $cartItem->product->size) {
+                    $sizesObj = is_string($cartItem->product->size) ? json_decode($cartItem->product->size, true) : $cartItem->product->size;
+                    if (is_array($sizesObj) && count($sizesObj) > 0) {
+                        $selectedSize = array_key_first($sizesObj);
+                    }
+                }
+                if ($selectedSize && $cartItem->product->size) {
+                    $sizesObj = is_string($cartItem->product->size) ? json_decode($cartItem->product->size, true) : $cartItem->product->size;
+                    if (is_array($sizesObj)) {
+                        $foundSize = null;
+                        if (isset($sizesObj[$selectedSize])) {
+                            $foundSize = $sizesObj[$selectedSize];
+                        } else {
+                            foreach ($sizesObj as $key => $val) {
+                                if (strcasecmp($key, $selectedSize) === 0) {
+                                    $foundSize = $val;
+                                    break;
+                                }
+                            }
+                        }
+                        if ($foundSize && is_array($foundSize) && isset($foundSize['stock'])) {
+                            if ($foundSize['stock'] !== null && $foundSize['stock'] !== '') {
+                                $stock = (int)$foundSize['stock'];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if ($quantity > $stock) {
             if ($request->ajax()) {
                 return response()->json([
@@ -238,7 +352,18 @@ class CartController extends Controller
         $this->authorizeCartItem($cartItem);
 
         $itemId = $cartItem->id;
-        $cartItem->delete();
+        $customComboId = $cartItem->custom_combo_id;
+        $deletedIds = [$itemId];
+
+        if ($customComboId) {
+            $itemsToDelete = Cart::current()->get()->filter(function($item) use ($customComboId) {
+                return $item->custom_combo_id === $customComboId;
+            })->pluck('id')->toArray();
+            Cart::whereIn('id', $itemsToDelete)->delete();
+            $deletedIds = $itemsToDelete;
+        } else {
+            $cartItem->delete();
+        }
 
         $this->updateSessionCounts();
 
@@ -249,13 +374,14 @@ class CartController extends Controller
         if ($request->ajax()) {
             return response()->json(array_merge([
                 'success' => true,
-                'message' => 'Item removed from cart.',
+                'message' => $customComboId ? 'Custom Combo Pack removed from cart.' : 'Item removed from cart.',
                 'cart_count' => $cartCount,
-                'item_id' => $itemId
+                'item_id' => $itemId,
+                'deleted_ids' => $deletedIds
             ], $totals));
         }
 
-        return back()->with('success', 'Item removed from cart.');
+        return back()->with('success', $customComboId ? 'Custom Combo Pack removed from cart.' : 'Item removed from cart.');
     }
 
     /**
@@ -420,5 +546,134 @@ class CartController extends Controller
 
         view()->share('cartCount', $cartCount);
         view()->share('wishlistCount', $wishlistCount);
+    }
+
+    public function addCustomCombo(Request $request)
+    {
+        $productIds = $request->input('product_ids');
+        $productSizes = $request->input('product_sizes', []);
+
+        if (!is_array($productIds) || count($productIds) < 2) {
+            return back()->with('error', 'Please select at least 2 products to build a combo.');
+        }
+
+        $settings = \App\Models\ComboPackSetting::first();
+        $maxProducts = $settings ? $settings->max_products : 5;
+
+        if (count($productIds) > $maxProducts) {
+            return back()->with('error', "Maximum {$maxProducts} products are allowed in a Combo Pack.");
+        }
+
+        // Map product ID to its submitted size
+        $sizesMap = [];
+        if (is_array($productSizes)) {
+            foreach ($productIds as $index => $id) {
+                $sizesMap[$id] = $productSizes[$index] ?? null;
+            }
+        }
+
+        // Fetch products and verify all are active & eligible
+        $products = Product::whereIn('id', $productIds)
+            ->where('combo_pack_eligible', 'Yes')
+            ->where('is_active', true)
+            ->get();
+
+        if ($products->count() !== count($productIds)) {
+            return back()->with('error', 'Some selected products are not eligible for a combo pack.');
+        }
+
+        // Check size/variant eligibility if product has variants
+        foreach ($products as $product) {
+            if ($product->has_variants) {
+                $selectedSize = $sizesMap[$product->id] ?? null;
+                $sizes = $product->size;
+                if (is_string($sizes)) {
+                    $sizes = json_decode($sizes, true);
+                }
+                $sizes = is_array($sizes) ? $sizes : [];
+
+                $matchedSizeKey = null;
+                if ($selectedSize) {
+                    foreach ($sizes as $k => $v) {
+                        if (strcasecmp($k, $selectedSize) === 0) {
+                            $matchedSizeKey = $k;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$matchedSizeKey || ($sizes[$matchedSizeKey]['combo_eligible'] ?? 'No') !== 'Yes') {
+                    return back()->with('error', "Product '{$product->name}' with the selected variant is not eligible for combo packs.");
+                }
+            }
+        }
+
+        // Check stock availability
+        foreach ($products as $product) {
+            if ($product->stock_quantity < 1) {
+                return back()->with('error', "Product '{$product->name}' is out of stock.");
+            }
+        }
+
+        // Delete old items if we are editing an existing combo
+        $editComboId = $request->input('edit_combo_id');
+        if ($editComboId) {
+            $oldCartItems = Cart::current()->get();
+            foreach ($oldCartItems as $item) {
+                if ($item->custom_combo_id === $editComboId) {
+                    $item->delete();
+                }
+            }
+        }
+
+        // Generate a unique identifier for this custom combo pack instance
+        $customComboId = 'cc_' . uniqid();
+
+        // Clear temporary carts
+        app(TempCartService::class)->clearUserTempCarts(Auth::id(), Auth::check() ? null : session()->getId());
+
+        // Add each product to the cart
+        foreach ($products as $product) {
+            $optionsData = [
+                'custom_combo_id' => $customComboId,
+                'combo_products' => $productIds
+            ];
+            
+            $selectedSize = $sizesMap[$product->id] ?? null;
+            
+            $sizes = $product->size;
+            if (is_string($sizes)) {
+                $sizes = json_decode($sizes, true);
+            }
+            
+            $matchedSize = null;
+            if ($selectedSize && is_array($sizes)) {
+                foreach ($sizes as $k => $v) {
+                    if (strcasecmp($k, $selectedSize) === 0) {
+                        $matchedSize = $k;
+                        break;
+                    }
+                }
+            }
+            
+            if ($matchedSize) {
+                $optionsData['size'] = $matchedSize;
+            } elseif (is_array($sizes) && count($sizes) > 0) {
+                $optionsData['size'] = array_key_first($sizes);
+            }
+
+            Cart::create([
+                'user_id' => Auth::id(),
+                'session_id' => Auth::check() ? null : session()->getId(),
+                'product_id' => $product->id,
+                'combo_pack_id' => null,
+                'quantity' => 1,
+                'options' => json_encode($optionsData)
+            ]);
+        }
+
+        $this->updateSessionCounts();
+
+        return redirect()->route('cart.index')->with('success', 'Custom Combo Pack added to cart successfully!');
     }
 }

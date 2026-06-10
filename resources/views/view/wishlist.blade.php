@@ -116,13 +116,36 @@
                                                 </button>
                                             </form>
                                             @else
-                                            <form action="{{ route('cart.add', $p->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="quantity" value="1">
-                                                <button type="submit" class="gi-btn-2 add-to-cart" title="Add To Cart">
-                                                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
-                                                </button>
-                                            </form>
+                                                @php
+                                                $hasAttributes = false;
+                                                if (!empty($p->size)) {
+                                                    if (is_array($p->size)) {
+                                                        $hasAttributes = count($p->size) > 0;
+                                                    } else {
+                                                        $decoded = json_decode($p->size, true);
+                                                        if (is_array($decoded)) {
+                                                            $hasAttributes = count($decoded) > 0;
+                                                        } else {
+                                                            $parts = array_filter(array_map('trim', explode(',', $p->size)));
+                                                            $hasAttributes = count($parts) > 0;
+                                                        }
+                                                    }
+                                                }
+                                                @endphp
+
+                                                @if($hasAttributes)
+                                                <a href="{{ route('product.show', $p->slug) }}" class="gi-btn-2 text-decoration-none" title="Select Options">
+                                                    <i class="fas fa-eye" aria-hidden="true"></i>
+                                                </a>
+                                                @else
+                                                <form action="{{ route('cart.add', $p->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <input type="hidden" name="quantity" value="1">
+                                                    <button type="submit" class="gi-btn-2 add-to-cart" title="Add To Cart">
+                                                        <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                                                    </button>
+                                                </form>
+                                                @endif
                                             @endif
                                             @endif
 

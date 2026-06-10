@@ -43,6 +43,8 @@ class Product extends Model
         'weight',
         'product_code',
         'batch_code',
+        'combo_pack_eligible',
+        'has_variants',
     ];
     protected $casts = [
         'price' => 'decimal:2',
@@ -54,6 +56,7 @@ class Product extends Model
         'is_active' => 'boolean',
         'sort_order' => 'integer',
         'weight' => 'decimal:2',
+        'has_variants' => 'boolean',
     ];
 
     public function scopeActive($query)
@@ -117,6 +120,64 @@ class Product extends Model
     public function reviews()
     {
         return $this->hasMany(ProductReview::class)->where('is_approved', true);
+    }
+
+    public function getHasVariantsAttribute($value)
+    {
+        return (bool)$value;
+    }
+
+    public function getStockQuantityAttribute($value)
+    {
+        if ($this->has_variants && $this->size) {
+            $sizesObj = is_string($this->size) ? json_decode($this->size, true) : $this->size;
+            if (is_array($sizesObj)) {
+                $totalStock = 0;
+                foreach ($sizesObj as $val) {
+                    $totalStock += is_array($val) ? (int)($val['stock'] ?? 0) : 0;
+                }
+                return $totalStock;
+            }
+        }
+        return $value;
+    }
+
+    public function getPriceAttribute($value)
+    {
+        if ($this->has_variants && $this->size) {
+            $sizesObj = is_string($this->size) ? json_decode($this->size, true) : $this->size;
+            if (is_array($sizesObj) && count($sizesObj) > 0) {
+                $first = reset($sizesObj);
+                $price = is_array($first) ? ($first['price'] ?? null) : $first;
+                if ($price !== null && $price > 0) {
+                    return $price;
+                }
+            }
+        }
+        return $value;
+    }
+
+    public function getSalePriceAttribute($value)
+    {
+        if ($this->has_variants && $this->size) {
+            return null; // When variants are enabled, use the variant price directly
+        }
+        return $value;
+    }
+
+    public function getWeightAttribute($value)
+    {
+        if ($this->has_variants && $this->size) {
+            $sizesObj = is_string($this->size) ? json_decode($this->size, true) : $this->size;
+            if (is_array($sizesObj) && count($sizesObj) > 0) {
+                $first = reset($sizesObj);
+                $weight = is_array($first) ? ($first['weight'] ?? null) : null;
+                if ($weight !== null && $weight > 0) {
+                    return $weight;
+                }
+            }
+        }
+        return $value;
     }
 }
 

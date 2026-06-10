@@ -179,6 +179,9 @@
                     <a class="nav-link {{ request()->routeIs('admin.blog-categories.*') || request()->routeIs('admin.blogs.*') ? 'active' : '' }}" href="{{ route('admin.blog-categories.index') }}">
                         <i class="fas fa-blog"></i> Blog Management
                     </a>
+                    <a class="nav-link {{ request()->routeIs('admin.custom-combo.*') ? 'active' : '' }}" href="{{ route('admin.custom-combo.settings') }}">
+                        <i class="fas fa-percent"></i> <span>Custom Combo Settings</span>
+                    </a>
                     <a class="nav-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}">
                         <i class="fas fa-cog"></i> <span>GST & General Settings</span>
                     </a>

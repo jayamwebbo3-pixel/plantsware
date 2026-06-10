@@ -87,14 +87,29 @@ class ImageService
 
             /*
             -----------------------------------------
-            STEP 5 — SAVE FINAL IMAGE
+            STEP 5 — SAVE FINAL IMAGE (CONVERT TO WEBP)
             -----------------------------------------
             */
-            $image->save($fullPath);
+            $extension = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
+            if ($extension !== 'webp') {
+                $newImagePath = preg_replace('/\.[^.]+$/', '.webp', $imagePath);
+                $newFullPath = storage_path('app/public/' . $newImagePath);
+
+                $image->save($newFullPath);
+
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
+
+                return $newImagePath;
+            } else {
+                $image->save($fullPath);
+                return $imagePath;
+            }
 
         } catch (\Exception $e) {
             // Never fail silently
-            \Log::error('Watermark failed: ' . $e->getMessage());
+            \Log::error('Watermark and conversion failed: ' . $e->getMessage());
             throw $e;
         }
     }

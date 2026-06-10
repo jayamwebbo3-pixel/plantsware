@@ -56,8 +56,9 @@ class ProductManagementController extends Controller
 {
     $categories = Category::orderBy('sort_order')->orderBy('name')->get();
     $subcategories = $category->subcategories()->orderBy('sort_order')->paginate(20);
+    $next_sort_order = (Subcategory::where('category_id', $category->id)->max('sort_order') ?? 0) + 1;
 
-    return view('admin.products-management.subcategories-create', compact('category', 'categories', 'subcategories'));
+    return view('admin.products-management.subcategories-create', compact('category', 'categories', 'subcategories', 'next_sort_order'));
 }
 
     // Store new subcategory

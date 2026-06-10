@@ -105,11 +105,16 @@
 
                             @if($product->stock_quantity <= 0)
                                 <span class="product-page-badge-sale" style="background: #dc3545 !important;">OUT OF STOCK</span>
-                                @elseif($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                    <span class="product-page-badge-sale">
-                                        -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
-                                    </span>
-                                    @endif
+                            @elseif($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
+                                <span class="product-page-badge-sale">
+                                    -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
+                                </span>
+                            @endif
+                            @if($product->combo_pack_eligible === 'Yes')
+                                <span class="product-page-badge-combo" style="position: absolute; top: 10px; right: 10px; background-color: #2e7d32; color: white; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; z-index: 10; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">
+                                    Combo Eligible
+                                </span>
+                            @endif
                         </div>
 
                     </div>{{-- /dpz-wrapper --}}
@@ -118,6 +123,13 @@
                 <div class="col-lg-6">
                     <div class="product-page-info position-relative">
                         <h1>{{ $product->name }}</h1>
+                        @if($product->combo_pack_eligible === 'Yes')
+                            <div class="mb-3">
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fw-bold" style="background-color: #e8f5e9 !important; color: #2e7d32 !important; border-color: #c8e6c9 !important; font-size: 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-box-open"></i> Eligible for Custom Combo Packs
+                                </span>
+                            </div>
+                        @endif
 
                         <style>
                             .product-share-container {
@@ -243,15 +255,14 @@
                         @endif
                         <!-- Price -->
                         <div class="product-page-price mb-4">
-                            @if($product->stock_quantity > 0)
                             @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="product-page-current-price h3" data-default="₹{{ number_format($product->sale_price, 2) }}">₹{{ number_format($product->sale_price, 2) }}</span>
                                 <span class="product-page-original-price ms-3 text-muted text-decoration-line-through" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
-                                @else
-                                @endif
-                                @endif
+                            @else
+                                <span class="product-page-current-price h3" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
+                            @endif
                         </div>
-                        @if($product->size)
+                        @if($product->has_variants && $product->size)
                         @php
                         $sizeData = [];
                         $isJsonSizes = false;
@@ -275,11 +286,72 @@
                         }
                         @endphp
                         @if(count($sizeData) > 0)
+                        <style>
+                            .custom-size-selector-container {
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 10px;
+                            }
+                            
+                            .custom-size-radio {
+                                position: absolute !important;
+                                opacity: 0 !important;
+                                width: 0 !important;
+                                height: 0 !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                                pointer-events: none !important;
+                            }
+                            
+                            .custom-size-label {
+                                display: inline-block;
+                                padding: 12px 24px;
+                                font-size: 15px;
+                                font-weight: 700;
+                                text-transform: uppercase;
+                                color: #000 !important;
+                                background-color: #fff !important;
+                                border: 1px solid #be5a38 !important;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                user-select: none;
+                                margin: 0;
+                                text-align: center;
+                                min-width: 100px;
+                            }
+                            
+                            .custom-size-label small {
+                                display: block;
+                                font-size: 12px;
+                                font-weight: 500;
+                                color: #666;
+                                margin-top: 2px;
+                                text-transform: none;
+                            }
+                            
+                            /* Selected state */
+                            .custom-size-radio:checked + .custom-size-label {
+                                background-color: #be5a38 !important;
+                                color: #fff !important;
+                                border-color: #be5a38 !important;
+                            }
+                            
+                            .custom-size-radio:checked + .custom-size-label small {
+                                color: rgba(255, 255, 255, 0.9) !important;
+                            }
+                            
+                            /* Hover state */
+                            .custom-size-label:hover {
+                                background-color: #fdfbf7 !important;
+                                border-color: #be5a38 !important;
+                            }
+                        </style>
                         <div class="product-page-attributes mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="fw-bold m-0 text-dark">Select Size:</label>
+                                <label class="fw-bold m-0 text-dark" style="font-size: 18px;">Available Size</label>
                             </div>
-                            <div class="d-flex flex-wrap gap-2" id="sizeSelectorContainer">
+                            <div class="custom-size-selector-container" id="sizeSelectorContainer">
                                 @php $loopIndex = 0; @endphp
                                 @foreach($sizeData as $sizeName => $sizeValue)
                                 @php 
@@ -288,13 +360,13 @@
                                     $stock = is_array($sizeValue) ? ($sizeValue['stock'] ?? null) : null;
                                     $weight = is_array($sizeValue) ? ($sizeValue['weight'] ?? null) : null;
                                 @endphp
-                                <input type="radio" class="btn-check size-radio" name="size" id="size-{{ $loopIndex }}" value="{{ $sizeName }}" autocomplete="off" form="mainCartForm" {{ $loopIndex === 0 ? 'checked' : '' }} required 
+                                <input type="radio" class="custom-size-radio size-radio" name="size" id="size-{{ $loopIndex }}" value="{{ $sizeName }}" autocomplete="off" form="mainCartForm" {{ $loopIndex === 0 ? 'checked' : '' }} required 
                                     data-price="{{ $price ?? '' }}" 
                                     data-image="{{ $image ? asset('storage/' . $image) : '' }}"
                                     data-stock="{{ $stock ?? '' }}"
                                     data-weight="{{ $weight ?? '' }}"
                                     onchange="updateProductPrice(this)">
-                                <label class="btn btn-outline-success" for="size-{{ $loopIndex }}">
+                                <label class="custom-size-label" for="size-{{ $loopIndex }}">
                                     {{ $sizeName }}
                                     @if($price) <small>(₹{{ $price }})</small> @endif
                                 </label>
@@ -607,7 +679,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            background: #ededed;
+            background: #ffffff;
         }
 
         .dpz-thumb.active,
@@ -685,7 +757,7 @@
             aspect-ratio: 1 / 1;
             object-fit: contain;
             object-position: center;
-            background: #ededed;
+            background: #ffffff;
             border-radius: 7px;
         }
 
