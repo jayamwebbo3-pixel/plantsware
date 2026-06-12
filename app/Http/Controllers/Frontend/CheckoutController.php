@@ -329,10 +329,8 @@ class CheckoutController extends Controller
         // Normal items
         foreach ($normalItems as $item) {
             $price = $item->calculated_price;
-            $origPrice = $item->original_price;
             
-            $subtotal += $origPrice * $item->quantity;
-            $discount += max(0, $origPrice - $price) * $item->quantity;
+            $subtotal += $price * $item->quantity;
             
             $totalWeight += $item->calculated_weight * $item->quantity;
         }
@@ -345,10 +343,6 @@ class CheckoutController extends Controller
                 return $item->calculated_price * $item->quantity;
             });
 
-            $comboOriginalSubtotal = $items->sum(function($item) {
-                return $item->original_price * $item->quantity;
-            });
-
             $applicableDiscountPercent = 0;
             foreach ($slabs as $slab) {
                 if ($comboSubtotal >= $slab->min_amount) {
@@ -358,8 +352,8 @@ class CheckoutController extends Controller
 
             $comboDiscount = $comboSubtotal * ($applicableDiscountPercent / 100);
 
-            $subtotal += $comboOriginalSubtotal;
-            $discount += $comboDiscount + ($comboOriginalSubtotal - $comboSubtotal);
+            $subtotal += $comboSubtotal;
+            $discount += $comboDiscount;
 
             $totalWeight += $items->sum(function($item) {
                 return $item->calculated_weight * $item->quantity;

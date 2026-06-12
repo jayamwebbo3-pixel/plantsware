@@ -275,12 +275,12 @@
                                         <span id="cartTaxLabel">GST ({{ $taxPercentage ?? 0 }}%):</span>
                                         <span class="summary-amount" id="cartTax">₹{{ number_format($tax ?? 0, 2) }}</span>
                                     </div>
-                                    <div class="summary-row">
+                                    <!-- <div class="summary-row">
                                         <span>Discount:</span>
                                         <span class="summary-amount" id="cartDiscount" style="color: var(--primary-color);">
                                             -₹{{ number_format($discount ?? 0, 2) }}
                                         </span>
-                                    </div>
+                                    </div> -->
                                     <div class="summary-row" id="couponDiscountRow" style="{{ ($couponDiscount ?? 0) > 0 ? '' : 'display:none;' }}">
                                         <span>Coupon Discount:</span>
                                         <span class="summary-amount text-success" id="cartCouponDiscount">
