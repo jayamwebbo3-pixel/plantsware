@@ -149,12 +149,26 @@ class PaymentController extends Controller
                     ->where('status', 'pending')
                     ->update(['status' => 'paid']);
 
+                // 5. Log Coupon Usage if applicable
+                if (!empty($checkoutData['coupon_code'])) {
+                    $coupon = \App\Models\Coupon::where('coupon_code', $checkoutData['coupon_code'])->first();
+                    if ($coupon) {
+                        \App\Models\CouponUsage::create([
+                            'coupon_id' => $coupon->id,
+                            'user_id' => $transaction->user_id,
+                            'order_id' => $order->id,
+                            'discount_amount' => $checkoutData['coupon_discount'] ?? 0,
+                        ]);
+                    }
+                }
+
                 DB::commit();
 
                 // Clear live cart
                 try {
                     Cart::where('user_id', $transaction->user_id)->delete();
                     session()->forget('shipping_address');
+                    session()->forget('coupon_code');
                     session(['cart_count' => 0]);
                 } catch (Exception $e) {
                 }

@@ -67,6 +67,8 @@ class CheckoutController extends Controller
 
         $subtotal = $totals['subtotal'];
         $discount = $totals['discount'];
+        $couponDiscount = $totals['couponDiscount'] ?? 0;
+        $coupon = $totals['coupon'] ?? null;
         $totalWeight = $totals['totalWeight'];
         $shipping = $totals['shipping'];
         $tax = $totals['tax'];
@@ -76,7 +78,7 @@ class CheckoutController extends Controller
         $total = $totals['total'];
         $itemCount = $totals['itemCount'];
 
-        return view('view.checkout.address', compact('cartItems', 'savedAddress', 'userAddresses', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'itemCount', 'totalWeight', 'discount'));
+        return view('view.checkout.address', compact('cartItems', 'savedAddress', 'userAddresses', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'itemCount', 'totalWeight', 'discount', 'couponDiscount', 'coupon'));
     }
 
     // Save address and redirect to checkout
@@ -163,6 +165,8 @@ class CheckoutController extends Controller
 
         $subtotal = $totals['subtotal'];
         $discount = $totals['discount'];
+        $couponDiscount = $totals['couponDiscount'] ?? 0;
+        $coupon = $totals['coupon'] ?? null;
         $totalWeight = $totals['totalWeight'];
         $shipping = $totals['shipping'];
         $tax = $totals['tax'];
@@ -174,7 +178,7 @@ class CheckoutController extends Controller
 
         $gstSettings = \App\Models\HeaderFooter::first();
 
-        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'discount', 'totalWeight', 'itemCount', 'gstSettings'));
+        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'discount', 'totalWeight', 'itemCount', 'gstSettings', 'couponDiscount', 'coupon'));
     }
 
     // Place order (confirm and save)
@@ -194,6 +198,8 @@ class CheckoutController extends Controller
 
         $subtotal = $totals['subtotal'];
         $discount = $totals['discount'];
+        $couponDiscount = $totals['couponDiscount'] ?? 0;
+        $couponCode = $totals['coupon'] ? $totals['coupon']->coupon_code : null;
         $totalWeight = $totals['totalWeight'];
         $shipping = $totals['shipping'];
         $tax = $totals['tax'];
@@ -296,6 +302,8 @@ class CheckoutController extends Controller
                 'total' => $total,
                 'total_weight' => $totalWeight,
                 'total_discount' => $discount,
+                'coupon_code' => $couponCode,
+                'coupon_discount' => $couponDiscount,
                 'items' => $itemsData,
                 'custom_combos' => $customComboDetails
             ]
@@ -358,6 +366,50 @@ class CheckoutController extends Controller
             });
         }
 
+        // Coupon Logic
+        $couponDiscount = 0;
+        $couponCode = session('coupon_code');
+        $coupon = null;
+
+        if ($couponCode) {
+            $now = now();
+            $coupon = \App\Models\Coupon::where('coupon_code', $couponCode)
+                ->where('status', true)
+                ->where(function($q) use ($now) {
+                    $q->whereNull('valid_from')
+                      ->orWhere('valid_from', '<=', $now);
+                })
+                ->where(function($q) use ($now) {
+                    $q->whereNull('valid_to')
+                      ->orWhere('valid_to', '>=', $now);
+                })
+                ->first();
+
+            if ($coupon) {
+                $cartValue = $subtotal - $discount;
+                $user = Auth::user();
+
+                $isAssigned = $coupon->is_public || ($user && $coupon->users()->where('users.id', $user->id)->exists());
+                $hasUsed = $user && $coupon->usages()->where('user_id', $user->id)->exists();
+
+                if ($isAssigned && !$hasUsed && $cartValue >= $coupon->minimum_order_amount) {
+                    if ($coupon->discount_type === 'percentage') {
+                        $couponDiscount = $cartValue * ($coupon->discount_value / 100);
+                        if ($coupon->max_discount > 0) {
+                            $couponDiscount = min($couponDiscount, $coupon->max_discount);
+                        }
+                    } else {
+                        $couponDiscount = min($coupon->discount_value, $cartValue);
+                    }
+                } else {
+                    session()->forget('coupon_code');
+                    $coupon = null;
+                }
+            } else {
+                session()->forget('coupon_code');
+            }
+        }
+
         // Shipping
         $shipping = 0;
         if ($state) {
@@ -371,7 +423,7 @@ class CheckoutController extends Controller
         $igst = 0;
         $gstSettings = \App\Models\HeaderFooter::first();
         if ($gstSettings && $gstSettings->gst_status) {
-            $tax = (($subtotal - $discount) * $gstSettings->gst_percentage) / 100;
+            $tax = (($subtotal - $discount - $couponDiscount) * $gstSettings->gst_percentage) / 100;
             if ($state) {
                 $sellerState = trim($gstSettings->business_state ?? 'Tamil Nadu');
                 if (strcasecmp($sellerState, trim($state)) === 0) {
@@ -383,11 +435,13 @@ class CheckoutController extends Controller
             }
         }
 
-        $total = ($subtotal - $discount) + $shipping + $tax;
+        $total = ($subtotal - $discount - $couponDiscount) + $shipping + $tax;
 
         return [
             'subtotal' => $subtotal,
             'discount' => $discount,
+            'couponDiscount' => $couponDiscount,
+            'coupon' => $coupon,
             'totalWeight' => $totalWeight,
             'shipping' => $shipping,
             'tax' => $tax,

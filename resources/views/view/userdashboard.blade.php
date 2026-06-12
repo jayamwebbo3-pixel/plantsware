@@ -62,6 +62,12 @@
                             <span>Wishlist</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="#my-coupons" class="nav-link" data-tab="my-coupons">
+                            <i class="fas fa-ticket-alt nav-icon"></i>
+                            <span>My Coupons</span>
+                        </a>
+                    </li>
                     <li class="nav-item" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e0e0e0;">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -370,6 +376,73 @@
                         @empty
                         <div style="grid-column: 1 / -1; padding: 20px; color: #666; font-style: italic;">
                             Your wishlist is empty.
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- My Coupons Section -->
+                <div class="content-section" id="my-coupons">
+                    <h2 class="section-title">My Coupons</h2>
+                    <div class="row g-3">
+                        @forelse($coupons as $coupon)
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-2 {{ $coupon->is_used ? 'border-light bg-light' : 'border-success' }} shadow-sm" style="border-style: dashed; border-radius: 12px; overflow: hidden; position: relative;">
+                                @if($coupon->is_used)
+                                    <div style="position: absolute; top: 10px; right: 10px; background-color: #6c757d; color: white; padding: 2px 8px; font-size: 0.75rem; border-radius: 4px; font-weight: bold; z-index: 2;">USED</div>
+                                @else
+                                    <div style="position: absolute; top: 10px; right: 10px; background-color: var(--primary-color); color: white; padding: 2px 8px; font-size: 0.75rem; border-radius: 4px; font-weight: bold; z-index: 2;">ACTIVE</div>
+                                @endif
+                                
+                                <div class="card-body p-3">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <i class="fas fa-ticket-alt {{ $coupon->is_used ? 'text-secondary' : 'text-success' }} fs-4"></i>
+                                        <h4 class="mb-0 fw-bold text-uppercase {{ $coupon->is_used ? 'text-secondary' : 'text-dark' }}" style="font-family: monospace; letter-spacing: 1px;">{{ $coupon->coupon_code }}</h4>
+                                    </div>
+                                    
+                                    <p class="mb-2 text-muted small">
+                                        @if($coupon->discount_type === 'percentage')
+                                            <strong>{{ number_format($coupon->discount_value, 0) }}% Off</strong> your order.
+                                            @if($coupon->max_discount)
+                                                <span class="d-block">(Max discount up to ₹{{ number_format($coupon->max_discount, 2) }})</span>
+                                            @endif
+                                        @else
+                                            <strong>Flat ₹{{ number_format($coupon->discount_value, 2) }} Off</strong> your order.
+                                        @endif
+                                    </p>
+                                    
+                                    <div class="border-top pt-2 mt-2">
+                                        <div class="d-flex justify-content-between extra-small text-muted mb-1">
+                                            <span>Min. Order Value:</span>
+                                            <span class="fw-bold text-dark">₹{{ number_format($coupon->minimum_order_amount, 2) }}</span>
+                                        </div>
+                                        @if($coupon->valid_to)
+                                        <div class="d-flex justify-content-between extra-small text-muted">
+                                            <span>Expires On:</span>
+                                            <span class="fw-bold text-danger">{{ $coupon->valid_to->format('d M Y') }}</span>
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent border-0 p-3 pt-0">
+                                    @if(!$coupon->is_used)
+                                        <button type="button" class="btn btn-sm btn-success w-100 copy-coupon-btn" data-code="{{ $coupon->coupon_code }}" style="background-color: var(--primary-color); border-color: var(--primary-color);">
+                                            <i class="fas fa-copy me-1"></i> Copy Code
+                                        </button>
+                                    @else
+                                        <button type="button" class="btn btn-sm btn-secondary w-100" disabled>
+                                            Already Used
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="col-12">
+                            <div class="text-center py-4 text-muted bg-white border rounded-3">
+                                <i class="fas fa-ticket-alt fs-1 text-muted mb-3 opacity-50"></i>
+                                <p class="mb-0">No active coupons currently available for you.</p>
+                            </div>
                         </div>
                         @endforelse
                     </div>
@@ -958,6 +1031,24 @@
         });
 
         // Initialize first address as selected logic has been completely removed as per request hook.
+        
+        // Copy coupon code functionality
+        document.querySelectorAll('.copy-coupon-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const code = this.getAttribute('data-code');
+                navigator.clipboard.writeText(code).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copied!',
+                        text: `Coupon code ${code} copied to clipboard.`,
+                        timer: 1500,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end'
+                    });
+                });
+            });
+        });
     });
 </script>
 

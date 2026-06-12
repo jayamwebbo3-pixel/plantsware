@@ -16,6 +16,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'total_purchase_value',
         'password',
         'google_id',
         'phone',
@@ -44,6 +45,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'otp_expires_at' => 'datetime',
+        'total_purchase_value' => 'decimal:2',
 
         // Keep ONLY if address column is JSON
         'address' => 'array',
@@ -53,6 +55,7 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     | Relationships
     |--------------------------------------------------------------------------
+    |
     */
 
     public function addresses()
@@ -75,6 +78,16 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function assignedCoupons()
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_users', 'user_id', 'coupon_id');
+    }
+
+    public function couponUsages()
+    {
+        return $this->hasMany(CouponUsage::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Helper Methods
@@ -86,5 +99,14 @@ class User extends Authenticatable
         return $this->wishlist()
             ->where('product_id', $product->id)
             ->exists();
+    }
+
+    public function updatePurchaseValue()
+    {
+        $total = $this->orders()
+            ->whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered', 'completed'])
+            ->where('payment_status', 'paid')
+            ->sum('total');
+        $this->update(['total_purchase_value' => $total]);
     }
 }

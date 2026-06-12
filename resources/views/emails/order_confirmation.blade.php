@@ -79,6 +79,12 @@
                             <td colspan="2" class="text-right" style="padding-top: 20px; color: #999;">Subtotal:</td>
                             <td class="text-right" style="padding-top: 20px; color: #333;">₹{{ number_format($order->subtotal, 2) }}</td>
                         </tr>
+                        @if($order->couponUsage)
+                        <tr>
+                            <td colspan="2" class="text-right" style="color: #999;">Coupon Discount ({{ $order->couponUsage->coupon->coupon_code ?? '' }}):</td>
+                            <td class="text-right" style="color: #333;">-₹{{ number_format($order->couponUsage->discount_amount, 2) }}</td>
+                        </tr>
+                        @endif
                         @if($order->shipping > 0)
                         <tr>
                             <td colspan="2" class="text-right" style="color: #999;">Shipping:</td>

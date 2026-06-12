@@ -95,20 +95,66 @@ class CartController extends Controller
             }
         }
 
+        // Coupon Logic
+        $couponDiscount = 0;
+        $couponCode = session('coupon_code');
+        $coupon = null;
+
+        if ($couponCode) {
+            $now = now();
+            $coupon = \App\Models\Coupon::where('coupon_code', $couponCode)
+                ->where('status', true)
+                ->where(function($q) use ($now) {
+                    $q->whereNull('valid_from')
+                      ->orWhere('valid_from', '<=', $now);
+                })
+                ->where(function($q) use ($now) {
+                    $q->whereNull('valid_to')
+                      ->orWhere('valid_to', '>=', $now);
+                })
+                ->first();
+
+            if ($coupon) {
+                $cartValue = $subtotal - $discount;
+                $user = Auth::user();
+
+                $isAssigned = $coupon->is_public || ($user && $coupon->users()->where('users.id', $user->id)->exists());
+                $hasUsed = $user && $coupon->usages()->where('user_id', $user->id)->exists();
+
+                if ($isAssigned && !$hasUsed && $cartValue >= $coupon->minimum_order_amount) {
+                    if ($coupon->discount_type === 'percentage') {
+                        $couponDiscount = $cartValue * ($coupon->discount_value / 100);
+                        if ($coupon->max_discount > 0) {
+                            $couponDiscount = min($couponDiscount, $coupon->max_discount);
+                        }
+                    } else {
+                        $couponDiscount = min($coupon->discount_value, $cartValue);
+                    }
+                } else {
+                    session()->forget('coupon_code');
+                    $coupon = null;
+                }
+            } else {
+                session()->forget('coupon_code');
+            }
+        }
+
         // Tax Calculation
         $settings = \App\Models\HeaderFooter::first();
         $tax = 0;
         $taxPercentage = 0;
         if ($settings && $settings->gst_status) {
             $taxPercentage = (float)$settings->gst_percentage;
-            $tax = (($subtotal - $discount) * $taxPercentage) / 100;
+            $tax = (($subtotal - $discount - $couponDiscount) * $taxPercentage) / 100;
         }
 
-        $total = ($subtotal - $discount) + $shipping + $tax;
+        $total = ($subtotal - $discount - $couponDiscount) + $shipping + $tax;
 
         return [
             'subtotal' => $subtotal,
             'discount' => $discount,
+            'couponDiscount' => $couponDiscount,
+            'coupon' => $coupon,
             'totalWeight' => $totalWeight,
             'shipping' => $shipping,
             'tax' => $tax,
@@ -675,5 +721,96 @@ class CartController extends Controller
         $this->updateSessionCounts();
 
         return redirect()->route('cart.index')->with('success', 'Custom Combo Pack added to cart successfully!');
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        if (!Auth::check()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please login to apply coupons.'
+            ]);
+        }
+
+        $code = strtoupper(trim($request->input('coupon_code')));
+        if (empty($code)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please enter a coupon code.'
+            ]);
+        }
+
+        $now = now();
+        $coupon = \App\Models\Coupon::where('coupon_code', $code)
+            ->where('status', true)
+            ->where(function($q) use ($now) {
+                $q->whereNull('valid_from')
+                  ->orWhere('valid_from', '<=', $now);
+            })
+            ->where(function($q) use ($now) {
+                $q->whereNull('valid_to')
+                  ->orWhere('valid_to', '>=', $now);
+            })
+            ->first();
+
+        if (!$coupon) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired coupon code.'
+            ]);
+        }
+
+        $user = Auth::user();
+
+        $isAssigned = $coupon->is_public || $coupon->users()->where('users.id', $user->id)->exists();
+        if (!$isAssigned) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This coupon is not applicable to your account.'
+            ]);
+        }
+
+        $hasUsed = $coupon->usages()->where('user_id', $user->id)->exists();
+        if ($hasUsed) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You have already used this coupon.'
+            ]);
+        }
+
+        $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
+        
+        $oldCoupon = session('coupon_code');
+        session()->forget('coupon_code');
+        $totals = $this->calculateCartTotals($cartItems);
+        if ($oldCoupon) {
+            session(['coupon_code' => $oldCoupon]);
+        }
+
+        $cartValue = $totals['subtotal'] - $totals['discount'];
+
+        if ($cartValue < $coupon->minimum_order_amount) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Minimum order amount of ₹' . number_format($coupon->minimum_order_amount, 2) . ' is required to apply this coupon.'
+            ]);
+        }
+
+        session(['coupon_code' => $code]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Coupon code applied successfully!'
+        ]);
+    }
+
+    public function removeCoupon()
+    {
+        session()->forget('coupon_code');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Coupon removed successfully.'
+        ]);
     }
 }

@@ -112,7 +112,7 @@ class OrderController extends Controller
 
     public function generateInvoice($order_id)
     {
-        $order = Order::with(['items.product', 'items.comboPack'])->findOrFail($order_id);
+        $order = Order::with(['items.product', 'items.comboPack', 'couponUsage.coupon'])->findOrFail($order_id);
 
         // Prevent generating an invoice if payment is still pending/failed
         if (!in_array($order->payment_status, ['paid', 'refunded'])) {
@@ -137,6 +137,8 @@ class OrderController extends Controller
             'order_items' => $order->items,
             'subtotal' => $order->subtotal,
             'discount_amount' => $order->discount,
+            'coupon_code' => $order->couponUsage && $order->couponUsage->coupon ? $order->couponUsage->coupon->coupon_code : null,
+            'coupon_discount' => $order->couponUsage ? $order->couponUsage->discount_amount : 0,
             'shipping_amount' => $order->shipping,
             'tax_amount' => $order->tax,
             'cgst' => $order->cgst ?? 0,

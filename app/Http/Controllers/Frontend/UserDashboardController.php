@@ -13,12 +13,33 @@ class UserDashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $now = now();
+        $coupons = \App\Models\Coupon::where('status', 1)
+            ->where(function($q) use ($now) {
+                $q->whereNull('valid_from')->orWhere('valid_from', '<=', $now);
+            })
+            ->where(function($q) use ($now) {
+                $q->whereNull('valid_to')->orWhere('valid_to', '>=', $now);
+            })
+            ->where(function($q) use ($user) {
+                $q->where('is_public', 1)
+                  ->orWhereHas('users', function($uq) use ($user) {
+                      $uq->where('users.id', $user->id);
+                  });
+            })
+            ->get();
+
+        $usedCouponIds = \App\Models\CouponUsage::where('user_id', $user->id)->pluck('coupon_id')->toArray();
+        foreach ($coupons as $coupon) {
+            $coupon->is_used = in_array($coupon->id, $usedCouponIds);
+        }
 
         return view('view.userdashboard', [
             'user' => $user,
             'addresses' => $user->addresses()->latest()->get(),
             'orders' => $user->orders()->with('items')->latest()->get(),
             'wishlist' => $user->wishlist()->with('product')->get(),
+            'coupons' => $coupons,
         ]);
     }
 
@@ -225,6 +246,8 @@ class UserDashboardController extends Controller
             // return back()->with('error', 'Invoice is available only after payment.');
         }
 
+        $order->load(['items.product', 'items.comboPack', 'couponUsage.coupon']);
+
         $shippingAddress = $order->shipping_address;
         $gstSettings = \App\Models\HeaderFooter::first();
 
@@ -244,6 +267,8 @@ class UserDashboardController extends Controller
             'order_items'      => $order->items,
             'subtotal'         => $order->subtotal,
             'discount_amount'  => $order->discount,
+            'coupon_code'      => $order->couponUsage && $order->couponUsage->coupon ? $order->couponUsage->coupon->coupon_code : null,
+            'coupon_discount'  => $order->couponUsage ? $order->couponUsage->discount_amount : 0,
             'shipping_amount'  => $order->shipping,
             'tax_amount'       => $order->tax,
             'cgst'             => $order->cgst ?? 0,

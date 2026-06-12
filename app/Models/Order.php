@@ -20,6 +20,8 @@ class Order extends Model
         'sgst',
         'igst',
         'total',
+        'total_weight',
+        'total_discount',
         'status',
         'payment_status',
         'payment_method',
@@ -30,6 +32,28 @@ class Order extends Model
         'return_rejection_reason',
         'return_images'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($order) {
+            if ($order->user) {
+                $order->user->updatePurchaseValue();
+            }
+        });
+
+        static::deleted(function ($order) {
+            if ($order->user) {
+                $order->user->updatePurchaseValue();
+            }
+        });
+    }
+
+    public function getDiscountAttribute()
+    {
+        return $this->total_discount;
+    }
 
     protected $casts = [
         'shipping_address' => 'array',
@@ -47,6 +71,11 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function couponUsage()
+    {
+        return $this->hasOne(CouponUsage::class);
     }
 
     public function getStatusBadgeClass()

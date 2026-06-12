@@ -321,6 +321,14 @@
                             </div>
                             @endif
 
+                            @if(isset($couponDiscount) && $couponDiscount > 0)
+                            <div class="summary-line d-flex justify-content-between mb-2 text-success">
+                                <span>Coupon Discount ({{ $coupon->coupon_code ?? '' }})</span>
+                                <span class="fw-bold">-₹{{ number_format($couponDiscount, 2) }}</span>
+                            </div>
+                            @endif
+
+
                             <hr class="my-4 border-2">
 
                             <div class="d-flex justify-content-between align-items-center mb-4">

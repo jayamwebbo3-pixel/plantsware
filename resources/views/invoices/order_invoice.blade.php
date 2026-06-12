@@ -244,6 +244,13 @@
                 <td class="value right">- ₹{{ number_format($discount_amount, 2) }}</td>
             </tr>
             @endif
+            @if(isset($coupon_discount) && $coupon_discount > 0)
+            <tr class="total-row">
+                <td colspan="5" style="border: none;"></td>
+                <td class="label">Coupon Discount ({{ $coupon_code ?? '' }}):</td>
+                <td class="value right">- ₹{{ number_format($coupon_discount, 2) }}</td>
+            </tr>
+            @endif
             <tr class="total-row">
                 <td colspan="5" style="border: none;"></td>
                 <td class="label">Shipping:</td>

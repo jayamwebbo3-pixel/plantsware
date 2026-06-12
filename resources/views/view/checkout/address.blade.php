@@ -237,6 +237,12 @@
                                     <span class="text-success extra-small fw-bold">-₹{{ number_format($discount, 2) }}</span>
                                 </div>
                                 @endif
+                                @if(isset($couponDiscount) && $couponDiscount > 0)
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted extra-small">Coupon Discount ({{ $coupon->coupon_code ?? '' }})</span>
+                                    <span class="text-success extra-small fw-bold">-₹{{ number_format($couponDiscount, 2) }}</span>
+                                </div>
+                                @endif
                                 @if(isset($cgst) && $cgst > 0)
                                 <div class="d-flex justify-content-between mb-1">
                                     <span class="text-muted extra-small">CGST</span>
