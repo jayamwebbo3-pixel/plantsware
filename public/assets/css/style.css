@@ -1846,7 +1846,7 @@ del {
 /*---------------------------------------------------------------- footer  -------------------------------------------------------------------------------------*/
 
 .footer {
-    background-color: #f0f6e8;
+    background-color: #c6dfa4;
     /* color: white; */
     padding: 3rem 0 1rem;
 }
@@ -1934,9 +1934,6 @@ del {
 }
 
 .footer-bottom {
-    border-top: 1px solid rgb(73 73 73 / 10%);
-    padding-top: 1.5rem;
-    margin-top: 2rem;
     text-align: center;
 }
 

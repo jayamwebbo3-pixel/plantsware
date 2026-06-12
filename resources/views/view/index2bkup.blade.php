@@ -73,7 +73,7 @@ use Illuminate\Support\Str;
                 @else
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img src="{{ asset('uploads/img2/slider/11.png') }}" class="d-block w-100 img-fluid" alt="Default">
+                            <img src="{{ asset('uploads/img2/slider/11.webp') }}" class="d-block w-100 img-fluid" alt="Default">
                             <div class="carousel-caption container silder_text">
                                 <p class="arrival">Complete Care for Every Plant</p>
                                 <h5 class="headding">From Soil to<br>Bloom Naturally</h5>

@@ -2,7 +2,7 @@
 <footer class="footer">
     <div class="container">
         <div class="row">
-            <div class="col-lg-3 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6">
                 <h5>About Us</h5>
                 <p>{{ $headerFooter->footer_content ?? 'We are passionate about providing high-quality gardening products and solutions to help you create beautiful, thriving green spaces.' }}</p>
                 <div class="social-links">
@@ -15,7 +15,7 @@
             </div>
 
             <!-- Second Column: Quick Links -->
-            <div class="col-lg-3 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6">
                 <h5>Quick Links</h5>
                 <ul>
                     <li><a href="{{ route('home') }}">Home</a></li>
@@ -79,6 +79,60 @@
         <!-- Footer Bottom -->
         <div class="footer-bottom py-3">
             <div class="container">
+                <!-- Footer Bottom Highlights (Creative UX) -->
+                <div class="footer-highlights-bar py-3 mb-4">
+                    <div class="row">
+                        <!-- Highlight 1 -->
+                        <div class="col-lg-3 col-md-6 mb-3 mb-lg-0 highlight-item">
+                            <div class="d-flex align-items-center justify-content-center justify-content-lg-start">
+                                <div class="highlight-icon-wrapper">
+                                    <i class="fas fa-truck"></i>
+                                </div>
+                                <div class="highlight-info">
+                                    <h6 class="highlight-title">Fast Delivery</h6>
+                                    <span class="highlight-desc">Fast Shipping On All Orders</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Highlight 2 -->
+                        <div class="col-lg-3 col-md-6 mb-3 mb-lg-0 highlight-item">
+                            <div class="d-flex align-items-center justify-content-center justify-content-lg-start">
+                                <div class="highlight-icon-wrapper">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="highlight-info">
+                                    <h6 class="highlight-title">Secure Payment</h6>
+                                    <span class="highlight-desc">100% Secure Payment</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Highlight 3 -->
+                        <div class="col-lg-3 col-md-6 mb-3 mb-lg-0 highlight-item">
+                            <div class="d-flex align-items-center justify-content-center justify-content-lg-start">
+                                <div class="highlight-icon-wrapper">
+                                    <i class="fas fa-undo"></i>
+                                </div>
+                                <div class="highlight-info">
+                                    <h6 class="highlight-title">Easy Returns</h6>
+                                    <span class="highlight-desc">30-Day Return Policy</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Highlight 4 -->
+                        <div class="col-lg-3 col-md-6 highlight-item">
+                            <div class="d-flex align-items-center justify-content-center justify-content-lg-start">
+                                <div class="highlight-icon-wrapper">
+                                    <i class="fas fa-award"></i>
+                                </div>
+                                <div class="highlight-info">
+                                    <h6 class="highlight-title">Quality Guarantee</h6>
+                                    <span class="highlight-desc">Premium Quality Products</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row">
                     <div class="col-12 d-flex justify-content-between align-items-center flex-wrap">
 
@@ -105,9 +159,8 @@
                             </div>
                         </div> -->
 
-                        <!-- Right Side -->
                         <p class="mb-0">
-                            <a href="https://jayamwebsolutions.com/" class="text-dark"> Developed by Jayam Web Solutions</a>
+                            <a href="https://jayamwebsolutions.com/web-design-company-in-chennai.php" class="text-dark"> Developed by Jayam Web Solutions</a>
                         </p>
 
                     </div>
@@ -260,7 +313,7 @@
 </style>
 
 <!-- scroll -->
-<a href="#" id="scroll"></a>
+<a href="#" id="scroll"><i class="fas fa-chevron-up"></i></a>
 <!-- jquery-3.4.1 -->
 <script src="{{ asset('assets/js/jquery-3.4.1.min.js') }}"></script>
 <script src="{{ asset('assets/js/popper.min.js') }}"></script>
@@ -395,42 +448,51 @@
 
 <script>
     $(document).ready(function() {
-        // Initialize the carousel
+        // Initialize the carousel dynamically based on slide count
+        var catSlideCount = $('#plantCategoriesCarousel .plant-category-item').length;
         $('#plantCategoriesCarousel').slick({
             dots: false,
             arrows: false,
-            infinite: true,
+            infinite: catSlideCount > 6,
             speed: 300,
-            slidesToShow: 6,
+            slidesToShow: Math.min(6, catSlideCount),
             slidesToScroll: 1,
-            autoplay: true,
+            autoplay: catSlideCount > 6,
             autoplaySpeed: 3000,
             responsive: [{
                     breakpoint: 1024,
                     settings: {
-                        slidesToShow: 4,
-                        slidesToScroll: 1
+                        slidesToShow: Math.min(4, catSlideCount),
+                        slidesToScroll: 1,
+                        infinite: catSlideCount > 4,
+                        autoplay: catSlideCount > 4
                     }
                 },
                 {
                     breakpoint: 768,
                     settings: {
-                        slidesToShow: 3,
-                        slidesToScroll: 1
+                        slidesToShow: Math.min(3, catSlideCount),
+                        slidesToScroll: 1,
+                        infinite: catSlideCount > 3,
+                        autoplay: catSlideCount > 3
                     }
                 },
                 {
                     breakpoint: 576,
                     settings: {
-                        slidesToShow: 2,
-                        slidesToScroll: 1
+                        slidesToShow: Math.min(2, catSlideCount),
+                        slidesToScroll: 1,
+                        infinite: catSlideCount > 2,
+                        autoplay: catSlideCount > 2
                     }
                 },
                 {
                     breakpoint: 400,
                     settings: {
                         slidesToShow: 1,
-                        slidesToScroll: 1
+                        slidesToScroll: 1,
+                        infinite: catSlideCount > 1,
+                        autoplay: catSlideCount > 1
                     }
                 }
             ]
