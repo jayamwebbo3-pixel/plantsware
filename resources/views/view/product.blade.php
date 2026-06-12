@@ -1,35 +1,6 @@
 @include('view.layout.header')
 
 
-<style>
-    .wishlist-btn {
-        width: 42px;
-        height: 42px;
-        border: 1px solid #ccc;
-        /* grey border */
-        border-radius: 50%;
-        /* circle shape */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: transparent;
-        color: #000;
-        /* black heart */
-        transition: 0.3s ease;
-    }
-
-    .wishlist-btn i {
-        font-size: 18px;
-    }
-
-    /* hover effect (your given style) */
-    .wishlist-btn:hover {
-        background: #ff4d4d;
-        color: #fff;
-        border-color: #ff4d4d;
-    }
-</style>
-
 <!-- Breadcrumb -->
 <div class="sp_header bg-white p-3">
     <div class="container">
@@ -122,122 +93,20 @@
                 <!-- Product Info -->
                 <div class="col-lg-6">
                     <div class="product-page-info position-relative">
-                        <h1>{{ $product->name }}</h1>
+                        <h1 class="product-detail-title">{{ $product->name }}</h1>
                         @if($product->combo_pack_eligible === 'Yes')
                             <div class="mb-3">
-                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fw-bold" style="background-color: #e8f5e9 !important; color: #2e7d32 !important; border-color: #c8e6c9 !important; font-size: 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                                <span class="combo-eligible-badge">
                                     <i class="fas fa-box-open"></i> Eligible for Custom Combo Packs
                                 </span>
                             </div>
                         @endif
 
-                        <style>
-                            .product-share-container {
-                                position: absolute;
-                                top: 20px;
-                                right: 20px;
-                                z-index: 100;
-                            }
 
-                            .btn-share-toggle {
-                                background: #ffffff;
-                                color: #333;
-                                border: none;
-                                border-radius: 50%;
-                                width: 44px;
-                                height: 44px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 20px;
-                                cursor: pointer;
-                                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-                                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                                border: 1px solid rgba(0, 0, 0, 0.05);
-                            }
-
-                            .btn-share-toggle:hover {
-                                background: #72a420;
-                                color: #fff;
-                                transform: translateY(-3px) scale(1.05);
-                                box-shadow: 0 12px 25px rgba(114, 164, 32, 0.3);
-                            }
-
-                            .share-dropdown {
-                                position: absolute;
-                                top: 55px;
-                                right: 0;
-                                background: #ffffff;
-                                border-radius: 12px;
-                                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
-                                padding: 12px;
-                                width: 180px;
-                                display: none;
-                                border: 1px solid #f0f0f0;
-                                animation: shareFadeIn 0.3s ease;
-                            }
-
-                            .share-dropdown.show {
-                                display: block;
-                            }
-
-                            .share-item {
-                                display: flex;
-                                align-items: center;
-                                gap: 12px;
-                                padding: 10px 14px;
-                                border-radius: 8px;
-                                text-decoration: none !important;
-                                color: #2d3436;
-                                transition: all 0.2s ease;
-                                font-size: 14px;
-                                font-weight: 500;
-                            }
-
-                            .share-item:hover {
-                                background: #f8f9fa;
-                                transform: translateX(5px);
-                                color: #72a420;
-                            }
-
-                            .share-item i {
-                                font-size: 18px;
-                                width: 24px;
-                                text-align: center;
-                            }
-
-                            .share-item.whatsapp i {
-                                color: #25D366;
-                            }
-
-                            .share-item.facebook i {
-                                color: #1877F2;
-                            }
-
-                            .share-item.twitter i {
-                                color: #1DA1F2;
-                            }
-
-                            .share-item.instagram i {
-                                color: #E4405F;
-                            }
-
-                            @keyframes shareFadeIn {
-                                from {
-                                    opacity: 0;
-                                    transform: translateY(-12px) scale(0.95);
-                                }
-
-                                to {
-                                    opacity: 1;
-                                    transform: translateY(0) scale(1);
-                                }
-                            }
-                        </style>
                         <!-- Dynamic Rating -->
                         @if(($product->total_reviews ?? 0) > 0 && ($product->avg_rating ?? 0) > 0)
                         <div class="product-page-rating mb-3">
-                            <div class="product-page-stars d-inline" style="color: #ffc107;">
+                            <div class="product-page-stars d-inline">
                                 @php $avg = $product->avg_rating ?? 0; @endphp
                                 @for($i = 1; $i <= 5; $i++)
                                     @if($i <=floor($avg))
@@ -249,17 +118,17 @@
                                     @endif
                                     @endfor
                             </div>
-                            <span class="product-page-rating-text ms-2 fw-bold" style="color: #333;">{{ number_format($avg, 1) }}</span>
-                            <span class="product-page-reviews-count text-muted ms-1">({{ $product->total_reviews ?? 0 }} Reviews)</span>
+                            <span class="product-page-rating-text fw-bold">{{ number_format($avg, 1) }}</span>
+                            <span class="product-page-reviews-count">({{ $product->total_reviews ?? 0 }} Reviews)</span>
                         </div>
                         @endif
                         <!-- Price -->
-                        <div class="product-page-price mb-4">
+                        <div class="product-page-price">
                             @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                <span class="product-page-current-price h3" data-default="₹{{ number_format($product->sale_price, 2) }}">₹{{ number_format($product->sale_price, 2) }}</span>
-                                <span class="product-page-original-price ms-3 text-muted text-decoration-line-through" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
+                                <span class="product-page-current-price" data-default="₹{{ number_format($product->sale_price, 2) }}">₹{{ number_format($product->sale_price, 2) }}</span>
+                                <span class="product-page-original-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
                             @else
-                                <span class="product-page-current-price h3" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
+                                <span class="product-page-current-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
                             @endif
                         </div>
                         @if($product->has_variants && $product->size)
@@ -286,70 +155,10 @@
                         }
                         @endphp
                         @if(count($sizeData) > 0)
-                        <style>
-                            .custom-size-selector-container {
-                                display: flex;
-                                flex-wrap: wrap;
-                                gap: 10px;
-                            }
-                            
-                            .custom-size-radio {
-                                position: absolute !important;
-                                opacity: 0 !important;
-                                width: 0 !important;
-                                height: 0 !important;
-                                margin: 0 !important;
-                                padding: 0 !important;
-                                pointer-events: none !important;
-                            }
-                            
-                            .custom-size-label {
-                                display: inline-block;
-                                padding: 12px 24px;
-                                font-size: 15px;
-                                font-weight: 700;
-                                text-transform: uppercase;
-                                color: #000 !important;
-                                background-color: #fff !important;
-                                border: 1px solid #be5a38 !important;
-                                border-radius: 8px;
-                                cursor: pointer;
-                                transition: all 0.3s ease;
-                                user-select: none;
-                                margin: 0;
-                                text-align: center;
-                                min-width: 100px;
-                            }
-                            
-                            .custom-size-label small {
-                                display: block;
-                                font-size: 12px;
-                                font-weight: 500;
-                                color: #666;
-                                margin-top: 2px;
-                                text-transform: none;
-                            }
-                            
-                            /* Selected state */
-                            .custom-size-radio:checked + .custom-size-label {
-                                background-color: #be5a38 !important;
-                                color: #fff !important;
-                                border-color: #be5a38 !important;
-                            }
-                            
-                            .custom-size-radio:checked + .custom-size-label small {
-                                color: rgba(255, 255, 255, 0.9) !important;
-                            }
-                            
-                            /* Hover state */
-                            .custom-size-label:hover {
-                                background-color: #fdfbf7 !important;
-                                border-color: #be5a38 !important;
-                            }
-                        </style>
-                        <div class="product-page-attributes mb-4">
+
+                        <div class="product-page-attributes">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="fw-bold m-0 text-dark" style="font-size: 18px;">Available Size</label>
+                                <label class="fw-bold m-0">Available Size</label>
                             </div>
                             <div class="custom-size-selector-container" id="sizeSelectorContainer">
                                 @php $loopIndex = 0; @endphp
@@ -529,64 +338,33 @@
                             </div>
 
                             <!-- Action Buttons -->
-                            <div class="product-page-action-buttons d-flex gap-3 mb-4 flex-md-nowrap flex-wrap">
-                                <button type="submit" class="product-page-btn-add-cart btn btn-lg btn-primary d-flex align-items-center justify-content-center gap-2 flex-grow-1 w-100-mobile">
+                            <div class="product-page-action-buttons">
+                                <button type="submit" class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 flex-grow-1">
                                     <i class="fas fa-shopping-bag"></i>
                                     Add to Cart
                                 </button>
-                                <button type="submit" name="buy_now" value="1"
-                                    class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1 w-100-mobile"
-                                    style="
-                                        padding: 15px 20px;
-                                        background: white;
-                                        color: #6EA820;
-                                        border: 2px solid #6EA820;
-                                        border-radius: 8px;
-                                        font-weight: 600;
-                                        cursor: pointer;
-                                        transition: all 0.3s;
-                                        font-size: 18px;
-                                    "
-                                    onmouseover="this.style.background='#6EA820'; this.style.color='#fff';"
-                                    onmouseout="this.style.background='white'; this.style.color='#6EA820';">
+                                <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1">
                                     Buy Now
                                 </button>
                             </div>
                         </form>
                         @else
-                        <div class="product-page-action-buttons mb-4">
+                        <div class="product-page-action-buttons">
                             <button class="product-page-btn-add-cart btn btn-lg btn-secondary d-flex align-items-center gap-2" style="cursor: not-allowed;" disabled>
                                 Out of Stock
                             </button>
                         </div>
                         @endif
-                        <!-- Wishlist Form -->
-                        <!-- <form action="{{ route('wishlist.add', $product) }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="product-page-btn-wishlist btn btn-lg btn-outline-danger d-flex align-items-center gap-2">
-                                <i class="far fa-heart"></i>
-                                Add to Wishlist
-                            </button>
-                        </form> -->
+
+
 
                     </div>
-                    <!-- Info Badges -->
-                    <!-- <div class="product-page-info-badges d-flex gap-4">
-                        <div class="product-page-info-badge d-flex align-items-center gap-2">
-                            <span class="product-page-badge-icon"><i class="fas fa-leaf text-success"></i></span>
-                            <span>100% Healthy Plant</span>
-                        </div>
-                        <div class="product-page-info-badge d-flex align-items-center gap-2">
-                            <span class="product-page-badge-icon"><i class="fas fa-shield-alt text-primary"></i></span>
-                            <span>30-Day Guarantee</span>
-                        </div>
-                    </div>
-                </div> -->
                 </div>
                 <!-- End Product Info -->
             </div>
         </div>
     </div>
+</div> <!-- Close outer container from line 27 -->
 
     @if($product->reviews->count() > 0)
     <div class="product-reviews-section py-5 bg-white border-top">
@@ -645,216 +423,6 @@
         </div>
     </section>
 
-    <style>
-        /* ─── Dual-Panel Zoom (Amazon-Style) ────────────────────── */
-
-        /* Outer flex wrapper: thumbs | main */
-        .dpz-wrapper {
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-        }
-
-        /* Thumbnail column */
-        .dpz-thumbs {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .dpz-thumb {
-            width: 72px;
-            height: 72px;
-            border: 2px solid #e8e8e8;
-            border-radius: 6px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: border-color 0.2s ease;
-            background: #fff;
-            padding: 3px;
-        }
-
-        .dpz-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background: #ffffff;
-        }
-
-        .dpz-thumb.active,
-        .dpz-thumb:hover {
-            border-color: #6EA820;
-        }
-
-        /* Pill-style Quantity Control */
-        .qty-pill-control {
-            display: inline-flex;
-            align-items: center;
-            background: #ffffff;
-            border: 2px solid #6EA820;
-            border-radius: 50px;
-            padding: 2px 5px;
-            height: 38px;
-            min-width: 100px;
-            justify-content: space-between;
-            box-shadow: 0 2px 8px rgba(110, 168, 32, 0.1);
-        }
-
-        .qty-btn-inline {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: none;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: #333;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .qty-btn-inline:hover {
-            background-color: #f3f7ed;
-            color: #6EA820;
-        }
-
-        .product-page-qty-input {
-            width: 35px;
-            border: none;
-            text-align: center;
-            font-weight: 700;
-            font-size: 15px;
-            color: #1e293b;
-            background: transparent;
-            outline: none !important;
-        }
-
-        /* Main image panel */
-        .dpz-main {
-            flex: 1;
-            position: relative;
-            min-width: 0;
-        }
-
-        /* Image wrapper — the hover target */
-        .dpz-img-wrap {
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            border: 1px solid #ececec;
-            background: #fff;
-            cursor: crosshair;
-            user-select: none;
-        }
-
-        .dpz-img {
-            display: block;
-            width: 100%;
-            height: auto;
-            aspect-ratio: 1 / 1;
-            object-fit: contain;
-            object-position: center;
-            background: #ffffff;
-            border-radius: 7px;
-        }
-
-        /* Tracking lens */
-        #dpzLens {
-            position: absolute;
-            width: 180px;
-            height: 180px;
-            border: 1px solid rgba(110, 168, 32, 0.6);
-            background: rgba(110, 168, 32, 0.08);
-            backdrop-filter: blur(1px);
-            display: none;
-            pointer-events: none;
-            z-index: 10;
-            border-radius: 4px;
-        }
-
-        /* Live zoom preview — fixed so NO parent clips it */
-        #dpzPreview {
-            position: fixed;
-            width: 480px;
-            height: 480px;
-            background: #fff no-repeat;
-            border: 1px solid #d0d0d0;
-            border-radius: 8px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-            display: none;
-            z-index: 99999;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        /* Keep parent row overflow visible so preview can escape */
-        .product-page-section,
-        .product-page-section .row,
-        .dpz-main {
-            overflow: visible !important;
-        }
-
-        /* Mobile: hide preview + lens, show tap-to-lightbox cursor */
-        @media (max-width: 991px) {
-            .dpz-thumbs {
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
-
-            #dpzLens,
-            #dpzPreview {
-                display: none !important;
-            }
-
-            .dpz-img-wrap {
-                cursor: zoom-in;
-            }
-        }
-
-        /* ─── Lightbox (mobile / click) ─────────────────────── */
-        #zoomLightbox {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.88);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-            cursor: zoom-out;
-        }
-
-        #zoomLightbox.open {
-            display: flex;
-        }
-
-        #zoomLightbox img {
-            max-width: 92vw;
-            max-height: 88vh;
-            border-radius: 8px;
-            object-fit: contain;
-            box-shadow: 0 12px 60px rgba(0, 0, 0, 0.6);
-        }
-
-        #zoomLightbox .lb-close {
-            position: absolute;
-            top: 16px;
-            right: 20px;
-            color: #fff;
-            font-size: 36px;
-            line-height: 1;
-            cursor: pointer;
-            opacity: 0.85;
-            font-weight: 300;
-            transition: opacity 0.2s;
-        }
-
-        #zoomLightbox .lb-close:hover {
-            opacity: 1;
-        }
-    </style>
 
     {{-- Lightbox markup --}}
     <div id="zoomLightbox">
@@ -965,17 +533,17 @@
                     dpzWrap.addEventListener('mousemove', function(e) {
                         if (window.innerWidth < 992) return;
 
-                        var rect = dpzImg.getBoundingClientRect();
+                        var rect = dpzWrap.getBoundingClientRect();
                         var lW = dpzLens.offsetWidth || 180;
                         var lH = dpzLens.offsetHeight || 180;
                         var pW = dpzPreview.offsetWidth || 460;
                         var pH = dpzPreview.offsetHeight || 460;
 
-                        // Cursor inside image (relative)
+                        // Cursor inside container (relative)
                         var x = e.clientX - rect.left;
                         var y = e.clientY - rect.top;
 
-                        // Clamp lens inside image
+                        // Clamp lens inside container
                         var lx = Math.min(Math.max(x - lW / 2, 0), rect.width - lW);
                         var ly = Math.min(Math.max(y - lH / 2, 0), rect.height - lH);
 

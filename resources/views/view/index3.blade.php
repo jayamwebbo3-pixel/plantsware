@@ -123,7 +123,7 @@
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <!-- <img src="assets/img2/slider/slider1.jpg" class="d-block w-100 img-fluid" alt="s1"> -->
-                        <img src="{{ asset('uploads/img2/slider/11.png') }}" class="d-block w-100 img-fluid" alt="s1">
+                        <img src="{{ asset('uploads/img2/slider/11.webp') }}" class="d-block w-100 img-fluid" alt="s1">
                         <div class="carousel-caption container silder_text">
                             <p class="arrival">Complete Care for Every Plant</p>
                             <h5 class="headding">From Soil to<br>Bloom Naturally</h5>
@@ -131,7 +131,7 @@
                         </div>
                     </div>
                     <div class="carousel-item">
-                        <img src="{{ asset('uploads/img2/slider/22.png') }}" class="d-block w-100 img-fluid" alt="s1">
+                        <img src="{{ asset('uploads/img2/slider/22.webp') }}" class="d-block w-100 img-fluid" alt="s1">
                         <div class="carousel-caption container silder_text">
                             <p>Complete Care for Every Plant</p>
                             <h5 class="headding">Everything Your Plants<br>Need Naturally </h5>
@@ -139,7 +139,7 @@
                         </div>
                     </div>
                     <div class="carousel-item">
-                        <img src="{{ asset('uploads/img2/slider/33.png') }}" class="d-block w-100 img-fluid" alt="s1">
+                        <img src="{{ asset('uploads/img2/slider/33.webp') }}" class="d-block w-100 img-fluid" alt="s1">
                         <div class="carousel-caption container silder_text">
                             <p>Complete Care for Every Plant</p>
                             <h5 class="headding">Plants Gonna Make<br> People Happy.</h5>
