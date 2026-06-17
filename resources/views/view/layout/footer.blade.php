@@ -312,8 +312,7 @@
     }
 </style>
 
-<!-- scroll -->
-<a href="#" id="scroll"><i class="fas fa-chevron-up"></i></a>
+
 <!-- jquery-3.4.1 -->
 <script src="{{ asset('assets/js/jquery-3.4.1.min.js') }}"></script>
 <script src="{{ asset('assets/js/popper.min.js') }}"></script>
@@ -401,7 +400,7 @@
                         spaceBetween: 15,
                     },
                     1024: {
-                        slidesPerView: 4,
+                        slidesPerView: 3,
                         spaceBetween: 20,
                     },
                 },
@@ -462,6 +461,15 @@
             responsive: [{
                     breakpoint: 1024,
                     settings: {
+                        slidesToShow: Math.min(5, catSlideCount),
+                        slidesToScroll: 1,
+                        infinite: catSlideCount > 5,
+                        autoplay: catSlideCount > 5
+                    }
+                },
+                {
+                    breakpoint: 768,
+                    settings: {
                         slidesToShow: Math.min(4, catSlideCount),
                         slidesToScroll: 1,
                         infinite: catSlideCount > 4,
@@ -469,7 +477,7 @@
                     }
                 },
                 {
-                    breakpoint: 768,
+                    breakpoint: 576,
                     settings: {
                         slidesToShow: Math.min(3, catSlideCount),
                         slidesToScroll: 1,
@@ -478,21 +486,12 @@
                     }
                 },
                 {
-                    breakpoint: 576,
+                    breakpoint: 375,
                     settings: {
                         slidesToShow: Math.min(2, catSlideCount),
                         slidesToScroll: 1,
                         infinite: catSlideCount > 2,
                         autoplay: catSlideCount > 2
-                    }
-                },
-                {
-                    breakpoint: 400,
-                    settings: {
-                        slidesToShow: 1,
-                        slidesToScroll: 1,
-                        infinite: catSlideCount > 1,
-                        autoplay: catSlideCount > 1
                     }
                 }
             ]

@@ -23,6 +23,15 @@
                 </span>
             @endif
         </a>
+        <a href="{{ route('product.show', $product->slug) }}" class="product-quick-view-btn" title="View Details">
+            <i class="fas fa-eye"></i>
+        </a>
+        @if(($product->total_reviews ?? 0) > 0)
+            <div class="product-rating-badge">
+                <span>{{ number_format($product->avg_rating ?? 0, 1) }}</span>
+                <i class="fas fa-star"></i>
+            </div>
+        @endif
     </div>
 
     <div class="product-info">
@@ -32,26 +41,7 @@
             </a>
         </h3>
 
-        <!-- Product Rating -->
-        @if(($product->total_reviews ?? 0) > 0)
-        <div class="product-rating mb-2">
-            <span class="stars" style="color: #ffc107; font-size: 13px;">
-                @php $avg = $product->avg_rating ?? 0; @endphp
-                @for($i = 1; $i <= 5; $i++)
-                    @if($i <=floor($avg))
-                    <i class="fas fa-star"></i>
-                    @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
-                    <i class="fas fa-star-half-alt"></i>
-                    @else
-                    <i class="far fa-star"></i>
-                    @endif
-                    @endfor
-            </span>
-            <span class="rating-count text-muted small">({{ $product->total_reviews }})</span>
-        </div>
-        @else
-        <div class="product-rating mb-2" style="height: 19px;"></div> <!-- Spacer -->
-        @endif
+
 
         <div class="product-price">
             @if($product->stock_quantity > 0)
@@ -83,95 +73,104 @@ if ($product->has_variants && !empty($product->size)) {
 }
 @endphp
 
-        <div class="product-actions mt-3 d-flex align-items-stretch" style="gap: 4px !important;">
+        <div class="product-actions mt-3 d-flex align-items-stretch">
             @if($product->stock_quantity > 0)
                 @if($hasAttributes)
                     @if(request()->routeIs('home'))
                         @if($product->combo_pack_eligible === 'Yes')
-                        <div class="flex-grow-1 d-flex">
-                            <a href="{{ route('combo-builder.index', ['add_product' => $product->id]) }}" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content; text-decoration: none;">
-                                Add To Combo
+                        <div class="flex-grow-1 d-flex combo-btn-wrapper">
+                            <a href="{{ route('combo-builder.index', ['add_product' => $product->id]) }}" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
+                                <span class="d-none d-lg-inline">Add To Combo</span>
+                                <span class="d-inline d-lg-none">Combo</span>
                             </a>
                         </div>
                         @else
-                        <div class="flex-grow-1 d-flex">
-                            <button type="button" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" disabled style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content; opacity: 0.4; cursor: not-allowed;">
-                                Add To Combo
+                        <div class="flex-grow-1 d-flex combo-btn-wrapper">
+                            <button type="button" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" disabled>
+                                <span class="d-none d-lg-inline">Add To Combo</span>
+                                <span class="d-inline d-lg-none">Combo</span>
                             </button>
                         </div>
                         @endif
-                        <div class="flex-grow-1 d-flex">
-                            <a href="{{ route('product.show', $product->slug) }}" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content; text-decoration: none;">
-                                View Options
+                        <div class="flex-grow-1 d-flex view-btn-wrapper">
+                            <a href="{{ route('product.show', $product->slug) }}" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
+                                <span class="d-none d-lg-inline">View Options</span>
+                                <span class="d-inline d-lg-none">View</span>
                             </a>
                         </div>
                     @else
-                        <div class="flex-grow-1 d-flex">
-                            <a href="{{ route('product.show', $product->slug) }}" class="btn btn-primary w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content; text-decoration: none;">
-                                View Options
+                        <div class="flex-grow-1 d-flex view-btn-wrapper">
+                            <a href="{{ route('product.show', $product->slug) }}" class="btn btn-primary w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
+                                <span class="d-none d-lg-inline">View Options</span>
+                                <span class="d-inline d-lg-none">View</span>
                             </a>
                         </div>
                     @endif
                 @else
                     @if(request()->routeIs('home'))
                         @if($product->combo_pack_eligible === 'Yes')
-                        <div class="flex-grow-1 d-flex">
-                            <a href="{{ route('combo-builder.index', ['add_product' => $product->id]) }}" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content; text-decoration: none;">
-                                Add To Combo
+                        <div class="flex-grow-1 d-flex combo-btn-wrapper">
+                            <a href="{{ route('combo-builder.index', ['add_product' => $product->id]) }}" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
+                                <span class="d-none d-lg-inline">Add To Combo</span>
+                                <span class="d-inline d-lg-none">Combo</span>
                             </a>
                         </div>
                         @else
-                        <div class="flex-grow-1 d-flex">
-                            <button type="button" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" disabled style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content; opacity: 0.4; cursor: not-allowed;">
-                                Add To Combo
+                        <div class="flex-grow-1 d-flex combo-btn-wrapper">
+                            <button type="button" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" disabled>
+                                <span class="d-none d-lg-inline">Add To Combo</span>
+                                <span class="d-inline d-lg-none">Combo</span>
                             </button>
                         </div>
                         @endif
-                        <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex">
+                        <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex cart-form-wrapper">
                             @csrf
                             <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap" style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content;">
-                                Add To Cart
+                            <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap">
+                                <span class="d-none d-lg-inline">Add To Cart</span>
+                                <span class="d-inline d-lg-none">Cart</span>
                             </button>
                         </form>
                     @else
-                        <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex">
+                        <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex cart-form-wrapper">
                             @csrf
                             <input type="hidden" name="quantity" value="1">
                             <input type="hidden" name="buy_now" value="1">
-                            <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap" style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content;">
-                                Buy Now
+                            <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap">
+                                <span class="d-none d-lg-inline">Buy Now</span>
+                                <span class="d-inline d-lg-none">Buy</span>
                             </button>
                         </form>
-                        <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex">
+                        <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex cart-form-wrapper">
                             @csrf
                             <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap" style="white-space: nowrap !important; padding: 6px 2px !important; font-size: 12px !important; min-width: max-content;">
-                                Add To Cart
+                            <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap">
+                                <span class="d-none d-lg-inline">Add To Cart</span>
+                                <span class="d-inline d-lg-none">Cart</span>
                             </button>
                         </form>
                     @endif
                 @endif
             @else
-            <div class="flex-grow-1 d-flex">
+            <div class="flex-grow-1 d-flex combo-btn-wrapper">
                 <button class="btn btn-secondary w-100 h-100" disabled>Out of Stock</button>
             </div>
             @endif
 
-            <div class="wishlist-btn-container d-flex">
-                @if(isset($isWishlistPage) && $isWishlistPage)
-                <button type="button" class="btn btn-wishlist btn-wishlist-action h-100" onclick="removeFromWishlist({{ $product->id }})" style="background-color: #fff5f5 !important; border-color: #dc3545 !important; color: #dc3545 !important;">
-                    <i class="fas fa-heart text-danger" style="font-size: 18px !important;"></i>
+            @if(isset($isWishlistPage) && $isWishlistPage)
+            <div class="wishlist-btn-container d-flex h-100">
+                <button type="button" class="btn btn-wishlist btn-wishlist-action w-100 h-100" onclick="removeFromWishlist({{ $product->id }})">
+                    <i class="fas fa-heart text-danger"></i>
                 </button>
-                @else
-                <form action="{{ route('wishlist.add', $product) }}" method="POST" class="d-flex h-100">
-                    @csrf
-                    <button type="submit" class="btn btn-wishlist btn-wishlist-action h-100" style="background-color: #fff5f5 !important; border-color: #dc3545 !important; color: #dc3545 !important;">
-                        <i class="far fa-heart" style="font-size: 18px !important;"></i>
-                    </button>
-                </form>
-                @endif
             </div>
+            @else
+            <form action="{{ route('wishlist.add', $product) }}" method="POST" class="wishlist-btn-container d-flex h-100">
+                @csrf
+                <button type="submit" class="btn btn-wishlist btn-wishlist-action w-100 h-100">
+                    <i class="far fa-heart"></i>
+                </button>
+            </form>
+            @endif
         </div>
 
     </div>

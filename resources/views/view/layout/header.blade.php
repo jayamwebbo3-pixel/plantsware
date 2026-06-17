@@ -224,6 +224,12 @@
                         </button>
                         <ul class="main-menu navbar">
                             <button class="close-menu" id="closeMenu" aria-label="Close Menu">×</button>
+                            <!-- Hamburger Logo -->
+                            <li class="hamburger-logo-item">
+                                <a href="{{ url('/') }}">
+                                    <img src="{{ asset('assets/images/logo-1.png') }}" alt="Plantsware Logo">
+                                </a>
+                            </li>
                             <!-- Home -->
                             <li><a href="{{ url('/') }}">Home</a></li>
 
