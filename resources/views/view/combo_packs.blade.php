@@ -18,9 +18,13 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Side Menu for Filters -->
-            <div class="col-lg-3 col-md-4 mb-4">
+            <div class="col-lg-3 col-md-4 mb-4 side-menu-wrapper" id="filterMenuWrapper">
                 <form id="filter-form" action="{{ url()->current() }}" method="GET" class="side-menu bg-white rounded shadow-sm p-3 sticky-top" style="top: 20px; z-index: 1000; border: 1px solid #ddd;">
-                    <h2 class="side-menu-title mb-3">Filters</h2>
+                    <div class="d-flex justify-content-between align-items-center d-md-none mb-3">
+                        <h4 class="fw-bold mb-0" style="color: #6EA820;">Filters</h4>
+                        <button type="button" class="btn-close" id="mobileFilterClose" style="border: none; background: transparent; font-size: 1.5rem; color: #333; line-height: 1;">&times;</button>
+                    </div>
+                    <h2 class="side-menu-title mb-3 d-none d-md-block">Filters</h2>
                     
                     <!-- Price Range Filter -->
                     <div class="filter-section active mb-3">
@@ -122,8 +126,15 @@
             <!-- Products Display Area -->
             <div class="col-lg-9 col-md-8">
                 <div class="products-area">
-                    <div class="products-header bg-white rounded p-3 mb-4 d-flex justify-content-between align-items-center border">
+                    <div class="products-header bg-white rounded p-3 mb-3 d-flex justify-content-between align-items-center border">
                         <h2 class="category-name mb-0">Combo Packs Listing</h2>
+                    </div>
+
+                    <!-- Mobile Filter Trigger (Visible only on mobile/tablet < 768px) -->
+                    <div class="d-md-none mb-3">
+                        <button type="button" class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2" id="mobileFilterToggle" style="background-color: #6EA820; border-color: #6EA820; font-weight: 600; border-radius: 8px;">
+                            <i class="fas fa-filter"></i> Filter & Sort Combo Packs
+                        </button>
                     </div>
 
                     <div class="products-grid row g-3">
@@ -140,7 +151,12 @@
                                                 @if(count($images) >= 2)
                                                     <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $combo->name }} 1">
                                                     <span class="image-plus-sign">+</span>
-                                                    <img src="{{ asset('storage/' . $images[1]) }}" alt="{{ $combo->name }} 2">
+                                                    <div class="image-wrap-more">
+                                                        <img src="{{ asset('storage/' . $images[1]) }}" alt="{{ $combo->name }} 2">
+                                                        @if(count($images) > 2)
+                                                            <span class="combo-more-badge">+{{ count($images) - 2 }} More</span>
+                                                        @endif
+                                                    </div>
                                                 @elseif(count($images) == 1)
                                                     <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $combo->name }}" class="single-combo-img">
                                                 @else
@@ -172,19 +188,29 @@
                                                 <div style="height: 30px;"></div>
                                             @endif
                                         </div>
-                                        <div class="card-actions-row">
+                                        <div class="card-actions-row d-flex gap-2 align-items-stretch">
                                             @if($combo->stock_quantity > 0)
-                                                <form action="{{ route('cart.add_combo', $combo->id) }}" method="POST" class="flex-grow-1">
+                                                <form action="{{ route('cart.add_combo', $combo->id) }}" method="POST" class="flex-grow-1 d-flex">
                                                     @csrf
                                                     <input type="hidden" name="buy_now" value="1">
-                                                    <button type="submit" class="btn-buy-now">Buy Now</button>
+                                                    <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
+                                                        <span class="d-none d-lg-inline">Buy Now</span>
+                                                        <span class="d-inline d-lg-none">Buy</span>
+                                                    </button>
                                                 </form>
-                                                <form action="{{ route('cart.add_combo', $combo->id) }}" method="POST" class="flex-grow-1">
+                                                <form action="{{ route('cart.add_combo', $combo->id) }}" method="POST" class="flex-grow-1 d-flex">
                                                     @csrf
-                                                    <button type="submit" class="btn-add-to-cart">Add To Cart</button>
+                                                    <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
+                                                        <span class="d-none d-lg-inline">Add To Cart</span>
+                                                        <span class="d-inline d-lg-none">Cart</span>
+                                                    </button>
                                                 </form>
                                             @else
-                                                <button type="button" class="btn-out-of-stock flex-grow-1" disabled>Out of Stock</button>
+                                                <div class="flex-grow-1 d-flex">
+                                                    <button type="button" class="btn btn-secondary w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" style="background-color: #f1f5f9 !important; color: #94a3b8 !important; border: 1px solid #e2e8f0 !important; cursor: not-allowed !important; font-size: 0.85rem !important; font-weight: 600 !important; border-radius: 8px !important;" disabled>
+                                                        Out of Stock
+                                                    </button>
+                                                </div>
                                             @endif
                                             <button type="button" class="btn-wishlist-custom wishlist-btn-combo" data-id="{{ $combo->id }}">
                                                 <i class="fa-regular fa-heart"></i>
@@ -222,30 +248,51 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // AJAX Wishlist
-    $('.wishlist-btn-combo').on('click', function() {
-        const id = $(this).data('id');
-        const btn = $(this);
+    document.querySelectorAll('.wishlist-btn-combo').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const currentBtn = this;
 
-        $.ajax({
-            url: "{{ url('/wishlist/add-combo') }}/" + id,
-            type: "POST",
-            data: {
-                _token: "{{ csrf_token() }}"
-            },
-            success: function(response) {
-                if (response.success) {
-                    alert(response.message);
-                    $('.price_cart').first().text(response.wishlist_count);
-                    btn.find('i').removeClass('fa-regular').addClass('fa-solid').css('color', '#e53e3e');
+            fetch("{{ url('/wishlist/add-combo') }}/" + id, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
                 }
-            },
-            error: function(xhr) {
-                if (xhr.status === 401) {
+            })
+            .then(response => {
+                if (response.status === 401) {
                     window.location.href = "{{ route('login') }}";
-                } else {
-                    alert(xhr.responseJSON.message || "Something went wrong");
+                    return;
                 }
-            }
+                return response.json().then(data => {
+                    if (!response.ok) {
+                        throw new Error(data.message || "Something went wrong");
+                    }
+                    return data;
+                });
+            })
+            .then(data => {
+                if (data && data.success) {
+                    alert(data.message);
+                    document.querySelectorAll('.price_cart').forEach(el => {
+                        el.textContent = data.wishlist_count;
+                    });
+                    const icon = currentBtn.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fa-regular');
+                        icon.classList.add('fa-solid');
+                        icon.style.color = '#e53e3e';
+                    }
+                }
+            })
+            .catch(error => {
+                if (error && error.message) {
+                    alert(error.message);
+                }
+            });
         });
     });
 });
@@ -475,5 +522,39 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 16px;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var filterToggle = document.getElementById('mobileFilterToggle');
+    var filterClose = document.getElementById('mobileFilterClose');
+    var filterMenu = document.getElementById('filterMenuWrapper');
+    
+    // Create backdrop overlay
+    var overlay = document.createElement('div');
+    overlay.className = 'filter-overlay';
+    document.body.appendChild(overlay);
+    
+    if (filterToggle && filterMenu) {
+        filterToggle.addEventListener('click', function() {
+            filterMenu.classList.add('open');
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden'; // prevent background scrolling
+        });
+    }
+    
+    function closeMobileFilter() {
+        if (filterMenu) {
+            filterMenu.classList.remove('open');
+        }
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    
+    if (filterClose) {
+        filterClose.addEventListener('click', closeMobileFilter);
+    }
+    overlay.addEventListener('click', closeMobileFilter);
+});
+</script>
 
 @include('view.layout.footer')

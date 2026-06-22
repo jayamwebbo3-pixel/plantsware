@@ -27,12 +27,12 @@
             <!-- Left Column: Products Grid & Search -->
             <div class="col-lg-8 mb-4">
                 <!-- Search & Filters -->
-                <div class="bg-white rounded-3 shadow-sm p-3 mb-4 border d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                <div class="bg-white rounded-3 shadow-sm p-3 mb-4 border d-flex flex-wrap gap-2 justify-content-between align-items-center builder-filter-wrapper">
                     <div class="input-group style-search-group" style="max-width: 400px; flex-grow: 1;">
                         <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
                         <input type="text" id="builderSearch" class="form-control bg-light border-start-0" placeholder="Search products...">
                     </div>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2 builder-filter-select-container">
                         <span class="text-muted small text-nowrap">Filter:</span>
                         <select id="builderCategory" class="form-select bg-light">
                             <option value="">All Categories</option>

@@ -167,12 +167,16 @@
                                     </div>
                                 </div>
 
-                                <div class="checkout-actions d-flex flex-column flex-md-row justify-content-between mt-4 border-top pt-4 gap-3">
-                                    <a href="{{ route('cart.index') }}" class="btn btn-secondary rounded-pill px-4 py-2 order-2 order-md-1 w-100 text-center">
-                                        <i class="fas fa-arrow-left me-2"></i> Back to Cart
+                                <div class="checkout-actions d-flex flex-column flex-md-row justify-content-between mt-4 border-top pt-4 gap-3 px-3 px-md-4">
+                                    <a href="{{ route('cart.index') }}" class="btn-checkout-secondary order-2 order-md-1">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        <span class="d-none d-lg-inline">Back to Cart</span>
+                                        <span class="d-inline d-lg-none">Back</span>
                                     </a>
-                                    <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-success-hover order-1 order-md-2 w-100 text-center">
-                                        CONTINUE TO PAYMENT <i class="fas fa-arrow-right ms-2"></i>
+                                    <button type="submit" class="btn-checkout-primary order-1 order-md-2">
+                                        <span class="d-none d-lg-inline">CONTINUE TO PAYMENT</span>
+                                        <span class="d-inline d-lg-none">CONTINUE</span>
+                                        <i class="fas fa-arrow-right ms-2"></i>
                                     </button>
                                 </div>
                             </form>
@@ -237,6 +241,12 @@
                                     <span class="text-success extra-small fw-bold">-₹{{ number_format($discount, 2) }}</span>
                                 </div>
                                 @endif
+                                @if(isset($couponDiscount) && $couponDiscount > 0)
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted extra-small">Coupon Discount ({{ $coupon->coupon_code ?? '' }})</span>
+                                    <span class="text-success extra-small fw-bold">-₹{{ number_format($couponDiscount, 2) }}</span>
+                                </div>
+                                @endif
                                 @if(isset($cgst) && $cgst > 0)
                                 <div class="d-flex justify-content-between mb-1">
                                     <span class="text-muted extra-small">CGST</span>
@@ -271,13 +281,13 @@
                     <div class="trust-cards-grid row g-2">
                         <div class="col-6">
                             <div class="card border-0 shadow-sm rounded-4 bg-white p-3 text-center h-100">
-                                <div class="text-success mb-2 fs-4"><i class="fas fa-shield-check"></i></div>
+                                <div class="text-success mb-2 fs-4"><i class="fas fa-shield-alt"></i></div>
                                 <h6 class="extra-small fw-bold mb-0">Safe Shipping</h6>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="card border-0 shadow-sm rounded-4 bg-white p-3 text-center h-100">
-                                <div class="text-primary mb-2 fs-4"><i class="fas fa-truck-container"></i></div>
+                                <div class="text-success mb-2 fs-4"><i class="fas fa-shipping-fast"></i></div>
                                 <h6 class="extra-small fw-bold mb-0">Fast Shipping</h6>
                             </div>
                         </div>
@@ -411,6 +421,7 @@
         height: 45px;
         flex-shrink: 0;
         overflow: hidden;
+        margin-right: 15px !important;
     }
 
     /* Global Utils */
@@ -445,14 +456,68 @@
     }
 
     /* Buttons */
-    .btn-success {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+    .btn-checkout-primary,
+    .btn-checkout-secondary {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important; /* Full-width on mobile */
+        min-width: 170px !important;
+        max-width: 100% !important;
+        min-height: 44px !important;
+        padding: 10px 24px !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        border-radius: 10px !important; /* Standardized 10px corner-radius box */
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        box-sizing: border-box !important;
+        border: none !important;
+        text-decoration: none !important;
+        white-space: nowrap !important;
     }
 
-    .btn-success:hover {
-        background-color: #5a821a;
-        border-color: #5a821a;
+    .btn-checkout-primary {
+        background-color: #4a7856 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(74, 120, 86, 0.25) !important;
+    }
+
+    .btn-checkout-primary:hover {
+        background-color: #3b6247 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(59, 98, 71, 0.35) !important;
+        color: #ffffff !important;
+    }
+
+    .btn-checkout-secondary {
+        background-color: #f1f5f9 !important;
+        color: #475569 !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    .btn-checkout-secondary:hover {
+        background-color: #e2e8f0 !important;
+        color: #1e293b !important;
+        transform: translateY(-2px) !important;
+    }
+
+    @media (min-width: 768px) {
+        .btn-checkout-primary,
+        .btn-checkout-secondary {
+            width: auto !important; /* Auto-width on desktop/tablet */
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .btn-checkout-primary,
+        .btn-checkout-secondary {
+            min-width: 120px !important;
+            min-height: 38px !important;
+            padding: 8px 18px !important;
+            font-size: 13px !important;
+            border-radius: 8px !important;
+        }
     }
 
     /* Hide scrollbar but keep functionality */

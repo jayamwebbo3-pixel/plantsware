@@ -32,8 +32,12 @@
 <section class="py-4">
     <div class="container-fluid">
         <div class="row">
+            <!-- Mobile Filter Overlay Backdrop -->
+            <div class="filter-overlay" id="filterOverlay"></div>
+
             <!-- Side Menu for Categories with Filters -->
-            <div class="col-lg-3 col-md-4 mb-4">
+            <div class="col-lg-3 col-md-4 mb-4 filter-desktop-col">
+                <div class="side-menu-wrapper" id="filterSidebar">
                 <form id="filter-form" action="{{ url()->current() }}" method="GET"
                     class="side-menu bg-white rounded shadow-sm p-3 sticky-top"
                     style="top: 20px; z-index: 1; border: 1px solid #ddd;">
@@ -264,44 +268,64 @@
 
                     {{-- ── Actions ─────────────────────────────────────────── --}}
                     <div class="filter-actions d-flex gap-2 mt-3">
-                        <button class="btn-filter btn-apply flex-fill" type="submit">Apply Filters</button>
+                        <button class="btn-filter btn-apply flex-fill" type="submit" id="applyFiltersBtn">Apply Filters</button>
                         <a href="{{ url()->current() }}"
                             class="btn-filter btn-reset flex-fill text-center text-decoration-none"
                             style="display:flex; justify-content:center; align-items:center;">Reset All</a>
                     </div>
                 </form>
+                </div><!-- /.side-menu-wrapper -->
             </div>
 
             <!-- Products Display Area -->
-            <div class="col-lg-9 col-md-8">
+            <div class="col-lg-9 col-md-8 col-12">
                 <div class="products-area">
-                    <div class="products-header bg-white rounded p-3 mb-4">
-                        <!-- @if(isset($category) && $category->image)
-                        <div class="category-image-banner mb-4 text-center">
-                            <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                        </div>
-                        @endif -->
-                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-                            <h2 class="category-name mb-2 mb-md-0">
-                                @if(request()->filled('q'))
-                                    Search results for "{{ request('q') }}"
-                                @elseif(isset($category))
-                                    {{ $category->name }}
-                                @elseif(isset($subcategory))
-                                    {{ $subcategory->name }}
-                                @else
-                                    All Categories
-                                @endif
-                            </h2>
+                    <!-- Mobile Filter Toggle Button -->
+                    <div class="mobile-filter-bar d-md-none d-flex align-items-center mb-3 px-1">
+                        <button type="button" id="filterToggleBtn" class="btn-filter-toggle">
+                            <i class="fas fa-sliders-h"></i>
+                            Filters
+                            @php $activeFilters = count(array_filter(request()->except(['page', 'sort']))); @endphp
+                            @if($activeFilters > 0)
+                                <span class="filter-active-badge">{{ $activeFilters }}</span>
+                            @endif
+                        </button>
+                    </div>
+                    <div class="products-header-bar mb-4">
+                        <div class="products-header-inner">
+                            <!-- Left: Category Title + Count -->
+                            <div class="products-header-left">
+                                <div class="category-title-group">
+                                    <i class="fas fa-leaf category-leaf-icon"></i>
+                                    <h2 class="category-name-heading">
+                                        @if(request()->filled('q'))
+                                            Search results for &ldquo;{{ request('q') }}&rdquo;
+                                        @elseif(isset($category))
+                                            {{ $category->name }}
+                                        @elseif(isset($subcategory))
+                                            {{ $subcategory->name }}
+                                        @else
+                                            All Categories
+                                        @endif
+                                    </h2>
+                                </div>
+                                <span class="product-count-pill">
+                                    {{ $products->total() }} Products
+                                </span>
+                            </div>
 
-                            <div class="sort-options">
-                                <select id="sort-products" class="form-select">
-                                    <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Sort by: Popularity</option>
-                                    <option value="name-asc" {{ request('sort') == 'name-asc' ? 'selected' : '' }}>Name: A to Z</option>
-                                    <option value="name-desc" {{ request('sort') == 'name-desc' ? 'selected' : '' }}>Name: Z to A</option>
-                                    <option value="price-low" {{ request('sort') == 'price-low' ? 'selected' : '' }}>Price: Low to High</option>
-                                    <option value="price-high" {{ request('sort') == 'price-high' ? 'selected' : '' }}>Price: High to Low</option>
-                                </select>
+                            <!-- Right: Sort Dropdown -->
+                            <div class="products-header-right">
+                                <div class="sort-select-wrapper">
+                                    <i class="fas fa-sort-amount-down sort-icon"></i>
+                                    <select id="sort-products" class="sort-select-styled">
+                                        <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Popularity</option>
+                                        <option value="name-asc" {{ request('sort') == 'name-asc' ? 'selected' : '' }}>Name: A to Z</option>
+                                        <option value="name-desc" {{ request('sort') == 'name-desc' ? 'selected' : '' }}>Name: Z to A</option>
+                                        <option value="price-low" {{ request('sort') == 'price-low' ? 'selected' : '' }}>Price: Low → High</option>
+                                        <option value="price-high" {{ request('sort') == 'price-high' ? 'selected' : '' }}>Price: High → Low</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -339,47 +363,37 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Dual Price Range Slider (noUiSlider)
+
+        // ── Price Slider ───────────────────────────────────────
         const priceSlider = document.getElementById('price-range-slider');
         if (priceSlider) {
             const minInput = document.getElementById('price_min');
             const maxInput = document.getElementById('price_max');
             const minLabel = document.getElementById('price-min-label');
             const maxLabel = document.getElementById('price-max-label');
-
             const startMin = parseInt(minInput.value) || {{ $minPrice }};
             const startMax = parseInt(maxInput.value) || {{ $maxPrice }};
             const globalMin = {{ $minPrice }};
             const globalMax = {{ $maxPrice }};
-
             noUiSlider.create(priceSlider, {
                 start: [startMin, startMax],
                 connect: true,
                 step: 10,
-                range: {
-                    'min': globalMin,
-                    'max': globalMax
-                },
+                range: { 'min': globalMin, 'max': globalMax },
                 format: {
                     to: function(value) { return Math.round(value); },
                     from: function(value) { return parseFloat(value); }
                 }
             });
-
-            priceSlider.noUiSlider.on('update', function(values, handle) {
-                const val0 = values[ handle ? 0 : 0 ]; // handle is irrelevant for labels in this simple update
-                const v0 = values[0];
-                const v1 = values[1];
-                
-                minLabel.textContent = `₹${v0}`;
-                maxLabel.textContent = `₹${v1}`;
-                
-                minInput.value = v0;
-                maxInput.value = v1;
+            priceSlider.noUiSlider.on('update', function(values) {
+                minLabel.textContent = `₹${values[0]}`;
+                maxLabel.textContent = `₹${values[1]}`;
+                minInput.value = values[0];
+                maxInput.value = values[1];
             });
         }
 
-        // Sort Dropdown Auto Submit
+        // ── Sort Dropdown Auto Submit ───────────────────────────
         const sortDropdown = document.getElementById('sort-products');
         if (sortDropdown) {
             sortDropdown.addEventListener('change', function() {
@@ -389,7 +403,7 @@
             });
         }
 
-        // Toggle heart icon color dynamically for wishlist
+        // ── Wishlist Icon Toggle ────────────────────────────────
         document.querySelectorAll('.btn-wishlist').forEach(button => {
             button.addEventListener('mousedown', function() {
                 const icon = this.querySelector('i');
@@ -401,13 +415,84 @@
             });
         });
 
-        // Collapsible filter sections
+        // ── Collapsible Filter Sections (mobile-only accordion) ────
         document.querySelectorAll('.filter-title').forEach(title => {
-            title.addEventListener('click', function(e) {
-                if (this.parentElement.querySelector('.filter-options')) {
+            title.addEventListener('click', function() {
+                // Only allow collapsing on mobile (< 768px)
+                if (window.innerWidth < 768 && this.parentElement.querySelector('.filter-options')) {
                     this.parentElement.classList.toggle('active');
                 }
             });
+        });
+
+        // ── Mobile Filter Drawer ───────────────────────────────
+        const filterToggleBtn  = document.getElementById('filterToggleBtn');
+        const filterSidebar    = document.getElementById('filterSidebar');
+        const filterOverlay    = document.getElementById('filterOverlay');
+        const applyFiltersBtn  = document.getElementById('applyFiltersBtn');
+        const filterForm       = document.getElementById('filter-form');
+
+        function isMobile() {
+            return window.innerWidth < 768;
+        }
+
+        function openFilterDrawer() {
+            if (!filterSidebar) return;
+            filterSidebar.classList.add('open');
+            if (filterOverlay) filterOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden'; // lock page scroll
+        }
+
+        function closeFilterDrawer() {
+            if (!filterSidebar) return;
+            filterSidebar.classList.remove('open');
+            if (filterOverlay) filterOverlay.classList.remove('open');
+            document.body.style.overflow = ''; // restore page scroll
+        }
+
+        // Toggle on button click
+        if (filterToggleBtn) {
+            filterToggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (filterSidebar && filterSidebar.classList.contains('open')) {
+                    closeFilterDrawer();
+                } else {
+                    openFilterDrawer();
+                }
+            });
+        }
+
+        // Close on overlay click
+        if (filterOverlay) {
+            filterOverlay.addEventListener('click', function() {
+                closeFilterDrawer();
+            });
+        }
+
+        // Close after Apply Filters (submit form then close)
+        if (applyFiltersBtn && filterForm) {
+            applyFiltersBtn.addEventListener('click', function(e) {
+                if (isMobile()) {
+                    closeFilterDrawer();
+                    // Let the form submit naturally after drawer closes
+                    setTimeout(function() { filterForm.submit(); }, 320);
+                    e.preventDefault();
+                }
+                // On desktop: let the default submit happen immediately
+            });
+        }
+
+        // Ensure drawer is always CLOSED on page load for mobile
+        if (isMobile()) {
+            closeFilterDrawer();
+        }
+
+        // Re-check on resize to handle orientation changes
+        window.addEventListener('resize', function() {
+            if (!isMobile()) {
+                closeFilterDrawer();
+                document.body.style.overflow = '';
+            }
         });
     });
 </script>

@@ -121,6 +121,9 @@
                     <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                         <i class="fas fa-users"></i> <span>Customers</span>
                     </a>
+                    <a class="nav-link {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}" href="{{ route('admin.coupons.index') }}">
+                        <i class="fas fa-ticket-alt"></i> <span>Coupons</span>
+                    </a>
 
                     <a class="nav-link {{ request()->routeIs('admin.shipping-rates.*') ? 'active' : '' }}" href="{{ route('admin.shipping-rates.index') }}">
                         <i class="fas fa-shipping-fast"></i> Shipping Cost

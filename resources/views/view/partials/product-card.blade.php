@@ -1,4 +1,4 @@
-<div class="product-card">
+<div class="product-card {{ $product->stock_quantity <= 0 ? 'out-of-stock' : '' }}">
     <div class="product-image-container" style="background: #ffffff;">
         <a href="{{ route('product.show', $product->slug) }}">
             @php
@@ -11,11 +11,9 @@
             <img src="{{ $hoverImage }}"
                  alt="{{ $product->name }}" class="product-image hover-image w-100 h-100" style="object-fit: contain; background: #ffffff;" loading="lazy" decoding="async">
             @if($product->stock_quantity <= 0)
-                <span class="discount-badge" style="background-color: #dc3545 !important;">OUT OF STOCK</span>
-            @elseif($product->sale_price && $product->sale_price < $product->price)
-                <span class="discount-badge">
-                    {{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
-                </span>
+                <div class="out-of-stock-overlay">
+                    <span class="out-of-stock-badge">Out Of Stock</span>
+                </div>
             @endif
             @if($product->combo_pack_eligible === 'Yes')
                 <span class="combo-badge" style="position: absolute; top: 10px; right: 10px; background-color: #2e7d32; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; z-index: 10; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">
@@ -45,15 +43,16 @@
 
         <div class="product-price">
             @if($product->stock_quantity > 0)
-            @if($product->sale_price && $product->sale_price < $product->price)
-                <span class="original-price text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</span>
-                <span class="current-price ms-2 fw-bold">₹{{ number_format($product->sale_price, 2) }}</span>
+                @if($product->sale_price && $product->sale_price < $product->price)
+                    <span class="original-price text-muted text-decoration-line-through">₹{{ number_format($product->price, 2) }}</span>
+                    <span class="current-price ms-2 fw-bold">₹{{ number_format($product->sale_price, 2) }}</span>
+                    <span class="price-discount-tag">{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF</span>
                 @else
-                <span class="current-price fw-bold">₹{{ number_format($product->price, 2) }}</span>
+                    <span class="current-price fw-bold">₹{{ number_format($product->price, 2) }}</span>
                 @endif
-                @else
+            @else
                 <div style="height: 24px;"></div> <!-- Spacer to keep layout consistent -->
-                @endif
+            @endif
         </div>
 
 @php
@@ -92,19 +91,29 @@ if ($product->has_variants && !empty($product->size)) {
                             </button>
                         </div>
                         @endif
-                        <div class="flex-grow-1 d-flex view-btn-wrapper">
-                            <a href="{{ route('product.show', $product->slug) }}" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
-                                <span class="d-none d-lg-inline">View Options</span>
-                                <span class="d-inline d-lg-none">View</span>
-                            </a>
-                        </div>
+                        <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex cart-form-wrapper">
+                            @csrf
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap">
+                                <span class="d-none d-lg-inline">Add To Cart</span>
+                                <span class="d-inline d-lg-none">Cart</span>
+                            </button>
+                        </form>
                     @else
                         <div class="flex-grow-1 d-flex view-btn-wrapper">
-                            <a href="{{ route('product.show', $product->slug) }}" class="btn btn-primary w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
-                                <span class="d-none d-lg-inline">View Options</span>
-                                <span class="d-inline d-lg-none">View</span>
+                            <a href="{{ route('product.show', $product->slug) }}" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
+                                <span class="d-none d-lg-inline">Buy Now</span>
+                                <span class="d-inline d-lg-none">Buy</span>
                             </a>
                         </div>
+                        <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex cart-form-wrapper">
+                            @csrf
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap">
+                                <span class="d-none d-lg-inline">Add To Cart</span>
+                                <span class="d-inline d-lg-none">Cart</span>
+                            </button>
+                        </form>
                     @endif
                 @else
                     @if(request()->routeIs('home'))

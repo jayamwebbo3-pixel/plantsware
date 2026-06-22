@@ -45,7 +45,9 @@
                             <th class="text-center">Name</th>
                             <th class="text-center">Email</th>
                             <th class="text-center">Phone</th>
+                            <th class="text-center">Total Purchase Value</th>
                             <th>Address</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -55,6 +57,7 @@
                                 <td class="text-center align-middle">{{ $user->name }}</td>
                                 <td class="text-center align-middle">{{ $user->email }}</td>
                                 <td class="text-center align-middle">{{ $user->phone ?? 'N/A' }}</td>
+                                <td class="text-center align-middle"><strong>₹{{ number_format($user->total_purchase_value, 2) }}</strong></td>
                                 <td class="align-middle">
                                     @php
                                         $latestOrder = $user->orders()->latest()->first();
@@ -114,10 +117,15 @@
                                         <span class="text-muted small">No address available</span>
                                     @endif
                                 </td>
+                                <td class="text-center align-middle">
+                                    <button type="button" class="btn btn-sm btn-outline-primary view-report-btn" data-user-id="{{ $user->id }}">
+                                        <i class="fas fa-chart-line me-1"></i> View Report
+                                    </button>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">No users found</td>
+                                <td colspan="7" class="text-center py-4 text-muted">No users found</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -136,4 +144,132 @@
         </div>
     </div>
 </div>
+
+<!-- Purchase Report Modal -->
+<div class="modal fade" id="purchaseReportModal" tabindex="-1" aria-labelledby="purchaseReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="purchaseReportModalLabel">
+                    <i class="fas fa-chart-bar me-2"></i> Purchase Report: <span id="reportCustomerName">...</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Summary Section -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded bg-light text-center">
+                            <small class="text-uppercase fw-bold text-muted d-block mb-1">Total Orders</small>
+                            <h3 class="mb-0 text-dark fw-bold" id="reportTotalOrders">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded bg-light text-center">
+                            <small class="text-uppercase fw-bold text-muted d-block mb-1">Completed Orders</small>
+                            <h3 class="mb-0 text-success fw-bold" id="reportCompletedOrders">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded bg-light text-center">
+                            <small class="text-uppercase fw-bold text-muted d-block mb-1">Total Purchase Value</small>
+                            <h3 class="mb-0 text-primary fw-bold">₹<span id="reportPurchaseValue">0.00</span></h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders List -->
+                <h6 class="fw-bold mb-3"><i class="fas fa-list-ul me-2"></i> Order History (Date-Wise)</h6>
+                <div class="table-responsive" style="max-height: 350px;">
+                    <table class="table table-sm table-bordered table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Order Number</th>
+                                <th>Items</th>
+                                <th class="text-end">Total Amount</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportOrdersTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">No orders found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const reportModal = new bootstrap.Modal(document.getElementById('purchaseReportModal'));
+        const nameSpan = document.getElementById('reportCustomerName');
+        const totalOrders = document.getElementById('reportTotalOrders');
+        const completedOrders = document.getElementById('reportCompletedOrders');
+        const purchaseValue = document.getElementById('reportPurchaseValue');
+        const ordersBody = document.getElementById('reportOrdersTableBody');
+
+        document.querySelectorAll('.view-report-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const userId = this.getAttribute('data-user-id');
+                
+                // Show loading
+                nameSpan.innerText = 'Loading...';
+                totalOrders.innerText = '0';
+                completedOrders.innerText = '0';
+                purchaseValue.innerText = '0.00';
+                ordersBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div> Loading...
+                        </td>
+                    </tr>
+                `;
+                reportModal.show();
+
+                fetch(`{{ url('admin/users') }}/${userId}/report`)
+                    .then(res => res.json())
+                    .then(data => {
+                        nameSpan.innerText = data.user.name;
+                        totalOrders.innerText = data.summary.total_orders;
+                        completedOrders.innerText = data.summary.total_completed_orders;
+                        purchaseValue.innerText = data.summary.total_purchase_value;
+
+                        ordersBody.innerHTML = '';
+                        if (data.orders.length === 0) {
+                            ordersBody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">No orders found</td></tr>';
+                            return;
+                        }
+
+                        data.orders.forEach(order => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td><small>${order.date}</small></td>
+                                <td><strong>${order.order_number}</strong></td>
+                                <td><small class="text-muted">${order.items_summary}</small></td>
+                                <td class="text-end">₹${order.total}</td>
+                                <td class="text-center">
+                                    <span class="badge ${order.badge_class}">${order.status}</span>
+                                </td>
+                            `;
+                            ordersBody.appendChild(tr);
+                        });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        nameSpan.innerText = 'Error loading report';
+                        ordersBody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-danger">Failed to load purchase report.</td></tr>';
+                    });
+            });
+        });
+    });
+</script>
+@endpush

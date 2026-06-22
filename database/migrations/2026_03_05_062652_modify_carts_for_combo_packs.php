@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::disableForeignKeyConstraints();
         Schema::table('carts', function (Blueprint $table) {
-            $table->dropUnique('carts_user_id_session_id_product_id_unique');
+            // $table->dropUnique('carts_user_id_session_id_product_id_unique');
             $table->dropIndex('carts_product_id_foreign');
             $table->unsignedBigInteger('product_id')->nullable()->change();
             $table->foreignId('combo_pack_id')->nullable()->constrained('combo_packs')->onDelete('cascade');

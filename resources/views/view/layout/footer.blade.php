@@ -214,69 +214,74 @@
     .whatsapp-message-container {
         position: absolute;
         right: 80px;
-        background: #333;
+        background: transparent;
         color: white;
-        padding: 8px 15px;
         border-radius: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        white-space: nowrap;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        min-width: 160px;
-        /* Stable width for longest message */
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        place-items: center;
         opacity: 1;
         visibility: visible;
         pointer-events: none;
     }
 
     .whatsapp-message {
-        position: absolute;
+        grid-area: 1 / 1 / 2 / 2;
+        position: relative;
         opacity: 0;
-        text-align: center;
-        width: 100%;
-        animation: fade-sequence 6s infinite ease-in-out;
+        text-align: left;
+        width: max-content;
+        background: #333;
+        padding: 8px 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+        animation: fade-sequence 15s infinite ease-in-out;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
     }
 
-    /* Sequential timing: 2s per message in a 6s total cycle */
+    /* Sequential timing: 5s per message in a 15s total cycle */
     .whatsapp-message:nth-child(1) {
         animation-delay: 0s;
     }
 
     .whatsapp-message:nth-child(2) {
-        animation-delay: 2s;
+        animation-delay: 5s;
     }
 
     .whatsapp-message:nth-child(3) {
-        animation-delay: 4s;
+        animation-delay: 10s;
     }
 
     @keyframes fade-sequence {
         0% {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateX(10px);
         }
 
-        5% {
+        1.33% { /* 0.2s fade-in */
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(0);
         }
 
-        28% {
+        6.67% { /* Stay visible until 1.0s */
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(0);
         }
 
-        33% {
+        8% { /* 0.2s fade-out (done at 1.2s) */
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateX(-10px);
         }
 
         100% {
             opacity: 0;
+            transform: translateX(-10px);
         }
     }
 
@@ -313,23 +318,33 @@
 </style>
 
 
+<!-- Cart Drawer Overlay -->
+<div id="cartDrawerOverlay" class="cart-drawer-overlay"></div>
+
+<!-- Cart Drawer -->
+<div id="cartDrawer" class="cart-drawer">
+    <div class="cart-drawer-header">
+        <h5 class="cart-drawer-title">Shopping Cart</h5>
+        <button type="button" id="closeCartDrawerBtn" class="cart-drawer-close-btn">&times;</button>
+    </div>
+    
+    <div class="cart-drawer-body" id="cartDrawerBody">
+        <div class="cart-drawer-loading">
+            <div class="spinner-border text-success" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- jquery-3.4.1 -->
-<script src="{{ asset('assets/js/jquery-3.4.1.min.js') }}"></script>
-<script src="{{ asset('assets/js/popper.min.js') }}"></script>
-<script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
-<script src="{{ asset('assets/js/wow.min.js') }}"></script>
-<script>
-    // Fallback stubs for unused/removed jQuery plugins in custom.js to prevent JS errors
-    (function($) {
-        if ($) {
-            if (!$.fn.owlCarousel) $.fn.owlCarousel = function() { return this; };
-            if (!$.fn.fancybox) $.fn.fancybox = function() { return this; };
-            if (!$.fn.magnificPopup) $.fn.magnificPopup = function() { return this; };
-        }
-    })(window.jQuery);
-</script>
-<script src="{{ asset('assets/js/custom.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('assets/js/jquery-3.4.1.min.js') }}" defer></script>
+<script src="{{ asset('assets/js/popper.min.js') }}" defer></script>
+<script src="{{ asset('assets/js/bootstrap.min.js') }}" defer></script>
+<script src="{{ asset('assets/js/wow.min.js') }}" defer></script>
+
+<script src="{{ asset('assets/js/custom.min.js') }}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const Toast = Swal.mixin({
@@ -363,8 +378,8 @@
     });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js" defer></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const swiperElements = document.querySelectorAll('.product-swiper');
@@ -372,12 +387,12 @@
         swiperElements.forEach(function(element) {
             new Swiper(element, {
                 loop: true,
-                slidesPerView: 1,
-                spaceBetween: 10,
+                slidesPerView: 2,
+                spaceBetween: 8,
 
                 // ⭐ AUTOPLAY SETTINGS
                 autoplay: {
-                    delay: 99000, // Time between slides (2500ms = 2.5 seconds)
+                    delay: 99000, // Time between slides
                     disableOnInteraction: false, // Keep autoplay after user swipes
                 },
 
@@ -391,16 +406,20 @@
                 },
 
                 breakpoints: {
-                    640: {
+                    480: {
                         slidesPerView: 2,
                         spaceBetween: 10,
                     },
                     768: {
-                        slidesPerView: 2,
+                        slidesPerView: 3,
                         spaceBetween: 15,
                     },
-                    1024: {
-                        slidesPerView: 3,
+                    992: {
+                        slidesPerView: 4,
+                        spaceBetween: 15,
+                    },
+                    1200: {
+                        slidesPerView: 5,
                         spaceBetween: 20,
                     },
                 },
@@ -446,52 +465,44 @@
 </script>
 
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // Initialize the carousel dynamically based on slide count
         var catSlideCount = $('#plantCategoriesCarousel .plant-category-item').length;
         $('#plantCategoriesCarousel').slick({
             dots: false,
             arrows: false,
-            infinite: catSlideCount > 6,
+            infinite: catSlideCount > 1,
             speed: 300,
             slidesToShow: Math.min(6, catSlideCount),
             slidesToScroll: 1,
-            autoplay: catSlideCount > 6,
+            autoplay: catSlideCount > 1,
             autoplaySpeed: 3000,
             responsive: [{
                     breakpoint: 1024,
                     settings: {
                         slidesToShow: Math.min(5, catSlideCount),
-                        slidesToScroll: 1,
-                        infinite: catSlideCount > 5,
-                        autoplay: catSlideCount > 5
+                        slidesToScroll: 1
                     }
                 },
                 {
                     breakpoint: 768,
                     settings: {
                         slidesToShow: Math.min(4, catSlideCount),
-                        slidesToScroll: 1,
-                        infinite: catSlideCount > 4,
-                        autoplay: catSlideCount > 4
+                        slidesToScroll: 1
                     }
                 },
                 {
                     breakpoint: 576,
                     settings: {
                         slidesToShow: Math.min(3, catSlideCount),
-                        slidesToScroll: 1,
-                        infinite: catSlideCount > 3,
-                        autoplay: catSlideCount > 3
+                        slidesToScroll: 1
                     }
                 },
                 {
                     breakpoint: 375,
                     settings: {
                         slidesToShow: Math.min(2, catSlideCount),
-                        slidesToScroll: 1,
-                        infinite: catSlideCount > 2,
-                        autoplay: catSlideCount > 2
+                        slidesToScroll: 1
                     }
                 }
             ]
@@ -520,6 +531,274 @@
 
 <!-- blog sharing section end  -->
 
+<!-- Mini Cart Drawer Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cartDrawer = document.getElementById('cartDrawer');
+    const cartDrawerOverlay = document.getElementById('cartDrawerOverlay');
+    const closeBtn = document.getElementById('closeCartDrawerBtn');
+    
+    function openCartDrawer() {
+        cartDrawer.classList.add('active');
+        cartDrawerOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeCartDrawer() {
+        cartDrawer.classList.remove('active');
+        cartDrawerOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    function showDrawerLoading() {
+        const body = document.getElementById('cartDrawerBody');
+        if (body) {
+            body.innerHTML = `
+                <div class="cart-drawer-loading">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    function refreshCartDrawer() {
+        fetch("{{ route('cart.drawer') }}")
+            .then(res => res.text())
+            .then(html => {
+                const body = document.getElementById('cartDrawerBody');
+                if (body) {
+                    body.innerHTML = html;
+                }
+            })
+            .catch(err => console.error('Error fetching cart drawer:', err));
+    }
+    
+    function updateCartCountBadges(count) {
+        document.querySelectorAll('.cart-qty.cart-icon-link .price_cart').forEach(el => {
+            el.textContent = count;
+        });
+    }
+    
+    window.openCartDrawer = openCartDrawer;
+    window.closeCartDrawer = closeCartDrawer;
+    window.refreshCartDrawer = refreshCartDrawer;
+    window.updateCartCountBadges = updateCartCountBadges;
+    
+
+    
+    // Close Drawer events
+    if (closeBtn) closeBtn.addEventListener('click', closeCartDrawer);
+    if (cartDrawerOverlay) cartDrawerOverlay.addEventListener('click', closeCartDrawer);
+    
+    // Continue Shopping button inside drawer (dynamic delegate)
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'drawerContinueShoppingBtn') {
+            closeCartDrawer();
+        }
+    });
+    
+    // Intercept Form Submissions for Add to Cart
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        const action = form.getAttribute('action') || '';
+        
+        // Handle normal product and combo pack forms (excluding custom combo redirects)
+        if (action.includes('cart/add/') || action.includes('cart/add-combo/')) {
+            const submitter = e.submitter;
+            
+            // Bypass Buy Now submits (must have explicitly name="buy_now" input/button or be product page buy now btn)
+            const hasBuyNowInput = form.querySelector('input[name="buy_now"]') || form.querySelector('input[value="buy_now"]');
+            const isBuyNowSubmitter = submitter && (submitter.name === 'buy_now' || submitter.value === 'buy_now' || submitter.classList.contains('product-page-btn-buy-now'));
+            
+            if (hasBuyNowInput || isBuyNowSubmitter) {
+                return; // Let it submit naturally
+            }
+            
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            if (submitter && submitter.name) {
+                formData.append(submitter.name, submitter.value);
+            }
+            
+            openCartDrawer();
+            showDrawerLoading();
+            
+            fetch(action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            })
+            .then(async response => {
+                const isJson = response.headers.get('content-type')?.includes('application/json');
+                const data = isJson ? await response.json() : null;
+                
+                return {
+                    status: response.status,
+                    ok: response.ok,
+                    body: data,
+                    text: isJson ? null : await response.text()
+                };
+            })
+            .then(({ status, ok, body, text }) => {
+                if (ok && body && body.success) {
+                    updateCartCountBadges(body.cart_count);
+                    refreshCartDrawer();
+                    
+                    if (window.Swal) {
+                        Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        }).fire({
+                            icon: 'success',
+                            title: body.message
+                        });
+                    }
+                } else {
+                    closeCartDrawer();
+                    const errMsg = body ? body.message : 'Error adding to cart (Server returned ' + status + ')';
+                    console.error('Add to cart failed:', errMsg, text);
+                    if (window.Swal) {
+                        Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000
+                        }).fire({
+                            icon: 'error',
+                            title: errMsg
+                        });
+                    }
+                }
+            })
+            .catch(err => {
+                console.error('Error adding to cart:', err);
+                closeCartDrawer();
+                if (window.Swal) {
+                    Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    }).fire({
+                        icon: 'error',
+                        title: 'Network error or request failed.'
+                    });
+                }
+            });
+        }
+    });
+
+    // Make global functions so they can be called inline (e.g. from onclick="removeDrawerItem(...)")
+    window.removeDrawerItem = function(itemId) {
+        showDrawerLoading();
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
+        fetch("{{ url('cart/remove') }}/" + itemId, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status >= 200 && status < 300 && body.success) {
+                updateCartCountBadges(body.cart_count);
+                refreshCartDrawer();
+                
+                // If we are currently on the /cart page, reload to sync
+                if (window.location.pathname.includes('/cart')) {
+                    window.location.reload();
+                }
+            } else {
+                refreshCartDrawer();
+            }
+        })
+        .catch(err => {
+            console.error('Error removing item:', err);
+            refreshCartDrawer();
+        });
+    };
+
+    // Inline qty increment/decrement delegation
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.drawer-qty-dec')) {
+            const btn = e.target.closest('.drawer-qty-dec');
+            const itemId = btn.getAttribute('data-item-id');
+            updateDrawerItemQty(itemId, -1);
+        }
+        if (e.target.closest('.drawer-qty-inc')) {
+            const btn = e.target.closest('.drawer-qty-inc');
+            const itemId = btn.getAttribute('data-item-id');
+            updateDrawerItemQty(itemId, 1);
+        }
+    });
+
+    function updateDrawerItemQty(itemId, change) {
+        const itemEl = document.getElementById(`drawerItem_${itemId}`);
+        if (!itemEl) return;
+        const input = itemEl.querySelector('.drawer-qty-input');
+        if (!input) return;
+        
+        let currentQty = parseInt(input.value) || 1;
+        let newQty = currentQty + change;
+        if (newQty < 1) return;
+        
+        showDrawerLoading();
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
+        fetch("{{ url('cart/update') }}/" + itemId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                quantity: newQty
+            })
+        })
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status >= 200 && status < 300 && body.success) {
+                updateCartCountBadges(body.cart_count);
+                refreshCartDrawer();
+                
+                // If we are currently on the /cart page, reload to sync
+                if (window.location.pathname.includes('/cart')) {
+                    window.location.reload();
+                }
+            } else {
+                refreshCartDrawer();
+                if (window.Swal) {
+                    Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    }).fire({
+                        icon: 'error',
+                        title: body.message || 'Unable to update quantity.'
+                    });
+                }
+            }
+        })
+        .catch(err => {
+            console.error('Error updating qty:', err);
+            refreshCartDrawer();
+        });
+    }
+});
+</script>
 </body>
 
 </html>

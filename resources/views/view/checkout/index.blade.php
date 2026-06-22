@@ -258,7 +258,9 @@
                                 <span class="fw-bold text-dark fs-5">₹{{ number_format($total, 2) }}</span>
                             </div>
                             <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill fw-bold py-2-5 shadow-success">
-                                PAY & PLACE ORDER <i class="fas fa-lock ms-2"></i>
+                                <span class="d-none d-lg-inline">PAY & PLACE ORDER</span>
+                                <span class="d-inline d-lg-none">PLACE ORDER</span>
+                                <i class="fas fa-lock ms-2"></i>
                             </button>
                         </div>
                     </form>
@@ -320,6 +322,14 @@
                                 <span class="fw-bold">-₹{{ number_format($discount, 2) }}</span>
                             </div>
                             @endif
+
+                            @if(isset($couponDiscount) && $couponDiscount > 0)
+                            <div class="summary-line d-flex justify-content-between mb-2 text-success">
+                                <span>Coupon Discount ({{ $coupon->coupon_code ?? '' }})</span>
+                                <span class="fw-bold">-₹{{ number_format($couponDiscount, 2) }}</span>
+                            </div>
+                            @endif
+
 
                             <hr class="my-4 border-2">
 
@@ -453,6 +463,7 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        margin-right: 15px !important;
     }
 
     .product-thumb-sm img {
@@ -473,21 +484,23 @@
     }
 
     .btn-success {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+        background-color: var(--secondary-color, #4a7856) !important;
+        border-color: var(--secondary-color, #4a7856) !important;
+        border-radius: 10px !important;
+        border: none !important;
     }
 
     .btn-success:hover {
-        background-color: #5a821a;
-        border-color: #5a821a;
+        background-color: #3b6247 !important;
+        border-color: #3b6247 !important;
     }
 
     .shadow-success {
-        box-shadow: 0 8px 20px rgba(114, 164, 32, 0.3);
+        box-shadow: 0 8px 20px rgba(74, 120, 86, 0.25) !important;
     }
 
     .shadow-success-hover:hover {
-        box-shadow: 0 8px 25px rgba(114, 164, 32, 0.4);
+        box-shadow: 0 8px 25px rgba(59, 98, 71, 0.35) !important;
         transform: translateY(-2px);
         transition: all 0.3s;
     }

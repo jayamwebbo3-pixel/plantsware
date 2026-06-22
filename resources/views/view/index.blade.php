@@ -15,9 +15,9 @@
                                 @endif
                                 <div class="plant-category-image">
                                     @if($category->image)
-                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" loading="lazy" decoding="async">
+                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" loading="eager" decoding="sync">
                                     @else
-                                        <img src="{{ asset('assets/images/category-placeholder.jpg') }}" alt="{{ $category->name }}" loading="lazy" decoding="async">
+                                        <img src="{{ asset('assets/images/category-placeholder.jpg') }}" alt="{{ $category->name }}" loading="eager" decoding="sync">
                                     @endif
                                 </div>
                             </div>
@@ -55,7 +55,7 @@
                                 @if($index === 0)
                                     <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}" fetchpriority="high" decoding="sync">
                                 @else
-                                    <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}" loading="lazy" decoding="async">
+                                    <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}" loading="eager" decoding="sync">
                                 @endif
                                 <div class="carousel-caption container silder_text">
                                     @if($slider->subtitle)<p class="arrival">{{ $slider->subtitle }}</p>@endif
@@ -249,6 +249,7 @@
     </div>
 </section>
 
+{{-- 
 <!---------------------------------------------------------- testimonials ------------------------------------------------------->
 <div class="reviews-carousel">
     <div class="carousel-header">
@@ -328,6 +329,7 @@
         </div>
     </div>
 </div>
+--}}
 
 <section class="bg-light-section">
     <div class="container-fluid px-4">
@@ -346,22 +348,27 @@
                         <div class="col-md-6 col-lg-4">
                             <div class="blog-card">
                                 <div class="blog-card-image">
-                                    @if(isset($blog->image) && $blog->image)
-                                        <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}" loading="lazy" decoding="async">
-                                    @else
-                                        <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="{{ $blog->title }}" loading="lazy" decoding="async">
-                                    @endif
+                                    <a href="{{ route('blog.show', $blog->slug) }}" class="d-block w-100 h-100">
+                                        @if(isset($blog->image) && $blog->image)
+                                            <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}" loading="lazy" decoding="async">
+                                        @else
+                                            <img src="{{ asset('assets/images/seed-to-plant.webp') }}" alt="{{ $blog->title }}" loading="lazy" decoding="async">
+                                        @endif
+                                    </a>
                                     <span class="blog-card-category">{{ $blog->category->name ?? 'General' }}</span>
                                 </div>
                                 <div class="blog-card-content">
                                     <div class="blog-card-date">{{ $blog->published_at ? $blog->published_at->format('M d, Y') : ($blog->created_at ? $blog->created_at->format('M d, Y') : '') }}</div>
-                                    <h3 class="blog-card-title">{{ $blog->title }}</h3>
+                                    <h3 class="blog-card-title">
+                                        <a href="{{ route('blog.show', $blog->slug) }}">
+                                            {{ $blog->title }}
+                                        </a>
+                                    </h3>
                                     <p class="blog-card-excerpt">
                                         {{ isset($blog->content) ? \Illuminate\Support\Str::limit(strip_tags($blog->content), 100) : '' }}
                                     </p>
                                     <div class="blog-card-footer">
-                                        <!-- <span class="blog-card-author">{{ $blog->author_name ?? 'Admin' }}</span> -->
-                                        <a href="{{ route('blog.show', $blog->slug) }}" class="read-more-link">Read →</a>
+                                        <a href="{{ route('blog.show', $blog->slug) }}" class="read-more-link">Read <i class="fas fa-arrow-right"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -371,18 +378,23 @@
                         <div class="col-md-6 col-lg-4">
                             <div class="blog-card">
                                 <div class="blog-card-image">
-                                    <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="Indoor plant care" loading="lazy" decoding="async">
+                                    <a href="#" class="d-block w-100 h-100">
+                                        <img src="{{ asset('assets/images/seed-to-plant.webp') }}" alt="Indoor plant care" loading="lazy" decoding="async">
+                                    </a>
                                     <span class="blog-card-category">Plant Care</span>
                                 </div>
                                 <div class="blog-card-content">
                                     <div class="blog-card-date">Nov 15, 2024</div>
-                                    <h3 class="blog-card-title">10 Essential Tips to Keep Indoor Plants Healthy</h3>
+                                    <h3 class="blog-card-title">
+                                        <a href="#">
+                                            10 Essential Tips to Keep Indoor Plants Healthy
+                                        </a>
+                                    </h3>
                                     <p class="blog-card-excerpt">
                                         Learn the fundamental watering, lighting, and soil requirements that help indoor plants grow stronger and greener.
                                     </p>
                                     <div class="blog-card-footer">
-                                        <span class="blog-card-author">Sophia Green</span>
-                                        <a href="#" class="read-more-link">Read →</a>
+                                        <a href="#" class="read-more-link">Read <i class="fas fa-arrow-right"></i></a>
                                     </div>
                                 </div>
                             </div>

@@ -59,10 +59,13 @@ Route::get('blog-category/{slug}', [FrontendBlogController::class, 'category'])-
 
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::get('/drawer', [CartController::class, 'drawer'])->name('drawer');
     Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
     Route::post('/update/{id}', [CartController::class, 'update'])->name('update');
     Route::delete('/remove/{cart}', [CartController::class, 'remove'])->name('remove');
     Route::post('/clear', [CartController::class, 'clear'])->name('clear');
+    Route::post('/apply-coupon', [CartController::class, 'applyCoupon'])->name('apply_coupon');
+    Route::post('/remove-coupon', [CartController::class, 'removeCoupon'])->name('remove_coupon');
 });
 
 // ================= WISHLIST ROUTES =================
@@ -210,6 +213,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('orders.invoice');
 
         Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::get('users/{user}/report', [UserController::class, 'report'])->name('users.report');
+        Route::get('coupons/search-users', [\App\Http\Controllers\Admin\CouponController::class, 'searchUsers'])->name('coupons.search-users');
+        Route::get('coupons/{coupon}/report', [\App\Http\Controllers\Admin\CouponController::class, 'report'])->name('coupons.report');
+        Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);
 
         // for embedded imgs new added line 
         Route::post('ckeditor/upload-image', [App\Http\Controllers\Admin\BlogController::class, 'ckeditorImageUpload'])->name('ckeditor.image.upload');

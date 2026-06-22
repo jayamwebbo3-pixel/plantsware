@@ -18,7 +18,7 @@
 </div>
 
 <main class="cart-section">
-    <div class="container py-4">
+<div class="container wishlist-page-container">
         <div class="row">
             <div class="col-md-12">
                 <div class="gi-vendor-dashboard-card">
@@ -275,17 +275,38 @@
                                         <span id="cartTaxLabel">GST ({{ $taxPercentage ?? 0 }}%):</span>
                                         <span class="summary-amount" id="cartTax">₹{{ number_format($tax ?? 0, 2) }}</span>
                                     </div>
-                                    <div class="summary-row">
+                                    <!-- <div class="summary-row">
                                         <span>Discount:</span>
                                         <span class="summary-amount" id="cartDiscount" style="color: var(--primary-color);">
                                             -₹{{ number_format($discount ?? 0, 2) }}
                                         </span>
+                                    </div> -->
+                                    <div class="summary-row" id="couponDiscountRow" style="{{ ($couponDiscount ?? 0) > 0 ? '' : 'display:none;' }}">
+                                        <span>Coupon Discount:</span>
+                                        <span class="summary-amount text-success" id="cartCouponDiscount">
+                                            -₹{{ number_format($couponDiscount ?? 0, 2) }}
+                                        </span>
                                     </div>
+                                    <div class="coupon-section border-top pt-3 mt-3">
+                                        <label class="form-label fw-bold small mb-2 text-dark d-block"><i class="fas fa-ticket-alt me-1 text-success"></i> Have a Coupon?</label>
+                                        <div class="input-group input-group-sm mb-2" style="display: flex;">
+                                            <input type="text" id="coupon_code_input" class="form-control text-uppercase" placeholder="Enter Code" value="{{ session('coupon_code') }}" {{ session('coupon_code') ? 'disabled' : '' }} style="border-radius: 4px 0 0 4px; padding: 6px 12px; border: 1px solid #cbd5e1; flex-grow: 1;">
+                                            @if(session('coupon_code'))
+                                                <button class="btn btn-danger btn-sm" type="button" id="removeCouponBtn" style="border-radius: 0 4px 4px 0; padding: 6px 12px;">Remove</button>
+                                            @else
+                                                <button class="btn btn-success btn-sm" type="button" id="applyCouponBtn" style="border-radius: 0 4px 4px 0; padding: 6px 12px; background-color: var(--primary-color); border-color: var(--primary-color); color: white;">Apply</button>
+                                            @endif
+                                        </div>
+                                    </div>
+
                                     <div class="summary-row total">
                                         <span>Total:</span>
                                         <span class="summary-amount total" id="cartTotal">₹{{ number_format($total ?? $subtotal ?? 0, 2) }}</span>
                                     </div>
-                                    <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">Proceed to Checkout</button>
+                                    <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">
+                                        <span class="d-none d-lg-inline">Proceed to Checkout</span>
+                                        <span class="d-inline d-lg-none">Checkout</span>
+                                    </button>
                                     <button type="button" class="continue-shopping-btn w-100" onclick="window.location='{{ route('home') }}'">Continue Shopping</button>
                                     <button type="button" class="clear-cart-btn btn-clear-red w-100 mt-2" onclick="clearCart()">
                                         <i class="fas fa-trash"></i> Clear Cart
@@ -744,6 +765,102 @@
                 if (itemId) removeCartItem(itemId);
             });
         });
+
+        // Setup Coupon Events
+        const applyCouponBtn = document.getElementById('applyCouponBtn');
+        const removeCouponBtn = document.getElementById('removeCouponBtn');
+        const couponCodeInput = document.getElementById('coupon_code_input');
+
+        if (applyCouponBtn) {
+            applyCouponBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const code = couponCodeInput.value.trim();
+                if (!code) {
+                    Swal.fire({
+                        icon: 'warning',
+                        text: 'Please enter a coupon code.',
+                        confirmButtonColor: '#72a420'
+                    });
+                    return;
+                }
+
+                applyCouponBtn.disabled = true;
+                applyCouponBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+
+                fetch(`${baseUrl}/cart/apply-coupon`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ coupon_code: code })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: data.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: data.message,
+                            confirmButtonColor: '#72a420'
+                        });
+                        applyCouponBtn.disabled = false;
+                        applyCouponBtn.innerText = 'Apply';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    applyCouponBtn.disabled = false;
+                    applyCouponBtn.innerText = 'Apply';
+                });
+            });
+        }
+
+        if (removeCouponBtn) {
+            removeCouponBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                removeCouponBtn.disabled = true;
+                removeCouponBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+
+                fetch(`${baseUrl}/cart/remove-coupon`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: data.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    removeCouponBtn.disabled = false;
+                    removeCouponBtn.innerText = 'Remove';
+                });
+            });
+        }
 
         console.log('Cart initialization complete');
     });

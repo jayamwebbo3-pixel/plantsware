@@ -1,3 +1,12 @@
+// Fallback stubs for unused/removed jQuery plugins in custom.js to prevent JS errors
+(function($) {
+    if ($) {
+        if (!$.fn.owlCarousel) $.fn.owlCarousel = function() { return this; };
+        if (!$.fn.fancybox) $.fn.fancybox = function() { return this; };
+        if (!$.fn.magnificPopup) $.fn.magnificPopup = function() { return this; };
+    }
+})(window.jQuery);
+
 $(document).ready(function () {
     "use strict";
         // Animate loader off screen

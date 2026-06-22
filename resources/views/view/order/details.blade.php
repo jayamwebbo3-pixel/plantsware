@@ -4,8 +4,12 @@
 <div class="order-details-container py-5 bg-light-gray">
     <div class="container">
         <!-- Top Navigation & Header -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
-            
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <a href="{{ route('user.dashboard') }}" class="btn btn-outline-success rounded-pill px-3 py-2 fs-7 fw-bold transition-all shadow-sm">
+                <i class="fas fa-arrow-left me-1"></i>
+                <span class="d-none d-lg-inline">Back to Orders</span>
+                <span class="d-inline d-lg-none">Back</span>
+            </a>
             <div class="text-end mt-3 mt-sm-0">
                 <h2 class="h4 mb-1 fw-bold text-dark">Order #{{ $order->order_number }}</h2>
                 @php
@@ -197,10 +201,14 @@
                 <!-- Actions -->
                 <div class="text-center text-md-end mb-4">
                     <a href="{{ route('user.order.invoice', $order->id) }}" class="btn btn-custom py-3 px-md-5 w-100 w-md-auto rounded-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center mb-2">
-                        <i class="fas fa-file-download me-2"></i> Download Invoice
-                            </a>
+                        <i class="fas fa-file-download me-2"></i>
+                        <span class="d-none d-lg-inline">Download Invoice</span>
+                        <span class="d-inline d-lg-none">Invoice</span>
+                    </a>
                     <a href="{{ route('user.dashboard') }}" class="btn btn-dark-gray py-3 px-md-5 w-100 w-md-auto rounded-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center">
-                        <i class="fas fa-arrow-left me-2"></i> Back to Orders
+                        <i class="fas fa-arrow-left me-2"></i>
+                        <span class="d-none d-lg-inline">Back to Orders</span>
+                        <span class="d-inline d-lg-none">Back</span>
                     </a>
                 </div>
             </div>
@@ -224,15 +232,26 @@
     .bg-soft-custom { background-color: var(--custom-soft) !important; }
 
     .btn-custom {
-        background-color: #557918;
+        background-color: var(--custom-color, #72a420);
         color: white;
         transition: 0.3s;
         border: none;
     }
     .btn-custom:hover {
-        background-color: #446114;
+        background-color: #5a821a;
         color: white;
         transform: translateY(-2px);
+    }
+
+    .btn-outline-success {
+        border-color: var(--custom-color, #72a420);
+        color: var(--custom-color, #72a420);
+        background: transparent;
+    }
+    .btn-outline-success:hover {
+        background-color: var(--custom-color, #72a420);
+        border-color: var(--custom-color, #72a420);
+        color: white;
     }
 
     .btn-dark-gray {

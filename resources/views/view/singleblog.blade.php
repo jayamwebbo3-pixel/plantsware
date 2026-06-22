@@ -68,7 +68,7 @@
             </div>
 
             <!-- Sidebar -->
-            <div class="col-lg-4">
+            <div class="col-lg-4 single-blog-sidebar-sticky">
                 <!-- Related Category -->
                 @php
                 $relatedBlogs = \App\Models\Blog::where('blog_category_id', $blog->blog_category_id)
@@ -96,7 +96,7 @@
                     $allCats = \App\Models\BlogCategory::active()->withCount('blogs')->get();
                     @endphp
                     @foreach($allCats as $cat)
-                    <a href="{{ route('blog.category.show', $cat->slug) }}" class="single-blog-sidebar-link d-flex justify-content-between">
+                    <a href="{{ route('blog.category.show', $cat->slug) }}" class="single-blog-sidebar-link d-flex justify-content-between align-items-center">
                         <span>{{ $cat->name }}</span>
                         <span class="badge rounded-pill bg-light text-dark">{{ $cat->blogs_count }}</span>
                     </a>

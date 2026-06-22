@@ -88,7 +88,10 @@
                             <span>Total:</span>
                             <span class="summary-amount total" id="cartTotal">₹{{ number_format($total ?? $subtotal ?? 0, 2) }}</span>
                         </div>
-                        <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">Proceed to Checkout</button>
+                        <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">
+                            <span class="d-none d-lg-inline">Proceed to Checkout</span>
+                            <span class="d-inline d-lg-none">Checkout</span>
+                        </button>
                         <button type="button" class="continue-shopping-btn" onclick="window.location='{{ route('home') }}'">Continue Shopping</button>
                         <button type="button" class="clear-cart-btn btn btn-outline-danger w-100 mt-3" 
                                 onclick="clearCart()">

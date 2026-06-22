@@ -63,19 +63,24 @@
                             </div>
 
                             {{-- Image + tracking lens (preview is a fixed sibling) --}}
-                            <div class="dpz-img-wrap" id="dpzImgWrap">
+                            <div class="dpz-img-wrap {{ $product->stock_quantity <= 0 ? 'out-of-stock' : '' }}" id="dpzImgWrap">
                                 <img id="mainProductImage"
                                     src="{{ $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/product1.jpg') }}"
                                     alt="{{ $product->name }}"
                                     class="dpz-img">
                                 {{-- Tracking lens only --}}
                                 <div id="dpzLens"></div>
+                                @if($product->stock_quantity <= 0)
+                                    <div class="out-of-stock-overlay">
+                                        <span class="out-of-stock-badge">Out Of Stock</span>
+                                    </div>
+                                @endif
                             </div>
                             {{-- Preview lives OUTSIDE the overflow:hidden wrap --}}
                             <div id="dpzPreview"></div>
 
                             @if($product->stock_quantity <= 0)
-                                <span class="product-page-badge-sale" style="background: #dc3545 !important;">OUT OF STOCK</span>
+                                {{-- Center overlay is displayed over the image instead --}}
                             @elseif($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="product-page-badge-sale">
                                     -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
@@ -105,31 +110,35 @@
 
                         <!-- Dynamic Rating -->
                         @if(($product->total_reviews ?? 0) > 0 && ($product->avg_rating ?? 0) > 0)
-                        <div class="product-page-rating mb-3">
-                            <div class="product-page-stars d-inline">
-                                @php $avg = $product->avg_rating ?? 0; @endphp
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($i <=floor($avg))
-                                    <i class="fas fa-star"></i>
-                                    @elseif($i == ceil($avg) && ($avg - floor($avg) >= 0.5))
-                                    <i class="fas fa-star-half-alt"></i>
-                                    @else
-                                    <i class="far fa-star text-muted"></i>
-                                    @endif
-                                    @endfor
+                        @php $avg = $product->avg_rating ?? 0; @endphp
+                        <div class="product-page-rating mb-3 d-flex align-items-center gap-2">
+                            <div class="product-page-rating-badge">
+                                <span>{{ number_format($avg, 1) }}</span>
+                                <i class="fas fa-star"></i>
                             </div>
-                            <span class="product-page-rating-text fw-bold">{{ number_format($avg, 1) }}</span>
-                            <span class="product-page-reviews-count">({{ $product->total_reviews ?? 0 }} Reviews)</span>
+                            <span class="product-page-reviews-count text-secondary" style="font-size: 0.85rem; font-weight: 500;">({{ $product->total_reviews ?? 0 }} Reviews)</span>
                         </div>
                         @endif
                         <!-- Price -->
                         <div class="product-page-price">
-                            @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                <span class="product-page-current-price" data-default="₹{{ number_format($product->sale_price, 2) }}">₹{{ number_format($product->sale_price, 2) }}</span>
-                                <span class="product-page-original-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
-                            @else
-                                <span class="product-page-current-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
-                            @endif
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
+                                    <span class="product-page-current-price" data-default="₹{{ number_format($product->sale_price, 2) }}">₹{{ number_format($product->sale_price, 2) }}</span>
+                                    <span class="product-page-original-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
+                                    @php
+                                        $discount = round((($product->price - $product->sale_price) / $product->price) * 100);
+                                    @endphp
+                                    <span class="badge-discount-save">
+                                        Save ₹{{ number_format($product->price - $product->sale_price, 2) }} ({{ $discount }}% OFF)
+                                    </span>
+                                @else
+                                    <span class="product-page-current-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
+                                @endif
+                                @if($product->stock_quantity <= 0)
+                                    <span class="badge-out-of-stock">Out of Stock</span>
+                                @endif
+                            </div>
+                            <div class="product-page-tax-info mt-1">Inclusive of all taxes</div>
                         </div>
                         @if($product->has_variants && $product->size)
                         @php
@@ -341,16 +350,18 @@
                             <div class="product-page-action-buttons">
                                 <button type="submit" class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 flex-grow-1">
                                     <i class="fas fa-shopping-bag"></i>
-                                    Add to Cart
+                                    <span class="d-none d-md-inline">Add to Cart</span>
+                                    <span class="d-inline d-md-none">Cart</span>
                                 </button>
                                 <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1">
-                                    Buy Now
+                                    <span class="d-none d-md-inline">Buy Now</span>
+                                    <span class="d-inline d-md-none">Buy</span>
                                 </button>
                             </div>
                         </form>
                         @else
                         <div class="product-page-action-buttons">
-                            <button class="product-page-btn-add-cart btn btn-lg btn-secondary d-flex align-items-center gap-2" style="cursor: not-allowed;" disabled>
+                            <button class="product-page-btn-add-cart btn btn-lg d-flex align-items-center gap-2" disabled>
                                 Out of Stock
                             </button>
                         </div>
@@ -594,7 +605,6 @@
             function attachZoom() {
                 dpzAttach();
             }
-
             attachZoom();
 
             // ─── Lightbox (desktop click OR mobile tap) ──────────────
