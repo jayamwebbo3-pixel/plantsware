@@ -29,8 +29,8 @@
                     <!-- Price Range Filter -->
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
-                            Price Range
-                            <span class="price-range-value" id="display-price-range">₹0 - ₹{{ request('price_max', 10000) }}</span>
+                            <span>Price Range <span class="price-range-value ms-2" id="display-price-range" style="font-size: 13px; font-weight: normal; color: #72a420;">₹0 - ₹{{ request('price_max', 10000) }}</span></span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </h3>
                         <div class="filter-options d-flex align-items-center">
                             <input type="range" name="price_max" class="form-range flex-grow-1 me-2" min="0" max="10000" step="100" id="price-max" value="{{ request('price_max', 10000) }}" style="width: 100%;" onchange="this.form.submit()">
@@ -39,7 +39,10 @@
 
                     <!-- Category Filter -->
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Categories</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Categories
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </h3>
                         <div class="filter-options">
                             <div class="filter-item">
                                 <input type="radio" name="category" id="cat-all" class="filter-radio" value="" onchange="this.form.submit()" {{ !request('category') ? 'checked' : '' }}>
@@ -56,7 +59,10 @@
                     
                     <!-- Discount Filter -->
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Discount</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Discount
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </h3>
                         <div class="filter-options">
                             <div class="filter-item">
                                 <input type="radio" name="discount" id="discount-all" class="filter-radio" value="all" onchange="this.form.submit()" {{ request('discount', 'all') == 'all' ? 'checked' : '' }}>
@@ -79,7 +85,10 @@
                     
                     <!-- Availability -->
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Availability</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Availability
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </h3>
                         <div class="filter-options">
                             <div class="filter-item">
                                 <input type="checkbox" name="availability[]" id="in-stock" class="filter-checkbox" value="in-stock" onchange="this.form.submit()" {{ is_array(request('availability')) && in_array('in-stock', request('availability')) ? 'checked' : '' }}>
@@ -94,7 +103,10 @@
 
                     <!-- Sort By -->
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Sort By</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Sort By
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </h3>
                         <div class="filter-options">
                             <div class="filter-item">
                                 <input type="radio" name="sort" id="sort-new" class="filter-radio" value="newest" onchange="this.form.submit()" {{ request('sort', 'newest') == 'newest' ? 'checked' : '' }}>
@@ -137,9 +149,9 @@
                         </button>
                     </div>
 
-                    <div class="products-grid row g-3">
+                    <div class="products-grid row g-4">
                         @forelse($comboPacks as $combo)
-                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
+                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
                                 <div class="product-custom-card">
                                     <div class="card-img-container">
                                         <a href="{{ route('combo_packs.frontend_show', $combo->slug) }}" class="w-100 h-100">
@@ -194,15 +206,15 @@
                                                     @csrf
                                                     <input type="hidden" name="buy_now" value="1">
                                                     <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
-                                                        <span class="d-none d-lg-inline">Buy Now</span>
-                                                        <span class="d-inline d-lg-none">Buy</span>
+                                                        <span class="d-none d-xl-inline">Buy Now</span>
+                                                        <span class="d-inline d-xl-none">Buy</span>
                                                     </button>
                                                 </form>
                                                 <form action="{{ route('cart.add_combo', $combo->id) }}" method="POST" class="flex-grow-1 d-flex">
                                                     @csrf
                                                     <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
-                                                        <span class="d-none d-lg-inline">Add To Cart</span>
-                                                        <span class="d-inline d-lg-none">Cart</span>
+                                                        <span class="d-none d-xl-inline">Add To Cart</span>
+                                                        <span class="d-inline d-xl-none">Cart</span>
                                                     </button>
                                                 </form>
                                             @else

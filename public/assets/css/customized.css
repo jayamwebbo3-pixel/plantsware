@@ -8437,6 +8437,313 @@ section.privacy-content {
     }
 }
 
+/* --- Filter Section Collapsible Styles --- */
+.filter-section {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    padding-bottom: 12px !important;
+    margin-bottom: 16px !important;
+}
+
+.filter-section:last-of-type {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 8px !important;
+}
+
+.filter-title {
+    cursor: pointer !important;
+    position: relative !important;
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+    user-select: none !important;
+    transition: color 0.2s ease !important;
+    margin: 0 !important;
+    padding: 4px 0 !important;
+}
+
+.filter-title:hover {
+    color: var(--primary-green, #6ea820) !important;
+}
+
+.filter-title .toggle-icon {
+    font-size: 12px !important;
+    color: #64748b !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.filter-section.active .filter-title .toggle-icon {
+    transform: rotate(180deg) !important;
+}
+
+.filter-options {
+    max-height: 600px !important; /* Large enough to display options */
+    overflow: hidden !important;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-top 0.3s ease !important;
+    opacity: 1 !important;
+    margin-top: 10px !important;
+}
+
+.filter-section:not(.active) .filter-options {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    margin-top: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+}
+
+/* noUiSlider Overrides moved from page-level to customized.css */
+.noUi-connect {
+    background: linear-gradient(90deg, #72a420 0%, #8ec63f 100%) !important;
+}
+.noUi-horizontal {
+    height: 6px !important;
+    border: none !important;
+    background: #e2e8f0 !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
+    border-radius: 4px !important;
+}
+.noUi-handle {
+    width: 20px !important;
+    height: 20px !important;
+    right: -10px !important;
+    top: -7px !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    border: 2px solid #72a420 !important;
+    box-shadow: 0 4px 8px rgba(114, 164, 32, 0.2) !important;
+    cursor: pointer !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+.noUi-handle:before {
+    display: none !important;
+}
+.noUi-handle:after {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    width: 6px !important;
+    height: 6px !important;
+    background: #72a420 !important;
+    border-radius: 50% !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
+.noUi-handle:hover {
+    transform: scale(1.15) !important;
+    box-shadow: 0 4px 12px rgba(114, 164, 32, 0.35) !important;
+}
+.noUi-handle.noUi-active {
+    box-shadow: 0 0 0 5px rgba(114, 164, 32, 0.25) !important;
+    transform: scale(1.15) !important;
+}
+
+
+/* Media query to prevent product card action buttons text overflowing at 1200px to 1399px viewports */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .product-card .btn-buy-now,
+    .product-card .btn-add-cart,
+    .product-custom-card .btn-buy-now,
+    .product-custom-card .btn-add-cart {
+        font-size: 10.5px !important;
+        padding: 10px 4px !important;
+    }
+}
+
+/* Restore standard Bootstrap card gutters that were disabled in style.css */
+.products-grid [class*="col-"],
+#products-container [class*="col-"],
+#products-container .col-lg-4 {
+    padding-left: calc(var(--bs-gutter-x) * .5) !important;
+    padding-right: calc(var(--bs-gutter-x) * .5) !important;
+}
+
+/* Make product images look smaller and give more breathing space inside the card */
+.product-image-container {
+    padding: 16px !important;
+    background: #ffffff !important;
+}
+.product-image-container .hover-image {
+    top: 16px !important;
+    left: 16px !important;
+    width: calc(100% - 32px) !important;
+    height: calc(100% - 32px) !important;
+}
+.product-card {
+    border-radius: 16px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.product-card:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 12px 30px rgba(114, 164, 32, 0.12) !important;
+}
+.product-info {
+    padding: 18px 16px 16px 16px !important;
+}
+
+/* Cart Drawer Buttons Styling & Fixes */
+.empty-drawer-container .btn {
+    flex: none !important;
+    width: auto !important;
+    min-width: 160px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    background-color: #2b6139 !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 10px rgba(43, 97, 57, 0.15) !important;
+    transition: all 0.25s ease !important;
+}
+.empty-drawer-container .btn:hover {
+    background-color: #1c3f24 !important;
+    box-shadow: 0 6px 15px rgba(43, 97, 57, 0.25) !important;
+    transform: translateY(-2px) !important;
+}
+
+.drawer-actions .btn {
+    flex: none !important;
+    height: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    transition: all 0.25s ease !important;
+}
+
+.drawer-actions .btn-outline-success {
+    background-color: transparent !important;
+    border: 2px solid #2b6139 !important;
+    color: #2b6139 !important;
+}
+
+.drawer-actions .btn-outline-success:hover {
+    background-color: #2b6139 !important;
+    color: #ffffff !important;
+}
+
+.drawer-actions .btn-checkout-drawer {
+    background-color: #2b6139 !important;
+    border: 2px solid #2b6139 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(43, 97, 57, 0.15) !important;
+}
+
+.drawer-actions .btn-checkout-drawer:hover {
+    background-color: #1c3f24 !important;
+    border-color: #1c3f24 !important;
+    box-shadow: 0 6px 15px rgba(43, 97, 57, 0.25) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Margin spacing override for product cards in category listings */
+.product-card {
+    margin: 0 5px !important;
+}
+
+/* Combo Builder Discount Slabs Styling */
+.slab-indicator-item {
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    transition: all 0.25s ease !important;
+}
+
+.slab-indicator-item .text-muted {
+    color: #334155 !important; /* Bold Slate-700 color for the label */
+    font-weight: 600 !important;
+}
+
+.slab-badge {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    padding: 6px 12px !important;
+    border-radius: 20px !important;
+    transition: all 0.25s ease !important;
+}
+
+/* Inactive state badge - thicker tone */
+.slab-badge.bg-secondary {
+    background-color: #f1f5f9 !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #475569 !important; /* Bold Slate-600 text for inactive slab badge */
+}
+
+/* Active state item and badge */
+.slab-indicator-item.bg-success-subtle {
+    background-color: #d1e7dd !important; /* Solid light green background */
+    border: 1px solid #a3cfbb !important;
+}
+
+.slab-badge.bg-success {
+    background-color: #2b6139 !important; /* Thick brand forest green background */
+    color: #ffffff !important;
+    border: 1.5px solid #2b6139 !important;
+}
+
+/* CKEditor / Static Content Styling */
+.ckeditor-content {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    color: #334155 !important;
+    line-height: 1.85 !important;
+    font-size: 15px !important;
+}
+
+.ckeditor-content h1,
+.ckeditor-content h2,
+.ckeditor-content h3,
+.ckeditor-content h4,
+.ckeditor-content h5,
+.ckeditor-content h6 {
+    color: #1e293b !important;
+    font-weight: 700 !important;
+    margin-top: 1.8rem !important;
+    margin-bottom: 0.8rem !important;
+    line-height: 1.35 !important;
+}
+
+.ckeditor-content h1 { font-size: 2.2rem !important; margin-top: 0 !important; border-bottom: 2px solid rgba(0, 0, 0, 0.05); padding-bottom: 12px; }
+.ckeditor-content h2 { font-size: 1.6rem !important; border-bottom: 1px solid rgba(0, 0, 0, 0.05); padding-bottom: 8px; }
+.ckeditor-content h3 { font-size: 1.3rem !important; }
+.ckeditor-content h4 { font-size: 1.15rem !important; }
+
+.ckeditor-content p {
+    margin-bottom: 1.25rem !important;
+    color: #475569 !important;
+}
+
+.ckeditor-content ul,
+.ckeditor-content ol {
+    margin-bottom: 1.25rem !important;
+    padding-left: 1.5rem !important;
+}
+
+.ckeditor-content li {
+    margin-bottom: 0.5rem !important;
+    color: #475569 !important;
+}
+
+.ckeditor-content strong {
+    font-weight: 600 !important;
+    color: #0f172a !important;
+}
+
+.ckeditor-content a {
+    color: #2b6139 !important;
+    text-decoration: underline !important;
+    font-weight: 500 !important;
+}
+
+.ckeditor-content a:hover {
+    color: #1c3f24 !important;
+}
 
 
 

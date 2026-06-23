@@ -1,5 +1,9 @@
 @include('view.layout.header')
-
+<style>
+    .product-card{
+margin: 0 5px !important;
+    }
+    </style>
 <div class="sp_header bg-white p-3">
     <div class="container">
         <div class="row">
@@ -53,20 +57,12 @@
 
     {{-- noUiSlider for Dual Price Range --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
-    <style>
-        .noUi-connect { background: #72a420 !important; }
-        .noUi-horizontal { height: 6px !important; border: none !important; background: #e9ecef !important; box-shadow: inset 0 1px 1px rgba(0,0,0,.1); }
-        .noUi-handle { width: 20px !important; height: 20px !important; right: -10px !important; top: -7px !important; border-radius: 50% !important; background: #fff !important; border: 2px solid #72a420 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; cursor: pointer !important; }
-        .noUi-handle:before, .noUi-handle:after { display: none !important; }
-        .filter-section.active .filter-title i { transform: rotate(180deg); }
-        .filter-title { cursor: pointer; transition: all 0.3s ease; }
-    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
 
     <div class="filter-section active mb-4">
         <h3 class="filter-title d-flex justify-content-between align-items-center mb-3">
             Price Range
-           
+            <i class="fas fa-chevron-down toggle-icon"></i>
         </h3>
         <div class="filter-options px-2">
             <div id="price-range-slider" class="mb-4 mt-3"></div>
@@ -89,6 +85,7 @@
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Discount
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </h3>
                         <div class="filter-options">
                             @php
@@ -121,6 +118,7 @@
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Availability
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </h3>
                         <div class="filter-options">
                             @php
@@ -150,6 +148,7 @@
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Shape
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </h3>
                         <div class="filter-options">
                             @foreach($filterCounts['shape'] as $val => $cnt)
@@ -181,6 +180,7 @@
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Material
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </h3>
                         <div class="filter-options">
                             @foreach($filterCounts['material'] as $val => $cnt)
@@ -206,6 +206,7 @@
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Weight
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </h3>
                         <div class="filter-options">
                             @php
@@ -244,6 +245,7 @@
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Sort By
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </h3>
                         <div class="filter-options">
                             @php
@@ -330,9 +332,9 @@
                         </div>
                     </div>
 
-                    <div class="products-grid row g-3" id="products-container">
+                    <div class="products-grid row g-4" id="products-container">
                         @forelse($products as $product)
-                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
+                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
                             @include('view.partials.product-card', ['product' => $product])
                         </div>
                         @empty
@@ -415,12 +417,13 @@
             });
         });
 
-        // ── Collapsible Filter Sections (mobile-only accordion) ────
+        // ── Collapsible Filter Sections ────────────────────────
         document.querySelectorAll('.filter-title').forEach(title => {
-            title.addEventListener('click', function() {
-                // Only allow collapsing on mobile (< 768px)
-                if (window.innerWidth < 768 && this.parentElement.querySelector('.filter-options')) {
-                    this.parentElement.classList.toggle('active');
+            title.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent duplicate toggle from global delegation in footer.blade.php
+                const section = this.closest('.filter-section');
+                if (section) {
+                    section.classList.toggle('active');
                 }
             });
         });

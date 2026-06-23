@@ -222,14 +222,14 @@
                                         <label for="pay_online" class="w-100 cursor-pointer">
                                             <div class="d-flex align-items-center p-3 border rounded-3 position-relative transition-all payment-card-inner">
                                                 <div class="payment-icon-circle me-3">
-                                                    <i class="fas fa-shield-alt text-primary"></i>
+                                                    <i class="fas fa-shield-alt text-success"></i>
                                                 </div>
                                                 <div class="flex-grow-1">
                                                     <div class="fw-bold text-dark">Secure Online Payment</div>
                                                     <div class="small text-success fw-medium">Zero Transaction fee • Instant Confirmation</div>
                                                 </div>
                                                 <div class="check-icon">
-                                                    <i class="fas fa-check-circle text-primary fs-4"></i>
+                                                    <i class="fas fa-check-circle text-success fs-4"></i>
                                                 </div>
                                             </div>
                                         </label>
@@ -358,7 +358,7 @@
 <style>
     :root {
         --primary-color: #72a420;
-        --secondary-color: #0d6efd;
+        --secondary-color: #2b6139;
         --light-bg: #f8f9fa;
         --border-dashed: #dee2e6;
     }
@@ -430,13 +430,13 @@
 
     .payment-option-modern.active .payment-card-inner {
         border-color: var(--secondary-color) !important;
-        background-color: #f8fbff;
+        background-color: #f4f8f5;
     }
 
     .payment-icon-circle {
         width: 45px;
         height: 45px;
-        background: #eef4ff;
+        background: #eaf0eb;
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -491,8 +491,8 @@
     }
 
     .btn-success:hover {
-        background-color: #3b6247 !important;
-        border-color: #3b6247 !important;
+        background-color: #1c3f24 !important;
+        border-color: #1c3f24 !important;
     }
 
     .shadow-success {
@@ -531,7 +531,8 @@
 
     @media (max-width: 576px) {
         .payment-brand-img {
-            height: 18px;
+            height: 20px;
+            margin: 6px 10px !important;
         }
 
         .card-header h5 {
@@ -542,12 +543,12 @@
     .hover-opacity-100:hover { opacity: 1 !important; transform: scale(1.1); transition: all 0.2s; }
 
     .payment-brand-img {
-        height: 22px;
+        height: 28px;
         width: auto;
         object-fit: contain;
-        filter: grayscale(100%);
-        opacity: 0.7;
+        
         transition: all 0.3s ease;
+        margin: 8px 16px !important;
     }
     
     .payment-brand-img:hover {

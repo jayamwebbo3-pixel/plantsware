@@ -96,7 +96,7 @@
                              data-category="{{ $product->category_id }}">
                             <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden product-builder-card position-relative">
                                 @if($hasDiscount)
-                                    <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 z-3">Sale</span>
+                                    <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3" style="z-index: 10 !important;">Sale</span>
                                 @endif
                                 <div class="p-3 bg-white text-center" style="height: 180px; display: flex; align-items: center; justify-content: center;">
                                     <img src="{{ $image }}" class="img-fluid" style="max-height: 100%; object-fit: contain;" alt="{{ $product->name }}">
@@ -178,7 +178,7 @@
                                     @foreach($slabs as $slab)
                                         <li class="d-flex justify-content-between align-items-center py-1 border-bottom border-dashed slab-indicator-item" data-min="{{ $slab->min_amount }}" data-percent="{{ $slab->discount_percentage }}">
                                             <span class="small text-muted">Above ₹{{ number_format($slab->min_amount, 2) }}</span>
-                                            <span class="badge bg-secondary rounded-pill slab-badge">{{ $slab->discount_percentage }}% Off</span>
+                                            <span class="badge bg-secondary rounded-pill slab-badge">{{ floatval($slab->discount_percentage) }}% Off</span>
                                         </li>
                                     @endforeach
                                 </ul>

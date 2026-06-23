@@ -79,15 +79,15 @@ if ($product->has_variants && !empty($product->size)) {
                         @if($product->combo_pack_eligible === 'Yes')
                         <div class="flex-grow-1 d-flex combo-btn-wrapper">
                             <a href="{{ route('combo-builder.index', ['add_product' => $product->id]) }}" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
-                                <span class="d-none d-lg-inline">Add To Combo</span>
-                                <span class="d-inline d-lg-none">Combo</span>
+                                <span class="d-none d-xl-inline">Add To Combo</span>
+                                <span class="d-inline d-xl-none">Combo</span>
                             </a>
                         </div>
                         @else
                         <div class="flex-grow-1 d-flex combo-btn-wrapper">
                             <button type="button" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" disabled>
-                                <span class="d-none d-lg-inline">Add To Combo</span>
-                                <span class="d-inline d-lg-none">Combo</span>
+                                <span class="d-none d-xl-inline">Add To Combo</span>
+                                <span class="d-inline d-xl-none">Combo</span>
                             </button>
                         </div>
                         @endif
@@ -95,23 +95,23 @@ if ($product->has_variants && !empty($product->size)) {
                             @csrf
                             <input type="hidden" name="quantity" value="1">
                             <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap">
-                                <span class="d-none d-lg-inline">Add To Cart</span>
-                                <span class="d-inline d-lg-none">Cart</span>
+                                <span class="d-none d-xl-inline">Add To Cart</span>
+                                <span class="d-inline d-xl-none">Cart</span>
                             </button>
                         </form>
                     @else
                         <div class="flex-grow-1 d-flex view-btn-wrapper">
                             <a href="{{ route('product.show', $product->slug) }}" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
-                                <span class="d-none d-lg-inline">Buy Now</span>
-                                <span class="d-inline d-lg-none">Buy</span>
+                                <span class="d-none d-xl-inline">Buy Now</span>
+                                <span class="d-inline d-xl-none">Buy</span>
                             </a>
                         </div>
                         <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex cart-form-wrapper">
                             @csrf
                             <input type="hidden" name="quantity" value="1">
                             <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap">
-                                <span class="d-none d-lg-inline">Add To Cart</span>
-                                <span class="d-inline d-lg-none">Cart</span>
+                                <span class="d-none d-xl-inline">Add To Cart</span>
+                                <span class="d-inline d-xl-none">Cart</span>
                             </button>
                         </form>
                     @endif
@@ -120,15 +120,15 @@ if ($product->has_variants && !empty($product->size)) {
                         @if($product->combo_pack_eligible === 'Yes')
                         <div class="flex-grow-1 d-flex combo-btn-wrapper">
                             <a href="{{ route('combo-builder.index', ['add_product' => $product->id]) }}" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
-                                <span class="d-none d-lg-inline">Add To Combo</span>
-                                <span class="d-inline d-lg-none">Combo</span>
+                                <span class="d-none d-xl-inline">Add To Combo</span>
+                                <span class="d-inline d-xl-none">Combo</span>
                             </a>
                         </div>
                         @else
                         <div class="flex-grow-1 d-flex combo-btn-wrapper">
                             <button type="button" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" disabled>
-                                <span class="d-none d-lg-inline">Add To Combo</span>
-                                <span class="d-inline d-lg-none">Combo</span>
+                                <span class="d-none d-xl-inline">Add To Combo</span>
+                                <span class="d-inline d-xl-none">Combo</span>
                             </button>
                         </div>
                         @endif
@@ -136,8 +136,8 @@ if ($product->has_variants && !empty($product->size)) {
                             @csrf
                             <input type="hidden" name="quantity" value="1">
                             <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap">
-                                <span class="d-none d-lg-inline">Add To Cart</span>
-                                <span class="d-inline d-lg-none">Cart</span>
+                                <span class="d-none d-xl-inline">Add To Cart</span>
+                                <span class="d-inline d-xl-none">Cart</span>
                             </button>
                         </form>
                     @else
@@ -146,16 +146,16 @@ if ($product->has_variants && !empty($product->size)) {
                             <input type="hidden" name="quantity" value="1">
                             <input type="hidden" name="buy_now" value="1">
                             <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap">
-                                <span class="d-none d-lg-inline">Buy Now</span>
-                                <span class="d-inline d-lg-none">Buy</span>
+                                <span class="d-none d-xl-inline">Buy Now</span>
+                                <span class="d-inline d-xl-none">Buy</span>
                             </button>
                         </form>
                         <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1 d-flex cart-form-wrapper">
                             @csrf
                             <input type="hidden" name="quantity" value="1">
                             <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap">
-                                <span class="d-none d-lg-inline">Add To Cart</span>
-                                <span class="d-inline d-lg-none">Cart</span>
+                                <span class="d-none d-xl-inline">Add To Cart</span>
+                                <span class="d-inline d-xl-none">Cart</span>
                             </button>
                         </form>
                     @endif

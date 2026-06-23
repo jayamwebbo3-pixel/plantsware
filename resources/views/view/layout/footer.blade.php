@@ -418,7 +418,7 @@
                         slidesPerView: 4,
                         spaceBetween: 15,
                     },
-                    1200: {
+                    1300: {
                         slidesPerView: 5,
                         spaceBetween: 20,
                     },
@@ -797,6 +797,17 @@ document.addEventListener('DOMContentLoaded', function() {
             refreshCartDrawer();
         });
     }
+
+    // --- Collapsible Filter Sections ---
+    document.addEventListener('click', function(e) {
+        const title = e.target.closest('.filter-title');
+        if (title) {
+            const section = title.closest('.filter-section');
+            if (section && section.querySelector('.filter-options')) {
+                section.classList.toggle('active');
+            }
+        }
+    });
 });
 </script>
 </body>

@@ -5,26 +5,25 @@
         <div class="row">
             <div class="col-12">
                 <ul class="list-unstyled mb-0">
-                    <li class="d-inline-block font-weight-bolder"><a href="{{ url('/') }}" class="text-decoration-none">home</a></li>
-                    <li class="d-inline-block font-weight-bolder mx-2">/</li>
-                    <li class="d-inline-block font-weight-bolder"><a href="#" class="text-decoration-none">Terms & Conditions</a></li>
+                    <li class="d-inline-block font-weight-bolder"><a href="{{ url('/') }}" class="text-decoration-none text-success">home</a></li>
+                    <li class="d-inline-block font-weight-bolder mx-2 text-muted">/</li>
+                    <li class="d-inline-block font-weight-bolder text-muted">Terms & Conditions</li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
 
-
-<section class="privacy-content">
+<section class="privacy-content py-5" style="background-color: #f8fafc;">
     <div class="container">
-        <div class="row">
-                {!! $page->content !!}
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border ckeditor-content">
+                    {!! $page->content !!}
+                </div>
             </div>
         </div>
     </div>
 </section>
-
-
-
 
 @include('view.layout.footer')
