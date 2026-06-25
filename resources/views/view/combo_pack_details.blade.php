@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data && data.success) {
                     alert(data.message);
-                    document.querySelectorAll('.price_cart').forEach(el => {
+                    document.querySelectorAll('.wishlist-icon-link .price_cart').forEach(el => {
                         el.textContent = data.wishlist_count;
                     });
                     // Update UI to show it's added

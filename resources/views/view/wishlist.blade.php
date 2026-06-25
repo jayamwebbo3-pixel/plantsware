@@ -371,27 +371,15 @@
 
     // Update cart count in header
     function updateCartCount(count) {
-        const cartCountElements = document.querySelectorAll('.cart-count, .cart-count-badge');
-        cartCountElements.forEach(element => {
+        document.querySelectorAll('.cart-icon-link .price_cart').forEach(element => {
             element.textContent = count;
-            if (count > 0) {
-                element.style.display = 'inline';
-            } else {
-                element.style.display = 'none';
-            }
         });
     }
 
     // Update wishlist count in header
     function updateWishlistCount(count) {
-        const wishlistCountElements = document.querySelectorAll('.wishlist-count, .wishlist-count-badge');
-        wishlistCountElements.forEach(element => {
+        document.querySelectorAll('.wishlist-icon-link .price_cart').forEach(element => {
             element.textContent = count;
-            if (count > 0) {
-                element.style.display = 'inline';
-            } else {
-                element.style.display = 'none';
-            }
         });
     }
 

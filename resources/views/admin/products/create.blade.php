@@ -512,12 +512,12 @@
                             <small class="text-muted">Hold Ctrl/Cmd to select multiple images</small>
                         </div>
 
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_featured">Mark as Featured Product</label>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="mb-3">
                             <label for="combo_pack_eligible" class="form-label fw-bold">Combo Pack Eligible</label>

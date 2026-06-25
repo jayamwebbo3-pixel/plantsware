@@ -33,7 +33,7 @@
                             <i class="fas fa-chevron-down toggle-icon"></i>
                         </h3>
                         <div class="filter-options d-flex align-items-center">
-                            <input type="range" name="price_max" class="form-range flex-grow-1 me-2" min="0" max="10000" step="100" id="price-max" value="{{ request('price_max', 10000) }}" style="width: 100%;" onchange="this.form.submit()">
+                            <input type="range" name="price_max" class="form-range flex-grow-1 me-2" min="0" max="10000" step="100" id="price-max" value="{{ request('price_max', 10000) }}" style="width: 100%;">
                         </div>
                     </div>
 
@@ -45,12 +45,12 @@
                         </h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="radio" name="category" id="cat-all" class="filter-radio" value="" onchange="this.form.submit()" {{ !request('category') ? 'checked' : '' }}>
+                                <input type="radio" name="category" id="cat-all" class="filter-radio" value="" {{ !request('category') ? 'checked' : '' }}>
                                 <label for="cat-all" class="filter-label">All Categories</label>
                             </div>
                             @foreach($categories as $cat)
                                 <div class="filter-item">
-                                    <input type="radio" name="category" id="cat-{{ $cat->id }}" class="filter-radio" value="{{ $cat->id }}" onchange="this.form.submit()" {{ request('category') == $cat->id ? 'checked' : '' }}>
+                                    <input type="radio" name="category" id="cat-{{ $cat->id }}" class="filter-radio" value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'checked' : '' }}>
                                     <label for="cat-{{ $cat->id }}" class="filter-label">{{ $cat->name }}</label>
                                 </div>
                             @endforeach
@@ -65,19 +65,19 @@
                         </h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-all" class="filter-radio" value="all" onchange="this.form.submit()" {{ request('discount', 'all') == 'all' ? 'checked' : '' }}>
+                                <input type="radio" name="discount" id="discount-all" class="filter-radio" value="all" {{ request('discount', 'all') == 'all' ? 'checked' : '' }}>
                                 <label for="discount-all" class="filter-label">All Discounts</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-50" class="filter-radio" value="50" onchange="this.form.submit()" {{ request('discount') == '50' ? 'checked' : '' }}>
+                                <input type="radio" name="discount" id="discount-50" class="filter-radio" value="50" {{ request('discount') == '50' ? 'checked' : '' }}>
                                 <label for="discount-50" class="filter-label">50% and above</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-30-50" class="filter-radio" value="30-50" onchange="this.form.submit()" {{ request('discount') == '30-50' ? 'checked' : '' }}>
+                                <input type="radio" name="discount" id="discount-30-50" class="filter-radio" value="30-50" {{ request('discount') == '30-50' ? 'checked' : '' }}>
                                 <label for="discount-30" class="filter-label">30% - 50%</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-10-30" class="filter-radio" value="10-30" onchange="this.form.submit()" {{ request('discount') == '10-30' ? 'checked' : '' }}>
+                                <input type="radio" name="discount" id="discount-10-30" class="filter-radio" value="10-30" {{ request('discount') == '10-30' ? 'checked' : '' }}>
                                 <label for="discount-10" class="filter-label">10% - 30%</label>
                             </div>
                         </div>
@@ -91,11 +91,11 @@
                         </h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="checkbox" name="availability[]" id="in-stock" class="filter-checkbox" value="in-stock" onchange="this.form.submit()" {{ is_array(request('availability')) && in_array('in-stock', request('availability')) ? 'checked' : '' }}>
+                                <input type="checkbox" name="availability[]" id="in-stock" class="filter-checkbox" value="in-stock" {{ is_array(request('availability')) && in_array('in-stock', request('availability')) ? 'checked' : '' }}>
                                 <label for="in-stock" class="filter-label">In Stock</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" name="availability[]" id="out-of-stock" class="filter-checkbox" value="out-of-stock" onchange="this.form.submit()" {{ is_array(request('availability')) && in_array('out-of-stock', request('availability')) ? 'checked' : '' }}>
+                                <input type="checkbox" name="availability[]" id="out-of-stock" class="filter-checkbox" value="out-of-stock" {{ is_array(request('availability')) && in_array('out-of-stock', request('availability')) ? 'checked' : '' }}>
                                 <label for="out-of-stock" class="filter-label">Out of Stock</label>
                             </div>
                         </div>
@@ -109,19 +109,19 @@
                         </h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-new" class="filter-radio" value="newest" onchange="this.form.submit()" {{ request('sort', 'newest') == 'newest' ? 'checked' : '' }}>
+                                <input type="radio" name="sort" id="sort-new" class="filter-radio" value="newest" {{ request('sort', 'newest') == 'newest' ? 'checked' : '' }}>
                                 <label for="sort-new" class="filter-label">Newest First</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-price-low" class="filter-radio" value="price-low" onchange="this.form.submit()" {{ request('sort') == 'price-low' ? 'checked' : '' }}>
+                                <input type="radio" name="sort" id="sort-price-low" class="filter-radio" value="price-low" {{ request('sort') == 'price-low' ? 'checked' : '' }}>
                                 <label for="sort-price-low" class="filter-label">Price: Low to High</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-price-high" class="filter-radio" value="price-high" onchange="this.form.submit()" {{ request('sort') == 'price-high' ? 'checked' : '' }}>
+                                <input type="radio" name="sort" id="sort-price-high" class="filter-radio" value="price-high" {{ request('sort') == 'price-high' ? 'checked' : '' }}>
                                 <label for="sort-price-high" class="filter-label">Price: High to Low</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-discount" class="filter-radio" value="discount" onchange="this.form.submit()" {{ request('sort') == 'discount' ? 'checked' : '' }}>
+                                <input type="radio" name="sort" id="sort-discount" class="filter-radio" value="discount" {{ request('sort') == 'discount' ? 'checked' : '' }}>
                                 <label for="sort-discount" class="filter-label">Discount</label>
                             </div>
                         </div>
@@ -129,7 +129,7 @@
 
                     <!-- Filter Actions -->
                     <div class="filter-actions d-flex gap-2 mt-3">
-                        <button class="btn btn-primary flex-fill" style="background-color: #72a420; border-color: #72a420;" type="submit">Apply Filters</button>
+                        <button class="btn btn-primary flex-fill" id="applyFiltersBtn" style="background-color: #72a420; border-color: #72a420;" type="submit">Apply Filters</button>
                         <a href="{{ route('combo_packs.frontend_index') }}" class="btn btn-outline-secondary flex-fill text-center text-decoration-none d-flex align-items-center justify-content-center">Reset</a>
                     </div>
                 </form>
@@ -250,20 +250,11 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Price Range Display Sync
-    const priceInput = document.getElementById('price-max');
-    const displayPriceRange = document.getElementById('display-price-range');
-    if(priceInput) {
-        priceInput.addEventListener('input', function() {
-            displayPriceRange.textContent = `₹0 - ₹${priceInput.value}`;
-        });
-    }
-
     // AJAX Wishlist
-    document.querySelectorAll('.wishlist-btn-combo').forEach(btn => {
+    document.querySelectorAll('.wishlist-btn-combo').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            const id = this.getAttribute('data-id');
-            const currentBtn = this;
+            var id = this.getAttribute('data-id');
+            var currentBtn = this;
 
             fetch("{{ url('/wishlist/add-combo') }}/" + id, {
                 method: "POST",
@@ -274,25 +265,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     "X-Requested-With": "XMLHttpRequest"
                 }
             })
-            .then(response => {
+            .then(function(response) {
                 if (response.status === 401) {
                     window.location.href = "{{ route('login') }}";
                     return;
                 }
-                return response.json().then(data => {
-                    if (!response.ok) {
-                        throw new Error(data.message || "Something went wrong");
-                    }
+                return response.json().then(function(data) {
+                    if (!response.ok) throw new Error(data.message || "Something went wrong");
                     return data;
                 });
             })
-            .then(data => {
+            .then(function(data) {
                 if (data && data.success) {
                     alert(data.message);
-                    document.querySelectorAll('.price_cart').forEach(el => {
+                    document.querySelectorAll('.wishlist-icon-link .price_cart').forEach(function(el) {
                         el.textContent = data.wishlist_count;
                     });
-                    const icon = currentBtn.querySelector('i');
+                    var icon = currentBtn.querySelector('i');
                     if (icon) {
                         icon.classList.remove('fa-regular');
                         icon.classList.add('fa-solid');
@@ -300,10 +289,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             })
-            .catch(error => {
-                if (error && error.message) {
-                    alert(error.message);
-                }
+            .catch(function(error) {
+                if (error && error.message) alert(error.message);
             });
         });
     });
@@ -537,34 +524,75 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var filterToggle = document.getElementById('mobileFilterToggle');
-    var filterClose = document.getElementById('mobileFilterClose');
-    var filterMenu = document.getElementById('filterMenuWrapper');
-    
-    // Create backdrop overlay
+    var filterForm      = document.getElementById('filter-form');
+    var applyFiltersBtn = document.getElementById('applyFiltersBtn');
+    var filterToggle    = document.getElementById('mobileFilterToggle');
+    var filterClose     = document.getElementById('mobileFilterClose');
+    var filterMenu      = document.getElementById('filterMenuWrapper');
+
+    function isMobile() { return window.innerWidth < 768; }
+
+    // ── Create backdrop overlay ────────────────────────────
     var overlay = document.createElement('div');
     overlay.className = 'filter-overlay';
     document.body.appendChild(overlay);
-    
+
+    // ── Collapsible Filter Sections ────────────────────────
+    document.querySelectorAll('.filter-title').forEach(function(title) {
+        title.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var section = this.closest('.filter-section');
+            if (section) section.classList.toggle('active');
+        });
+    });
+
+    // ── Desktop: Auto-submit on any filter change ──────────
+    if (filterForm) {
+        filterForm.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(function(input) {
+            input.addEventListener('change', function() {
+                if (!isMobile()) filterForm.submit();
+            });
+        });
+        // Price range slider — submit on release (desktop only)
+        var priceInput = document.getElementById('price-max');
+        var displayPriceRange = document.getElementById('display-price-range');
+        if (priceInput) {
+            priceInput.addEventListener('input', function() {
+                if (displayPriceRange) displayPriceRange.textContent = '₹0 - ₹' + priceInput.value;
+            });
+            priceInput.addEventListener('change', function() {
+                if (!isMobile()) filterForm.submit();
+            });
+        }
+    }
+
+    // ── Mobile: Apply Filters button submits ──────────────
+    if (applyFiltersBtn && filterForm) {
+        applyFiltersBtn.addEventListener('click', function(e) {
+            if (isMobile()) {
+                e.preventDefault();
+                closeMobileFilter();
+                setTimeout(function() { filterForm.submit(); }, 320);
+            }
+        });
+    }
+
+    // ── Mobile drawer open/close ───────────────────────────
     if (filterToggle && filterMenu) {
         filterToggle.addEventListener('click', function() {
             filterMenu.classList.add('open');
             overlay.classList.add('open');
-            document.body.style.overflow = 'hidden'; // prevent background scrolling
+            document.body.style.overflow = 'hidden';
         });
     }
-    
+
     function closeMobileFilter() {
-        if (filterMenu) {
-            filterMenu.classList.remove('open');
-        }
+        if (filterMenu) filterMenu.classList.remove('open');
         overlay.classList.remove('open');
         document.body.style.overflow = '';
     }
-    
-    if (filterClose) {
-        filterClose.addEventListener('click', closeMobileFilter);
-    }
+
+    if (filterClose) filterClose.addEventListener('click', closeMobileFilter);
     overlay.addEventListener('click', closeMobileFilter);
 });
 </script>

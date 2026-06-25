@@ -33,6 +33,10 @@ class ProductController extends Controller
         $minPrice = floor(Product::where('is_active', true)->min(\DB::raw($ep)) ?? 0);
         $maxPrice = ceil(Product::where('is_active', true)->max(\DB::raw($ep)) ?? 10000);
 
+        if ($request->ajax()) {
+            return view('view.partials.products-grid', compact('categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'))->render();
+        }
+
         return view('view.productcategory', compact('categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'));
     }
 
@@ -68,6 +72,10 @@ class ProductController extends Controller
         $minPrice = floor(Product::where('is_active', true)->min(\DB::raw($ep)) ?? 0);
         $maxPrice = ceil(Product::where('is_active', true)->max(\DB::raw($ep)) ?? 10000);
 
+        if ($request->ajax()) {
+            return view('view.partials.products-grid', compact('categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'))->render();
+        }
+
         return view('view.productcategory', compact('categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'));
     }
 
@@ -87,6 +95,10 @@ class ProductController extends Controller
         $minPrice = floor(Product::where('category_id', $category->id)->where('is_active', true)->min(\DB::raw($ep)) ?? 0);
         $maxPrice = ceil(Product::where('category_id', $category->id)->where('is_active', true)->max(\DB::raw($ep)) ?? 10000);
 
+        if ($request->ajax()) {
+            return view('view.partials.products-grid', compact('category', 'categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'))->render();
+        }
+
         return view('view.productcategory', compact('category', 'categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'));
     }
 
@@ -105,6 +117,10 @@ class ProductController extends Controller
         $ep = "COALESCE(NULLIF(sale_price, 0), price)";
         $minPrice = floor(Product::where('subcategory_id', $subcategory->id)->where('is_active', true)->min(\DB::raw($ep)) ?? 0);
         $maxPrice = ceil(Product::where('subcategory_id', $subcategory->id)->where('is_active', true)->max(\DB::raw($ep)) ?? 10000);
+
+        if ($request->ajax()) {
+            return view('view.partials.products-grid', compact('subcategory', 'categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'))->render();
+        }
 
         return view('view.productcategory', compact('subcategory', 'categories', 'products', 'filterCounts', 'minPrice', 'maxPrice'));
     }

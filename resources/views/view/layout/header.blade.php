@@ -353,7 +353,7 @@
                             @if($customComboSetting && $customComboSetting->is_enabled)
                             <li class="{{ Request::routeIs('combo-builder.index') ? 'active' : '' }}"><a href="{{ route('combo-builder.index') }}">Build a Combo</a></li>
                             @endif
-                            <li class="{{ Request::is('about') ? 'active' : '' }}"><a href="{{ url('about') }}">About Plantsware</a></li>
+                            <li class="{{ Request::is('about') ? 'active' : '' }}"><a href="{{ url('about') }}">About Us</a></li>
                             <li class="{{ Request::routeIs('blog.categories') || Request::is('blog*') ? 'active' : '' }}"><a href="{{ route('blog.categories') }}">Blog</a></li>
                         </ul>
                     </div>

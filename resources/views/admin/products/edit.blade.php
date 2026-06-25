@@ -165,12 +165,12 @@
                             <small class="text-muted">Hold Ctrl/Cmd to select multiple. These will be added to your current gallery.</small>
                         </div>
 
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_featured">Mark as Featured Product</label>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="mb-3">
                             <label for="combo_pack_eligible" class="form-label fw-bold">Combo Pack Eligible</label>
@@ -366,7 +366,7 @@
                     </div>
 
                     <!-- Secondary Attributes (Shape / Material) -->
-                    <div class="row g-4 mb-4">
+                    <!-- <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body p-4">
@@ -397,7 +397,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <style>
                         .bg-light-subtle { background-color: #f8f9fa !important; }

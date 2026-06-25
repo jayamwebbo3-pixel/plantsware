@@ -3955,7 +3955,7 @@ del {
     gap: 4px;
 }
 
-.btn {
+.product-actions .btn {
     padding: 2px 4px;
     border: none;
     border-radius: 6px;
@@ -4581,7 +4581,7 @@ del {
     gap: 0.5rem;
 }
 
-.btn {
+.product-actions .btn {
     display: flex;
     align-items: center;
     justify-content: center;

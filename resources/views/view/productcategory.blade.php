@@ -69,11 +69,11 @@ margin: 0 5px !important;
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="flex-column d-flex">
                     <small class="text-muted mb-1" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Minimum</small>
-                    <span class="fw-bold text-dark" id="price-min-label" style="font-size: 14px;">₹{{ request('price_min', $minPrice) }}</span>
+                    <span class="fw-bold text-dark" id="price-min-label" style="font-size: 14px;">â‚¹{{ request('price_min', $minPrice) }}</span>
                 </div>
                 <div class="flex-column d-flex text-end">
                     <small class="text-muted mb-1" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Maximum</small>
-                    <span class="fw-bold text-dark" id="price-max-label" style="font-size: 14px;">₹{{ request('price_max', $maxPrice) }}</span>
+                    <span class="fw-bold text-dark" id="price-max-label" style="font-size: 14px;">â‚¹{{ request('price_max', $maxPrice) }}</span>
                 </div>
             </div>
             <input type="hidden" name="price_min" id="price_min" value="{{ request('price_min', $minPrice) }}">
@@ -81,7 +81,7 @@ margin: 0 5px !important;
         </div>
     </div>
 
-                    {{-- ── Discount ─────────────────────────────────────────── --}}
+                    {{-- â”€â”€ Discount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Discount
@@ -92,8 +92,8 @@ margin: 0 5px !important;
                             $discountOptions = [
                             'all' => 'All Products',
                             '50' => '50% and above',
-                            '30-50' => '30% – 50%',
-                            '10-30' => '10% – 30%',
+                            '30-50' => '30% - 50%',
+                            '10-30' => '10% - 30%',
                             'below10' => 'Below 10%',
                             ];
                             @endphp
@@ -114,7 +114,7 @@ margin: 0 5px !important;
                         </div>
                     </div>
 
-                    {{-- ── Availability ─────────────────────────────────────── --}}
+                    {{-- â”€â”€ Availability â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Availability
@@ -142,7 +142,7 @@ margin: 0 5px !important;
                         </div>
                     </div>
 
-                    {{-- ── Shape ────────────────────────────────────────────── --}}
+                    {{-- â”€â”€ Shape â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
                     @php $shapeTotal = array_sum($filterCounts['shape'] ?? []); @endphp
                     @if($shapeTotal > 0)
                     <div class="filter-section active mb-3">
@@ -174,7 +174,7 @@ margin: 0 5px !important;
                     </div>
                     @endif
 
-                    {{-- ── Material ─────────────────────────────────────────── --}}
+                    {{-- â”€â”€ Material â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
                     @php $matTotal = array_sum($filterCounts['material'] ?? []); @endphp
                     @if($matTotal > 0)
                     <div class="filter-section active mb-3">
@@ -200,7 +200,7 @@ margin: 0 5px !important;
                     </div>
                     @endif
 
-                    {{-- ── Weight ───────────────────────────────────────────── --}}
+                    {{-- â”€â”€ Weight â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
                     @php $weightTotal = array_sum($filterCounts['weight'] ?? []); @endphp
                     @if($weightTotal > 0)
                     <div class="filter-section active mb-3">
@@ -211,10 +211,10 @@ margin: 0 5px !important;
                         <div class="filter-options">
                             @php
                             $weightOptions = [
-                                '0to1'   => '0 kg – 1 kg',
-                                '1to3'   => '1 kg – 3 kg',
-                                '3to5'   => '3 kg – 5 kg',
-                                'above5' => 'Above 5 kg',
+                                '0to1'   => '0 Kg - 1 Kg',
+                                '1to3'   => '1 Kg - 3 Kg',
+                                '3to5'   => '3 Kg - 5 Kg',
+                                'above5' => 'Above 5 Kg',
                             ];
                             @endphp
                             @foreach($weightOptions as $val => $label)
@@ -241,7 +241,7 @@ margin: 0 5px !important;
                     </div>
                     @endif
 
-                    {{-- ── Sort By ──────────────────────────────────────────── --}}
+                    {{-- â”€â”€ Sort By â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
                             Sort By
@@ -268,7 +268,7 @@ margin: 0 5px !important;
                         </div>
                     </div>
 
-                    {{-- ── Actions ─────────────────────────────────────────── --}}
+                    {{-- â”€â”€ Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
                     <div class="filter-actions d-flex gap-2 mt-3">
                         <button class="btn-filter btn-apply flex-fill" type="submit" id="applyFiltersBtn">Apply Filters</button>
                         <a href="{{ url()->current() }}"
@@ -293,68 +293,10 @@ margin: 0 5px !important;
                             @endif
                         </button>
                     </div>
-                    <div class="products-header-bar mb-4">
-                        <div class="products-header-inner">
-                            <!-- Left: Category Title + Count -->
-                            <div class="products-header-left">
-                                <div class="category-title-group">
-                                    <i class="fas fa-leaf category-leaf-icon"></i>
-                                    <h2 class="category-name-heading">
-                                        @if(request()->filled('q'))
-                                            Search results for &ldquo;{{ request('q') }}&rdquo;
-                                        @elseif(isset($category))
-                                            {{ $category->name }}
-                                        @elseif(isset($subcategory))
-                                            {{ $subcategory->name }}
-                                        @else
-                                            All Categories
-                                        @endif
-                                    </h2>
-                                </div>
-                                <span class="product-count-pill">
-                                    {{ $products->total() }} Products
-                                </span>
-                            </div>
 
-                            <!-- Right: Sort Dropdown -->
-                            <div class="products-header-right">
-                                <div class="sort-select-wrapper">
-                                    <i class="fas fa-sort-amount-down sort-icon"></i>
-                                    <select id="sort-products" class="sort-select-styled">
-                                        <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Popularity</option>
-                                        <option value="name-asc" {{ request('sort') == 'name-asc' ? 'selected' : '' }}>Name: A to Z</option>
-                                        <option value="name-desc" {{ request('sort') == 'name-desc' ? 'selected' : '' }}>Name: Z to A</option>
-                                        <option value="price-low" {{ request('sort') == 'price-low' ? 'selected' : '' }}>Price: Low → High</option>
-                                        <option value="price-high" {{ request('sort') == 'price-high' ? 'selected' : '' }}>Price: High → Low</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="products-grid row g-4" id="products-container">
-                        @forelse($products as $product)
-                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
-                            @include('view.partials.product-card', ['product' => $product])
-                        </div>
-                        @empty
-                        <div class="col-12 py-5 text-center">
-                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                            <p class="h4 text-muted">
-                                @if(request()->filled('q'))
-                                    No products found for "{{ request('q') }}".
-                                @else
-                                    No products available in this category.
-                                @endif
-                            </p>
-                            <a href="{{ route('products.index') }}" class="btn btn-success mt-3" style="background-color: #72a420; border: none;">View All Products</a>
-                        </div>
-                        @endforelse
-                        @if(isset($products) && method_exists($products, 'links'))
-                        <div class="col-12 mt-4 text-center">
-                            {{ $products->links('pagination::bootstrap-5') }}
-                        </div>
-                        @endif
+                    <!-- Products Container â€” updated via AJAX; no full page reload -->
+                    <div id="products-container">
+                        @include('view.partials.products-grid')
                     </div>
 
                 </div>
@@ -366,136 +308,190 @@ margin: 0 5px !important;
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-        // ── Price Slider ───────────────────────────────────────
-        const priceSlider = document.getElementById('price-range-slider');
-        if (priceSlider) {
-            const minInput = document.getElementById('price_min');
-            const maxInput = document.getElementById('price_max');
-            const minLabel = document.getElementById('price-min-label');
-            const maxLabel = document.getElementById('price-max-label');
-            const startMin = parseInt(minInput.value) || {{ $minPrice }};
-            const startMax = parseInt(maxInput.value) || {{ $maxPrice }};
-            const globalMin = {{ $minPrice }};
-            const globalMax = {{ $maxPrice }};
-            noUiSlider.create(priceSlider, {
-                start: [startMin, startMax],
-                connect: true,
-                step: 10,
-                range: { 'min': globalMin, 'max': globalMax },
-                format: {
-                    to: function(value) { return Math.round(value); },
-                    from: function(value) { return parseFloat(value); }
+        // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        function isMobile() { return window.innerWidth < 768; }
+
+        var filterForm        = document.getElementById('filter-form');
+        var applyFiltersBtn   = document.getElementById('applyFiltersBtn');
+        var productsContainer = document.getElementById('products-container');
+        var csrfMeta          = document.querySelector('meta[name="csrf-token"]');
+        var csrfToken         = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+        // â”€â”€ Loading state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        function showLoading() {
+            productsContainer.style.opacity       = '0.4';
+            productsContainer.style.pointerEvents = 'none';
+            productsContainer.style.transition    = 'opacity 0.2s ease';
+        }
+        function hideLoading() {
+            productsContainer.style.opacity       = '1';
+            productsContainer.style.pointerEvents = '';
+        }
+
+        // â”€â”€ Core AJAX fetch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        function fetchProducts(params, pushUrl) {
+            showLoading();
+            var freshUrl = new URL(window.location.pathname, window.location.origin);
+            params.forEach(function(pair) {
+                if (pair[1] !== '') freshUrl.searchParams.append(pair[0], pair[1]);
+            });
+            fetch(freshUrl.toString(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken }
+            })
+            .then(function(res) { return res.text(); })
+            .then(function(html) {
+                productsContainer.innerHTML = html;
+                hideLoading();
+                if (isMobile()) productsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (pushUrl) window.history.pushState({ ajaxParams: params }, '', freshUrl.toString());
+                bindPaginationLinks();
+                bindSortDropdown();
+            })
+            .catch(function(err) {
+                console.error('AJAX filter error:', err);
+                hideLoading();
+            });
+        }
+
+        // ── Collect form field values ────────────────────────────
+        function getFormParams() {
+            if (!filterForm) return [];
+            var params = [];
+            (new FormData(filterForm)).forEach(function(v, k) { params.push([k, v]); });
+            
+            // Preserve 'q' search parameter from URL if present
+            var urlParams = new URLSearchParams(window.location.search);
+            var qVal = urlParams.get('q');
+            if (qVal) {
+                var hasQ = params.some(function(p) { return p[0] === 'q'; });
+                if (!hasQ) {
+                    params.push(['q', qVal]);
                 }
+            }
+            return params;
+        }
+
+        function submitFiltersAjax() { fetchProducts(getFormParams(), true); }
+
+        // â”€â”€ Price Slider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        var priceSlider = document.getElementById('price-range-slider');
+        if (priceSlider) {
+            var minInput  = document.getElementById('price_min');
+            var maxInput  = document.getElementById('price_max');
+            var minLabel  = document.getElementById('price-min-label');
+            var maxLabel  = document.getElementById('price-max-label');
+
+            noUiSlider.create(priceSlider, {
+                start  : [parseInt(minInput.value) || {{ $minPrice }}, parseInt(maxInput.value) || {{ $maxPrice }}],
+                connect: true,
+                step   : 10,
+                range  : { 'min': {{ $minPrice }}, 'max': {{ $maxPrice }} },
+                format : { to: function(v){ return Math.round(v); }, from: function(v){ return parseFloat(v); } }
             });
             priceSlider.noUiSlider.on('update', function(values) {
-                minLabel.textContent = `₹${values[0]}`;
-                maxLabel.textContent = `₹${values[1]}`;
+                minLabel.textContent = '\u20B9' + values[0];
+                maxLabel.textContent = '\u20B9' + values[1];
                 minInput.value = values[0];
                 maxInput.value = values[1];
             });
-        }
-
-        // ── Sort Dropdown Auto Submit ───────────────────────────
-        const sortDropdown = document.getElementById('sort-products');
-        if (sortDropdown) {
-            sortDropdown.addEventListener('change', function() {
-                let url = new URL(window.location.href);
-                url.searchParams.set('sort', this.value);
-                window.location.href = url.href;
+            // Desktop: AJAX on slider release
+            priceSlider.noUiSlider.on('end', function() {
+                if (!isMobile()) submitFiltersAjax();
             });
         }
 
-        // ── Wishlist Icon Toggle ────────────────────────────────
-        document.querySelectorAll('.btn-wishlist').forEach(button => {
-            button.addEventListener('mousedown', function() {
-                const icon = this.querySelector('i');
-                if (icon && icon.classList.contains('far')) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
-                    icon.style.color = '#e53e3e';
-                }
+        // â”€â”€ Desktop: AJAX on radio / checkbox change â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        if (filterForm) {
+            filterForm.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(function(input) {
+                input.addEventListener('change', function() {
+                    if (!isMobile()) submitFiltersAjax();
+                });
             });
-        });
+        }
 
-        // ── Collapsible Filter Sections ────────────────────────
-        document.querySelectorAll('.filter-title').forEach(title => {
+        // â”€â”€ Collapsible Filter Sections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        document.querySelectorAll('.filter-title').forEach(function(title) {
             title.addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent duplicate toggle from global delegation in footer.blade.php
-                const section = this.closest('.filter-section');
-                if (section) {
-                    section.classList.toggle('active');
-                }
+                e.stopPropagation();
+                var section = this.closest('.filter-section');
+                if (section) section.classList.toggle('active');
             });
         });
 
-        // ── Mobile Filter Drawer ───────────────────────────────
-        const filterToggleBtn  = document.getElementById('filterToggleBtn');
-        const filterSidebar    = document.getElementById('filterSidebar');
-        const filterOverlay    = document.getElementById('filterOverlay');
-        const applyFiltersBtn  = document.getElementById('applyFiltersBtn');
-        const filterForm       = document.getElementById('filter-form');
-
-        function isMobile() {
-            return window.innerWidth < 768;
+        // â”€â”€ Sort dropdown (re-bound after each AJAX refresh) â”€â”€â”€
+        function bindSortDropdown() {
+            var sortSel = document.getElementById('sort-products');
+            if (!sortSel) return;
+            sortSel.addEventListener('change', function() {
+                var params = getFormParams().filter(function(p) { return p[0] !== 'sort'; });
+                params.push(['sort', this.value]);
+                fetchProducts(params, true);
+            });
         }
+        bindSortDropdown();
+
+        // â”€â”€ Pagination links (re-bound after each AJAX refresh) â”€
+        function bindPaginationLinks() {
+            productsContainer.querySelectorAll('.ajax-pagination a').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var href = this.getAttribute('href');
+                    if (!href) return;
+                    var pageUrl = new URL(href, window.location.origin);
+                    var params  = [];
+                    pageUrl.searchParams.forEach(function(v, k) { params.push([k, v]); });
+                    fetchProducts(params, true);
+                });
+            });
+        }
+        bindPaginationLinks();
+
+        // â”€â”€ Browser back / forward â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        window.addEventListener('popstate', function() {
+            var params = [];
+            new URLSearchParams(window.location.search).forEach(function(v, k) { params.push([k, v]); });
+            fetchProducts(params, false);
+        });
+
+        // â”€â”€ Mobile Filter Drawer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        var filterToggleBtn = document.getElementById('filterToggleBtn');
+        var filterSidebar   = document.getElementById('filterSidebar');
+        var filterOverlay   = document.getElementById('filterOverlay');
 
         function openFilterDrawer() {
             if (!filterSidebar) return;
             filterSidebar.classList.add('open');
             if (filterOverlay) filterOverlay.classList.add('open');
-            document.body.style.overflow = 'hidden'; // lock page scroll
+            document.body.style.overflow = 'hidden';
         }
-
         function closeFilterDrawer() {
             if (!filterSidebar) return;
             filterSidebar.classList.remove('open');
             if (filterOverlay) filterOverlay.classList.remove('open');
-            document.body.style.overflow = ''; // restore page scroll
+            document.body.style.overflow = '';
         }
 
-        // Toggle on button click
         if (filterToggleBtn) {
             filterToggleBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                if (filterSidebar && filterSidebar.classList.contains('open')) {
-                    closeFilterDrawer();
-                } else {
-                    openFilterDrawer();
-                }
+                filterSidebar && filterSidebar.classList.contains('open') ? closeFilterDrawer() : openFilterDrawer();
             });
         }
+        if (filterOverlay) filterOverlay.addEventListener('click', closeFilterDrawer);
 
-        // Close on overlay click
-        if (filterOverlay) {
-            filterOverlay.addEventListener('click', function() {
-                closeFilterDrawer();
-            });
-        }
-
-        // Close after Apply Filters (submit form then close)
-        if (applyFiltersBtn && filterForm) {
+        // Mobile: Apply Filters â†’ AJAX + close drawer
+        if (applyFiltersBtn) {
             applyFiltersBtn.addEventListener('click', function(e) {
-                if (isMobile()) {
-                    closeFilterDrawer();
-                    // Let the form submit naturally after drawer closes
-                    setTimeout(function() { filterForm.submit(); }, 320);
-                    e.preventDefault();
-                }
-                // On desktop: let the default submit happen immediately
+                e.preventDefault();
+                if (isMobile()) { closeFilterDrawer(); setTimeout(submitFiltersAjax, 320); }
+                else { submitFiltersAjax(); }
             });
         }
 
-        // Ensure drawer is always CLOSED on page load for mobile
-        if (isMobile()) {
-            closeFilterDrawer();
-        }
+        if (isMobile()) closeFilterDrawer();
 
-        // Re-check on resize to handle orientation changes
         window.addEventListener('resize', function() {
-            if (!isMobile()) {
-                closeFilterDrawer();
-                document.body.style.overflow = '';
-            }
+            if (!isMobile()) { closeFilterDrawer(); document.body.style.overflow = ''; }
         });
     });
 </script>
