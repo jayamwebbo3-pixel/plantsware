@@ -59,6 +59,7 @@ Route::get('blog-category/{slug}', [FrontendBlogController::class, 'category'])-
 
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::get('/drawer', [CartController::class, 'drawer'])->name('drawer');
     Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
     Route::post('/update/{id}', [CartController::class, 'update'])->name('update');
     Route::delete('/remove/{cart}', [CartController::class, 'remove'])->name('remove');

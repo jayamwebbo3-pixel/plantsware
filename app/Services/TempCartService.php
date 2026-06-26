@@ -71,6 +71,7 @@ class TempCartService
             } else {
                 $comboProducts = ComboPackProduct::where('combo_pack_id', $combo->id)->first();
                 if ($comboProducts && $comboProducts->product_ids) {
+                    $this->checkConstituentStock($comboProducts->product_ids, $quantity);
                     $this->subtractConstituentStock($comboProducts->product_ids, $quantity);
                 }
             }
@@ -278,6 +279,40 @@ class TempCartService
                         if ($nestedComboProducts && $nestedComboProducts->product_ids) {
                             $this->addConstituentStock($nestedComboProducts->product_ids, $orderQuantity);
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private function checkConstituentStock(array $productIds, int $quantity)
+    {
+        foreach ($productIds as $id) {
+            if (str_starts_with($id, 'p_')) {
+                $realId = str_replace('p_', '', $id);
+                $p = Product::find($realId);
+                if (!$p || $p->stock_quantity < $quantity) {
+                    $name = $p ? $p->name : 'Product';
+                    throw new Exception("Insufficient stock for constituent product: {$name}.");
+                }
+            } elseif (str_starts_with($id, 'co_')) {
+                $realId = str_replace('co_', '', $id);
+                $co = ComboOnlyProduct::find($realId);
+                if (!$co || $co->stock_quantity < $quantity) {
+                    $name = $co ? $co->name : 'Product';
+                    throw new Exception("Insufficient stock for constituent product: {$name}.");
+                }
+            } elseif (str_starts_with($id, 'c_')) {
+                $realId = str_replace('c_', '', $id);
+                $nestedCombo = ComboPack::find($realId);
+                if (!$nestedCombo || $nestedCombo->stock_quantity < $quantity) {
+                    $name = $nestedCombo ? $nestedCombo->name : 'Combo Pack';
+                    throw new Exception("Insufficient stock for constituent combo: {$name}.");
+                }
+                if (!$nestedCombo->is_combo_only) {
+                    $nestedComboProducts = ComboPackProduct::where('combo_pack_id', $nestedCombo->id)->first();
+                    if ($nestedComboProducts && $nestedComboProducts->product_ids) {
+                        $this->checkConstituentStock($nestedComboProducts->product_ids, $quantity);
                     }
                 }
             }

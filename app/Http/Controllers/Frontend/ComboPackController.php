@@ -21,6 +21,13 @@ class ComboPackController extends Controller
 
         $comboPacks = $query->paginate(12)->withQueryString();
 
+        // Return only the products partial for AJAX requests
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('view.partials.combo-packs-grid', compact('comboPacks'))->render(),
+            ]);
+        }
+
         return view('view.combo_packs', compact('comboPacks', 'categories'));
     }
 

@@ -1,3 +1,12 @@
+// Fallback stubs for unused/removed jQuery plugins in custom.js to prevent JS errors
+(function($) {
+    if ($) {
+        if (!$.fn.owlCarousel) $.fn.owlCarousel = function() { return this; };
+        if (!$.fn.fancybox) $.fn.fancybox = function() { return this; };
+        if (!$.fn.magnificPopup) $.fn.magnificPopup = function() { return this; };
+    }
+})(window.jQuery);
+
 $(document).ready(function () {
     "use strict";
         // Animate loader off screen
@@ -159,37 +168,103 @@ $(document).ready(function() {
   });
 });
 
-//home page Silder
-$('#silder_carousel').owlCarousel({
-  // loop: true,  
-  autoPlay: 3000,
-      animateIn: 'fadeIn',
-      animateOut: 'fadeOut',
-      loop: false,
-      navigationText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
-      navigation : false,
-      pagination:true,
-  responsive: {
-    0: {
-      items: 1
-    },
-    380: {
-      items: 1
-    },
-    576: {
-      items: 1
-    },
-    992: {
-      items: 1
-    },
-    1409: {
-      items: 1
-    },
-    1850: {
-      items: 1
+//home page Slider (Bootstrap Carousel Touch Swipe, Mouse Drag, No Pause on Hover, and Progress Bar Animation)
+$(document).ready(function() {
+    var $carousel = $('#carouselExampleIndicators');
+    if ($carousel.length === 0) return;
+
+    // Set Carousel options to run continuously and not pause on hover
+    $carousel.carousel({
+        interval: 5000,
+        pause: false
+    });
+
+    var startX = 0;
+    var currentX = 0;
+    var isDragging = false;
+    var wasDragging = false;
+    var threshold = 50;
+
+    // Prevent default browser ghost image drag behavior
+    $carousel.find('img').on('dragstart', function(e) {
+        e.preventDefault();
+    });
+
+    $carousel.on('touchstart mousedown', function(e) {
+        if (e.type === 'mousedown' && e.which !== 1) return; // Left click only
+
+        isDragging = true;
+        wasDragging = false;
+        startX = (e.type === 'mousedown') ? e.pageX : e.originalEvent.touches[0].pageX;
+        currentX = startX;
+        
+        $carousel.addClass('is-dragging');
+    });
+
+    $(document).on('mousemove touchmove', function(e) {
+        if (!isDragging) return;
+
+        currentX = (e.type === 'mousemove') ? e.pageX : e.originalEvent.touches[0].pageX;
+        
+        // Prevent default screen scrolling when swiping horizontally
+        var diff = startX - currentX;
+        if (Math.abs(diff) > 10) {
+            wasDragging = true;
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('mouseup touchend', function() {
+        if (!isDragging) return;
+        isDragging = false;
+        $carousel.removeClass('is-dragging');
+
+        var diff = startX - currentX;
+        if (Math.abs(diff) > threshold) {
+            if (diff > 0) {
+                $carousel.carousel('next');
+            } else {
+                $carousel.carousel('prev');
+            }
+        }
+        
+        // Reset dragging state after a tiny delay so click handler knows we dragged
+        setTimeout(function() {
+            wasDragging = false;
+        }, 50);
+    });
+
+    // Prevent navigation click trigger if a drag/swipe occurred
+    $carousel.find('a, button').on('click', function(e) {
+        if (wasDragging) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    });
+
+    // Premium Progress Bar Animation (Creative Alternative)
+    var $progressBar = $carousel.find('.slider-progress-bar');
+    
+    function resetAndStartProgressBar() {
+        if (!$progressBar.length) return;
+        $progressBar.css({
+            'width': '0%',
+            'transition': 'none'
+        });
+        $progressBar.outerWidth(); // Force reflow
+        $progressBar.css({
+            'width': '100%',
+            'transition': 'width 5000ms linear'
+        });
     }
-  }
-})
+
+    resetAndStartProgressBar();
+
+    $carousel.on('slide.bs.carousel', function() {
+        resetAndStartProgressBar();
+    });
+});
+
 
 $('#top_carousel').owlCarousel({
   loop: true,  
@@ -464,19 +539,30 @@ function closeNav() {
 /* responsive menu */
 
 
-// append-header
+function checkHeaderLayout() {
+    var width = window.innerWidth;
+    var inputClass = $( ".input-class" );
+    var menuToggle = $( "#menuToggle" );
+    if (inputClass.length) {
+        if (width < 992) {
+            if (menuToggle.length && !inputClass.next().is("#menuToggle")) {
+                inputClass.insertBefore( menuToggle );
+            }
+        } else {
+            var desktopParent = $( ".head-search .navbar" );
+            if (desktopParent.length && !inputClass.parent().is(desktopParent)) {
+                inputClass.prependTo( desktopParent );
+            }
+        }
+    }
+}
 
 $(document).ready(function () {
-   if($(window).width() < 992) {
-        $( ".input-class" ).appendTo( ".header-top " ); 
-        $( ".navbar-header" ).appendTo( ".head-logo" );
-        $( ".md_acc" ).appendTo( ".md_login " );
-        $( ".md_compare" ).appendTo( ".md_login " );
-        $( ".md_wish" ).appendTo( ".md_login " );
-        $( ".md_1" ).appendTo( ".md_login " );
-        $( ".md_2" ).appendTo( ".md_login " );
-     }
- });
+    checkHeaderLayout();
+    $(window).on('resize', function () {
+        checkHeaderLayout();
+    });
+});
 // append-header
 
 $('.user span').click(function(event){
@@ -560,7 +646,7 @@ $('.user span').click(function(event){
 // append-header
 
 $(document).ready(function () {
-   if($(window).width() > 991) {
+   if(window.innerWidth > 991) {
          $( "#sp_vertical_menu .vertical_menu " ).insertBefore( "#sp_header_top .col-lg-9.text-left" );
         }
  });
@@ -951,6 +1037,3 @@ $('#ab_team').owlCarousel({
 
 
 // new for navbar 
-document.getElementById("menuToggle").addEventListener("click", function () {
-    document.querySelector(".main-menu").classList.toggle("show");
-});

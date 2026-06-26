@@ -184,7 +184,7 @@
                     </a>
                     <a class="nav-link {{ request()->routeIs('admin.custom-combo.*') ? 'active' : '' }}" href="{{ route('admin.custom-combo.settings') }}">
                         <i class="fas fa-percent"></i> <span>Custom Combo Settings</span>
-                    </a>
+                    </a> 
                     <a class="nav-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}">
                         <i class="fas fa-cog"></i> <span>GST & General Settings</span>
                     </a>

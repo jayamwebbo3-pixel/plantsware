@@ -4,8 +4,12 @@
 <div class="order-details-container py-5 bg-light-gray">
     <div class="container">
         <!-- Top Navigation & Header -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
-            
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <a href="{{ route('user.dashboard') }}" class="btn btn-outline-success rounded-pill px-3 py-2 fs-7 fw-bold transition-all shadow-sm">
+                <i class="fas fa-arrow-left me-1"></i>
+                <span class="d-none d-lg-inline">Back to Orders</span>
+                <span class="d-inline d-lg-none">Back</span>
+            </a>
             <div class="text-end mt-3 mt-sm-0">
                 <h2 class="h4 mb-1 fw-bold text-dark">Order #{{ $order->order_number }}</h2>
                 @php
@@ -121,8 +125,13 @@
                                     <img src="{{ $imgSrc }}" class="w-100 h-100 object-fit-cover" alt="{{ $item->product_name }}" onerror="this.src='{{ asset('assets/images/product/product1.jpg') }}'">
                                 </a>
                                 <div class="ms-3 flex-grow-1">
-                                    <a href="{{ $productUrl }}" class="h6 mb-1 text-dark fw-bold text-decoration-none d-block hover-text-custom">{{ $item->product_name }}</a>
-                                    @if($item->options)
+                                     <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                                         <a href="{{ $productUrl }}" class="h6 mb-0 text-dark fw-bold text-decoration-none hover-text-custom">{{ $item->product_name }}</a>
+                                         @if($item->custom_combo_id)
+                                             <span class="badge bg-soft-danger text-danger text-uppercase px-2 py-1 rounded-pill" style="font-size: 0.6rem; letter-spacing: 0.5px; line-height: 1;">BUILD A COMBO</span>
+                                         @endif
+                                     </div>
+                                     @if($item->options)
                                         @php $options = is_string($item->options) ? json_decode($item->options, true) : $item->options; @endphp
                                         @if(is_array($options))
                                             <p class="small mb-0 text-muted">
@@ -197,10 +206,14 @@
                 <!-- Actions -->
                 <div class="text-center text-md-end mb-4">
                     <a href="{{ route('user.order.invoice', $order->id) }}" class="btn btn-custom py-3 px-md-5 w-100 w-md-auto rounded-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center mb-2">
-                        <i class="fas fa-file-download me-2"></i> Download Invoice
-                            </a>
+                        <i class="fas fa-file-download me-2"></i>
+                        <span class="d-none d-lg-inline">Download Invoice</span>
+                        <span class="d-inline d-lg-none">Invoice</span>
+                    </a>
                     <a href="{{ route('user.dashboard') }}" class="btn btn-dark-gray py-3 px-md-5 w-100 w-md-auto rounded-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center">
-                        <i class="fas fa-arrow-left me-2"></i> Back to Orders
+                        <i class="fas fa-arrow-left me-2"></i>
+                        <span class="d-none d-lg-inline">Back to Orders</span>
+                        <span class="d-inline d-lg-none">Back</span>
                     </a>
                 </div>
             </div>
@@ -224,15 +237,26 @@
     .bg-soft-custom { background-color: var(--custom-soft) !important; }
 
     .btn-custom {
-        background-color: #557918;
+        background-color: var(--custom-color, #72a420);
         color: white;
         transition: 0.3s;
         border: none;
     }
     .btn-custom:hover {
-        background-color: #446114;
+        background-color: #5a821a;
         color: white;
         transform: translateY(-2px);
+    }
+
+    .btn-outline-success {
+        border-color: var(--custom-color, #72a420);
+        color: var(--custom-color, #72a420);
+        background: transparent;
+    }
+    .btn-outline-success:hover {
+        background-color: var(--custom-color, #72a420);
+        border-color: var(--custom-color, #72a420);
+        color: white;
     }
 
     .btn-dark-gray {

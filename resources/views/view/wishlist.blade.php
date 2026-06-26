@@ -16,7 +16,7 @@
     </div>
 </div>
 
-<div class="container py-4">
+<div class="container wishlist-page-container">
     <div class="row">
         <div class="col-md-12">
             <div class="gi-vendor-dashboard-card">
@@ -30,145 +30,159 @@
                 </div>
                 <div class="gi-vendor-card-body">
                     @if(Auth::check() && $wishlistItems->count() > 0)
-                    <!-- Wishlist Items Table -->
-                    <div class="gi-vendor-card-table">
-                        <table class="table gi-table" id="wishlistTable">
-                            <thead>
-                                <tr>
-                                    <th scope="col">S. NO</th>
-                                    <th scope="col">Image</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Price</th>
-                                    <th scope="col">Stock</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="wishlist-items" id="wishlistItems">
-                                @foreach($wishlistItems as $index => $item)
-                                @php
-                                $isCombo = (bool) $item->combo_pack_id;
-                                $p = $isCombo ? $item->comboPack : $item->product;
-                                @endphp
-                                @if($p)
-                                <tr class="pro-gl-content" id="wishlistItem_{{ $item->id }}">
-                                    <td scope="row"><span>{{ $index + 1 }}</span></td>
-                                    <td style="min-width: 90px; vertical-align: middle; text-align: center;">
-                                        <div class="wishlist-img-wrapper d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px; background: #fdfdfd; border-radius: 8px; overflow: hidden; position: relative;">
-                                            @php
-                                            $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
-                                            @endphp
+                    <!-- Wishlist Items List -->
+                    <div class="wishlist-list-wrapper">
+                        <!-- Wishlist Table Header (Desktop Only) -->
+                        <div class="wishlist-table-header d-none d-md-flex">
+                            <div class="wishlist-item-main">
+                                <span class="fw-bold text-uppercase" style="font-size: 12px; color: #475569; letter-spacing: 0.5px;">Product</span>
+                            </div>
+                            <div class="wishlist-item-details">
+                                <div class="wishlist-price-box">
+                                    <span class="fw-bold text-uppercase" style="font-size: 12px; color: #475569; letter-spacing: 0.5px;">Price</span>
+                                </div>
+                                <div class="wishlist-stock-box">
+                                    <span class="fw-bold text-uppercase" style="font-size: 12px; color: #475569; letter-spacing: 0.5px;">Stock Status</span>
+                                </div>
+                            </div>
+                            <div class="wishlist-actions-box">
+                                <span class="fw-bold text-uppercase" style="font-size: 12px; color: #475569; letter-spacing: 0.5px;">Actions</span>
+                            </div>
+                        </div>
 
-                                            @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
-                                            <div class="wishlist-dual-image d-flex align-items-center justify-content-center w-100 h-100 p-1">
-                                                <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}" style="width: 42%; height: auto; object-fit: contain;">
-                                                <span style="font-size: 10px; font-weight: bold; color: #72a420; margin: 0 2px;">+</span>
-                                                <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}" style="width: 42%; height: auto; object-fit: contain;">
-                                            </div>
-                                            @else
-                                            @php
-                                            $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
-                                            @endphp
-                                            <img class="prod-img"
-                                                src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}"
-                                                alt="{{ $p->name }}"
-                                                style="width: 100%; height: 100%; object-fit: cover;">
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td>
-                                        @if($isCombo)
-                                        <a href="{{ route('combo_packs.frontend_show', $p->slug) }}" class="text-decoration-none text-dark">
-                                            <strong>{{ $p->name }} <span class="badge badge-danger">COMBO</span></strong>
-                                        </a>
-                                        @else
-                                        <a href="{{ route('product.show', $p->slug) }}" class="text-decoration-none text-dark">
-                                            <strong>{{ $p->name }}</strong>
-                                        </a>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @php
-                                        if ($isCombo) {
-                                        $priceToUse = $p->offer_price;
-                                        } else {
-                                        $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
-                                            ? $p->sale_price
-                                            : $p->price;
-                                            }
-                                            @endphp
-                                            <span class="text-brand-success fw-bold">₹{{ number_format($priceToUse, 2) }}</span>
-                                    </td>
-                                    <td>
+                        @foreach($wishlistItems as $index => $item)
+                        @php
+                        $isCombo = (bool) $item->combo_pack_id;
+                        $p = $isCombo ? $item->comboPack : $item->product;
+                        @endphp
+                        @if($p)
+                        @php
+                        if ($isCombo) {
+                            $priceToUse = $p->offer_price;
+                        } else {
+                            $priceToUse = ($p->sale_price && $p->sale_price > 0 && $p->sale_price < $p->price)
+                                ? $p->sale_price
+                                : $p->price;
+                        }
+                        @endphp
+                        <div class="wishlist-row-item" id="wishlistItem_{{ $item->id }}">
+                            
+                            <!-- Main info (Image & Name) -->
+                            <div class="wishlist-item-main">
+                                <div class="wishlist-img-box">
+                                    @php
+                                    $imgData = is_string($p->image) ? json_decode($p->image, true) : $p->image;
+                                    @endphp
+
+                                    @if($isCombo && !$p->is_combo_only && is_array($imgData) && count($imgData) >= 2)
+                                    <div class="wishlist-dual-image-box">
+                                        <img src="{{ asset('storage/' . $imgData[0]) }}" alt="{{ $p->name }}">
+                                        <span>+</span>
+                                        <img src="{{ asset('storage/' . $imgData[1]) }}" alt="{{ $p->name }}">
+                                    </div>
+                                    @else
+                                    @php
+                                    $firstImg = is_array($imgData) && count($imgData) > 0 ? $imgData[0] : $p->image;
+                                    @endphp
+                                    <img src="{{ $firstImg ? asset('storage/' . $firstImg) : asset('assets/images/product/product1.jpg') }}" alt="{{ $p->name }}">
+                                    @endif
+                                </div>
+                                
+                                <div class="wishlist-meta-box">
+                                    @if($isCombo)
+                                    <a href="{{ route('combo_packs.frontend_show', $p->slug) }}" class="wishlist-item-title">
+                                        {{ $p->name }} <span class="badge-combo">COMBO</span>
+                                    </a>
+                                    @else
+                                    <a href="{{ route('product.show', $p->slug) }}" class="wishlist-item-title">
+                                        {{ $p->name }}
+                                    </a>
+                                    @endif
+                                    
+                                    <!-- Mobile Price & Stock -->
+                                    <div class="wishlist-mobile-price-stock d-md-none">
+                                        <span class="price-val">₹{{ number_format($priceToUse, 2) }}</span>
                                         @if($p->stock_quantity > 0)
-                                        <span class="badge bg-brand-success">In Stock</span>
+                                        <span class="stock-status in-stock">In Stock</span>
                                         @else
-                                        <span class="badge bg-danger">Out of Stock</span>
+                                        <span class="stock-status out-of-stock">Out of Stock</span>
                                         @endif
-                                    </td>
-                                    <td>
-                                        <div class="tbl-btn d-flex gap-2">
-                                            @if($p->stock_quantity > 0)
-                                            @if($isCombo)
-                                            <form action="{{ route('cart.add_combo', $p->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="gi-btn-2 add-to-cart" title="Add To Cart">
-                                                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
-                                                </button>
-                                            </form>
-                                            @else
-                                                @php
-                                                $hasAttributes = false;
-                                                if (!empty($p->size)) {
-                                                    if (is_array($p->size)) {
-                                                        $hasAttributes = count($p->size) > 0;
-                                                    } else {
-                                                        $decoded = json_decode($p->size, true);
-                                                        if (is_array($decoded)) {
-                                                            $hasAttributes = count($decoded) > 0;
-                                                        } else {
-                                                            $parts = array_filter(array_map('trim', explode(',', $p->size)));
-                                                            $hasAttributes = count($parts) > 0;
-                                                        }
-                                                    }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Desktop Details (Price & Stock) -->
+                            <div class="wishlist-item-details d-none d-md-flex">
+                                <div class="wishlist-price-box">
+                                    <span class="price-val">₹{{ number_format($priceToUse, 2) }}</span>
+                                </div>
+                                <div class="wishlist-stock-box">
+                                    @if($p->stock_quantity > 0)
+                                    <span class="stock-status in-stock">In Stock</span>
+                                    @else
+                                    <span class="stock-status out-of-stock">Out of Stock</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Action buttons -->
+                            <div class="wishlist-actions-box">
+                                @if($p->stock_quantity > 0)
+                                    @if($isCombo)
+                                    <form action="{{ route('cart.add_combo', $p->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn-wishlist-cart" title="Add To Cart">
+                                            <i class="fas fa-shopping-cart"></i> <span>Add to Cart</span>
+                                        </button>
+                                    </form>
+                                    @else
+                                        @php
+                                        $hasAttributes = false;
+                                        if (!empty($p->size)) {
+                                            if (is_array($p->size)) {
+                                                $hasAttributes = count($p->size) > 0;
+                                            } else {
+                                                $decoded = json_decode($p->size, true);
+                                                if (is_array($decoded)) {
+                                                    $hasAttributes = count($decoded) > 0;
+                                                } else {
+                                                    $parts = array_filter(array_map('trim', explode(',', $p->size)));
+                                                    $hasAttributes = count($parts) > 0;
                                                 }
-                                                @endphp
+                                            }
+                                        }
+                                        @endphp
 
-                                                @if($hasAttributes)
-                                                <a href="{{ route('product.show', $p->slug) }}" class="gi-btn-2 text-decoration-none" title="Select Options">
-                                                    <i class="fas fa-eye" aria-hidden="true"></i>
-                                                </a>
-                                                @else
-                                                <form action="{{ route('cart.add', $p->id) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    <input type="hidden" name="quantity" value="1">
-                                                    <button type="submit" class="gi-btn-2 add-to-cart" title="Add To Cart">
-                                                        <i class="fas fa-shopping-cart" aria-hidden="true"></i>
-                                                    </button>
-                                                </form>
-                                                @endif
-                                            @endif
-                                            @endif
-
-                                            @if($isCombo)
-                                            <button type="button" class="gi-btn-1 gi-remove-wish btn"
-                                                onclick="removeFromWishlistCombo({{ $p->id }})"
-                                                title="Remove From List">
-                                                ×
+                                        @if($hasAttributes)
+                                        <a href="{{ route('product.show', $p->slug) }}" class="btn-wishlist-cart text-decoration-none" title="Select Options">
+                                            <i class="fas fa-eye"></i> <span>Select Options</span>
+                                        </a>
+                                        @else
+                                        <form action="{{ route('cart.add', $p->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn-wishlist-cart" title="Add To Cart">
+                                                <i class="fas fa-shopping-cart"></i> <span>Add to Cart</span>
                                             </button>
-                                            @else
-                                            <button type="button" class="gi-btn-1 gi-remove-wish btn"
-                                                onclick="removeFromWishlist({{ $p->id }})"
-                                                title="Remove From List">
-                                                ×
-                                            </button>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </form>
+                                        @endif
+                                    @endif
                                 @endif
-                                @endforeach
-                            </tbody>
-                        </table>
+
+                                @if($isCombo)
+                                <button type="button" class="btn-wishlist-delete" onclick="removeFromWishlistCombo({{ $p->id }})" title="Remove From List">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                                @else
+                                <button type="button" class="btn-wishlist-delete" onclick="removeFromWishlist({{ $p->id }})" title="Remove From List">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                                @endif
+                            </div>
+
+                        </div>
+                        @endif
+                        @endforeach
                     </div>
                     @else
                     <!-- Empty Wishlist -->
@@ -318,7 +332,13 @@
                 // Update cart count in header
                 if (data.cart_count !== undefined) {
                     updateCartCount(data.cart_count);
+                    if (typeof window.updateCartCountBadges === 'function') {
+                        window.updateCartCountBadges(data.cart_count);
+                    }
                 }
+
+                if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
+                if (typeof window.refreshCartDrawer === 'function') window.refreshCartDrawer();
 
                 showToast(data.message || 'Added to cart!', 'success');
 
@@ -351,27 +371,15 @@
 
     // Update cart count in header
     function updateCartCount(count) {
-        const cartCountElements = document.querySelectorAll('.cart-count, .cart-count-badge');
-        cartCountElements.forEach(element => {
+        document.querySelectorAll('.cart-icon-link .price_cart').forEach(element => {
             element.textContent = count;
-            if (count > 0) {
-                element.style.display = 'inline';
-            } else {
-                element.style.display = 'none';
-            }
         });
     }
 
     // Update wishlist count in header
     function updateWishlistCount(count) {
-        const wishlistCountElements = document.querySelectorAll('.wishlist-count, .wishlist-count-badge');
-        wishlistCountElements.forEach(element => {
+        document.querySelectorAll('.wishlist-icon-link .price_cart').forEach(element => {
             element.textContent = count;
-            if (count > 0) {
-                element.style.display = 'inline';
-            } else {
-                element.style.display = 'none';
-            }
         });
     }
 
@@ -582,11 +590,11 @@
     }
     
     .text-brand-success {
-        color: #72a420 !important;
+        color: var(--primary-color, #6ea820) !important;
     }
     
     .bg-brand-success {
-        background-color: #72a420 !important;
+        background-color: var(--primary-color, #6ea820) !important;
         color: white !important;
     }
     
@@ -615,7 +623,7 @@
         align-items: center;
         justify-content: center;
         margin-bottom: 25px;
-        color: #72a420;
+        color: var(--primary-color, #6ea820);
         font-size: 40px;
         transition: all 0.3s ease;
     }
@@ -640,7 +648,7 @@
 
     .continue-shopping-btn {
         display: inline-block;
-        background-color: #72a420;
+        background-color: var(--primary-color, #6ea820);
         color: #fff !important;
         padding: 12px 35px;
         border-radius: 4px;
@@ -654,8 +662,8 @@
     }
 
     .continue-shopping-btn:hover {
-        background-color: #5b8c19;
-        box-shadow: 0 5px 15px rgba(114, 164, 32, 0.3);
+        background-color: #5a8c16;
+        box-shadow: 0 5px 15px rgba(110, 168, 32, 0.3);
     }
 
     @media (max-width: 768px) {

@@ -308,6 +308,10 @@
                                 <span class="fw-bold">{{ $item->product_name }}</span>
                                 @endif
 
+                                @if($item->custom_combo_id)
+                                <br><span class="badge bg-danger" style="font-size: 0.6rem; padding: 3px 6px;">BUILD A COMBO</span>
+                                @endif
+
                                 @if($sizeParam)
                                 <br><small class="text-muted">Size: {{ $sizeParam }}</small>
                                 @endif

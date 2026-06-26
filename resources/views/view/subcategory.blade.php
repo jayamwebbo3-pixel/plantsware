@@ -46,9 +46,9 @@
         </div>
 
         @if(isset($products) && $products->count() > 0)
-        <div class="products-grid row g-3 mt-4">
+        <div class="products-grid row g-4 mt-4">
             @foreach($products as $product)
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
                 @include('view.partials.product-card', ['product' => $product])
             </div>
             @endforeach

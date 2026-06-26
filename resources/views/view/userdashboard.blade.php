@@ -300,7 +300,10 @@
                             </div>
                             <div class="order-price" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-start; gap: 10px;">
                                 <div>₹{{ number_format($order->total ?? 0, 2) }}</div>
-                                <a href="{{ route('user.order.show', $order->id) }}" class="btn-view" style="background-color: var(--primary-color); color: white; padding: 4px 12px; border-radius: 4px; text-decoration: none; font-size: 0.85rem; white-space: nowrap;">View Details</a>
+                                <a href="{{ route('user.order.show', $order->id) }}" class="btn-view" style="background-color: var(--primary-color); color: white; padding: 4px 12px; border-radius: 4px; text-decoration: none; font-size: 0.85rem; white-space: nowrap;">
+                                    <span class="d-none d-lg-inline">View Details</span>
+                                    <span class="d-inline d-lg-none">Details</span>
+                                </a>
                             </div>
                         </div>
                         @empty
@@ -318,13 +321,15 @@
                         @forelse($wishlist as $item)
                         @if($item->product)
                         <div class="product-card">
-                            <div class="product-image" style="position: relative;">
-                                @if($item->product->image)
-                                <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" style="width: 100%; height: 200px; object-fit: cover;">
-                                @else
-                                <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $item->product->name }}" style="width: 100%; height: 200px; object-fit: cover;">
-                                @endif
-                                <form action="{{ route('wishlist.remove', $item->product->id) }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
+                            <div class="product-image-container" style="background: #ffffff; position: relative;">
+                                <a href="{{ route('product.show', $item->product->slug) }}">
+                                    @if($item->product->image)
+                                    <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="product-image main-image w-100 h-100" style="object-fit: contain; background: #ffffff;">
+                                    @else
+                                    <img src="{{ asset('assets/images/product/product1.jpg') }}" alt="{{ $item->product->name }}" class="product-image main-image w-100 h-100" style="object-fit: contain; background: #ffffff;">
+                                    @endif
+                                </a>
+                                <form action="{{ route('wishlist.remove', $item->product->id) }}" method="POST" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="wishlist-remove" title="Remove from wishlist" style="background: white; border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: red; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
@@ -332,44 +337,61 @@
                                     </button>
                                 </form>
                             </div>
-                            <div class="product-info" style="padding: 15px;">
-                                <div class="product-name" style="font-weight: 600; margin-bottom: 5px;">
-                                    <a href="{{ route('product.show', $item->product->slug) }}" style="text-decoration: none; color: inherit;">
+                            <div class="product-info">
+                                <h3 class="product-title">
+                                    <a href="{{ route('product.show', $item->product->slug) }}" class="text-decoration-none text-dark">
                                         {{ $item->product->name }}
                                     </a>
-                                </div>
+                                </h3>
                                 @php
                                 $dashPriceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
                                     ? $item->product->sale_price
                                     : $item->product->price;
-                                    @endphp
-                                    <div class="product-price" style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">₹{{ number_format($dashPriceToUse, 2) }}</div>
+                                @endphp
+                                <div class="product-price">
+                                    @if($item->product->sale_price && $item->product->sale_price < $item->product->price)
+                                        <span class="original-price text-muted text-decoration-line-through">₹{{ number_format($item->product->price, 2) }}</span>
+                                        <span class="current-price ms-2 fw-bold">₹{{ number_format($item->product->sale_price, 2) }}</span>
+                                    @else
+                                        <span class="current-price fw-bold">₹{{ number_format($item->product->price, 2) }}</span>
+                                    @endif
+                                </div>
 
-                                    @php
-                                    $hasAttributes = false;
-                                    if (!empty($item->product->size)) {
-                                        if (is_array($item->product->size)) {
-                                            $hasAttributes = count($item->product->size) > 0;
+                                @php
+                                $hasAttributes = false;
+                                if (!empty($item->product->size)) {
+                                    if (is_array($item->product->size)) {
+                                        $hasAttributes = count($item->product->size) > 0;
+                                    } else {
+                                        $decoded = json_decode($item->product->size, true);
+                                        if (is_array($decoded)) {
+                                            $hasAttributes = count($decoded) > 0;
                                         } else {
-                                            $decoded = json_decode($item->product->size, true);
-                                            if (is_array($decoded)) {
-                                                $hasAttributes = count($decoded) > 0;
-                                            } else {
-                                                $parts = array_filter(array_map('trim', explode(',', $item->product->size)));
-                                                $hasAttributes = count($parts) > 0;
-                                            }
+                                            $parts = array_filter(array_map('trim', explode(',', $item->product->size)));
+                                            $hasAttributes = count($parts) > 0;
                                         }
                                     }
-                                    @endphp
+                                }
+                                @endphp
 
-                                    @if($hasAttributes)
-                                    <a href="{{ route('product.show', $item->product->slug) }}" class="add-to-cart-btn text-decoration-none text-center d-block" style="width: 100%; padding: 8px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s;">View Options</a>
+                                <div class="product-actions mt-3 d-flex align-items-stretch">
+                                    @if($item->product->stock_quantity > 0)
+                                        @if($hasAttributes)
+                                            <a href="{{ route('product.show', $item->product->slug) }}" class="btn btn-primary w-100 text-nowrap d-flex align-items-center justify-content-center" style="font-weight: 700;">
+                                                Add To Cart
+                                            </a>
+                                        @else
+                                            <form action="{{ route('cart.add', $item->product->id) }}" method="POST" class="w-100">
+                                                @csrf
+                                                <button type="submit" class="btn btn-primary w-100" style="font-weight: 700;">
+                                                    Add To Cart
+                                                </button>
+                                            </form>
+                                        @endif
                                     @else
-                                    <form action="{{ route('cart.add', $item->product->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="add-to-cart-btn" style="width: 100%; padding: 8px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s;">Add to Cart</button>
-                                    </form>
+                                        <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
                                     @endif
+                                </div>
                             </div>
                         </div>
                         @endif

@@ -15,9 +15,9 @@
                                 @endif
                                 <div class="plant-category-image">
                                     @if($category->image)
-                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" loading="lazy" decoding="async">
+                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" loading="eager" decoding="sync">
                                     @else
-                                        <img src="{{ asset('assets/images/category-placeholder.jpg') }}" alt="{{ $category->name }}" loading="lazy" decoding="async">
+                                        <img src="{{ asset('assets/images/category-placeholder.jpg') }}" alt="{{ $category->name }}" loading="eager" decoding="sync">
                                     @endif
                                 </div>
                             </div>
@@ -36,76 +36,13 @@
     </div>
 </section>
 
-<!-- vertical menu and slider -->
-<style>
-    .main_slider #carouselExampleIndicators {
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-    
-    .main_slider .carousel-item {
-        height: 550px;
-        background-color: #f8f9fa;
-        overflow: hidden; 
-    }
-    
-    .main_slider .carousel-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-        display: block; 
-    }
-
-    .silder_text {
-        bottom: 20% !important;
-        text-align: left !important;
-        left: 8% !important;
-    }
-
-    .silder_text .headding {
-        font-size: 4rem;
-        font-weight: 800;
-        line-height: 1.1;
-        margin-bottom: 25px;
-        text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-    }
-
-    .silder_text .arrival {
-        font-size: 1.2rem;
-        font-weight: 500;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-    }
-
-    @media (max-width: 991px) {
-        .main_slider .carousel-item {
-            height: 400px;
-            overflow: hidden; 
-        }
-        .silder_text .headding {
-            font-size: 2.5rem;
-        }
-    }
-
-    @media (max-width: 575px) {
-        .main_slider .carousel-item {
-            height: 300px;
-            overflow: hidden; 
-        }
-        .silder_text .headding {
-            font-size: 1.8rem;
-        }
-        .silder_text .arrival {
-            font-size: 0.9rem;
-        }
-    }
-</style>
+<!-- vertical menu and slider (styles moved to customized.css for clean design) -->
 <div id="home_vertical_menu" class="menu_slider ">
     <div class="row ">
         <div class="col-lg-12 col-md-12 main_slider">
-            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-pause="false" data-interval="5000">
+                <!-- Slider Progress Bar (Creative Alternative) -->
+                <div class="slider-progress-bar"></div>
                 @if($sliders->count() > 0)
                     <ol class="carousel-indicators">
                         @foreach($sliders as $index => $slider)
@@ -118,7 +55,7 @@
                                 @if($index === 0)
                                     <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}" fetchpriority="high" decoding="sync">
                                 @else
-                                    <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}" loading="lazy" decoding="async">
+                                    <img src="{{ asset('storage/' . $slider->image) }}" class="d-block w-100 img-fluid" alt="{{ $slider->title }}" loading="eager" decoding="sync">
                                 @endif
                                 <div class="carousel-caption container silder_text">
                                     @if($slider->subtitle)<p class="arrival">{{ $slider->subtitle }}</p>@endif
@@ -134,7 +71,7 @@
                     </ol>
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img src="{{ asset('uploads/img2/slider/11.png') }}" class="d-block w-100 img-fluid" alt="s1" fetchpriority="high" decoding="sync">
+                            <img src="{{ asset('uploads/img2/slider/11.webp') }}" class="d-block w-100 img-fluid" alt="s1" fetchpriority="high" decoding="sync">
                             <div class="carousel-caption container silder_text">
                                 <p class="arrival">Complete Care for Every Plant</p>
                                 <h5 class="headding">From Soil to<br>Bloom Naturally</h5>
@@ -154,6 +91,7 @@
 <!-- vertical menu and slider end -->
 
 <!-- services -->
+<!--
 <div class="container-fluid">
     <div class="main_services">
         <div class="row">
@@ -189,6 +127,7 @@
         </div>
     </div>
 </div>
+-->
 <!-- services end -->
 
 
@@ -310,6 +249,7 @@
     </div>
 </section>
 
+{{-- 
 <!---------------------------------------------------------- testimonials ------------------------------------------------------->
 <div class="reviews-carousel">
     <div class="carousel-header">
@@ -389,6 +329,7 @@
         </div>
     </div>
 </div>
+--}}
 
 <section class="bg-light-section">
     <div class="container-fluid px-4">
@@ -407,22 +348,27 @@
                         <div class="col-md-6 col-lg-4">
                             <div class="blog-card">
                                 <div class="blog-card-image">
-                                    @if(isset($blog->image) && $blog->image)
-                                        <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}" loading="lazy" decoding="async">
-                                    @else
-                                        <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="{{ $blog->title }}" loading="lazy" decoding="async">
-                                    @endif
+                                    <a href="{{ route('blog.show', $blog->slug) }}" class="d-block w-100 h-100">
+                                        @if(isset($blog->image) && $blog->image)
+                                            <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}" loading="lazy" decoding="async">
+                                        @else
+                                            <img src="{{ asset('assets/images/seed-to-plant.webp') }}" alt="{{ $blog->title }}" loading="lazy" decoding="async">
+                                        @endif
+                                    </a>
                                     <span class="blog-card-category">{{ $blog->category->name ?? 'General' }}</span>
                                 </div>
                                 <div class="blog-card-content">
                                     <div class="blog-card-date">{{ $blog->published_at ? $blog->published_at->format('M d, Y') : ($blog->created_at ? $blog->created_at->format('M d, Y') : '') }}</div>
-                                    <h3 class="blog-card-title">{{ $blog->title }}</h3>
+                                    <h3 class="blog-card-title">
+                                        <a href="{{ route('blog.show', $blog->slug) }}">
+                                            {{ $blog->title }}
+                                        </a>
+                                    </h3>
                                     <p class="blog-card-excerpt">
                                         {{ isset($blog->content) ? \Illuminate\Support\Str::limit(strip_tags($blog->content), 100) : '' }}
                                     </p>
                                     <div class="blog-card-footer">
-                                        <!-- <span class="blog-card-author">{{ $blog->author_name ?? 'Admin' }}</span> -->
-                                        <a href="{{ route('blog.show', $blog->slug) }}" class="read-more-link">Read →</a>
+                                        <a href="{{ route('blog.show', $blog->slug) }}" class="read-more-link">Read <i class="fas fa-arrow-right"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -432,18 +378,23 @@
                         <div class="col-md-6 col-lg-4">
                             <div class="blog-card">
                                 <div class="blog-card-image">
-                                    <img src="{{ asset('assets/images/product/product11.jpg') }}" alt="Indoor plant care" loading="lazy" decoding="async">
+                                    <a href="#" class="d-block w-100 h-100">
+                                        <img src="{{ asset('assets/images/seed-to-plant.webp') }}" alt="Indoor plant care" loading="lazy" decoding="async">
+                                    </a>
                                     <span class="blog-card-category">Plant Care</span>
                                 </div>
                                 <div class="blog-card-content">
                                     <div class="blog-card-date">Nov 15, 2024</div>
-                                    <h3 class="blog-card-title">10 Essential Tips to Keep Indoor Plants Healthy</h3>
+                                    <h3 class="blog-card-title">
+                                        <a href="#">
+                                            10 Essential Tips to Keep Indoor Plants Healthy
+                                        </a>
+                                    </h3>
                                     <p class="blog-card-excerpt">
                                         Learn the fundamental watering, lighting, and soil requirements that help indoor plants grow stronger and greener.
                                     </p>
                                     <div class="blog-card-footer">
-                                        <span class="blog-card-author">Sophia Green</span>
-                                        <a href="#" class="read-more-link">Read →</a>
+                                        <a href="#" class="read-more-link">Read <i class="fas fa-arrow-right"></i></a>
                                     </div>
                                 </div>
                             </div>

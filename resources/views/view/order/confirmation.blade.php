@@ -321,7 +321,9 @@
 
             <div class="btn-action-group">
                 <a href="{{ route('user.dashboard') }}#order-history" class="btn-dashboard">
-                    <i class="fas fa-boxes"></i> View Details
+                    <i class="fas fa-boxes"></i>
+                    <span class="d-none d-lg-inline">View Details</span>
+                    <span class="d-inline d-lg-none">Details</span>
                 </a>
                 <a href="{{ url('/') }}" class="btn-shop">
                     <i class="fas fa-leaf"></i> Continue Shopping

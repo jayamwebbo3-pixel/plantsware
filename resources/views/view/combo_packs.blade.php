@@ -18,32 +18,39 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Side Menu for Filters -->
-            <div class="col-lg-3 col-md-4 mb-4">
+            <div class="col-lg-3 col-md-4 mb-4 side-menu-wrapper" id="filterMenuWrapper">
                 <form id="filter-form" action="{{ url()->current() }}" method="GET" class="side-menu bg-white rounded shadow-sm p-3 sticky-top" style="top: 20px; z-index: 1000; border: 1px solid #ddd;">
-                    <h2 class="side-menu-title mb-3">Filters</h2>
+                    <div class="d-flex justify-content-between align-items-center d-md-none mb-3">
+                        <h4 class="fw-bold mb-0" style="color: #6EA820;">Filters</h4>
+                        <button type="button" class="btn-close" id="mobileFilterClose" style="border: none; background: transparent; font-size: 1.5rem; color: #333; line-height: 1;">&times;</button>
+                    </div>
+                    <h2 class="side-menu-title mb-3 d-none d-md-block">Filters</h2>
                     
                     <!-- Price Range Filter -->
                     <div class="filter-section active mb-3">
                         <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
-                            Price Range
-                            <span class="price-range-value" id="display-price-range">₹0 - ₹{{ request('price_max', 10000) }}</span>
+                            <span>Price Range <span class="price-range-value ms-2" id="display-price-range" style="font-size: 13px; font-weight: normal; color: #72a420;">₹0 - ₹{{ request('price_max', 10000) }}</span></span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </h3>
                         <div class="filter-options d-flex align-items-center">
-                            <input type="range" name="price_max" class="form-range flex-grow-1 me-2" min="0" max="10000" step="100" id="price-max" value="{{ request('price_max', 10000) }}" style="width: 100%;" onchange="this.form.submit()">
+                            <input type="range" name="price_max" class="form-range flex-grow-1 me-2" min="0" max="10000" step="100" id="price-max" value="{{ request('price_max', 10000) }}" style="width: 100%;">
                         </div>
                     </div>
 
                     <!-- Category Filter -->
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Categories</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Categories
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="radio" name="category" id="cat-all" class="filter-radio" value="" onchange="this.form.submit()" {{ !request('category') ? 'checked' : '' }}>
+                                <input type="radio" name="category" id="cat-all" class="filter-radio" value="" {{ !request('category') ? 'checked' : '' }}>
                                 <label for="cat-all" class="filter-label">All Categories</label>
                             </div>
                             @foreach($categories as $cat)
                                 <div class="filter-item">
-                                    <input type="radio" name="category" id="cat-{{ $cat->id }}" class="filter-radio" value="{{ $cat->id }}" onchange="this.form.submit()" {{ request('category') == $cat->id ? 'checked' : '' }}>
+                                    <input type="radio" name="category" id="cat-{{ $cat->id }}" class="filter-radio" value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'checked' : '' }}>
                                     <label for="cat-{{ $cat->id }}" class="filter-label">{{ $cat->name }}</label>
                                 </div>
                             @endforeach
@@ -52,22 +59,25 @@
                     
                     <!-- Discount Filter -->
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Discount</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Discount
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-all" class="filter-radio" value="all" onchange="this.form.submit()" {{ request('discount', 'all') == 'all' ? 'checked' : '' }}>
+                                <input type="radio" name="discount" id="discount-all" class="filter-radio" value="all" {{ request('discount', 'all') == 'all' ? 'checked' : '' }}>
                                 <label for="discount-all" class="filter-label">All Discounts</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-50" class="filter-radio" value="50" onchange="this.form.submit()" {{ request('discount') == '50' ? 'checked' : '' }}>
+                                <input type="radio" name="discount" id="discount-50" class="filter-radio" value="50" {{ request('discount') == '50' ? 'checked' : '' }}>
                                 <label for="discount-50" class="filter-label">50% and above</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-30-50" class="filter-radio" value="30-50" onchange="this.form.submit()" {{ request('discount') == '30-50' ? 'checked' : '' }}>
+                                <input type="radio" name="discount" id="discount-30-50" class="filter-radio" value="30-50" {{ request('discount') == '30-50' ? 'checked' : '' }}>
                                 <label for="discount-30" class="filter-label">30% - 50%</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="discount" id="discount-10-30" class="filter-radio" value="10-30" onchange="this.form.submit()" {{ request('discount') == '10-30' ? 'checked' : '' }}>
+                                <input type="radio" name="discount" id="discount-10-30" class="filter-radio" value="10-30" {{ request('discount') == '10-30' ? 'checked' : '' }}>
                                 <label for="discount-10" class="filter-label">10% - 30%</label>
                             </div>
                         </div>
@@ -75,14 +85,17 @@
                     
                     <!-- Availability -->
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Availability</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Availability
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="checkbox" name="availability[]" id="in-stock" class="filter-checkbox" value="in-stock" onchange="this.form.submit()" {{ is_array(request('availability')) && in_array('in-stock', request('availability')) ? 'checked' : '' }}>
+                                <input type="checkbox" name="availability[]" id="in-stock" class="filter-checkbox" value="in-stock" {{ is_array(request('availability')) && in_array('in-stock', request('availability')) ? 'checked' : '' }}>
                                 <label for="in-stock" class="filter-label">In Stock</label>
                             </div>
                             <div class="filter-item">
-                                <input type="checkbox" name="availability[]" id="out-of-stock" class="filter-checkbox" value="out-of-stock" onchange="this.form.submit()" {{ is_array(request('availability')) && in_array('out-of-stock', request('availability')) ? 'checked' : '' }}>
+                                <input type="checkbox" name="availability[]" id="out-of-stock" class="filter-checkbox" value="out-of-stock" {{ is_array(request('availability')) && in_array('out-of-stock', request('availability')) ? 'checked' : '' }}>
                                 <label for="out-of-stock" class="filter-label">Out of Stock</label>
                             </div>
                         </div>
@@ -90,22 +103,25 @@
 
                     <!-- Sort By -->
                     <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">Sort By</h3>
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
+                            Sort By
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </h3>
                         <div class="filter-options">
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-new" class="filter-radio" value="newest" onchange="this.form.submit()" {{ request('sort', 'newest') == 'newest' ? 'checked' : '' }}>
+                                <input type="radio" name="sort" id="sort-new" class="filter-radio" value="newest" {{ request('sort', 'newest') == 'newest' ? 'checked' : '' }}>
                                 <label for="sort-new" class="filter-label">Newest First</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-price-low" class="filter-radio" value="price-low" onchange="this.form.submit()" {{ request('sort') == 'price-low' ? 'checked' : '' }}>
+                                <input type="radio" name="sort" id="sort-price-low" class="filter-radio" value="price-low" {{ request('sort') == 'price-low' ? 'checked' : '' }}>
                                 <label for="sort-price-low" class="filter-label">Price: Low to High</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-price-high" class="filter-radio" value="price-high" onchange="this.form.submit()" {{ request('sort') == 'price-high' ? 'checked' : '' }}>
+                                <input type="radio" name="sort" id="sort-price-high" class="filter-radio" value="price-high" {{ request('sort') == 'price-high' ? 'checked' : '' }}>
                                 <label for="sort-price-high" class="filter-label">Price: High to Low</label>
                             </div>
                             <div class="filter-item">
-                                <input type="radio" name="sort" id="sort-discount" class="filter-radio" value="discount" onchange="this.form.submit()" {{ request('sort') == 'discount' ? 'checked' : '' }}>
+                                <input type="radio" name="sort" id="sort-discount" class="filter-radio" value="discount" {{ request('sort') == 'discount' ? 'checked' : '' }}>
                                 <label for="sort-discount" class="filter-label">Discount</label>
                             </div>
                         </div>
@@ -113,7 +129,7 @@
 
                     <!-- Filter Actions -->
                     <div class="filter-actions d-flex gap-2 mt-3">
-                        <button class="btn btn-primary flex-fill" style="background-color: #72a420; border-color: #72a420;" type="submit">Apply Filters</button>
+                        <button class="btn btn-primary flex-fill" id="applyFiltersBtn" style="background-color: #72a420; border-color: #72a420;" type="submit">Apply Filters</button>
                         <a href="{{ route('combo_packs.frontend_index') }}" class="btn btn-outline-secondary flex-fill text-center text-decoration-none d-flex align-items-center justify-content-center">Reset</a>
                     </div>
                 </form>
@@ -122,88 +138,22 @@
             <!-- Products Display Area -->
             <div class="col-lg-9 col-md-8">
                 <div class="products-area">
-                    <div class="products-header bg-white rounded p-3 mb-4 d-flex justify-content-between align-items-center border">
+                    <div class="products-header bg-white rounded p-3 mb-3 d-flex justify-content-between align-items-center border">
                         <h2 class="category-name mb-0">Combo Packs Listing</h2>
                     </div>
 
-                    <div class="products-grid row g-3">
-                        @forelse($comboPacks as $combo)
-                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4">
-                                <div class="product-custom-card">
-                                    <div class="card-img-container">
-                                        <a href="{{ route('combo_packs.frontend_show', $combo->slug) }}" class="w-100 h-100">
-                                            @php
-                                                $images = $combo->images;
-                                            @endphp
-
-                                            <div class="dual-image-wrapper">
-                                                @if(count($images) >= 2)
-                                                    <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $combo->name }} 1">
-                                                    <span class="image-plus-sign">+</span>
-                                                    <img src="{{ asset('storage/' . $images[1]) }}" alt="{{ $combo->name }} 2">
-                                                @elseif(count($images) == 1)
-                                                    <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $combo->name }}" class="single-combo-img">
-                                                @else
-                                                    <img src="{{ asset('assets/images/product/default.jpg') }}" alt="{{ $combo->name }}" class="single-combo-img">
-                                                @endif
-                                            </div>
-                                        </a>
-                                        @php
-                                            $discount = 0;
-                                            if ($combo->total_price > 0) {
-                                                $discount = round((($combo->total_price - $combo->offer_price) / $combo->total_price) * 100);
-                                            }
-                                        @endphp
-                                        @if($combo->stock_quantity <= 0)
-                                            <div class="custom-discount-badge" style="background: #dc3545 !important;">OUT OF STOCK</div>
-                                        @elseif($discount > 0)
-                                            <div class="custom-discount-badge">{{ $discount }}% OFF</div>
-                                        @endif
-                                    </div>
-                                    <div class="card-content">
-                                        <h3 class="card-title">
-                                            <a href="{{ route('combo_packs.frontend_show', $combo->slug) }}">{{ $combo->name }}</a>
-                                        </h3>
-                                        <div class="card-price-row">
-                                            @if($combo->stock_quantity > 0)
-                                                <span class="old-price">₹{{ number_format($combo->total_price, 2) }}</span>
-                                                <span class="new-price">₹{{ number_format($combo->offer_price, 2) }}</span>
-                                            @else
-                                                <div style="height: 30px;"></div>
-                                            @endif
-                                        </div>
-                                        <div class="card-actions-row">
-                                            @if($combo->stock_quantity > 0)
-                                                <form action="{{ route('cart.add_combo', $combo->id) }}" method="POST" class="flex-grow-1">
-                                                    @csrf
-                                                    <input type="hidden" name="buy_now" value="1">
-                                                    <button type="submit" class="btn-buy-now">Buy Now</button>
-                                                </form>
-                                                <form action="{{ route('cart.add_combo', $combo->id) }}" method="POST" class="flex-grow-1">
-                                                    @csrf
-                                                    <button type="submit" class="btn-add-to-cart">Add To Cart</button>
-                                                </form>
-                                            @else
-                                                <button type="button" class="btn-out-of-stock flex-grow-1" disabled>Out of Stock</button>
-                                            @endif
-                                            <button type="button" class="btn-wishlist-custom wishlist-btn-combo" data-id="{{ $combo->id }}">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="col-12 text-center py-5">
-                                <h3>No combo packs found matching your filters.</h3>
-                                <a href="{{ route('combo_packs.frontend_index') }}" class="btn btn-danger mt-3">Reset Filters</a>
-                            </div>
-                        @endforelse
+                    <!-- Mobile Filter Trigger (Visible only on mobile/tablet < 768px) -->
+                    <div class="d-md-none mb-3">
+                        <button type="button" class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2" id="mobileFilterToggle" style="background-color: #6EA820; border-color: #6EA820; font-weight: 600; border-radius: 8px;">
+                            <i class="fas fa-filter"></i> Filter & Sort Combo Packs
+                        </button>
                     </div>
 
-                    <div class="d-flex justify-content-center mt-5">
-                        {{ $comboPacks->links() }}
+                    <!-- AJAX Products Area -->
+                    <div id="ajax-products-area" style="position: relative; min-height: 200px; transition: opacity 0.25s ease;">
+                        @include('view.partials.combo-packs-grid')
                     </div>
+
                 </div>
             </div>
         </div>
@@ -211,44 +161,213 @@
 </section>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Price Range Display Sync
-    const priceInput = document.getElementById('price-max');
-    const displayPriceRange = document.getElementById('display-price-range');
-    if(priceInput) {
-        priceInput.addEventListener('input', function() {
-            displayPriceRange.textContent = `₹0 - ₹${priceInput.value}`;
+(function () {
+    'use strict';
+
+    var filterForm    = document.getElementById('filter-form');
+    var productsArea  = document.getElementById('ajax-products-area');
+    var priceInput    = document.getElementById('price-max');
+    var displayPriceRange = document.getElementById('display-price-range');
+    var filterToggle  = document.getElementById('mobileFilterToggle');
+    var filterClose   = document.getElementById('mobileFilterClose');
+    var filterMenu    = document.getElementById('filterMenuWrapper');
+    var debounceTimer = null;
+
+    function isMobile() { return window.innerWidth < 768; }
+
+    // ── Loading helpers ─────────────────────────────────────────────
+    function showLoading() {
+        if (productsArea) productsArea.style.opacity = '0.4';
+    }
+    function hideLoading() {
+        if (productsArea) productsArea.style.opacity = '1';
+    }
+
+    // ── Core AJAX fetch ─────────────────────────────────────────────
+    function fetchProducts(url) {
+        showLoading();
+        // Update browser URL bar without reload
+        window.history.pushState({}, '', url);
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (productsArea && data.html) {
+                productsArea.innerHTML = data.html;
+            }
+            hideLoading();
+            productsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        })
+        .catch(function (err) {
+            console.error('Combo packs AJAX filter error:', err);
+            hideLoading();
         });
     }
 
-    // AJAX Wishlist
-    $('.wishlist-btn-combo').on('click', function() {
-        const id = $(this).data('id');
-        const btn = $(this);
+    // Build query string from filter form and optional extra params
+    function buildUrl(extraParams) {
+        if (!filterForm) return window.location.href;
+        var formData = new FormData(filterForm);
+        var params   = new URLSearchParams();
+        formData.forEach(function (value, key) {
+            if (value !== '') params.append(key, value);
+        });
+        if (extraParams) {
+            Object.keys(extraParams).forEach(function (k) {
+                params.set(k, extraParams[k]);
+            });
+        }
+        return filterForm.getAttribute('action') + '?' + params.toString();
+    }
 
-        $.ajax({
-            url: "{{ url('/wishlist/add-combo') }}/" + id,
-            type: "POST",
-            data: {
-                _token: "{{ csrf_token() }}"
-            },
-            success: function(response) {
-                if (response.success) {
-                    alert(response.message);
-                    $('.price_cart').first().text(response.wishlist_count);
-                    btn.find('i').removeClass('fa-regular').addClass('fa-solid').css('color', '#e53e3e');
+    // ── Desktop: auto-submit on filter change ─────────────────────
+    if (filterForm) {
+        filterForm.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(function (input) {
+            input.addEventListener('change', function () {
+                if (!isMobile()) fetchProducts(buildUrl());
+            });
+        });
+
+        // Price slider — debounce on 'input', fire on 'change'
+        if (priceInput) {
+            priceInput.addEventListener('input', function () {
+                if (displayPriceRange) displayPriceRange.textContent = '\u20B90 - \u20B9' + priceInput.value;
+                if (!isMobile()) {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function () { fetchProducts(buildUrl()); }, 400);
                 }
-            },
-            error: function(xhr) {
-                if (xhr.status === 401) {
-                    window.location.href = "{{ route('login') }}";
-                } else {
-                    alert(xhr.responseJSON.message || "Something went wrong");
+            });
+            priceInput.addEventListener('change', function () {
+                if (!isMobile()) {
+                    clearTimeout(debounceTimer);
+                    fetchProducts(buildUrl());
+                }
+            });
+        }
+
+        // Prevent native form submit — always use AJAX
+        filterForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (isMobile()) closeMobileFilter();
+            setTimeout(function () { fetchProducts(buildUrl()); }, isMobile() ? 320 : 0);
+        });
+    }
+
+    // ── Pagination: delegate clicks on nav links inside products area ──
+    document.addEventListener('click', function (e) {
+        // Only intercept links inside a <nav> (Laravel pagination wrapper)
+        var paginationLink = e.target.closest('#ajax-products-area nav a[href]');
+        if (paginationLink) {
+            e.preventDefault();
+            fetchProducts(paginationLink.href);
+            return;
+        }
+
+        // "Reset Filters" button inside products area (empty state only)
+        var resetBtn = e.target.closest('#ajax-products-area .col-12.text-center a.btn-danger');
+        if (resetBtn) {
+            e.preventDefault();
+            fetchProducts(resetBtn.href);
+            return;
+        }
+    });
+
+    // ── "Reset" sidebar link — clear all filters via AJAX ─────────
+    var sidebarResetLink = document.querySelector('#filter-form ~ * a.btn-outline-secondary, .filter-actions a.btn-outline-secondary');
+    if (sidebarResetLink) {
+        sidebarResetLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            fetchProducts(this.href);
+        });
+    }
+
+    // ── AJAX Wishlist (delegated — works after AJAX re-render) ─────
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.wishlist-btn-combo');
+        if (!btn) return;
+
+        var id = btn.getAttribute('data-id');
+
+        fetch('{{ url("/wishlist/add-combo") }}/' + id, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(function (response) {
+            if (response.status === 401) {
+                window.location.href = '{{ route("login") }}';
+                return;
+            }
+            return response.json().then(function (data) {
+                if (!response.ok) throw new Error(data.message || 'Something went wrong');
+                return data;
+            });
+        })
+        .then(function (data) {
+            if (data && data.success) {
+                alert(data.message);
+                document.querySelectorAll('.wishlist-icon-link .price_cart').forEach(function (el) {
+                    el.textContent = data.wishlist_count;
+                });
+                var icon = btn.querySelector('i');
+                if (icon) {
+                    icon.classList.remove('fa-regular');
+                    icon.classList.add('fa-solid');
+                    icon.style.color = '#e53e3e';
                 }
             }
+        })
+        .catch(function (error) {
+            if (error && error.message) alert(error.message);
         });
     });
-});
+
+    // ── Collapsible Filter Sections ────────────────────────────────
+    document.querySelectorAll('.filter-title').forEach(function (title) {
+        title.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var section = this.closest('.filter-section');
+            if (section) section.classList.toggle('active');
+        });
+    });
+
+    // ── Mobile drawer open/close ───────────────────────────────────
+    var overlay = document.createElement('div');
+    overlay.className = 'filter-overlay';
+    document.body.appendChild(overlay);
+
+    if (filterToggle && filterMenu) {
+        filterToggle.addEventListener('click', function () {
+            filterMenu.classList.add('open');
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    function closeMobileFilter() {
+        if (filterMenu) filterMenu.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    if (filterClose) filterClose.addEventListener('click', closeMobileFilter);
+    overlay.addEventListener('click', closeMobileFilter);
+
+    // ── Handle browser back/forward ────────────────────────────────
+    window.addEventListener('popstate', function () {
+        fetchProducts(window.location.href);
+    });
+
+}());
 </script>
 
 <style>

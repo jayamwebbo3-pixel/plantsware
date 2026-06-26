@@ -155,10 +155,6 @@
                                                         <span class="fw-bold text-success" style="font-size: 14px;">₹{{ number_format($comboSubtotal - $comboDiscount, 2) }}</span>
                                                     </td>
                                                     <td class="pe-4 py-2 text-end">
-                                                        <button type="button" class="btn-close-style" 
-                                                                onclick="removeFromCartSummary('{{ $groupItems->first()->id }}')" title="Remove Bundle">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
                                                     </td>
                                                 </tr>
                                                 @foreach($groupItems as $item)
@@ -222,14 +218,14 @@
                                         <label for="pay_online" class="w-100 cursor-pointer">
                                             <div class="d-flex align-items-center p-3 border rounded-3 position-relative transition-all payment-card-inner">
                                                 <div class="payment-icon-circle me-3">
-                                                    <i class="fas fa-shield-alt text-primary"></i>
+                                                    <i class="fas fa-shield-alt text-success"></i>
                                                 </div>
                                                 <div class="flex-grow-1">
                                                     <div class="fw-bold text-dark">Secure Online Payment</div>
                                                     <div class="small text-success fw-medium">Zero Transaction fee • Instant Confirmation</div>
                                                 </div>
                                                 <div class="check-icon">
-                                                    <i class="fas fa-check-circle text-primary fs-4"></i>
+                                                    <i class="fas fa-check-circle text-success fs-4"></i>
                                                 </div>
                                             </div>
                                         </label>
@@ -258,7 +254,9 @@
                                 <span class="fw-bold text-dark fs-5">₹{{ number_format($total, 2) }}</span>
                             </div>
                             <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill fw-bold py-2-5 shadow-success">
-                                PAY & PLACE ORDER <i class="fas fa-lock ms-2"></i>
+                                <span class="d-none d-lg-inline">PAY & PLACE ORDER</span>
+                                <span class="d-inline d-lg-none">PLACE ORDER</span>
+                                <i class="fas fa-lock ms-2"></i>
                             </button>
                         </div>
                     </form>
@@ -356,7 +354,7 @@
 <style>
     :root {
         --primary-color: #72a420;
-        --secondary-color: #0d6efd;
+        --secondary-color: #2b6139;
         --light-bg: #f8f9fa;
         --border-dashed: #dee2e6;
     }
@@ -428,13 +426,13 @@
 
     .payment-option-modern.active .payment-card-inner {
         border-color: var(--secondary-color) !important;
-        background-color: #f8fbff;
+        background-color: #f4f8f5;
     }
 
     .payment-icon-circle {
         width: 45px;
         height: 45px;
-        background: #eef4ff;
+        background: #eaf0eb;
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -461,6 +459,7 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        margin-right: 15px !important;
     }
 
     .product-thumb-sm img {
@@ -481,21 +480,23 @@
     }
 
     .btn-success {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+        background-color: var(--secondary-color, #4a7856) !important;
+        border-color: var(--secondary-color, #4a7856) !important;
+        border-radius: 10px !important;
+        border: none !important;
     }
 
     .btn-success:hover {
-        background-color: #5a821a;
-        border-color: #5a821a;
+        background-color: #1c3f24 !important;
+        border-color: #1c3f24 !important;
     }
 
     .shadow-success {
-        box-shadow: 0 8px 20px rgba(114, 164, 32, 0.3);
+        box-shadow: 0 8px 20px rgba(74, 120, 86, 0.25) !important;
     }
 
     .shadow-success-hover:hover {
-        box-shadow: 0 8px 25px rgba(114, 164, 32, 0.4);
+        box-shadow: 0 8px 25px rgba(59, 98, 71, 0.35) !important;
         transform: translateY(-2px);
         transition: all 0.3s;
     }
@@ -526,7 +527,8 @@
 
     @media (max-width: 576px) {
         .payment-brand-img {
-            height: 18px;
+            height: 20px;
+            margin: 6px 10px !important;
         }
 
         .card-header h5 {
@@ -537,12 +539,12 @@
     .hover-opacity-100:hover { opacity: 1 !important; transform: scale(1.1); transition: all 0.2s; }
 
     .payment-brand-img {
-        height: 22px;
+        height: 28px;
         width: auto;
         object-fit: contain;
-        filter: grayscale(100%);
-        opacity: 0.7;
+        
         transition: all 0.3s ease;
+        margin: 8px 16px !important;
     }
     
     .payment-brand-img:hover {

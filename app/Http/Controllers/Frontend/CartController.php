@@ -191,6 +191,34 @@ class CartController extends Controller
         $name = $item->name;
         $stock = $item->stock_quantity;
 
+        if ($type === 'combo') {
+            $anyConstituentOutOfStock = false;
+            $outOfStockNames = [];
+            if ($item->comboProduct && $item->comboProduct->product_ids) {
+                foreach ($item->comboProduct->product_ids as $pid) {
+                    if (str_starts_with($pid, 'p_')) {
+                        $realId = str_replace('p_', '', $pid);
+                        $p = \App\Models\Product::find($realId);
+                        if ($p && $p->stock_quantity <= 0) {
+                            $anyConstituentOutOfStock = true;
+                            $outOfStockNames[] = $p->name;
+                        }
+                    } elseif (str_starts_with($pid, 'co_')) {
+                        $realId = str_replace('co_', '', $pid);
+                        $co = \App\Models\ComboOnlyProduct::find($realId);
+                        if ($co && $co->stock_quantity <= 0) {
+                            $anyConstituentOutOfStock = true;
+                            $outOfStockNames[] = $co->name;
+                        }
+                    }
+                }
+            }
+            if ($anyConstituentOutOfStock) {
+                $msg = "This combo cannot be added to cart because some constituent products are out of stock: " . implode(', ', $outOfStockNames);
+                return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : back()->with('error', $msg);
+            }
+        }
+
         $selectedSize = null;
         if ($type === 'product' && $item->has_variants) {
             if ($options) {
@@ -594,14 +622,16 @@ class CartController extends Controller
         $productSizes = $request->input('product_sizes', []);
 
         if (!is_array($productIds) || count($productIds) < 2) {
-            return back()->with('error', 'Please select at least 2 products to build a combo.');
+            $msg = 'Please select at least 2 products to build a combo.';
+            return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : back()->with('error', $msg);
         }
 
         $settings = \App\Models\ComboPackSetting::first();
         $maxProducts = $settings ? $settings->max_products : 5;
 
         if (count($productIds) > $maxProducts) {
-            return back()->with('error', "Maximum {$maxProducts} products are allowed in a Combo Pack.");
+            $msg = "Maximum {$maxProducts} products are allowed in a Combo Pack.";
+            return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : back()->with('error', $msg);
         }
 
         // Map product ID to its submitted size
@@ -619,7 +649,8 @@ class CartController extends Controller
             ->get();
 
         if ($products->count() !== count($productIds)) {
-            return back()->with('error', 'Some selected products are not eligible for a combo pack.');
+            $msg = 'Some selected products are not eligible for a combo pack.';
+            return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : back()->with('error', $msg);
         }
 
         // Check size/variant eligibility if product has variants
@@ -643,7 +674,8 @@ class CartController extends Controller
                 }
 
                 if (!$matchedSizeKey || ($sizes[$matchedSizeKey]['combo_eligible'] ?? 'No') !== 'Yes') {
-                    return back()->with('error', "Product '{$product->name}' with the selected variant is not eligible for combo packs.");
+                    $msg = "Product '{$product->name}' with the selected variant is not eligible for combo packs.";
+                    return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : back()->with('error', $msg);
                 }
             }
         }
@@ -651,7 +683,8 @@ class CartController extends Controller
         // Check stock availability
         foreach ($products as $product) {
             if ($product->stock_quantity < 1) {
-                return back()->with('error', "Product '{$product->name}' is out of stock.");
+                $msg = "Product '{$product->name}' is out of stock.";
+                return $request->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : back()->with('error', $msg);
             }
         }
 
@@ -713,6 +746,19 @@ class CartController extends Controller
         }
 
         $this->updateSessionCounts();
+
+        if ($request->ajax()) {
+            $cartCount = Cart::current()->sum('quantity') ?? 0;
+            $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
+            $totals = $this->calculateCartTotals($cartItems);
+
+            return response()->json(array_merge([
+                'success' => true,
+                'message' => 'Custom Combo Pack added to cart successfully!',
+                'cart_count' => $cartCount,
+                'custom_combo_id' => $customComboId
+            ], $totals));
+        }
 
         return redirect()->route('cart.index')->with('success', 'Custom Combo Pack added to cart successfully!');
     }
@@ -806,5 +852,13 @@ class CartController extends Controller
             'success' => true,
             'message' => 'Coupon removed successfully.'
         ]);
+    }
+
+    public function drawer()
+    {
+        $cartItems = Cart::current()->with(['product', 'comboPack'])->get();
+        $totals = $this->calculateCartTotals($cartItems);
+        
+        return view('view.partials.cart-drawer-content', array_merge(['cartItems' => $cartItems], $totals));
     }
 }

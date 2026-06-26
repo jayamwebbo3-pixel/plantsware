@@ -18,7 +18,7 @@
 </div>
 
 <main class="cart-section">
-    <div class="container py-4">
+<div class="container wishlist-page-container">
         <div class="row">
             <div class="col-md-12">
                 <div class="gi-vendor-dashboard-card">
@@ -303,7 +303,10 @@
                                         <span>Total:</span>
                                         <span class="summary-amount total" id="cartTotal">₹{{ number_format($total ?? $subtotal ?? 0, 2) }}</span>
                                     </div>
-                                    <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">Proceed to Checkout</button>
+                                    <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.address') }}'">
+                                        <span class="d-none d-lg-inline">Proceed to Checkout</span>
+                                        <span class="d-inline d-lg-none">Checkout</span>
+                                    </button>
                                     <button type="button" class="continue-shopping-btn w-100" onclick="window.location='{{ route('home') }}'">Continue Shopping</button>
                                     <button type="button" class="clear-cart-btn btn-clear-red w-100 mt-2" onclick="clearCart()">
                                         <i class="fas fa-trash"></i> Clear Cart

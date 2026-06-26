@@ -27,12 +27,12 @@
             <!-- Left Column: Products Grid & Search -->
             <div class="col-lg-8 mb-4">
                 <!-- Search & Filters -->
-                <div class="bg-white rounded-3 shadow-sm p-3 mb-4 border d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                <div class="bg-white rounded-3 shadow-sm p-3 mb-4 border d-flex flex-wrap gap-2 justify-content-between align-items-center builder-filter-wrapper">
                     <div class="input-group style-search-group" style="max-width: 400px; flex-grow: 1;">
                         <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
                         <input type="text" id="builderSearch" class="form-control bg-light border-start-0" placeholder="Search products...">
                     </div>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2 builder-filter-select-container">
                         <span class="text-muted small text-nowrap">Filter:</span>
                         <select id="builderCategory" class="form-select bg-light">
                             <option value="">All Categories</option>
@@ -96,10 +96,10 @@
                              data-category="{{ $product->category_id }}">
                             <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden product-builder-card position-relative">
                                 @if($hasDiscount)
-                                    <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 z-3">Sale</span>
+                                    <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3" style="z-index: 10 !important;">Sale</span>
                                 @endif
-                                <div class="p-3 bg-white text-center" style="height: 180px; display: flex; align-items: center; justify-content: center;">
-                                    <img src="{{ $image }}" class="img-fluid" style="max-height: 100%; object-fit: contain;" alt="{{ $product->name }}">
+                                <div class="builder-card-img-wrap">
+                                    <img src="{{ $image }}" class="builder-card-img" alt="{{ $product->name }}" loading="lazy">
                                 </div>
                                 <div class="card-body p-3 d-flex flex-column">
                                     <h5 class="card-title text-dark fs-6 fw-bold text-truncate mb-2" title="{{ $product->name }}">{{ $product->name }}</h5>
@@ -161,7 +161,10 @@
 
                         <!-- Selected Items List -->
                         <div class="mb-4">
-                            <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Selected Products</h5>
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                                <h5 class="fw-bold text-dark mb-0">Selected Products</h5>
+                                <button type="button" class="btn btn-link btn-sm text-danger p-0 text-decoration-none" id="clearAllComboBtn" onclick="clearComboBuilder()" style="font-size: 13px; display: none;">Clear All</button>
+                            </div>
                             <div id="selectedProductsList" class="d-flex flex-column gap-2" style="max-height: 240px; overflow-y: auto;">
                                 <div class="text-center py-4 text-muted" id="emptyPlaceholder">
                                     <i class="fas fa-shopping-basket fa-2x mb-2 text-muted opacity-50"></i>
@@ -178,7 +181,7 @@
                                     @foreach($slabs as $slab)
                                         <li class="d-flex justify-content-between align-items-center py-1 border-bottom border-dashed slab-indicator-item" data-min="{{ $slab->min_amount }}" data-percent="{{ $slab->discount_percentage }}">
                                             <span class="small text-muted">Above ₹{{ number_format($slab->min_amount, 2) }}</span>
-                                            <span class="badge bg-secondary rounded-pill slab-badge">{{ $slab->discount_percentage }}% Off</span>
+                                            <span class="badge bg-secondary rounded-pill slab-badge">{{ floatval($slab->discount_percentage) }}% Off</span>
                                         </li>
                                     @endforeach
                                 </ul>
@@ -332,11 +335,26 @@
         }
     }
 
+    function clearComboBuilder() {
+        sessionStorage.removeItem('selected_combo_products');
+        sessionStorage.removeItem('editing_combo_id');
+        selectedProducts = [];
+        editingComboId = null;
+        updateUI();
+    }
+
+    window.clearComboBuilder = clearComboBuilder;
+
     function removeProduct(productId) {
         toggleProduct(productId);
     }
 
     function updateUI() {
+        const clearAllBtn = document.getElementById('clearAllComboBtn');
+        if (clearAllBtn) {
+            clearAllBtn.style.display = selectedProducts.length > 0 ? 'inline-block' : 'none';
+        }
+
         // Update product list col cards button state
         document.querySelectorAll('.product-item-col').forEach(col => {
             const id = parseInt(col.getAttribute('data-id'));
@@ -365,13 +383,17 @@
 
         // Update selected items list
         const selectedList = document.getElementById('selectedProductsList');
-        const emptyPlaceholder = document.getElementById('emptyPlaceholder');
 
         // Clear list
         selectedList.innerHTML = '';
 
         if (selectedProducts.length === 0) {
-            selectedList.appendChild(emptyPlaceholder);
+            selectedList.innerHTML = `
+                <div class="text-center py-4 text-muted" id="emptyPlaceholder">
+                    <i class="fas fa-shopping-basket fa-2x mb-2 text-muted opacity-50"></i>
+                    <p class="mb-0 small">No products selected yet.</p>
+                </div>
+            `;
         } else {
             selectedProducts.forEach(p => {
                 const itemDiv = document.createElement('div');
@@ -539,12 +561,63 @@
         if (searchInput) searchInput.addEventListener('input', filterProducts);
         if (categorySelect) categorySelect.addEventListener('change', filterProducts);
 
-        // Form submit listener to clear sessionStorage
+        // Form submit listener to submit via AJAX and open side cart drawer
         const form = document.getElementById('customComboForm');
         if (form) {
-            form.addEventListener('submit', () => {
-                sessionStorage.removeItem('selected_combo_products');
-                sessionStorage.removeItem('editing_combo_id');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const checkoutBtn = document.getElementById('checkoutBtn');
+                const originalText = checkoutBtn.innerHTML;
+                checkoutBtn.disabled = true;
+                checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Adding to Cart...';
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || formData.get('_token') || ''
+                    },
+                    body: formData
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(err => { throw new Error(err.message || 'Failed to add custom combo pack.') });
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.custom_combo_id) {
+                        editingComboId = data.custom_combo_id;
+                        sessionStorage.setItem('editing_combo_id', editingComboId);
+                    }
+                    updateUI();
+
+                    if (typeof window.updateCartCountBadges === 'function') {
+                        window.updateCartCountBadges(data.cart_count);
+                    }
+                    if (typeof window.refreshCartDrawer === 'function') {
+                        window.refreshCartDrawer();
+                    }
+                    if (typeof window.openCartDrawer === 'function') {
+                        window.openCartDrawer();
+                    }
+                })
+                .catch(err => {
+                    console.error('Error adding custom combo:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: err.message || 'Something went wrong.',
+                        confirmButtonColor: '#198754'
+                    });
+                })
+                .finally(() => {
+                    checkoutBtn.innerHTML = originalText;
+                    checkoutBtn.disabled = false;
+                });
             });
         }
 
@@ -653,13 +726,40 @@
         padding-left: 5px;
         padding-right: 5px;
     }
+
+    /* Full-fill image container — no padding, no whitespace */
+    .builder-card-img-wrap {
+        width: 100%;
+        height: 220px;
+        overflow: hidden;
+        background: #ffffff;
+        position: relative;
+        display: block;
+    }
+
+    .builder-card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        backface-visibility: hidden;
+    }
+
+    /* Hover zoom on the image */
+    .product-builder-card:hover .builder-card-img {
+        transform: scale(1.08);
+    }
+
     .product-builder-card {
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         border: 1px solid #eef2f6 !important;
     }
     .product-builder-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+        box-shadow: 0 10px 28px rgba(110, 168, 32, 0.14) !important;
+        border-color: rgba(110, 168, 32, 0.25) !important;
     }
     .style-search-group .form-control:focus {
         border-color: #ced4da;

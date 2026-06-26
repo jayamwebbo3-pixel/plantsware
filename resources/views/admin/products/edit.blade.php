@@ -162,15 +162,15 @@
                             <label for="gallery_images" class="form-label">Add More Gallery Images</label>
                             <input type="file" class="form-control" id="gallery_images" name="gallery_images[]" accept="image/*" multiple>
                             <div id="galleryPreviewContainer" class="d-flex flex-wrap mt-2"></div>
-                            <small class="text-muted">Hold Ctrl/Cmd to select multiple. These will be added to your current gallery.</small>
+                            <small class="text-muted">Hold Ctrl to select multiple. These will be added to your current gallery.</small>
                         </div>
 
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_featured">Mark as Featured Product</label>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="mb-3">
                             <label for="combo_pack_eligible" class="form-label fw-bold">Combo Pack Eligible</label>
@@ -366,7 +366,7 @@
                     </div>
 
                     <!-- Secondary Attributes (Shape / Material) -->
-                    <div class="row g-4 mb-4">
+                    <!-- <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body p-4">
@@ -397,7 +397,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <style>
                         .bg-light-subtle { background-color: #f8f9fa !important; }
@@ -736,6 +736,54 @@
                     dataTransfer.items.add(file);
                 });
                 galleryInput.files = dataTransfer.files;
+            }
+
+            // Frontend Validation for Combo Pack Eligibility and Empty Attributes
+            const form = document.querySelector('form[action*="products"]');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const comboPackSelect = document.getElementById('combo_pack_eligible');
+                    const hasVariantsToggle = document.getElementById('has_variants_toggle');
+                    
+                    // 1. Validation for empty attributes when variants is ON
+                    if (hasVariantsToggle && hasVariantsToggle.checked) {
+                        const attributeRows = document.querySelectorAll('#attributes-body .attribute-row');
+                        if (attributeRows.length === 0) {
+                            e.preventDefault();
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Variants Validation Error',
+                                    text: 'At least one product attribute/variant must be added when variants are enabled, or turn off the variants switch.',
+                                    confirmButtonColor: '#134e5e'
+                                });
+                            } else {
+                                alert('At least one product attribute/variant must be added when variants are enabled, or turn off the variants switch.');
+                            }
+                            return;
+                        }
+                    }
+                    
+                    // 2. Validation for combo pack eligibility matching variants
+                    if (comboPackSelect && comboPackSelect.value === 'Yes' && hasVariantsToggle && hasVariantsToggle.checked) {
+                        const comboSelects = Array.from(document.querySelectorAll('#attributes-body select[name*="[combo_eligible]"]'));
+                        const hasYes = comboSelects.some(sel => sel.value === 'Yes');
+                        
+                        if (!hasYes) {
+                            e.preventDefault();
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Combo Pack Validation Error',
+                                    text: 'At least one attribute variant must be marked as Combo Eligible when the product itself is Combo Pack Eligible.',
+                                    confirmButtonColor: '#134e5e'
+                                });
+                            } else {
+                                alert('At least one attribute variant must be marked as Combo Eligible when the product itself is Combo Pack Eligible.');
+                            }
+                        }
+                    }
+                });
             }
         });
     </script>
