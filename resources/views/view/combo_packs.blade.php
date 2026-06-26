@@ -149,99 +149,11 @@
                         </button>
                     </div>
 
-                    <div class="products-grid row g-4">
-                        @forelse($comboPacks as $combo)
-                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-6 mb-4">
-                                <div class="product-custom-card">
-                                    <div class="card-img-container">
-                                        <a href="{{ route('combo_packs.frontend_show', $combo->slug) }}" class="w-100 h-100">
-                                            @php
-                                                $images = $combo->images;
-                                            @endphp
-
-                                            <div class="dual-image-wrapper">
-                                                @if(count($images) >= 2)
-                                                    <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $combo->name }} 1">
-                                                    <span class="image-plus-sign">+</span>
-                                                    <div class="image-wrap-more">
-                                                        <img src="{{ asset('storage/' . $images[1]) }}" alt="{{ $combo->name }} 2">
-                                                        @if(count($images) > 2)
-                                                            <span class="combo-more-badge">+{{ count($images) - 2 }} More</span>
-                                                        @endif
-                                                    </div>
-                                                @elseif(count($images) == 1)
-                                                    <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $combo->name }}" class="single-combo-img">
-                                                @else
-                                                    <img src="{{ asset('assets/images/product/default.jpg') }}" alt="{{ $combo->name }}" class="single-combo-img">
-                                                @endif
-                                            </div>
-                                        </a>
-                                        @php
-                                            $discount = 0;
-                                            if ($combo->total_price > 0) {
-                                                $discount = round((($combo->total_price - $combo->offer_price) / $combo->total_price) * 100);
-                                            }
-                                        @endphp
-                                        @if($combo->stock_quantity <= 0)
-                                            <div class="custom-discount-badge" style="background: #dc3545 !important;">OUT OF STOCK</div>
-                                        @elseif($discount > 0)
-                                            <div class="custom-discount-badge">{{ $discount }}% OFF</div>
-                                        @endif
-                                    </div>
-                                    <div class="card-content">
-                                        <h3 class="card-title">
-                                            <a href="{{ route('combo_packs.frontend_show', $combo->slug) }}">{{ $combo->name }}</a>
-                                        </h3>
-                                        <div class="card-price-row">
-                                            @if($combo->stock_quantity > 0)
-                                                <span class="old-price">₹{{ number_format($combo->total_price, 2) }}</span>
-                                                <span class="new-price">₹{{ number_format($combo->offer_price, 2) }}</span>
-                                            @else
-                                                <div style="height: 30px;"></div>
-                                            @endif
-                                        </div>
-                                        <div class="card-actions-row d-flex gap-2 align-items-stretch">
-                                            @if($combo->stock_quantity > 0)
-                                                <form action="{{ route('cart.add_combo', $combo->id) }}" method="POST" class="flex-grow-1 d-flex">
-                                                    @csrf
-                                                    <input type="hidden" name="buy_now" value="1">
-                                                    <button type="submit" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
-                                                        <span class="d-none d-xl-inline">Buy Now</span>
-                                                        <span class="d-inline d-xl-none">Buy</span>
-                                                    </button>
-                                                </form>
-                                                <form action="{{ route('cart.add_combo', $combo->id) }}" method="POST" class="flex-grow-1 d-flex">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
-                                                        <span class="d-none d-xl-inline">Add To Cart</span>
-                                                        <span class="d-inline d-xl-none">Cart</span>
-                                                    </button>
-                                                </form>
-                                            @else
-                                                <div class="flex-grow-1 d-flex">
-                                                    <button type="button" class="btn btn-secondary w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" style="background-color: #f1f5f9 !important; color: #94a3b8 !important; border: 1px solid #e2e8f0 !important; cursor: not-allowed !important; font-size: 0.85rem !important; font-weight: 600 !important; border-radius: 8px !important;" disabled>
-                                                        Out of Stock
-                                                    </button>
-                                                </div>
-                                            @endif
-                                            <button type="button" class="btn-wishlist-custom wishlist-btn-combo" data-id="{{ $combo->id }}">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="col-12 text-center py-5">
-                                <h3>No combo packs found matching your filters.</h3>
-                                <a href="{{ route('combo_packs.frontend_index') }}" class="btn btn-danger mt-3">Reset Filters</a>
-                            </div>
-                        @endforelse
+                    <!-- AJAX Products Area -->
+                    <div id="ajax-products-area" style="position: relative; min-height: 200px; transition: opacity 0.25s ease;">
+                        @include('view.partials.combo-packs-grid')
                     </div>
 
-                    <div class="d-flex justify-content-center mt-5">
-                        {{ $comboPacks->links() }}
-                    </div>
                 </div>
             </div>
         </div>
@@ -249,52 +161,213 @@
 </section>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // AJAX Wishlist
-    document.querySelectorAll('.wishlist-btn-combo').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var id = this.getAttribute('data-id');
-            var currentBtn = this;
+(function () {
+    'use strict';
 
-            fetch("{{ url('/wishlist/add-combo') }}/" + id, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                    "Accept": "application/json",
-                    "X-Requested-With": "XMLHttpRequest"
-                }
-            })
-            .then(function(response) {
-                if (response.status === 401) {
-                    window.location.href = "{{ route('login') }}";
-                    return;
-                }
-                return response.json().then(function(data) {
-                    if (!response.ok) throw new Error(data.message || "Something went wrong");
-                    return data;
-                });
-            })
-            .then(function(data) {
-                if (data && data.success) {
-                    alert(data.message);
-                    document.querySelectorAll('.wishlist-icon-link .price_cart').forEach(function(el) {
-                        el.textContent = data.wishlist_count;
-                    });
-                    var icon = currentBtn.querySelector('i');
-                    if (icon) {
-                        icon.classList.remove('fa-regular');
-                        icon.classList.add('fa-solid');
-                        icon.style.color = '#e53e3e';
-                    }
-                }
-            })
-            .catch(function(error) {
-                if (error && error.message) alert(error.message);
+    var filterForm    = document.getElementById('filter-form');
+    var productsArea  = document.getElementById('ajax-products-area');
+    var priceInput    = document.getElementById('price-max');
+    var displayPriceRange = document.getElementById('display-price-range');
+    var filterToggle  = document.getElementById('mobileFilterToggle');
+    var filterClose   = document.getElementById('mobileFilterClose');
+    var filterMenu    = document.getElementById('filterMenuWrapper');
+    var debounceTimer = null;
+
+    function isMobile() { return window.innerWidth < 768; }
+
+    // ── Loading helpers ─────────────────────────────────────────────
+    function showLoading() {
+        if (productsArea) productsArea.style.opacity = '0.4';
+    }
+    function hideLoading() {
+        if (productsArea) productsArea.style.opacity = '1';
+    }
+
+    // ── Core AJAX fetch ─────────────────────────────────────────────
+    function fetchProducts(url) {
+        showLoading();
+        // Update browser URL bar without reload
+        window.history.pushState({}, '', url);
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (productsArea && data.html) {
+                productsArea.innerHTML = data.html;
+            }
+            hideLoading();
+            productsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        })
+        .catch(function (err) {
+            console.error('Combo packs AJAX filter error:', err);
+            hideLoading();
+        });
+    }
+
+    // Build query string from filter form and optional extra params
+    function buildUrl(extraParams) {
+        if (!filterForm) return window.location.href;
+        var formData = new FormData(filterForm);
+        var params   = new URLSearchParams();
+        formData.forEach(function (value, key) {
+            if (value !== '') params.append(key, value);
+        });
+        if (extraParams) {
+            Object.keys(extraParams).forEach(function (k) {
+                params.set(k, extraParams[k]);
+            });
+        }
+        return filterForm.getAttribute('action') + '?' + params.toString();
+    }
+
+    // ── Desktop: auto-submit on filter change ─────────────────────
+    if (filterForm) {
+        filterForm.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(function (input) {
+            input.addEventListener('change', function () {
+                if (!isMobile()) fetchProducts(buildUrl());
             });
         });
+
+        // Price slider — debounce on 'input', fire on 'change'
+        if (priceInput) {
+            priceInput.addEventListener('input', function () {
+                if (displayPriceRange) displayPriceRange.textContent = '\u20B90 - \u20B9' + priceInput.value;
+                if (!isMobile()) {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function () { fetchProducts(buildUrl()); }, 400);
+                }
+            });
+            priceInput.addEventListener('change', function () {
+                if (!isMobile()) {
+                    clearTimeout(debounceTimer);
+                    fetchProducts(buildUrl());
+                }
+            });
+        }
+
+        // Prevent native form submit — always use AJAX
+        filterForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (isMobile()) closeMobileFilter();
+            setTimeout(function () { fetchProducts(buildUrl()); }, isMobile() ? 320 : 0);
+        });
+    }
+
+    // ── Pagination: delegate clicks on nav links inside products area ──
+    document.addEventListener('click', function (e) {
+        // Only intercept links inside a <nav> (Laravel pagination wrapper)
+        var paginationLink = e.target.closest('#ajax-products-area nav a[href]');
+        if (paginationLink) {
+            e.preventDefault();
+            fetchProducts(paginationLink.href);
+            return;
+        }
+
+        // "Reset Filters" button inside products area (empty state only)
+        var resetBtn = e.target.closest('#ajax-products-area .col-12.text-center a.btn-danger');
+        if (resetBtn) {
+            e.preventDefault();
+            fetchProducts(resetBtn.href);
+            return;
+        }
     });
-});
+
+    // ── "Reset" sidebar link — clear all filters via AJAX ─────────
+    var sidebarResetLink = document.querySelector('#filter-form ~ * a.btn-outline-secondary, .filter-actions a.btn-outline-secondary');
+    if (sidebarResetLink) {
+        sidebarResetLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            fetchProducts(this.href);
+        });
+    }
+
+    // ── AJAX Wishlist (delegated — works after AJAX re-render) ─────
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.wishlist-btn-combo');
+        if (!btn) return;
+
+        var id = btn.getAttribute('data-id');
+
+        fetch('{{ url("/wishlist/add-combo") }}/' + id, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(function (response) {
+            if (response.status === 401) {
+                window.location.href = '{{ route("login") }}';
+                return;
+            }
+            return response.json().then(function (data) {
+                if (!response.ok) throw new Error(data.message || 'Something went wrong');
+                return data;
+            });
+        })
+        .then(function (data) {
+            if (data && data.success) {
+                alert(data.message);
+                document.querySelectorAll('.wishlist-icon-link .price_cart').forEach(function (el) {
+                    el.textContent = data.wishlist_count;
+                });
+                var icon = btn.querySelector('i');
+                if (icon) {
+                    icon.classList.remove('fa-regular');
+                    icon.classList.add('fa-solid');
+                    icon.style.color = '#e53e3e';
+                }
+            }
+        })
+        .catch(function (error) {
+            if (error && error.message) alert(error.message);
+        });
+    });
+
+    // ── Collapsible Filter Sections ────────────────────────────────
+    document.querySelectorAll('.filter-title').forEach(function (title) {
+        title.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var section = this.closest('.filter-section');
+            if (section) section.classList.toggle('active');
+        });
+    });
+
+    // ── Mobile drawer open/close ───────────────────────────────────
+    var overlay = document.createElement('div');
+    overlay.className = 'filter-overlay';
+    document.body.appendChild(overlay);
+
+    if (filterToggle && filterMenu) {
+        filterToggle.addEventListener('click', function () {
+            filterMenu.classList.add('open');
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    function closeMobileFilter() {
+        if (filterMenu) filterMenu.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    if (filterClose) filterClose.addEventListener('click', closeMobileFilter);
+    overlay.addEventListener('click', closeMobileFilter);
+
+    // ── Handle browser back/forward ────────────────────────────────
+    window.addEventListener('popstate', function () {
+        fetchProducts(window.location.href);
+    });
+
+}());
 </script>
 
 <style>
@@ -521,80 +594,5 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 16px;
 }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var filterForm      = document.getElementById('filter-form');
-    var applyFiltersBtn = document.getElementById('applyFiltersBtn');
-    var filterToggle    = document.getElementById('mobileFilterToggle');
-    var filterClose     = document.getElementById('mobileFilterClose');
-    var filterMenu      = document.getElementById('filterMenuWrapper');
-
-    function isMobile() { return window.innerWidth < 768; }
-
-    // ── Create backdrop overlay ────────────────────────────
-    var overlay = document.createElement('div');
-    overlay.className = 'filter-overlay';
-    document.body.appendChild(overlay);
-
-    // ── Collapsible Filter Sections ────────────────────────
-    document.querySelectorAll('.filter-title').forEach(function(title) {
-        title.addEventListener('click', function(e) {
-            e.stopPropagation();
-            var section = this.closest('.filter-section');
-            if (section) section.classList.toggle('active');
-        });
-    });
-
-    // ── Desktop: Auto-submit on any filter change ──────────
-    if (filterForm) {
-        filterForm.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(function(input) {
-            input.addEventListener('change', function() {
-                if (!isMobile()) filterForm.submit();
-            });
-        });
-        // Price range slider — submit on release (desktop only)
-        var priceInput = document.getElementById('price-max');
-        var displayPriceRange = document.getElementById('display-price-range');
-        if (priceInput) {
-            priceInput.addEventListener('input', function() {
-                if (displayPriceRange) displayPriceRange.textContent = '₹0 - ₹' + priceInput.value;
-            });
-            priceInput.addEventListener('change', function() {
-                if (!isMobile()) filterForm.submit();
-            });
-        }
-    }
-
-    // ── Mobile: Apply Filters button submits ──────────────
-    if (applyFiltersBtn && filterForm) {
-        applyFiltersBtn.addEventListener('click', function(e) {
-            if (isMobile()) {
-                e.preventDefault();
-                closeMobileFilter();
-                setTimeout(function() { filterForm.submit(); }, 320);
-            }
-        });
-    }
-
-    // ── Mobile drawer open/close ───────────────────────────
-    if (filterToggle && filterMenu) {
-        filterToggle.addEventListener('click', function() {
-            filterMenu.classList.add('open');
-            overlay.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        });
-    }
-
-    function closeMobileFilter() {
-        if (filterMenu) filterMenu.classList.remove('open');
-        overlay.classList.remove('open');
-        document.body.style.overflow = '';
-    }
-
-    if (filterClose) filterClose.addEventListener('click', closeMobileFilter);
-    overlay.addEventListener('click', closeMobileFilter);
-});
-</script>
 
 @include('view.layout.footer')

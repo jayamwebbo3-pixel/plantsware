@@ -155,10 +155,6 @@
                                                         <span class="fw-bold text-success" style="font-size: 14px;">₹{{ number_format($comboSubtotal - $comboDiscount, 2) }}</span>
                                                     </td>
                                                     <td class="pe-4 py-2 text-end">
-                                                        <button type="button" class="btn-close-style" 
-                                                                onclick="removeFromCartSummary('{{ $groupItems->first()->id }}')" title="Remove Bundle">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
                                                     </td>
                                                 </tr>
                                                 @foreach($groupItems as $item)

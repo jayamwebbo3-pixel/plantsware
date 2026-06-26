@@ -509,7 +509,7 @@
                             <label for="gallery_images" class="form-label">Gallery Images (Multiple)</label>
                             <input type="file" class="form-control" id="gallery_images" name="gallery_images[]" accept="image/*" multiple>
                             <div id="galleryPreviewContainer" class="d-flex flex-wrap mt-2"></div>
-                            <small class="text-muted">Hold Ctrl/Cmd to select multiple images</small>
+                            <small class="text-muted">Hold Ctrl to select multiple images</small>
                         </div>
 
                         <!-- <div class="mb-3">
@@ -651,6 +651,54 @@
                     dataTransfer.items.add(file);
                 });
                 galleryInput.files = dataTransfer.files;
+            }
+
+            // Frontend Validation for Combo Pack Eligibility and Empty Attributes
+            const form = document.querySelector('form[action*="products"]');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const comboPackSelect = document.getElementById('combo_pack_eligible');
+                    const hasVariantsToggle = document.getElementById('has_variants');
+                    
+                    // 1. Validation for empty attributes when variants is ON
+                    if (hasVariantsToggle && hasVariantsToggle.checked) {
+                        const attributeRows = document.querySelectorAll('#attributes-body .attribute-row');
+                        if (attributeRows.length === 0) {
+                            e.preventDefault();
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Variants Validation Error',
+                                    text: 'At least one product attribute/variant must be added when variants are enabled, or turn off the variants switch.',
+                                    confirmButtonColor: '#134e5e'
+                                });
+                            } else {
+                                alert('At least one product attribute/variant must be added when variants are enabled, or turn off the variants switch.');
+                            }
+                            return;
+                        }
+                    }
+                    
+                    // 2. Validation for combo pack eligibility matching variants
+                    if (comboPackSelect && comboPackSelect.value === 'Yes' && hasVariantsToggle && hasVariantsToggle.checked) {
+                        const comboSelects = Array.from(document.querySelectorAll('#attributes-body select[name*="[combo_eligible]"]'));
+                        const hasYes = comboSelects.some(sel => sel.value === 'Yes');
+                        
+                        if (!hasYes) {
+                            e.preventDefault();
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Combo Pack Validation Error',
+                                    text: 'At least one attribute variant must be marked as Combo Eligible when the product itself is Combo Pack Eligible.',
+                                    confirmButtonColor: '#134e5e'
+                                });
+                            } else {
+                                alert('At least one attribute variant must be marked as Combo Eligible when the product itself is Combo Pack Eligible.');
+                            }
+                        }
+                    }
+                });
             }
         });
     </script>

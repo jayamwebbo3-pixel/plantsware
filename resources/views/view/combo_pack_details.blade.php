@@ -73,9 +73,10 @@
                                             $prodImg = ($prod && !empty($prod->image) && file_exists(public_path('storage/' . $prod->image))) ? asset('storage/' . $prod->image) : asset('assets/images/product/product1.jpg');
                                             $prodUrl = ($prod instanceof \App\Models\Product) ? route('product.show', $prod->slug) : '#';
                                             $prodName = $prod->name ?? $comboPack->name;
+                                            $prodOutOfStock = (isset($prod->stock_quantity) && $prod->stock_quantity <= 0);
                                         @endphp
                                         
-                                        <div class="combo-stack-card card-index-{{ $index }} {{ $comboPack->stock_quantity <= 0 ? 'out-of-stock' : '' }}" 
+                                        <div class="combo-stack-card card-index-{{ $index }} {{ $prodOutOfStock ? 'out-of-stock' : '' }}" 
                                              id="stackCard-{{ $index }}" 
                                              data-index="{{ $index }}"
                                              data-name="{{ $prodName }}"
@@ -83,7 +84,7 @@
                                             
                                             <div class="combo-stack-img-wrap" style="position: relative; overflow: hidden !important;">
                                                 <img src="{{ $prodImg }}" alt="{{ $prodName }}" class="combo-stack-img">
-                                                @if($comboPack->stock_quantity <= 0)
+                                                @if($prodOutOfStock)
                                                     <div class="out-of-stock-overlay">
                                                         <span class="out-of-stock-badge">Out Of Stock</span>
                                                     </div>
@@ -119,12 +120,13 @@
                                 $prod = $constituentProducts[0];
                                 $prodImg = ($prod && !empty($prod->image) && file_exists(public_path('storage/' . $prod->image))) ? asset('storage/' . $prod->image) : asset('assets/images/product/product1.jpg');
                                 $prodUrl = ($prod instanceof \App\Models\Product) ? route('product.show', $prod->slug) : '#';
+                                $prodOutOfStock = (isset($prod->stock_quantity) && $prod->stock_quantity <= 0);
                             @endphp
                             <div class="combo-images-container d-flex align-items-center justify-content-center w-100">
-                                <div class="combo-image-card single {{ $comboPack->stock_quantity <= 0 ? 'out-of-stock' : '' }}">
+                                <div class="combo-image-card single {{ $prodOutOfStock ? 'out-of-stock' : '' }}">
                                     <div class="combo-image-wrap" style="position: relative; overflow: hidden !important;">
                                         <img src="{{ $prodImg }}" alt="{{ $prod->name ?? $comboPack->name }}" class="combo-img single-img">
-                                        @if($comboPack->stock_quantity <= 0)
+                                        @if($prodOutOfStock)
                                             <div class="out-of-stock-overlay">
                                                 <span class="out-of-stock-badge">Out Of Stock</span>
                                             </div>
@@ -210,6 +212,30 @@
                                 {!! $comboPack->description !!}
                             </div>
                         </div>
+
+                        @php
+                            $outOfStockConstituentNames = [];
+                            foreach ($constituentProducts as $prod) {
+                                if (isset($prod->stock_quantity) && $prod->stock_quantity <= 0) {
+                                    $outOfStockConstituentNames[] = $prod->name ?? 'Constituent Product';
+                                }
+                            }
+                        @endphp
+                        @if(!empty($outOfStockConstituentNames))
+                            <div class="alert alert-warning mb-4" style="border-radius: 8px; border-left: 4px solid #dc3545; background-color: #fff8f8; color: #721c24; padding: 15px; font-size: 0.95rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                                <div class="d-flex align-items-start gap-2">
+                                    <i class="fas fa-exclamation-triangle mt-1" style="color: #dc3545;"></i>
+                                    <div>
+                                        <strong>Availability Issue:</strong> This combo pack is temporarily unavailable because the following item(s) are currently out of stock:
+                                        <ul class="mb-0 mt-2 ps-3 fw-bold" style="color: #c53030;">
+                                            @foreach($outOfStockConstituentNames as $name)
+                                                <li>{{ $name }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
 
                         <!-- Main Purchase Form -->
                         <form action="{{ route('cart.add_combo', $comboPack->id) }}" method="POST" id="mainCartForm">

@@ -214,10 +214,12 @@
                                         <div class="text-muted extra-small">Qty: {{ $item->quantity }} • ₹{{ number_format($item->calculated_price * $item->quantity, 2) }}</div>
                                     </div>
                                     <div class="ps-2">
+                                        @if(!$item->custom_combo_id)
                                         <button type="button" class="btn-close-style" 
                                                 onclick="removeFromCartSummary('{{ $item->id }}')" title="Remove Item">
                                             <i class="fas fa-times"></i>
                                         </button>
+                                        @endif
                                     </div>
                                 </div>
                                 @endforeach

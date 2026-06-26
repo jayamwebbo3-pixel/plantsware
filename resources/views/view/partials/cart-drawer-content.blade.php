@@ -78,6 +78,7 @@
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
+                                <div class="drawer-item-error mt-1" style="display: none; font-size: 11px; font-weight: 600; line-height: 1.2; color: #dc3545 !important;">Stock Is Not Available</div>
                             </div>
                         </div>
                     @endif
@@ -134,10 +135,34 @@
     </div>
     
     <div class="cart-drawer-footer">
-        <div class="drawer-summary-row">
+        <!-- Coupon Form inside Side Cart -->
+        <div class="drawer-coupon-section mb-3">
+            @if(isset($coupon) && $coupon)
+                <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded" style="border: 1px dashed #2b6139;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-ticket-alt text-success me-2"></i>
+                        <span class="fw-bold text-success small text-uppercase">{{ $coupon->coupon_code }} Applied</span>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDrawerCoupon()" style="padding: 2px 8px; font-size: 11px;">Remove</button>
+                </div>
+            @else
+                <form id="drawerCouponForm" onsubmit="applyDrawerCoupon(event)" style="margin-bottom: 12px;">
+                    <label class="fw-bold mb-2 text-dark d-flex align-items-center" style="font-size: 15px;">
+                        <i class="fas fa-ticket-alt text-success me-2"></i>Have A Coupon?
+                    </label>
+                    <div class="d-flex gap-2">
+                        <input type="text" id="drawerCouponCode" class="form-control" placeholder="ENTER CODE" style="text-transform: uppercase; font-weight: 600; font-size: 13px; border-radius: 4px; padding: 6px 12px; height: 38px;">
+                        <button class="btn btn-success" type="submit" style="background-color: #2b6139; border-color: #2b6139; border-radius: 4px; padding: 6px 12px; font-weight: 600; color: white; white-space: nowrap; flex-shrink: 0; font-size: 14px; width: auto !important;">Apply</button>
+                    </div>
+                    <div id="drawerCouponError" style="display: none; font-size: 11px; font-weight: 600; color: #dc3545 !important; margin-top: 6px; line-height: 1.3;"></div>
+                </form>
+            @endif
+        </div>
+
+        <!-- <div class="drawer-summary-row">
             <span>Subtotal</span>
             <strong>₹{{ number_format($subtotal, 2) }}</strong>
-        </div>
+        </div> -->
         @if(isset($discount) && $discount > 0)
         <div class="drawer-summary-row">
             <span>Discount</span>
@@ -155,14 +180,11 @@
             <strong>₹{{ number_format($total ?? $subtotal, 2) }}</strong>
         </div>
         
-        <div class="drawer-actions">
-            <a href="{{ route('cart.index') }}" class="btn btn-outline-success w-100 mb-2 py-2">
-                <span class="d-none d-lg-inline">View Cart</span>
-                <span class="d-inline d-lg-none">Cart</span>
-            </a>
-            <a href="{{ route('checkout.address') }}" class="btn btn-success w-100 py-2 btn-checkout-drawer">
-                <span class="d-none d-lg-inline">Proceed to Checkout</span>
-                <span class="d-inline d-lg-none">Checkout</span>
+        <div class="drawer-actions mt-3">
+            <a href="{{ route('checkout.address') }}" class="btn btn-success w-100 py-3 btn-checkout-drawer d-flex justify-content-between align-items-center px-3 px-sm-4" style="border-radius: 8px; font-weight: 700; letter-spacing: 0.5px; height: auto !important; line-height: 1.2;">
+                <span class="d-none d-sm-inline">Checkout</span>
+                <span class="d-inline d-sm-none">Checkout</span>
+                <!-- <span>₹{{ number_format($total ?? $subtotal, 2) }}</span> -->
             </a>
         </div>
     </div>

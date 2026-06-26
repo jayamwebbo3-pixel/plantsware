@@ -76,7 +76,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/media.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/customized.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/customized.min.css') }}?v=1.5">
 
     <!-- Google Fonts (Preloaded & Swapped) -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">

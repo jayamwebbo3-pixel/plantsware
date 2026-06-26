@@ -197,6 +197,9 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>
                         {{ $item->product_name ?? $item->name }}
+                        @if($item->custom_combo_id)
+                            <br><span style="font-size: 10px; color: #d9534f; font-weight: bold;">[BUILD A COMBO]</span>
+                        @endif
                         @if($item->options)
                             @php $options = is_string($item->options) && is_array(json_decode($item->options, true)) ? json_decode($item->options, true) : $item->options; @endphp
                             @if(is_array($options) && isset($options['size']))

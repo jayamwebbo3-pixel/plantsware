@@ -599,16 +599,14 @@ document.addEventListener('DOMContentLoaded', function() {
     window.updateCartCountBadges = updateCartCountBadges;
     window.updateWishlistCountBadges = updateWishlistCountBadges;
     
-    // Intercept header cart icon clicks to open drawer instead of full redirect
-    document.addEventListener('click', function(e) {
+     document.addEventListener('click', function(e) {
         const cartLink = e.target.closest('.cart-icon-link');
         if (cartLink) {
-            if (!window.location.pathname.includes('/checkout')) {
-                e.preventDefault();
-                openCartDrawer();
-            }
+            e.preventDefault();
+            openCartDrawer();
         }
     });
+    // Intercept clicks on the cart icon to open the side cart drawer instead of navigating to the cart page
     
     // Close Drawer events
     if (closeBtn) closeBtn.addEventListener('click', closeCartDrawer);
@@ -671,19 +669,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (ok && body && body.success) {
                     updateCartCountBadges(body.cart_count);
                     refreshCartDrawer();
-                    
-                    if (window.Swal) {
-                        Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 2000,
-                            timerProgressBar: true
-                        }).fire({
-                            icon: 'success',
-                            title: body.message
-                        });
-                    }
                 } else {
                     closeCartDrawer();
                     const errMsg = body ? body.message : 'Error adding to cart (Server returned ' + status + ')';
@@ -742,8 +727,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (status >= 200 && status < 300 && body.success) {
                 updateCartCountBadges(body.cart_count);
                 refreshCartDrawer();
-                
-                // If we are currently on the /cart page, reload to sync
+                                // If we are currently on the /cart page, reload to sync
                 if (window.location.pathname.includes('/cart')) {
                     window.location.reload();
                 }
@@ -791,6 +775,26 @@ document.addEventListener('DOMContentLoaded', function() {
         let newQty = currentQty + change;
         if (newQty < 1) return;
         
+        // Hide any previous inline error
+        const errorEl = itemEl.querySelector('.drawer-item-error');
+        if (errorEl) {
+            errorEl.style.display = 'none';
+        }
+        
+        // Stock Limit Check for Side Cart
+        if (change > 0) {
+            const incBtn = itemEl.querySelector('.drawer-qty-inc');
+            if (incBtn) {
+                const stock = parseInt(incBtn.getAttribute('data-stock') || 0);
+                if (newQty > stock) {
+                    if (errorEl) {
+                        errorEl.style.display = 'block';
+                    }
+                    return;
+                }
+            }
+        }
+        
         itemEl.style.transition = 'opacity 0.2s ease';
         itemEl.style.opacity = '0.6';
         itemEl.style.pointerEvents = 'none';
@@ -813,7 +817,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (status >= 200 && status < 300 && body.success) {
                 updateCartCountBadges(body.cart_count);
                 refreshCartDrawer();
-                
                 // If we are currently on the /cart page, reload to sync
                 if (window.location.pathname.includes('/cart')) {
                     window.location.reload();
@@ -842,6 +845,109 @@ document.addEventListener('DOMContentLoaded', function() {
             refreshCartDrawer();
         });
     }
+
+    window.applyDrawerCoupon = function(e) {
+        e.preventDefault();
+        const input = document.getElementById('drawerCouponCode');
+        const code = input ? input.value.trim() : '';
+        const errorEl = document.getElementById('drawerCouponError');
+        if (errorEl) {
+            errorEl.style.display = 'none';
+            errorEl.textContent = '';
+        }
+        
+        if (!code) {
+            if (errorEl) {
+                errorEl.textContent = 'Please enter a coupon code.';
+                errorEl.style.display = 'block';
+            }
+            return;
+        }
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+        }
+        
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
+        fetch("{{ route('cart.apply_coupon') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ coupon_code: code })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                refreshCartDrawer();
+                if (window.location.pathname.includes('/cart')) {
+                    window.location.reload();
+                }
+            } else {
+                if (errorEl) {
+                    errorEl.textContent = data.message;
+                    errorEl.style.display = 'block';
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Apply';
+                }
+            }
+        })
+        .catch(err => {
+            console.error('Error applying coupon:', err);
+            if (errorEl) {
+                errorEl.textContent = 'Something went wrong. Please try again.';
+                errorEl.style.display = 'block';
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Apply';
+            }
+        });
+    };
+
+    window.removeDrawerCoupon = function() {
+        const removeBtn = document.querySelector('.drawer-coupon-section button[onclick="removeDrawerCoupon()"]');
+        if (removeBtn) {
+            removeBtn.disabled = true;
+            removeBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+        }
+        
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
+        fetch("{{ route('cart.remove_coupon') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                refreshCartDrawer();
+                if (window.location.pathname.includes('/cart')) {
+                    window.location.reload();
+                }
+            }
+        })
+        .catch(err => {
+            console.error('Error removing coupon:', err);
+            if (removeBtn) {
+                removeBtn.disabled = false;
+                removeBtn.innerText = 'Remove';
+            }
+        });
+    };
 
     // --- Collapsible Filter Sections ---
     document.addEventListener('click', function(e) {

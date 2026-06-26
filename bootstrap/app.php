@@ -19,6 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.seller' => \App\Http\Middleware\sellerAuth::class,
             'auth.admin' => \App\Http\Middleware\AdminAuth::class,
         ]);
+        $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return route('admin.login');
+            }
+            return route('login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

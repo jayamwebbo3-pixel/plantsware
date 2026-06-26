@@ -125,8 +125,13 @@
                                     <img src="{{ $imgSrc }}" class="w-100 h-100 object-fit-cover" alt="{{ $item->product_name }}" onerror="this.src='{{ asset('assets/images/product/product1.jpg') }}'">
                                 </a>
                                 <div class="ms-3 flex-grow-1">
-                                    <a href="{{ $productUrl }}" class="h6 mb-1 text-dark fw-bold text-decoration-none d-block hover-text-custom">{{ $item->product_name }}</a>
-                                    @if($item->options)
+                                     <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                                         <a href="{{ $productUrl }}" class="h6 mb-0 text-dark fw-bold text-decoration-none hover-text-custom">{{ $item->product_name }}</a>
+                                         @if($item->custom_combo_id)
+                                             <span class="badge bg-soft-danger text-danger text-uppercase px-2 py-1 rounded-pill" style="font-size: 0.6rem; letter-spacing: 0.5px; line-height: 1;">BUILD A COMBO</span>
+                                         @endif
+                                     </div>
+                                     @if($item->options)
                                         @php $options = is_string($item->options) ? json_decode($item->options, true) : $item->options; @endphp
                                         @if(is_array($options))
                                             <p class="small mb-0 text-muted">
