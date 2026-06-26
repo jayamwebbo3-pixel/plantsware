@@ -186,7 +186,7 @@
                 const productId = this.dataset.id;
                 const isActive = this.checked ? 1 : 0;
 
-                fetch(`/admin/products/${productId}/status`, {
+                fetch(`{{ url('admin/products') }}/${productId}/status`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
