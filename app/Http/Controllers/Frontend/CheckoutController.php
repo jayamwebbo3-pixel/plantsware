@@ -63,6 +63,17 @@ class CheckoutController extends Controller
             $state = $sessAddr['state'] ?? $state;
         }
 
+        $billingSame = true;
+        if (session()->has('billing_same')) {
+            $billingSame = session('billing_same');
+        }
+        if (session()->has('billing_address')) {
+            $sessBill = session('billing_address');
+            foreach ($sessBill as $k => $v) {
+                $savedAddress['billing_' . $k] = $v;
+            }
+        }
+
         $totals = $this->calculateTotalsForCheckout($cartItems, $state);
 
         $subtotal = $totals['subtotal'];
@@ -78,13 +89,13 @@ class CheckoutController extends Controller
         $total = $totals['total'];
         $itemCount = $totals['itemCount'];
 
-        return view('view.checkout.address', compact('cartItems', 'savedAddress', 'userAddresses', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'itemCount', 'totalWeight', 'discount', 'couponDiscount', 'coupon'));
+        return view('view.checkout.address', compact('cartItems', 'savedAddress', 'userAddresses', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'itemCount', 'totalWeight', 'discount', 'couponDiscount', 'coupon', 'billingSame'));
     }
 
     // Save address and redirect to checkout
     public function saveAddress(Request $request)
     {
-        $validated = $request->validate([
+        $rules = [
             'address_id' => 'nullable',
             'name' => 'required|string|max:255',
             'door_number' => 'nullable|string|max:255',
@@ -93,10 +104,54 @@ class CheckoutController extends Controller
             'state' => 'required|string|max:100',
             'pincode' => 'required|string|max:10',
             'phone' => 'required|string|max:15',
-        ]);
+            'billing_same' => 'nullable',
+        ];
+
+        $billingSame = $request->has('billing_same');
+
+        if (!$billingSame) {
+            $rules['billing_name'] = 'required|string|max:255';
+            $rules['billing_door_number'] = 'nullable|string|max:255';
+            $rules['billing_address'] = 'required|string|max:255';
+            $rules['billing_city'] = 'required|string|max:100';
+            $rules['billing_state'] = 'required|string|max:100';
+            $rules['billing_pincode'] = 'required|string|max:10';
+            $rules['billing_phone'] = 'required|string|max:15';
+        }
+
+        $validated = $request->validate($rules);
+
+        // Prepare shipping address array
+        $shippingAddress = [
+            'address_id' => $validated['address_id'] ?? null,
+            'name' => $validated['name'],
+            'door_number' => $validated['door_number'] ?? null,
+            'address' => $validated['address'],
+            'city' => $validated['city'],
+            'state' => $validated['state'],
+            'pincode' => $validated['pincode'],
+            'phone' => $validated['phone'],
+        ];
+
+        // Prepare billing address array
+        if ($billingSame) {
+            $billingAddress = $shippingAddress;
+        } else {
+            $billingAddress = [
+                'name' => $validated['billing_name'],
+                'door_number' => $validated['billing_door_number'] ?? null,
+                'address' => $validated['billing_address'],
+                'city' => $validated['billing_city'],
+                'state' => $validated['billing_state'],
+                'pincode' => $validated['billing_pincode'],
+                'phone' => $validated['billing_phone'],
+            ];
+        }
 
         // Save to session
-        session(['shipping_address' => $validated]);
+        session(['shipping_address' => $shippingAddress]);
+        session(['billing_address' => $billingAddress]);
+        session(['billing_same' => $billingSame]);
 
         // Optionally save to user profile if logged in
         if (Auth::check()) {
@@ -104,40 +159,40 @@ class CheckoutController extends Controller
 
             // Update legacy address field
             $user->update([
-                'address' => json_encode($validated),
-                'name' => $validated['name'] ?? $user->name,
-                'phone' => $validated['phone'] ?? $user->phone,
+                'address' => json_encode($shippingAddress),
+                'name' => $shippingAddress['name'] ?? $user->name,
+                'phone' => $shippingAddress['phone'] ?? $user->phone,
             ]);
 
             // Save to new UserAddress table
-            $nameParts = explode(' ', $validated['name'], 2);
+            $nameParts = explode(' ', $shippingAddress['name'], 2);
             $firstName = $nameParts[0];
             $lastName = $nameParts[1] ?? '';
 
-            if (!empty($validated['address_id'])) {
-                $user->addresses()->where('id', $validated['address_id'])->update([
+            if (!empty($shippingAddress['address_id'])) {
+                $user->addresses()->where('id', $shippingAddress['address_id'])->update([
                     'first_name' => $firstName,
                     'last_name' => $lastName,
-                    'door_number' => $validated['door_number'],
-                    'street' => $validated['address'],
-                    'city' => $validated['city'],
-                    'state' => $validated['state'],
-                    'post_code' => $validated['pincode'],
-                    'phone_number' => $validated['phone'],
+                    'door_number' => $shippingAddress['door_number'],
+                    'street' => $shippingAddress['address'],
+                    'city' => $shippingAddress['city'],
+                    'state' => $shippingAddress['state'],
+                    'post_code' => $shippingAddress['pincode'],
+                    'phone_number' => $shippingAddress['phone'],
                 ]);
             } else {
                 $user->addresses()->updateOrCreate(
                     [
-                        'street' => $validated['address'],
-                        'city' => $validated['city'],
-                        'post_code' => $validated['pincode'],
-                        'phone_number' => $validated['phone'],
+                        'street' => $shippingAddress['address'],
+                        'city' => $shippingAddress['city'],
+                        'post_code' => $shippingAddress['pincode'],
+                        'phone_number' => $shippingAddress['phone'],
                     ],
                     [
                         'first_name' => $firstName,
                         'last_name' => $lastName,
-                        'door_number' => $validated['door_number'],
-                        'state' => $validated['state'],
+                        'door_number' => $shippingAddress['door_number'],
+                        'state' => $shippingAddress['state'],
                         // If no addresses yet, make this default
                         'is_default' => $user->addresses()->count() === 0,
                     ]
@@ -161,6 +216,9 @@ class CheckoutController extends Controller
             return redirect()->route('checkout.address')->with('error', 'Please provide shipping address.');
         }
 
+        $billingAddress = session('billing_address') ?? $shippingAddress;
+        $billingSame = session('billing_same', true);
+
         $totals = $this->calculateTotalsForCheckout($cartItems, $shippingAddress['state']);
 
         $subtotal = $totals['subtotal'];
@@ -178,7 +236,7 @@ class CheckoutController extends Controller
 
         $gstSettings = \App\Models\HeaderFooter::first();
 
-        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'discount', 'totalWeight', 'itemCount', 'gstSettings', 'couponDiscount', 'coupon'));
+        return view('view.checkout.index', compact('cartItems', 'shippingAddress', 'billingAddress', 'billingSame', 'subtotal', 'shipping', 'tax', 'cgst', 'sgst', 'igst', 'total', 'discount', 'totalWeight', 'itemCount', 'gstSettings', 'couponDiscount', 'coupon'));
     }
 
     // Place order (confirm and save)
@@ -293,6 +351,7 @@ class CheckoutController extends Controller
             'order_id' => null, // Will be linked after success
             'checkout_data' => [
                 'shipping_address' => $shippingAddress,
+                'billing_address' => session('billing_address') ?? $shippingAddress,
                 'subtotal' => $subtotal,
                 'shipping' => $shipping,
                 'tax' => $tax,

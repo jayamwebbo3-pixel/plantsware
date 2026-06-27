@@ -167,7 +167,7 @@
                     @if ($order->status === 'confirmed' || $order->status === 'pending')
                     <button type="submit" name="status" value="processing" class="btn btn-success w-100 mb-2">Accept Order (Processing)</button>
                     @elseif ($order->status === 'processing')
-                    <button type="submit" name="status" value="shipped" class="btn btn-primary w-100 mb-2">Ship Order</button>
+                    <button type="button" id="shipOrderBtn" class="btn btn-primary w-100 mb-2">Ship Order</button>
                     @elseif ($order->status === 'shipped')
                     <button type="submit" name="status" value="delivered" class="btn btn-success w-100 mb-2">Mark Delivered</button>
                     @endif
@@ -190,8 +190,107 @@
                     {{ $order->shipping_address['city'] ?? '' }}, {{ $order->shipping_address['pincode'] ?? '' }}<br>
                     {{ $order->shipping_address['state'] ?? '' }}
                 </p>
+                <hr>
+                <p><strong>Billing Address:</strong><br>
+                    @if(empty($order->billing_address) || (isset($order->billing_address['name']) && $order->billing_address == $order->shipping_address))
+                        <span class="text-muted small">Same as shipping address</span>
+                    @else
+                        {{ $order->billing_address['name'] ?? '' }}<br>
+                        @if(!empty($order->billing_address['door_number'])){{ $order->billing_address['door_number'] }}, @endif{{ $order->billing_address['address'] ?? '' }}<br>
+                        {{ $order->billing_address['city'] ?? '' }}, {{ $order->billing_address['pincode'] ?? '' }}<br>
+                        {{ $order->billing_address['state'] ?? '' }}
+                    @endif
+                </p>
+                @if($order->tracking_number)
+                <hr>
+                <p class="mb-0"><strong>Tracking Info:</strong><br>
+                    <strong>ID:</strong> {{ $order->tracking_number }}<br>
+                    @if($order->tracking_link)
+                    <strong>Link:</strong> <a href="{{ $order->tracking_link }}" target="_blank" style="display:inline; background-color:transparent; color:#0d6efd !important; padding:0; font-size:inherit; font-weight:normal; text-decoration:underline !important;">{{ $order->tracking_link }}</a>
+                    @endif
+                </p>
+                @endif
             </div>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const shipBtn = document.getElementById('shipOrderBtn');
+    if (shipBtn) {
+        shipBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Ship Order',
+                html: `
+                    <div class="text-start mb-3">
+                        <label for="swal-tracking-id" class="form-label fw-bold">Tracking ID / Number (Required)</label>
+                        <input type="text" id="swal-tracking-id" class="form-control" placeholder="Enter tracking ID/number">
+                    </div>
+                    <div class="text-start">
+                        <label for="swal-tracking-link" class="form-label fw-bold">Tracking Link (Optional)</label>
+                        <input type="text" id="swal-tracking-link" class="form-control" placeholder="Enter tracking URL or details">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#134e5e',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Confirm Shipment',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const trackingId = document.getElementById('swal-tracking-id').value.trim();
+                    const trackingLink = document.getElementById('swal-tracking-link').value.trim();
+                    if (!trackingId) {
+                        Swal.showValidationMessage('Tracking ID is required');
+                        return false;
+                    }
+                    return { tracking_number: trackingId, tracking_link: trackingLink };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = "{{ route('admin.orders.updateStatus', $order) }}";
+                    
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = "{{ csrf_token() }}";
+                    form.appendChild(csrfToken);
+                    
+                    const methodField = document.createElement('input');
+                    methodField.type = 'hidden';
+                    methodField.name = '_method';
+                    methodField.value = 'PATCH';
+                    form.appendChild(methodField);
+                    
+                    const statusField = document.createElement('input');
+                    statusField.type = 'hidden';
+                    statusField.name = 'status';
+                    statusField.value = 'shipped';
+                    form.appendChild(statusField);
+                    
+                    const trackingIdField = document.createElement('input');
+                    trackingIdField.type = 'hidden';
+                    trackingIdField.name = 'tracking_number';
+                    trackingIdField.value = result.value.tracking_number;
+                    form.appendChild(trackingIdField);
+                    
+                    const trackingLinkField = document.createElement('input');
+                    trackingLinkField.type = 'hidden';
+                    trackingLinkField.name = 'tracking_link';
+                    trackingLinkField.value = result.value.tracking_link;
+                    form.appendChild(trackingLinkField);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
+    }
+});
+</script>
+@endpush
 @endsection

@@ -112,6 +112,7 @@ class PaymentController extends Controller
                     'order_number' => 'PLW-' . strtoupper(uniqid()),
                     'user_id' => $transaction->user_id,
                     'shipping_address' => $checkoutData['shipping_address'] ?? [],
+                    'billing_address' => $checkoutData['billing_address'] ?? $checkoutData['shipping_address'] ?? [],
                     'subtotal' => $checkoutData['subtotal'] ?? 0,
                     'shipping' => $checkoutData['shipping'] ?? 0,
                     'tax' => $checkoutData['tax'] ?? 0,
@@ -168,6 +169,8 @@ class PaymentController extends Controller
                 try {
                     Cart::where('user_id', $transaction->user_id)->delete();
                     session()->forget('shipping_address');
+                    session()->forget('billing_address');
+                    session()->forget('billing_same');
                     session()->forget('coupon_code');
                     session(['cart_count' => 0]);
                 } catch (Exception $e) {

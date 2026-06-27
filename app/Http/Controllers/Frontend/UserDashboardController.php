@@ -256,8 +256,12 @@ class UserDashboardController extends Controller
 
         $order->load(['items.product', 'items.comboPack', 'couponUsage.coupon']);
 
-        $shippingAddress = $order->shipping_address;
         $gstSettings = \App\Models\HeaderFooter::first();
+
+        $billingAddress = $order->billing_address;
+        if (empty($billingAddress) || !isset($billingAddress['name'])) {
+            $billingAddress = $order->shipping_address;
+        }
 
         $data = [
             'invoice_number'   => $order->order_number,
@@ -268,10 +272,10 @@ class UserDashboardController extends Controller
             'store_address'    => $gstSettings->address ?? 'Plantsware Admin, Tamil Nadu',
             'store_email'      => $gstSettings->email ?? 'support@plantsware.in',
             'store_phone'      => $gstSettings->mobile_no ?? '+91 98765 43210',
-            'customer_name'    => ($shippingAddress['name'] ?? ($user->name ?? 'Guest')),
+            'customer_name'    => ($billingAddress['name'] ?? ($user->name ?? 'Guest')),
             'customer_email'   => $user->email ?? 'N/A',
-            'customer_phone'   => ($shippingAddress['phone'] ?? 'N/A'),
-            'customer_address' => $shippingAddress,
+            'customer_phone'   => ($billingAddress['phone'] ?? 'N/A'),
+            'customer_address' => $billingAddress,
             'order_items'      => $order->items,
             'subtotal'         => $order->subtotal,
             'discount_amount'  => $order->discount,

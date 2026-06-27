@@ -96,8 +96,8 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6" id="maxDiscountContainer">
-                                <label for="max_discount" class="form-label fw-bold">Max Discount Amount (₹)</label>
-                                <input type="number" step="0.01" name="max_discount" id="max_discount" class="form-control" placeholder="Max Deduction Limit" value="{{ old('max_discount') }}" min="0">
+                                <label for="max_discount" class="form-label fw-bold">Discount Deduction Limit (₹)</label>
+                                <input type="number" step="0.01" name="max_discount" id="max_discount" class="form-control" placeholder="Deduction Limit" value="{{ old('max_discount') }}" min="0">
                             </div>
                             <div class="col-md-6">
                                 <label for="minimum_order_amount" class="form-label fw-bold">Min Order Amount (₹)</label>

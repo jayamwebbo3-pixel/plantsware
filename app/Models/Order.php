@@ -13,6 +13,7 @@ class Order extends Model
         'order_number',
         'user_id',
         'shipping_address',
+        'billing_address',
         'subtotal',
         'shipping',
         'tax',
@@ -30,7 +31,9 @@ class Order extends Model
         'return_requested_at',
         'return_reason',
         'return_rejection_reason',
-        'return_images'
+        'return_images',
+        'tracking_number',
+        'tracking_link'
     ];
 
     protected static function boot()
@@ -57,6 +60,7 @@ class Order extends Model
 
     protected $casts = [
         'shipping_address' => 'array',
+        'billing_address' => 'array',
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
         'return_requested_at' => 'datetime',

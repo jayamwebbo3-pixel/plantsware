@@ -92,6 +92,33 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Billing Address Card -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                        <h6 class="fw-bold mb-0 text-muted"><i class="fas fa-file-invoice me-2 text-custom"></i> Billing Address</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        @if(empty($order->billing_address) || (isset($order->billing_address['name']) && $order->billing_address == $order->shipping_address))
+                            <p class="small text-muted mb-0">
+                                <i class="fas fa-check-circle text-success me-1"></i> Same as shipping address
+                            </p>
+                        @else
+                            <h6 class="fw-bold text-dark mb-2">{{ $order->billing_address['name'] ?? '' }}</h6>
+                            <p class="small text-muted mb-3 lh-base">
+                                @if(!empty($order->billing_address['door_number'])){{ $order->billing_address['door_number'] }}, @endif
+                                @if(!empty($order->billing_address['street'])){{ $order->billing_address['street'] }}, @endif
+                                {{ $order->billing_address['address'] ?? '' }}<br>
+                                {{ $order->billing_address['city'] ?? '' }}@if(!empty($order->billing_address['district'])), {{ $order->billing_address['district'] }}@endif, 
+                                {{ $order->billing_address['state'] ?? '' }} {{ $order->billing_address['pincode'] ?? '' }}
+                            </p>
+                            <div class="pt-3 border-top d-flex align-items-center">
+                                <i class="fas fa-phone-alt me-2 text-custom small"></i>
+                                <span class="small text-muted fw-bold">{{ $order->billing_address['phone'] ?? 'N/A' }}</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
 
             <!-- Right Items Column -->

@@ -165,6 +165,88 @@
                                         </div>
                                         @error('phone') <div class="text-danger extra-small ms-1">{{ $message }}</div> @enderror
                                     </div>
+
+                                    <!-- Billing address same as shipping checkbox -->
+                                    <div class="col-12 mt-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="billing_same" id="billing_same" value="1" {{ old('billing_same', $billingSame ?? true) ? 'checked' : '' }}>
+                                            <label class="form-check-label text-dark fw-bold small" for="billing_same">
+                                                Billing address is same as shipping address
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Collapsible Billing Details -->
+                                    <div id="billing-address-section" style="display: none;" class="col-12 mt-3 pt-3 border-top">
+                                        <h5 class="mb-3 fw-bold d-flex align-items-center text-dark">
+                                            <i class="fas fa-file-invoice text-success me-2"></i> Billing Details
+                                        </h5>
+                                        <div class="row g-3">
+                                            <!-- Billing Full Name -->
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    <label for="billing_name" class="form-label text-dark fw-bold small">Full Name <span class="text-danger">*</span></label>
+                                                    <input type="text" name="billing_name" id="billing_name" class="form-control @error('billing_name') is-invalid @enderror"
+                                                        placeholder="Enter billing full name" value="{{ old('billing_name', $savedAddress['billing_name'] ?? '') }}">
+                                                </div>
+                                                @error('billing_name') <div class="text-danger extra-small ms-1">{{ $message }}</div> @enderror
+                                            </div>
+
+                                            <!-- Billing Door Number & Street -->
+                                            <div class="col-md-5">
+                                                <div class="mb-3">
+                                                    <label for="billing_door_number" class="form-label text-dark fw-bold small">Door / Block No.</label>
+                                                    <input type="text" name="billing_door_number" id="billing_door_number" class="form-control @error('billing_door_number') is-invalid @enderror"
+                                                        placeholder="e.g. 12A" value="{{ old('billing_door_number', $savedAddress['billing_door_number'] ?? '') }}">
+                                                </div>
+                                                @error('billing_door_number') <div class="text-danger extra-small ms-1">{{ $message }}</div> @enderror
+                                            </div>
+                                            <div class="col-md-7">
+                                                <div class="mb-3">
+                                                    <label for="billing_address" class="form-label text-dark fw-bold small">Street / Road Name <span class="text-danger">*</span></label>
+                                                    <input type="text" name="billing_address" id="billing_address" class="form-control @error('billing_address') is-invalid @enderror"
+                                                        placeholder="Enter street or area name" value="{{ old('billing_address', $savedAddress['billing_address'] ?? '') }}">
+                                                </div>
+                                                @error('billing_address') <div class="text-danger extra-small ms-1">{{ $message }}</div> @enderror
+                                            </div>
+
+                                            <!-- Billing City, State, Pincode -->
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="billing_city" class="form-label text-dark fw-bold small">City / Town <span class="text-danger">*</span></label>
+                                                    <input type="text" name="billing_city" id="billing_city" class="form-control @error('billing_city') is-invalid @enderror"
+                                                        placeholder="City" value="{{ old('billing_city', $savedAddress['billing_city'] ?? '') }}">
+                                                </div>
+                                                @error('billing_city') <div class="text-danger extra-small ms-1">{{ $message }}</div> @enderror
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="billing_state" class="form-label text-dark fw-bold small">State <span class="text-danger">*</span></label>
+                                                    <input type="text" name="billing_state" id="billing_state" class="form-control @error('billing_state') is-invalid @enderror"
+                                                        placeholder="State name" value="{{ old('billing_state', $savedAddress['billing_state'] ?? '') }}">
+                                                </div>
+                                                @error('billing_state') <div class="text-danger extra-small ms-1">{{ $message }}</div> @enderror
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="billing_pincode" class="form-label text-dark fw-bold small">Pincode <span class="text-danger">*</span></label>
+                                                    <input type="text" name="billing_pincode" id="billing_pincode" class="form-control @error('billing_pincode') is-invalid @enderror"
+                                                        placeholder="6-digit PIN code" value="{{ old('billing_pincode', $savedAddress['billing_pincode'] ?? '') }}">
+                                                </div>
+                                                @error('billing_pincode') <div class="text-danger extra-small ms-1">{{ $message }}</div> @enderror
+                                            </div>
+
+                                            <!-- Billing Phone Number -->
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    <label for="billing_phone" class="form-label text-dark fw-bold small">Phone Number <span class="text-danger">*</span></label>
+                                                    <input type="tel" name="billing_phone" id="billing_phone" class="form-control @error('billing_phone') is-invalid @enderror"
+                                                        placeholder="10-digit mobile number" value="{{ old('billing_phone', $savedAddress['billing_phone'] ?? '') }}">
+                                                </div>
+                                                @error('billing_phone') <div class="text-danger extra-small ms-1">{{ $message }}</div> @enderror
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="checkout-actions d-flex flex-column flex-md-row justify-content-between mt-4 border-top pt-4 gap-3 px-3 px-md-4">
@@ -173,7 +255,7 @@
                                         <span class="d-none d-lg-inline">Back to Cart</span>
                                         <span class="d-inline d-lg-none">Back</span>
                                     </a>
-                                    <button type="submit" class="btn-checkout-primary order-1 order-md-2">
+                                    <button type="submit" class="btn-checkout-primary order-1 order-md-2" style="font-size: 15px;">
                                         <span class="d-none d-lg-inline">CONTINUE TO PAYMENT</span>
                                         <span class="d-inline d-lg-none">CONTINUE</span>
                                         <i class="fas fa-arrow-right ms-2"></i>
@@ -191,8 +273,8 @@
                 <div class="sticky-top" style="top: 100px; z-index: 10;">
                     @if($cartItems && $cartItems->isNotEmpty())
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                        <div class="card-header bg-light text-dark py-3">
-                            <h6 class="mb-0 fw-bold text-center">ORDER SUMMARY</h6>
+                        <div class="card-header py-3" style="background-color: var(--secondary-color, #2b6139) !important; color: #ffffff !important;">
+                            <h6 class="mb-0 fw-bold text-center text-white" style="color: #ffffff !important;">ORDER SUMMARY</h6>
                         </div>
                         <div class="card-body p-0">
                             <div class="cart-items-preview" style="max-height: 300px; overflow-y: auto;">
@@ -541,6 +623,26 @@
 </style>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const billingSame = document.getElementById('billing_same');
+        const billingSection = document.getElementById('billing-address-section');
+        const billingInputs = billingSection.querySelectorAll('input:not(#billing_door_number)');
+
+        function toggleBillingSection() {
+            if (billingSame.checked) {
+                billingSection.style.display = 'none';
+                billingInputs.forEach(input => input.removeAttribute('required'));
+            } else {
+                billingSection.style.display = 'block';
+                billingInputs.forEach(input => input.setAttribute('required', 'required'));
+            }
+        }
+
+        if (billingSame) {
+            billingSame.addEventListener('change', toggleBillingSection);
+            toggleBillingSection(); // Run on load
+        }
+    });
     function resetAndFocusForm() {
         // Clear the hidden ID
         document.getElementById('address_id').value = '';
@@ -552,8 +654,21 @@
         // Manually clear if needed (sometimes reset doesn't hit everything in complex forms)
         const inputs = form.querySelectorAll('input');
         inputs.forEach(input => {
-            if (input.name !== '_token') input.value = '';
+            if (input.name !== '_token' && input.name !== 'billing_same') {
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            }
         });
+
+        // Set billing_same checkbox back to true and trigger change event to hide section
+        const billingSame = document.getElementById('billing_same');
+        if (billingSame) {
+            billingSame.checked = true;
+            billingSame.dispatchEvent(new Event('change'));
+        }
 
         // Remove selection from all cards
         document.querySelectorAll('.saved-address-card').forEach(card => {
@@ -598,45 +713,8 @@
         }
     }
 
-    function removeFromCartSummary(itemId) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You want to remove this item from your order?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#72a420",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, remove it!",
-            cancelButtonText: "Keep it"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Create a temporary form to send DELETE request
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = "{{ url('cart/remove') }}/" + itemId + "?redirect=checkout";
-                
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = "{{ csrf_token() }}";
-                
-                const methodField = document.createElement('input');
-                methodField.type = 'hidden';
-                methodField.name = '_method';
-                methodField.value = 'DELETE';
-                
-                form.appendChild(csrfToken);
-                form.appendChild(methodField);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-</script>
-
-<script>
 async function removeFromCartSummary(itemId) {
-    const { value: confirmed } = await Swal.fire({
+    const result = await Swal.fire({
         title: 'Remove Item?',
         text: 'Are you sure you want to remove this item from your order?',
         icon: 'warning',
@@ -647,7 +725,7 @@ async function removeFromCartSummary(itemId) {
         cancelButtonText: 'Cancel'
     });
 
-    if (confirmed) {
+    if (result.isConfirmed) {
         try {
             const response = await fetch(`${window.APP_URL}/cart/remove/${itemId}`, {
                 method: 'DELETE',
@@ -661,7 +739,39 @@ async function removeFromCartSummary(itemId) {
             
             const data = await response.json();
             if (data.success) {
-                window.location.reload();
+                // If cart is now empty, redirect to cart page
+                if (data.cart_count === 0) {
+                    window.location.href = "{{ route('cart.index') }}";
+                    return;
+                }
+
+                // Fetch the updated page in the background
+                const pageResponse = await fetch(window.location.href);
+                const pageHtml = await pageResponse.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(pageHtml, 'text/html');
+
+                // Swap the order summary card body (sticky summary)
+                const oldSummary = document.querySelector('.sticky-top');
+                const newSummary = doc.querySelector('.sticky-top');
+                if (oldSummary && newSummary) {
+                    oldSummary.innerHTML = newSummary.innerHTML;
+                }
+
+                // Update cart count badge in header
+                document.querySelectorAll('.cart-icon-link .price_cart').forEach(el => el.textContent = data.cart_count);
+                document.querySelectorAll('.cart-icon-link .sticky-badge').forEach(el => el.textContent = data.cart_count);
+
+                // Show success toast
+                Swal.fire({
+                    icon: 'success',
+                    title: data.message || 'Item removed',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
             } else {
                 Swal.fire('Error', data.message || 'Failed to remove item', 'error');
             }

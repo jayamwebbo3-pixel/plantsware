@@ -11,32 +11,67 @@
     @stack('styles')
     <style>
         .sidebar {
-            min-height: 100vh;
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
             background: linear-gradient(135deg, #134e5e, #71b280);
             color: white;
-            padding: 20px 0;
+            padding: 24px 12px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 12px 20px;
-            margin: 5px 10px;
+            color: rgba(255, 255, 255, 0.75) !important;
+            padding: 12px 18px;
+            margin: 6px 8px;
             border-radius: 8px;
+            white-space: nowrap;
+            font-size: 15.0px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: block;
         }
 
-        .sidebar .nav-link:hover,
+        .sidebar .nav-link i:first-child {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff !important;
+            transform: translateX(4px);
+        }
+
         .sidebar .nav-link.active {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
+            background: rgba(255, 255, 255, 0.18) !important;
+            color: #fff !important;
+            font-weight: 600;
+        }
+
+        .main-wrapper {
+            margin-left: 280px;
+            min-height: 100vh;
+            background-color: #f8f9fa;
         }
 
         .main-content {
-            padding: 20px;
+            padding: 24px;
         }
 
         .navbar {
             background: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid #eef2f5;
+            padding: 16px 24px;
         }
 
         .btn-primary {
@@ -81,29 +116,50 @@
             transition: 0.3s ease;
         }
 
-        /* .text-decoration-none:hover {
-            background-color: #0b5ed7;
-            color: #fff !important;
-        } */
-
         .btn {
             padding: 5px 10px;
             font-size: 12px;
             border-radius: 20px;
             font-weight: 400;
         }
+
+        /* Mobile Responsive Sidebar */
+        @media (max-width: 991px) {
+            .sidebar {
+                width: 70px;
+                padding: 20px 4px;
+            }
+            .sidebar .nav-link {
+                padding: 12px 0;
+                margin: 6px 4px;
+                text-align: center;
+            }
+            .sidebar .nav-link span,
+            .sidebar .nav-link i.fa-chevron-down {
+                display: none !important;
+            }
+            .sidebar .nav-link i:first-child {
+                margin-right: 0;
+                font-size: 18px;
+            }
+            .sidebar .text-center {
+                display: none !important;
+            }
+            .main-wrapper {
+                margin-left: 70px;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 sidebar">
-                <div class="text-center mb-4">
-                    @php $headerFooter = \App\Models\HeaderFooter::first(); @endphp
-                    <img src="{{ asset('assets/images/logo-1.png') }}" alt="Plantly Logo" style="background-color: #fff; border: 1px solid #bd1313ff; border-radius: 10px; margin-bottom: 15px;height: 15vh;width: 15vw;object-fit: cover;">
-                </div>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="text-center mb-4 pb-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;">
+            <div class="bg-white rounded-3 p-2 d-inline-block shadow-sm" style="width: 85%; max-width: 180px;">
+                <img src="{{ asset('assets/images/logo-1.png') }}" alt="Plantsware Logo" style="max-height: 55px; width: 100%; object-fit: contain;">
+            </div>
+        </div>
                 <nav class="nav flex-column">
                     <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
                         <i class="fas fa-tachometer-alt"></i> Dashboard
@@ -201,50 +257,46 @@
                         </button>
                     </form>
                 </nav>
-            </div>
+    </div>
 
-            <!-- Main Content -->
-            <div class="col-md-10">
-                <nav class="navbar navbar-light bg-white mb-3">
-                    <div class="container-fluid">
-                        <span class="navbar-brand mb-0 h1">@yield('title', 'Dashboard')</span>
-                        <div class="dropdown ms-auto">
-                            <button class="btn btn-light dropdown-toggle d-flex align-items-center rounded-pill px-3 shadow-sm border-0" type="button" id="adminUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle me-2 text-primary fs-5"></i>
-                                <span class="fw-semibold text-dark">{{ auth()->guard('admin')->user()->name ?? 'Admin' }}</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 py-2" aria-labelledby="adminUserDropdown">
-                                <li>
-                                    <h6 class="dropdown-header small text-muted text-uppercase fw-bold pb-2">Admin Profile</h6>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item py-2 px-3" href="{{ route('admin.profile.edit') }}">
-                                        <i class="fas fa-user-gear me-2 text-info opacity-75"></i> Manage Account
-                                    </a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider opacity-25">
-                                </li>
-                                <li>
-                                    <form method="POST" action="{{ route('admin.logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item py-2 px-3 text-danger">
-                                            <i class="fas fa-sign-out-alt me-2 opacity-75"></i> Sign Out
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </nav>
-
-                <div class="main-content">
-                    @yield('content')
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <nav class="navbar navbar-light bg-white mb-3">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1">@yield('title', 'Dashboard')</span>
+                <div class="dropdown ms-auto">
+                    <button class="btn btn-light dropdown-toggle d-flex align-items-center rounded-pill px-3 shadow-sm border-0" type="button" id="adminUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle me-2 text-primary fs-5"></i>
+                        <span class="fw-semibold text-dark">{{ auth()->guard('admin')->user()->name ?? 'Admin' }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 py-2" aria-labelledby="adminUserDropdown">
+                        <li>
+                            <h6 class="dropdown-header small text-muted text-uppercase fw-bold pb-2">Admin Profile</h6>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 px-3" href="{{ route('admin.profile.edit') }}">
+                                <i class="fas fa-user-gear me-2 text-info opacity-75"></i> Manage Account
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider opacity-25">
+                        </li>
+                        <li>
+                            <form method="POST" action="{{ route('admin.logout') }}">
+                                @csrf
+                                <button type="submit" class="dropdown-item py-2 px-3 text-danger">
+                                    <i class="fas fa-sign-out-alt me-2 opacity-75"></i> Sign Out
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
+        </nav>
+
+        <div class="main-content">
+            @yield('content')
         </div>
-    </div>
-    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

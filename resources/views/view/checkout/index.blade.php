@@ -16,27 +16,65 @@
             <div class="col-lg-8">
                 <div class="checkout-main-content">
 
-                    <!-- Shipping Address Card -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
-                        <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 fw-bold d-flex align-items-center">
-                                <i class="fas fa-shipping-fast text-success me-2"></i> Shipping Address
-                            </h5>
-                            <div class="align-self-start align-self-sm-center">
-                                <a href="{{ route('checkout.address') }}" class="btn btn-success btn-xs-comp rounded-pill px-3 shadow-sm">
-                                    <i class="fas fa-edit me-1"></i> Change
-                                </a>
+                    <!-- Address Info Row -->
+                    <div class="row g-4 mb-4">
+                        <!-- Shipping Address Column -->
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                                <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 fw-bold d-flex align-items-center">
+                                        <i class="fas fa-shipping-fast text-success me-2"></i> Shipping Address
+                                    </h5>
+                                    <div>
+                                        <a href="{{ route('checkout.address') }}" class="btn btn-success btn-xs-comp rounded-pill px-3 shadow-sm">
+                                            <i class="fas fa-edit me-1"></i> Change
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body pt-0">
+                                    <div class="shipping-info-box p-3 rounded-3 bg-light border h-100">
+                                        <div class="address-details">
+                                            <h6 class="fw-bold mb-1">{{ $shippingAddress['name'] }}</h6>
+                                            <p class="text-muted mb-0 small line-height-base">
+                                                @if(!empty($shippingAddress['door_number'])){{ $shippingAddress['door_number'] }}, @endif{{ $shippingAddress['address'] }}<br>
+                                                {{ $shippingAddress['city'] }}, {{ $shippingAddress['state'] }} - {{ $shippingAddress['pincode'] }}<br>
+                                                <span class="text-dark fw-medium mt-1 d-block"><i class="fas fa-phone-alt me-1 small"></i> {{ $shippingAddress['phone'] }}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-body pt-0">
-                            <div class="shipping-info-box p-3 rounded-3 bg-light border">
-                                <div class="address-details">
-                                    <h6 class="fw-bold mb-1">{{ $shippingAddress['name'] }}</h6>
-                                    <p class="text-muted mb-0 small line-height-base">
-                                        @if(!empty($shippingAddress['door_number'])){{ $shippingAddress['door_number'] }}, @endif{{ $shippingAddress['address'] }}<br>
-                                        {{ $shippingAddress['city'] }}, {{ $shippingAddress['state'] }} - {{ $shippingAddress['pincode'] }}<br>
-                                        <span class="text-dark fw-medium mt-1 d-block"><i class="fas fa-phone-alt me-1 small"></i> {{ $shippingAddress['phone'] }}</span>
-                                    </p>
+                        <!-- Billing Address Column -->
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                                <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 fw-bold d-flex align-items-center">
+                                        <i class="fas fa-file-invoice text-success me-2"></i> Billing Address
+                                    </h5>
+                                    <div>
+                                        <a href="{{ route('checkout.address') }}" class="btn btn-success btn-xs-comp rounded-pill px-3 shadow-sm">
+                                            <i class="fas fa-edit me-1"></i> Change
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body pt-0">
+                                    <div class="shipping-info-box p-3 rounded-3 bg-light border h-100">
+                                        <div class="address-details">
+                                            @if($billingSame)
+                                                <p class="text-muted mb-0 small py-3 text-center">
+                                                    <i class="fas fa-check-circle text-success me-1"></i> Same as shipping address
+                                                </p>
+                                            @else
+                                                <h6 class="fw-bold mb-1">{{ $billingAddress['name'] ?? '' }}</h6>
+                                                <p class="text-muted mb-0 small line-height-base">
+                                                    @if(!empty($billingAddress['door_number'])){{ $billingAddress['door_number'] }}, @endif{{ $billingAddress['address'] ?? '' }}<br>
+                                                    {{ $billingAddress['city'] ?? '' }}, {{ $billingAddress['state'] ?? '' }} - {{ $billingAddress['pincode'] ?? '' }}<br>
+                                                    <span class="text-dark fw-medium mt-1 d-block"><i class="fas fa-phone-alt me-1 small"></i> {{ $billingAddress['phone'] ?? '' }}</span>
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -202,50 +240,10 @@
                         </div>
                     </div>
 
-                    <!-- Payment Method Card (Step 3) -->
+                    <!-- Payment Method Form -->
                     <form action="{{ route('checkout.placeOrder') }}" method="POST" id="checkout-form">
                         @csrf
-                        <div class="card border-0 shadow-sm rounded-4 mb-4">
-                            <div class="card-header bg-white py-3 border-bottom-0">
-                                <h5 class="mb-0 fw-bold d-flex align-items-center">
-                                    <i class="fas fa-credit-card text-success me-2"></i> Payment Method
-                                </h5>
-                            </div>
-                            <div class="card-body pt-0">
-                                <div class="payment-selection-modern">
-                                    <div class="payment-option-modern active">
-                                        <input type="radio" name="payment_method" value="online" id="pay_online" checked class="d-none">
-                                        <label for="pay_online" class="w-100 cursor-pointer">
-                                            <div class="d-flex align-items-center p-3 border rounded-3 position-relative transition-all payment-card-inner">
-                                                <div class="payment-icon-circle me-3">
-                                                    <i class="fas fa-shield-alt text-success"></i>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <div class="fw-bold text-dark">Secure Online Payment</div>
-                                                    <div class="small text-success fw-medium">Zero Transaction fee • Instant Confirmation</div>
-                                                </div>
-                                                <div class="check-icon">
-                                                    <i class="fas fa-check-circle text-success fs-4"></i>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-
-                                    <div class="accepted-cards-container mt-4 p-3 rounded-3 bg-light border-dashed">
-                                        <div class="text-center mb-3">
-                                            <span class="text-muted small fw-medium">We accept all major payment modes</span>
-                                        </div>
-                                        <div class="d-flex flex-wrap justify-content-center align-items-center gap-4 payment-icons-row">
-                                            <img src="/assets/images/visa.png" alt="Visa" class="payment-brand-img" title="Visa">
-                                            <img src="/assets/images/rupay.png" alt="RuPay" class="payment-brand-img" title="RuPay">
-                                            <img src="/assets/images/gpay.png" alt="Google Pay" class="payment-brand-img" title="Google Pay">
-                                            <img src="/assets/images/paytm.png" alt="Paytm" class="payment-brand-img" title="Paytm">
-                                            <img src="/assets/images/upi.png" alt="UPI" class="payment-brand-img" title="UPI">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <input type="hidden" name="payment_method" value="online">
 
                         <!-- Mobile Submit Button (Sticky Bottom) - Hidden on Desktop -->
                         <div class="d-lg-none sticky-bottom bg-white p-3 border-top shadow-lg-reverse">
@@ -267,8 +265,8 @@
             <div class="col-lg-4">
                 <div class="sticky-top" style="top: 100px; z-index: 10;">
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                        <div class="card-header bg-light text-dark py-3">
-                            <h6 class="mb-0 fw-bold text-center">ORDER SUMMARY</h6>
+                        <div class="card-header py-3" style="background-color: var(--secondary-color, #2b6139) !important; color: #ffffff !important;">
+                            <h6 class="mb-0 fw-bold text-center text-white" style="color: #ffffff !important;">ORDER SUMMARY</h6>
                         </div>
                          <div class="card-body p-4">
                             <div class="summary-line d-flex justify-content-between mb-2">
@@ -334,15 +332,15 @@
                                 <span class="h4 mb-0 fw-bold text-success">₹{{ number_format($total, 2) }}</span>
                             </div>
 
-                            <button type="submit" form="checkout-form" class="btn btn-success btn-lg w-100 rounded-pill fw-bold py-2-5 shadow-success-hover d-none d-lg-block">
+                            <button type="submit" form="checkout-form" class="btn btn-success btn-lg w-100 rounded-pill fw-bold py-2-5 shadow-success-hover d-none d-lg-block" style="font-size: 15px;">
                                 SECURE CHECKOUT <i class="fas fa-lock ms-2"></i>
                             </button>
 
-                            <div class="mt-4 text-center">
+                            <!-- <div class="mt-4 text-center">
                                 <div class="text-muted extra-small mb-2 d-flex align-items-center justify-content-center">
                                     <i class="fas fa-shield-alt text-success me-2"></i> 256-bit Secure Encryption
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -555,45 +553,8 @@
 </style>
 
 <script>
-    function removeFromCartSummary(itemId) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You want to remove this item from your order?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#72a420",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, remove it!",
-            cancelButtonText: "Keep it"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Create a temporary form to send DELETE request
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = "{{ url('cart/remove') }}/" + itemId + "?redirect=checkout";
-                
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = "{{ csrf_token() }}";
-                
-                const methodField = document.createElement('input');
-                methodField.type = 'hidden';
-                methodField.name = '_method';
-                methodField.value = 'DELETE';
-                
-                form.appendChild(csrfToken);
-                form.appendChild(methodField);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-</script>
-
-<script>
 async function removeFromCartSummary(itemId) {
-    const { value: confirmed } = await Swal.fire({
+    const result = await Swal.fire({
         title: 'Remove Item?',
         text: 'Are you sure you want to remove this item from your order?',
         icon: 'warning',
@@ -604,7 +565,7 @@ async function removeFromCartSummary(itemId) {
         cancelButtonText: 'Cancel'
     });
 
-    if (confirmed) {
+    if (result.isConfirmed) {
         try {
             const response = await fetch(`${window.APP_URL}/cart/remove/${itemId}`, {
                 method: 'DELETE',
@@ -618,7 +579,53 @@ async function removeFromCartSummary(itemId) {
             
             const data = await response.json();
             if (data.success) {
-                window.location.reload();
+                // If cart is now empty, redirect to cart page
+                if (data.cart_count === 0) {
+                    window.location.href = "{{ route('cart.index') }}";
+                    return;
+                }
+
+                // Fetch the updated checkout page in the background
+                const pageResponse = await fetch(window.location.href);
+                const pageHtml = await pageResponse.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(pageHtml, 'text/html');
+
+                // Swap the items table
+                const oldTable = document.querySelector('.table-responsive');
+                const newTable = doc.querySelector('.table-responsive');
+                if (oldTable && newTable) {
+                    oldTable.innerHTML = newTable.innerHTML;
+                }
+
+                // Swap the order summary card body
+                const oldSummary = document.querySelector('.sticky-top');
+                const newSummary = doc.querySelector('.sticky-top');
+                if (oldSummary && newSummary) {
+                    oldSummary.innerHTML = newSummary.innerHTML;
+                }
+
+                // Swap the mobile sticky bottom bar
+                const oldStickyBottom = document.querySelector('.sticky-bottom');
+                const newStickyBottom = doc.querySelector('.sticky-bottom');
+                if (oldStickyBottom && newStickyBottom) {
+                    oldStickyBottom.innerHTML = newStickyBottom.innerHTML;
+                }
+
+                // Update cart count badge in header
+                document.querySelectorAll('.cart-icon-link .price_cart').forEach(el => el.textContent = data.cart_count);
+                document.querySelectorAll('.cart-icon-link .sticky-badge').forEach(el => el.textContent = data.cart_count);
+
+                // Show success toast
+                Swal.fire({
+                    icon: 'success',
+                    title: data.message || 'Item removed',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
             } else {
                 Swal.fire('Error', data.message || 'Failed to remove item', 'error');
             }

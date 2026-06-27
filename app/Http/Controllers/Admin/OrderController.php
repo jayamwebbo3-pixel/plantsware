@@ -41,7 +41,11 @@ class OrderController extends Controller
 
         // Filter by status
         if ($status && in_array($status, ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned', 'return_requested', 'return_rejected', 'completed'])) {
-            $query->where('status', $status);
+            if (in_array($status, ['confirmed', 'processing', 'shipped', 'delivered', 'returned', 'return_requested', 'return_rejected', 'completed'])) {
+                $query->where('status', $status)->where('payment_status', 'paid');
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         // Sort by latest
@@ -53,14 +57,14 @@ class OrderController extends Controller
         $stats = [
             'total' => Order::count(),
             'pending' => Order::where('status', 'pending')->count(),
-            'confirmed' => Order::where('status', 'confirmed')->count(),
-            'processing' => Order::where('status', 'processing')->count(),
-            'shipped' => Order::where('status', 'shipped')->count(),
-            'delivered' => Order::where('status', 'delivered')->count(),
+            'confirmed' => Order::where('status', 'confirmed')->where('payment_status', 'paid')->count(),
+            'processing' => Order::where('status', 'processing')->where('payment_status', 'paid')->count(),
+            'shipped' => Order::where('status', 'shipped')->where('payment_status', 'paid')->count(),
+            'delivered' => Order::where('status', 'delivered')->where('payment_status', 'paid')->count(),
             'cancelled' => Order::where('status', 'cancelled')->count(),
-            'returned' => Order::where('status', 'returned')->count(),
-            'return_requested' => Order::where('status', 'return_requested')->count(),
-            'return_rejected' => Order::where('status', 'return_rejected')->count(),
+            'returned' => Order::where('status', 'returned')->where('payment_status', 'paid')->count(),
+            'return_requested' => Order::where('status', 'return_requested')->where('payment_status', 'paid')->count(),
+            'return_rejected' => Order::where('status', 'return_rejected')->where('payment_status', 'paid')->count(),
         ];
 
         return view('admin.orders.index', compact('orders', 'stats'));
@@ -76,13 +80,19 @@ class OrderController extends Controller
     {
         $request->validate([
             'status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled,returned,return_requested,return_rejected,completed',
-            'return_rejection_reason' => 'nullable|string'
+            'return_rejection_reason' => 'nullable|string',
+            'tracking_number' => 'nullable|required_if:status,shipped|string',
+            'tracking_link' => 'nullable|string'
         ]);
 
         $data = ['status' => $request->status];
 
-        if ($request->status === 'shipped' && !$order->shipped_at) {
-            $data['shipped_at'] = now();
+        if ($request->status === 'shipped') {
+            if (!$order->shipped_at) {
+                $data['shipped_at'] = now();
+            }
+            $data['tracking_number'] = $request->tracking_number;
+            $data['tracking_link'] = $request->tracking_link;
         }
 
         if ($request->status === 'delivered' && !$order->delivered_at) {
@@ -121,6 +131,11 @@ class OrderController extends Controller
 
         $gstSettings = \App\Models\HeaderFooter::first();
 
+        $billingAddress = $order->billing_address;
+        if (empty($billingAddress) || !isset($billingAddress['name'])) {
+            $billingAddress = $order->shipping_address;
+        }
+
         $data = [
             'invoice_number' => $order->order_number,
             'order_date' => $order->created_at->format('d/M/Y'),
@@ -130,10 +145,10 @@ class OrderController extends Controller
             'store_address' => $gstSettings->address ?? 'Plantsware Admin, Tamil Nadu',
             'store_email' => $gstSettings->email ?? 'support@plantsware.in',
             'store_phone' => $gstSettings->mobile_no ?? '+91 98765 43210',
-            'customer_name' => collect($order->shipping_address)->get('name') ?? ($order->user->name ?? 'Guest'),
+            'customer_name' => collect($billingAddress)->get('name') ?? ($order->user->name ?? 'Guest'),
             'customer_email' => $order->user->email ?? 'N/A',
-            'customer_phone' => collect($order->shipping_address)->get('phone') ?? 'N/A',
-            'customer_address' => $order->shipping_address,
+            'customer_phone' => collect($billingAddress)->get('phone') ?? 'N/A',
+            'customer_address' => $billingAddress,
             'order_items' => $order->items,
             'subtotal' => $order->subtotal,
             'discount_amount' => $order->discount,
