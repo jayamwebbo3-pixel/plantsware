@@ -51,6 +51,7 @@
                     </div>
                     <div class="card-actions-row d-flex gap-2 align-items-stretch">
                         @if($combo->stock_quantity > 0)
+                            @auth
                             <form action="{{ route('cart.add_combo', $combo->id) }}" method="POST" class="flex-grow-1 d-flex">
                                 @csrf
                                 <input type="hidden" name="buy_now" value="1">
@@ -66,6 +67,20 @@
                                     <span class="d-inline d-xl-none">Cart</span>
                                 </button>
                             </form>
+                            @else
+                            <div class="flex-grow-1 d-flex">
+                                <a href="{{ route('login') }}" class="btn btn-primary btn-buy-now w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
+                                    <span class="d-none d-xl-inline">Buy Now</span>
+                                    <span class="d-inline d-xl-none">Buy</span>
+                                </a>
+                            </div>
+                            <div class="flex-grow-1 d-flex">
+                                <a href="{{ route('login') }}" class="btn btn-secondary btn-add-cart w-100 h-100 text-nowrap d-flex align-items-center justify-content-center">
+                                    <span class="d-none d-xl-inline">Add To Cart</span>
+                                    <span class="d-inline d-xl-none">Cart</span>
+                                </a>
+                            </div>
+                            @endauth
                         @else
                             <div class="flex-grow-1 d-flex">
                                 <button type="button" class="btn btn-secondary w-100 h-100 text-nowrap d-flex align-items-center justify-content-center" style="background-color: #f1f5f9 !important; color: #94a3b8 !important; border: 1px solid #e2e8f0 !important; cursor: not-allowed !important; font-size: 0.85rem !important; font-weight: 600 !important; border-radius: 8px !important;" disabled>
@@ -73,9 +88,15 @@
                                 </button>
                             </div>
                         @endif
+                        @auth
                         <button type="button" class="btn-wishlist-custom wishlist-btn-combo" data-id="{{ $combo->id }}">
                             <i class="fa-regular fa-heart"></i>
                         </button>
+                        @else
+                        <a href="{{ route('login') }}" class="btn-wishlist-custom d-flex align-items-center justify-content-center">
+                            <i class="fa-regular fa-heart"></i>
+                        </a>
+                        @endauth
                     </div>
                 </div>
             </div>

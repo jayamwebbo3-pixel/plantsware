@@ -238,55 +238,89 @@
                         @endif
 
                         <!-- Main Purchase Form -->
+                        @if($comboPack->stock_quantity > 0)
+                        @auth
                         <form action="{{ route('cart.add_combo', $comboPack->id) }}" method="POST" id="mainCartForm">
                             @csrf
-
-                            @if($comboPack->stock_quantity > 0)
-                                <!-- Quantity Selector and Wishlist Button Row -->
-                                <div class="d-flex align-items-center mb-4 flex-nowrap" style="gap: 15px;">
-                                    <div class="product-page-quantity-selector d-flex align-items-center mb-0 pe-2">
-                                        <label class="product-page-qty-label me-3 fw-bold text-nowrap" for="quantityInput" style="font-size: 0.95rem;">Quantity:</label>
-                                        <div class="product-page-qty-control qty-pill-control d-flex align-items-center">
-                                            <button type="button" class="qty-btn-inline border-0 bg-transparent" onclick="updateQty(-1)">
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <input type="number" id="quantityInput" name="quantity" class="product-page-qty-input border-0 text-center" value="1" min="1" readonly style="width: 40px; font-weight: 700;">
-                                            <button type="button" class="qty-btn-inline border-0 bg-transparent" onclick="updateQty(1)">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
+                            <!-- Quantity Selector and Wishlist Button Row -->
+                            <div class="d-flex align-items-center mb-4 flex-nowrap" style="gap: 15px;">
+                                <div class="product-page-quantity-selector d-flex align-items-center mb-0 pe-2">
+                                    <label class="product-page-qty-label me-3 fw-bold text-nowrap" for="quantityInput" style="font-size: 0.95rem;">Quantity:</label>
+                                    <div class="product-page-qty-control qty-pill-control d-flex align-items-center">
+                                        <button type="button" class="qty-btn-inline border-0 bg-transparent" onclick="updateQty(-1)">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" id="quantityInput" name="quantity" class="product-page-qty-input border-0 text-center" value="1" min="1" readonly style="width: 40px; font-weight: 700;">
+                                        <button type="button" class="qty-btn-inline border-0 bg-transparent" onclick="updateQty(1)">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
-
-                                    <button type="button" class="wishlist-btn wishlist-btn-combo flex-shrink-0" data-id="{{ $comboPack->id }}">
-                                        <i class="far fa-heart"></i>
-                                    </button>
                                 </div>
 
-                                <!-- Action Buttons -->
-                                <div class="product-page-action-buttons">
-                                    <button type="submit" class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 flex-grow-1">
-                                        <i class="fas fa-shopping-bag"></i>
-                                        <span class="d-none d-md-inline">Add to Cart</span>
-                                        <span class="d-inline d-md-none">Cart</span>
-                                    </button>
-                                    <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1">
-                                        <span class="d-none d-md-inline">Buy Now</span>
-                                        <span class="d-inline d-md-none">Buy</span>
-                                    </button>
-                                </div>
-                            @else
-                                <div class="d-flex align-items-center mb-4 flex-nowrap" style="gap: 15px;">
-                                    <button type="button" class="wishlist-btn wishlist-btn-combo flex-shrink-0" data-id="{{ $comboPack->id }}">
-                                        <i class="far fa-heart"></i>
-                                    </button>
-                                </div>
-                                <div class="product-page-action-buttons">
-                                    <button class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 w-100" disabled>
-                                        Out of Stock
-                                    </button>
-                                </div>
-                            @endif
+                                <button type="button" class="wishlist-btn wishlist-btn-combo flex-shrink-0" data-id="{{ $comboPack->id }}">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="product-page-action-buttons">
+                                <button type="submit" class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 flex-grow-1">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span class="d-none d-md-inline">Add to Cart</span>
+                                    <span class="d-inline d-md-none">Cart</span>
+                                </button>
+                                <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1">
+                                    <span class="d-none d-md-inline">Buy Now</span>
+                                    <span class="d-inline d-md-none">Buy</span>
+                                </button>
+                            </div>
                         </form>
+                        @else
+                        {{-- Guest: redirect all actions to login --}}
+                        <div class="d-flex align-items-center mb-4 flex-nowrap" style="gap: 15px;">
+                            <div class="product-page-quantity-selector d-flex align-items-center mb-0 pe-2">
+                                <label class="product-page-qty-label me-3 fw-bold text-nowrap" style="font-size: 0.95rem;">Quantity:</label>
+                                <div class="product-page-qty-control qty-pill-control d-flex align-items-center">
+                                    <span class="qty-btn-inline border-0 bg-transparent"><i class="fas fa-minus"></i></span>
+                                    <input type="number" class="product-page-qty-input border-0 text-center" value="1" min="1" readonly style="width: 40px; font-weight: 700;">
+                                    <span class="qty-btn-inline border-0 bg-transparent"><i class="fas fa-plus"></i></span>
+                                </div>
+                            </div>
+                            <a href="{{ route('login') }}" class="wishlist-btn flex-shrink-0 d-flex align-items-center justify-content-center">
+                                <i class="far fa-heart"></i>
+                            </a>
+                        </div>
+                        <div class="product-page-action-buttons">
+                            <a href="{{ route('login') }}" class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 flex-grow-1">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span class="d-none d-md-inline">Add to Cart</span>
+                                <span class="d-inline d-md-none">Cart</span>
+                            </a>
+                            <a href="{{ route('login') }}" class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1">
+                                <span class="d-none d-md-inline">Buy Now</span>
+                                <span class="d-inline d-md-none">Buy</span>
+                            </a>
+                        </div>
+                        @endauth
+                        @else
+                        {{-- Out of stock section --}}
+                        <div class="d-flex align-items-center mb-4 flex-nowrap" style="gap: 15px;">
+                            @auth
+                            <button type="button" class="wishlist-btn wishlist-btn-combo flex-shrink-0" data-id="{{ $comboPack->id }}">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            @else
+                            <a href="{{ route('login') }}" class="wishlist-btn flex-shrink-0 d-flex align-items-center justify-content-center">
+                                <i class="far fa-heart"></i>
+                            </a>
+                            @endauth
+                        </div>
+                        <div class="product-page-action-buttons">
+                            <button class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 w-100" disabled>
+                                Out of Stock
+                            </button>
+                        </div>
+                        @endif
 
                     </div>
                 </div>

@@ -317,6 +317,7 @@
 
                         <!-- Quantity Selector and Action Buttons inside Single Form -->
                         @if($product->stock_quantity > 0)
+                        @auth
                         <!-- Wishlist Form (Standalone to avoid HTML nested form issue) -->
                         <form id="wishlistForm-{{ $product->id }}" action="{{ route('wishlist.add', $product) }}" method="POST" class="d-none">
                             @csrf
@@ -359,6 +360,33 @@
                                 </button>
                             </div>
                         </form>
+                        @else
+                        {{-- Guest: redirect all actions to login --}}
+                        <div class="d-flex align-items-center mb-4 flex-nowrap" style="gap: 15px;">
+                            <div class="product-page-quantity-selector d-flex align-items-center mb-0 pe-2">
+                                <label class="product-page-qty-label me-3 fw-bold text-nowrap">Quantity:</label>
+                                <div class="product-page-qty-control qty-pill-control d-flex align-items-center">
+                                    <span class="qty-btn-inline border-0 bg-transparent"><i class="fas fa-minus"></i></span>
+                                    <input type="number" class="product-page-qty-input border-0 text-center" value="1" min="1" readonly style="width: 40px; font-weight: 700;">
+                                    <span class="qty-btn-inline border-0 bg-transparent"><i class="fas fa-plus"></i></span>
+                                </div>
+                            </div>
+                            <a href="{{ route('login') }}" class="wishlist-btn flex-shrink-0 d-flex align-items-center justify-content-center">
+                                <i class="far fa-heart"></i>
+                            </a>
+                        </div>
+                        <div class="product-page-action-buttons">
+                            <a href="{{ route('login') }}" class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 flex-grow-1">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span class="d-none d-md-inline">Add to Cart</span>
+                                <span class="d-inline d-md-none">Cart</span>
+                            </a>
+                            <a href="{{ route('login') }}" class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1">
+                                <span class="d-none d-md-inline">Buy Now</span>
+                                <span class="d-inline d-md-none">Buy</span>
+                            </a>
+                        </div>
+                        @endauth
                         @else
                         <div class="product-page-action-buttons">
                             <button class="product-page-btn-add-cart btn btn-lg d-flex align-items-center gap-2" disabled>
