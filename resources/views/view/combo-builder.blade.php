@@ -129,9 +129,15 @@
                                                 <span class="text-dark fw-bold fs-5">₹{{ number_format($price, 2) }}</span>
                                             @endif
                                         </div>
+                                        @auth
                                         <button type="button" class="btn btn-outline-success btn-sm w-100 rounded-pill toggle-product-btn" onclick="toggleProduct({{ $product->id }})">
                                             <i class="fas fa-plus me-1"></i> Add to Combo
                                         </button>
+                                        @else
+                                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm w-100 rounded-pill toggle-product-btn d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-plus me-1"></i> Add to Combo
+                                        </a>
+                                        @endauth
                                     </div>
                                 </div>
                             </div>
@@ -208,6 +214,7 @@
                         </div>
 
                         <!-- Action Button & Add Form -->
+                        @auth
                         <form action="{{ route('cart.add_custom_combo') }}" method="POST" id="customComboForm">
                             @csrf
                             <div id="hiddenFieldsContainer"></div>
@@ -215,6 +222,11 @@
                                 Add Combo To Cart
                             </button>
                         </form>
+                        @else
+                        <a href="{{ route('login') }}" class="btn btn-success btn-lg w-100 rounded-pill py-3 fw-bold d-flex align-items-center justify-content-center">
+                            <i class="fas fa-sign-in-alt me-2"></i> Login to Add Combo To Cart
+                        </a>
+                        @endauth
                     </div>
                 </div>
             </div>

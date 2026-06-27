@@ -33,6 +33,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ComboPackController;
 use App\Http\Controllers\Admin\ComboOnlyProductController;
+use App\Http\Controllers\Admin\SalesReportController;
 
 // ======================================================
 // ================= FRONTEND ROUTES =====================
@@ -288,6 +289,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/reviews', [App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
         Route::post('/reviews/{id}/toggle', [App\Http\Controllers\Admin\ReviewController::class, 'toggleApproval'])->name('reviews.toggle');
         Route::delete('/reviews/{id}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+        // Sales Report
+        Route::get('sales-report', [SalesReportController::class, 'index'])->name('sales-report.index');
+        Route::get('sales-report/pdf', [SalesReportController::class, 'downloadPdf'])->name('sales-report.pdf');
+        Route::get('sales-report/export', [SalesReportController::class, 'exportData'])->name('sales-report.export');
     });
 });
 
