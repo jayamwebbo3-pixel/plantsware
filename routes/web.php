@@ -213,6 +213,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('orders.invoice');
 
         Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::get('users/export', [UserController::class, 'export'])->name('users.export');
         Route::get('users/{user}/report', [UserController::class, 'report'])->name('users.report');
         Route::get('coupons/search-users', [\App\Http\Controllers\Admin\CouponController::class, 'searchUsers'])->name('coupons.search-users');
         Route::get('coupons/{coupon}/report', [\App\Http\Controllers\Admin\CouponController::class, 'report'])->name('coupons.report');
