@@ -175,10 +175,16 @@ class PaymentController extends Controller
 
                 // Send Confirmation Emails
                 try {
-                    \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderConfirmation($order));
+                    // Send Order Confirmation with invoice attachment to customer
+                    \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderConfirmation($order, true));
+                    
+                    // Send New Order Alert to the Owner (jayamweb.developer2@gmail.com)
+                    \Illuminate\Support\Facades\Mail::to('jayamweb.developer2@gmail.com')->send(new \App\Mail\NewOrderReceived($order));
+
+                    // Send New Order Alert to the configured store email if different
                     $headerFooter = \App\Models\HeaderFooter::first();
-                    if (!empty($headerFooter->email)) {
-                        \Illuminate\Support\Facades\Mail::to($headerFooter->email)->send(new \App\Mail\OrderConfirmation($order));
+                    if (!empty($headerFooter->email) && strcasecmp($headerFooter->email, 'jayamweb.developer2@gmail.com') !== 0) {
+                        \Illuminate\Support\Facades\Mail::to($headerFooter->email)->send(new \App\Mail\NewOrderReceived($order));
                     }
                 } catch (Exception $e) {
                     // Log mail error but don't fail the order
