@@ -79,8 +79,8 @@ class CouponController extends Controller
             // Send emails to assigned users
             $this->sendCouponEmails($coupon, $targetUserIds);
         } elseif ($data['is_public']) {
-            // Send emails to all users
-            $allUserIds = User::pluck('id')->toArray();
+            // Send emails to all users registered in the current month and past 5 months
+            $allUserIds = User::where('created_at', '>=', now()->subMonths(5)->startOfMonth())->pluck('id')->toArray();
             $this->sendCouponEmails($coupon, $allUserIds);
         }
 
@@ -142,9 +142,9 @@ class CouponController extends Controller
         if ($data['is_public']) {
             $coupon->users()->detach();
             
-            // If it transitioned from private to public, notify all users
+            // If it transitioned from private to public, notify all users registered in current month and past 5 months
             if (!$coupon->getOriginal('is_public')) {
-                $allUserIds = User::pluck('id')->toArray();
+                $allUserIds = User::where('created_at', '>=', now()->subMonths(5)->startOfMonth())->pluck('id')->toArray();
                 $this->sendCouponEmails($coupon, $allUserIds);
             }
         } else {
@@ -211,7 +211,7 @@ class CouponController extends Controller
     public function report(Coupon $coupon)
     {
         if ($coupon->is_public) {
-            $targetedUsers = User::get(['users.id', 'users.name', 'users.email', 'users.phone']);
+            $targetedUsers = User::where('created_at', '>=', now()->subMonths(5)->startOfMonth())->get(['users.id', 'users.name', 'users.email', 'users.phone']);
         } else {
             $targetedUsers = $coupon->users()->get(['users.id', 'users.name', 'users.email', 'users.phone']);
         }
@@ -270,7 +270,7 @@ class CouponController extends Controller
             'validity' => ($coupon->valid_from || $coupon->valid_to)
                 ? 'From: ' . ($coupon->valid_from ? $coupon->valid_from->format('d M Y') : 'N/A') . ' To: ' . ($coupon->valid_to ? $coupon->valid_to->format('d M Y') : 'N/A')
                 : 'No limit',
-            'audience_text' => $coupon->is_public ? 'All Customers (Public)' : 'Restricted (Targeted)',
+            'audience_text' => $coupon->is_public ? 'All Customers - Current & Past 5 Months' : 'Restricted (Targeted)',
             'status_text' => $coupon->status ? 'Active' : 'Inactive',
             'total_usages' => $usages->count(),
             'total_discount_given' => '₹' . number_format($usages->sum('discount_amount'), 2),

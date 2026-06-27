@@ -60,11 +60,11 @@ class Coupon extends Model
 
     public function isValidForUser($user)
     {
-        if ($this->is_public) {
-            return true;
-        }
         if (!$user) {
             return false;
+        }
+        if ($this->is_public) {
+            return $user->created_at >= now()->subMonths(5)->startOfMonth();
         }
         return $this->users()->where('users.id', $user->id)->exists();
     }

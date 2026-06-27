@@ -114,6 +114,9 @@
                     <a class="nav-link {{ request()->routeIs('admin.combo-packs.*') ? 'active' : '' }}" href="{{ route('admin.combo-packs.index') }}">
                         <i class="fas fa-cubes"></i> Combo Packs
                     </a>
+                    <a class="nav-link {{ request()->routeIs('admin.custom-combo.*') ? 'active' : '' }}" href="{{ route('admin.custom-combo.settings') }}">
+                        <i class="fas fa-percent"></i> <span>Custom Combo Settings</span>
+                    </a> 
                     <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
                         <i class="fa-solid fa-truck"></i> Orders Management
                     </a>
@@ -174,7 +177,7 @@
 
                             <!--<li class="nav-item">
                                 <hr style="border-color: rgba(255,255,255,0.2); margin: 5px 20px;">
-                              </li> -->
+                               </li> -->
 
                         </ul>
                     </div>
@@ -182,9 +185,6 @@
                     <a class="nav-link {{ request()->routeIs('admin.blog-categories.*') || request()->routeIs('admin.blogs.*') ? 'active' : '' }}" href="{{ route('admin.blog-categories.index') }}">
                         <i class="fas fa-blog"></i> Blog Management
                     </a>
-                    <a class="nav-link {{ request()->routeIs('admin.custom-combo.*') ? 'active' : '' }}" href="{{ route('admin.custom-combo.settings') }}">
-                        <i class="fas fa-percent"></i> <span>Custom Combo Settings</span>
-                    </a> 
                     <a class="nav-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}">
                         <i class="fas fa-cog"></i> <span>GST & General Settings</span>
                     </a>

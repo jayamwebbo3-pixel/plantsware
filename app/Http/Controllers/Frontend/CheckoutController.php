@@ -383,7 +383,7 @@ class CheckoutController extends Controller
                 $cartValue = $subtotal - $discount;
                 $user = Auth::user();
 
-                $isAssigned = $coupon->is_public || ($user && $coupon->users()->where('users.id', $user->id)->exists());
+                $isAssigned = $coupon->isValidForUser($user);
                 $hasUsed = $user && $coupon->usages()->where('user_id', $user->id)->exists();
 
                 if ($isAssigned && !$hasUsed && $cartValue >= $coupon->minimum_order_amount) {

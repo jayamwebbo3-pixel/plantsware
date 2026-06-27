@@ -62,7 +62,7 @@
                                 </td>
                                 <td class="text-center">
                                     @if($coupon->is_public)
-                                        <span class="badge bg-success">All Customers</span>
+                                        <span class="badge bg-success">All Customers (Current & Past 5 Months)</span>
                                     @else
                                         <span class="badge bg-info text-dark">Restricted ({{ $coupon->users_count ?? $coupon->users()->count() }})</span>
                                     @endif

@@ -155,7 +155,7 @@ class CouponTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonPath('coupon.coupon_code', 'PUBLICTEST');
-        $response->assertJsonPath('coupon.audience_text', 'All Customers (Public)');
+        $response->assertJsonPath('coupon.audience_text', 'All Customers - Current & Past 5 Months');
         
         // Assert that both users are listed in the report
         $users = $response->json('users');

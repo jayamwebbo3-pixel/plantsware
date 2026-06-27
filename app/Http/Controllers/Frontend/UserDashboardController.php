@@ -14,6 +14,8 @@ class UserDashboardController extends Controller
     {
         $user = Auth::user();
         $now = now();
+        $isNewUser = $user && $user->created_at >= now()->subMonths(5)->startOfMonth();
+
         $coupons = \App\Models\Coupon::where('status', 1)
             ->where(function($q) use ($now) {
                 $q->whereNull('valid_from')->orWhere('valid_from', '<=', $now);
@@ -21,11 +23,17 @@ class UserDashboardController extends Controller
             ->where(function($q) use ($now) {
                 $q->whereNull('valid_to')->orWhere('valid_to', '>=', $now);
             })
-            ->where(function($q) use ($user) {
-                $q->where('is_public', 1)
-                  ->orWhereHas('users', function($uq) use ($user) {
-                      $uq->where('users.id', $user->id);
-                  });
+            ->where(function($q) use ($user, $isNewUser) {
+                $q->where(function($sq) use ($isNewUser) {
+                    if ($isNewUser) {
+                        $sq->where('is_public', 1);
+                    } else {
+                        $sq->whereRaw('1 = 0');
+                    }
+                })
+                ->orWhereHas('users', function($uq) use ($user) {
+                    $uq->where('users.id', $user->id);
+                });
             })
             ->get();
 

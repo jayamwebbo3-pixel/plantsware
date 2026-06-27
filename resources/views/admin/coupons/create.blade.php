@@ -128,7 +128,7 @@
                             <div class="form-check mb-2">
                                 <input class="form-check-input audience-radio" type="radio" name="audience_type" id="audience_all" value="all" checked>
                                 <label class="form-check-label fw-bold" for="audience_all">
-                                    All Customers (Public Coupon)
+                                    All Customers (Current & Past 5 Months Registered)
                                 </label>
                             </div>
                             <div class="form-check mb-2">
