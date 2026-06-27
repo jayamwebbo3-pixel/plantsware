@@ -190,7 +190,7 @@
                     <a class="nav-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}">
                         <i class="fas fa-cog"></i> <span>GST & General Settings</span>
                     </a>
-                     <a class="nav-link {{ request()->routeIs('admin.sales-report.*') ? 'active' : '' }}" href="{{ route('admin.sales-report.index') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.sales-report.*') ? 'active' : '' }}" href="{{ route('admin.sales-report.index') }}">
                         <i class="fas fa-chart-bar"></i> Sales Report
                     </a>
                     <hr style="border-color: rgba(255,255,255,0.3);">
