@@ -114,7 +114,7 @@ section {
     background: var(--bg-white);
     padding: 15px 0;
     position: relative;
-    z-index: 999;
+    z-index: 998;
 }
 .header-top .dropdown-menu {
     z-index: 1110;
@@ -268,10 +268,14 @@ section {
 .close-menu, .hamburger-logo-item {
     display: none;
 }
-.main-menu > li.active > a {
-    background-color: #3b9b4f;
-    color: white !important;
+/* Desktop only active state to prevent bleeding into mobile hamburger */
+@media (min-width: 1025px) {
+    .main-menu > li.active > a {
+        background-color: #3b9b4f;
+        color: white !important;
+    }
 }
+
 .main-menu > li > a:hover:not(.active) {
     background-color: var(--primary-hover) !important;
     color: #fff;
@@ -449,23 +453,23 @@ section {
     padding: 0;
     list-style: none;
 }
-.sticky-menu-toggle {
-    background: #f1f8ee;
-    border: 1px solid transparent;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    font-size: 20px;
-    color: #2e6a39;
-    cursor: pointer;
+.sticky-menu-toggle, #menuToggle {
+    background: #f1f8ee !important;
+    border: 1px solid transparent !important;
+    border-radius: 50% !important;
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 20px !important;
+    color: #2e6a39 !important;
+    cursor: pointer !important;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
 }
-.sticky-menu-toggle:hover {
-    background: #e5f1e0;
-    color: var(--primary-color);
+.sticky-menu-toggle:hover, #menuToggle:hover {
+    background: #e5f1e0 !important;
+    color: var(--primary-color) !important;
 }
 
 /* ==========================================================================
@@ -1038,20 +1042,19 @@ section:has(.product-swiper) {
     .main-menu {
         position: fixed;
         top: 0;
+        bottom: 0;
         right: -300px;
         width: 280px;
         height: 100vh;
         background: #fff;
         box-shadow: -4px 0 15px rgba(0,0,0,0.1);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch;
+        display: block;
         padding: 0;
         margin: 0;
         transition: right 0.3s ease;
         z-index: 99999;
         overflow-y: auto;
+        overflow-x: hidden;
     }
     .main-menu.show {
         right: 0;
@@ -1110,9 +1113,10 @@ section:has(.product-swiper) {
         font-weight: 600;
     }
     .main-menu li a:hover,
-    .main-menu > li.active > a {
-        background-color: rgba(46, 106, 57, 0.08) !important;
-        color: #2e6a39 !important;
+    .main-menu > li.active > a,
+    .main-menu > li.dropdown.active > a {
+        background-color: #f5f5f5 !important;
+        color: #333 !important;
     }
     
     /* Handle Mobile Dropdowns */
@@ -1129,8 +1133,9 @@ section:has(.product-swiper) {
     .main-menu li.dropdown.active .dropdown-menu {
         display: block;
     }
-    .main-menu .dropdown-menu .h_title a.active {
-        background-color: rgba(46, 106, 57, 0.08) !important;
+    .main-menu .dropdown-menu .h_title a.active,
+    .main-menu .dropdown-menu .h_title a:hover {
+        background-color: #f5f5f5 !important;
         color: #2e6a39 !important;
         transform: none !important;
     }
@@ -1227,6 +1232,39 @@ section:has(.product-swiper) {
 /* ==========================================================================
    MISC UTILITIES & COMPONENTS
    ========================================================================== */
+.btn-filter-toggle {
+    background: #fff;
+    color: #2e6a39;
+    border: 2px solid #2e6a39;
+    border-radius: 50px;
+    padding: 8px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(46, 106, 57, 0.1);
+}
+.btn-filter-toggle:hover, .btn-filter-toggle:active {
+    background: #2e6a39;
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(46, 106, 57, 0.2);
+}
+.btn-filter-toggle i {
+    font-size: 14px;
+}
+.filter-active-badge {
+    background: #dc3545;
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 50px;
+    margin-left: 5px;
+    line-height: 1;
+}
+
 .combo-badge-wrapper {
     position: absolute;
     top: 10px;
@@ -2745,7 +2783,7 @@ section:has(.product-swiper) {
 }
 
 .side-menu-title { font-family: var(--font-main); font-size: 1.25rem; font-weight: 700; color: #2c3e50; letter-spacing: 0.5px; position: relative; }
-.filter-section { border-bottom: 1px solid rgba(0, 0, 0, 0.05); padding-bottom: 15px; margin-bottom: 15px !important; }
+/* .filter-section { border-bottom: 1px solid rgba(0, 0, 0, 0.05); padding-bottom: 15px; margin-bottom: 15px !important; } */
 .filter-section:last-of-type { border-bottom: none; }
 .filter-title { font-size: 1rem; font-weight: 600; color: #34495e; cursor: pointer; transition: color 0.3s; }
 .filter-title:hover { color: #2e6a39; }
@@ -2839,7 +2877,7 @@ section:has(.product-swiper) {
     width: 100%;
     background: #fff;
     border-top: 1px solid #eee;
-    z-index: 1000;
+    z-index: 997;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
 }
 .mobile-whatsapp-bottom a {
