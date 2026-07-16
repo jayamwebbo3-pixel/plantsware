@@ -1,5 +1,6 @@
 @include('view.layout.header')
 
+{{-- 
 <div class="sp_header bg-white p-3">
     <div class="container">
         <div class="row">
@@ -13,6 +14,7 @@
         </div>
     </div>
 </div>
+ --}}
 
 <section class="privacy-content py-5" style="background-color: #f8fafc;">
     <div class="container">

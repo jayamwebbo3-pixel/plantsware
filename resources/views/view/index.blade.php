@@ -4,15 +4,18 @@
     <div class="plant-categories-container">
 
         <div class="categories-carousel-container">
-            <!-- Carousel -->
-            <div class="plant-categories-carousel" id="plantCategoriesCarousel">
-                @forelse($categories as $category)
-                    <div class="plant-category-item">
+            <!-- Swiper Carousel -->
+            <div class="swiper plant-categories-carousel" id="plantCategoriesCarousel">
+                <div class="swiper-wrapper">
+                    @php 
+                        // Duplicate categories to ensure enough slides for infinite swiper loop
+                        $loopCategories = $categories->isEmpty() ? collect([]) : $categories->concat($categories)->concat($categories);
+                    @endphp
+                    @forelse($loopCategories as $category)
+                        <div class="swiper-slide plant-category-item">
                         <a href="{{ route('category.show', $category->slug ?? $category->id) }}" class="plant-category-card">
                             <div class="category-image-container">
-                                @if($category->badge_type)
-                                    <span class="category-badge badge-{{ $category->badge_type }}">{{ \Illuminate\Support\Str::upper($category->badge_type) }}</span>
-                                @endif
+
                                 <div class="plant-category-image">
                                     @if($category->image)
                                         <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" loading="eager" decoding="sync">
@@ -27,10 +30,11 @@
                         </a>
                     </div>
                 @empty
-                    <div class="plant-category-item">
+                    <div class="swiper-slide plant-category-item">
                         <p class="text-center w-100">No categories available</p>
                     </div>
                 @endforelse
+                </div>
             </div>
         </div>
     </div>
@@ -409,8 +413,8 @@
 @include('view.layout.footer')
 
 <!-- Notification after Add to Cart -->
-<div id="cart-alert-container" style="position: fixed; z-index: 99999; left: 50%; transform: translateX(-50%); top: 20px; display: none;">
-    <div class="alert alert-success alert-dismissible fade show" role="alert" id="cart-added-alert" style="min-width: 250px;">
+<div id="cart-alert-container" class="cart-alert-container" style="display: none;">
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="cart-added-alert">
         Item added with success!
     </div>
 </div>

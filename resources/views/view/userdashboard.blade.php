@@ -1,20 +1,379 @@
 @include('view.layout.header')
 
+<style>
+/* Dashboard Base Layout */
+.profile-container {
+    padding: 60px 0;
+    background-color: #f8fafc;
+    min-height: calc(100vh - 200px);
+}
+.profile-content {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 30px;
+    align-items: flex-start;
+}
 
-<div class="sp_header bg-white p-3">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <ul class="list-unstyled mb-0">
-                    <li class="d-inline-block font-weight-bolder"><a href="{{ url('/') }}" class="text-decoration-none">home</a></li>
-                    <li class="d-inline-block font-weight-bolder mx-2">/</li>
-                    <li class="d-inline-block font-weight-bolder"><a href="#" class="text-decoration-none">My Dashboard</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+@media (max-width: 991.98px) {
+    .profile-content {
+        flex-wrap: wrap;
+    }
+}
 
+/* Sidebar Styles */
+.profile-sidebar {
+    width: 280px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 30px 20px;
+    flex: 0 0 280px;
+}
+@media (max-width: 991.98px) {
+    .profile-sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}
+
+/* User Info Styling */
+.user-info {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.user-avatar {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 15px auto;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--primary-color, #1b8744);
+    box-shadow: 0 4px 10px rgba(27, 135, 68, 0.2);
+}
+.user-name {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #1e293b;
+}
+
+/* Navigation Menu Styling */
+.nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.nav-item {
+    margin-bottom: 5px;
+}
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #475569;
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    cursor: pointer;
+}
+.nav-link:hover {
+    background-color: #f1f5f9;
+    color: var(--primary-color, #1b8744);
+    text-decoration: none;
+}
+.nav-link.active {
+    background-color: #eaf5ec; /* Light green tint */
+    color: var(--primary-color, #1b8744);
+    border-left: 4px solid var(--primary-color, #1b8744);
+    border-radius: 0 8px 8px 0;
+}
+.nav-link i.nav-icon, .nav-link i.fa-sign-out-alt {
+    width: 24px;
+    margin-right: 12px;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1 1 0%;
+    min-width: 0; /* Prevents overflow in flexbox */
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+}
+
+/* Hide content sections by default */
+.content-section {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+.content-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section-title {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 15px;
+}
+
+/* Tab Container (Address Book) */
+.tab-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #e2e8f0;
+}
+.tab-label {
+    padding: 10px 20px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+}
+.tab-label:hover {
+    color: var(--primary-color, #1b8744);
+}
+.tab-label.active {
+    color: var(--primary-color, #1b8744);
+    border-bottom-color: var(--primary-color, #1b8744);
+}
+
+/* Address Cards */
+.address-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+.address-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    transition: all 0.3s ease;
+    background: #fff;
+    cursor: pointer;
+}
+.address-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+.address-card.selected.default {
+    border: 2px solid var(--primary-color, #1b8744);
+    background-color: #fafffa;
+}
+.address-badge {
+    position: absolute;
+    top: 15px;
+    right: 45px;
+    background: var(--primary-color, #1b8744);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+.address-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #1e293b;
+    margin-bottom: 10px;
+    padding-right: 60px; /* space for badge */
+}
+.address-detail {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+.address-phone {
+    margin-top: 10px;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.9rem;
+}
+.address-actions {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #e2e8f0;
+    display: flex;
+    gap: 10px;
+}
+.address-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.address-btn-edit {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+.address-btn-edit:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+.address-btn-delete {
+    background: #fff;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+}
+.address-btn-delete:hover {
+    background: #fef2f2;
+}
+
+/* Order History */
+.order-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+.order-item:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border-color: #cbd5e1;
+}
+.order-info {
+    flex-grow: 1;
+}
+.order-info h4 {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+.order-info p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+.order-price {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #1e293b;
+}
+
+/* Wishlist Grid */
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+.product-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+.product-card:hover {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    transform: translateY(-3px);
+}
+.product-info {
+    padding: 15px;
+}
+.product-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* General Form Styles */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.form-group {
+    flex: 1;
+    min-width: 250px;
+}
+.form-label {
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 8px;
+    display: block;
+}
+.form-control, .form-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color, #1b8744);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(27, 135, 68, 0.1);
+}
+.btn-primary {
+    background: var(--primary-color, #1b8744);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-primary:hover {
+    background: #146833;
+    transform: translateY(-2px);
+}
+.btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-secondary:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+/* Logout button fix */
+.nav-item form {
+    margin: 0;
+}
+.nav-item form button {
+    outline: none;
+}
+</style>
 
 <div class="profile-container">
     <div class="container">
@@ -418,8 +777,8 @@
                                 
                                 <div class="card-body p-3">
                                     <div class="d-flex align-items-center gap-2 mb-2">
-                                        <i class="fas fa-ticket-alt {{ $coupon->is_used ? 'text-secondary' : 'text-success' }} fs-4"></i>
-                                        <h4 class="mb-0 fw-bold text-uppercase {{ $coupon->is_used ? 'text-secondary' : 'text-dark' }}" style="font-family: monospace; letter-spacing: 1px;">{{ $coupon->coupon_code }}</h4>
+                                        <i class="fas fa-ticket-alt {{ $coupon->is_used ? 'text-secondary' : 'text-success' }} fs-4 me-2"></i>
+                                        <h4 class="mb-0 mx-1 fw-bold text-uppercase {{ $coupon->is_used ? 'text-secondary' : 'text-dark' }}" style="font-family: monospace; letter-spacing: 1px;">{{ $coupon->coupon_code }}</h4>
                                     </div>
                                     
                                     <p class="mb-2 text-muted small">
@@ -530,187 +889,7 @@
     </div>
 </div>
 
-<style>
-    .star-rating {
-        display: flex;
-        flex-direction: row-reverse;
-        justify-content: flex-end;
-        gap: 5px;
-        margin-top: 5px;
-    }
 
-    .star-rating input {
-        display: none;
-    }
-
-    .star-rating label {
-        color: #ddd;
-        font-size: 24px;
-        padding: 0;
-        cursor: pointer;
-        transition: color 0.2s;
-    }
-
-    .star-rating label:hover,
-    .star-rating label:hover~label,
-    .star-rating input:checked~label {
-        color: #ffc107;
-    }
-
-    .star-rating.readonly label {
-        cursor: default;
-    }
-
-    .star-rating.readonly label:hover,
-    .star-rating.readonly label:hover~label {
-        color: #ddd;
-    }
-
-    .star-rating.readonly input:checked~label {
-        color: #ffc107;
-    }
-
-    .order-item-review {
-        background: #f9f9f9;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        border: 1px solid #eee;
-    }
-
-    .order-item-review h5 {
-        margin: 0 0 10px 0;
-        font-size: 1rem;
-        color: #333;
-    }
-
-    /* Address Selection Styles */
-    .address-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-        align-items: stretch;
-    }
-
-    .address-card {
-        cursor: pointer;
-        transition: all 0.4s ease-in-out;
-        border: 2px solid #eaeaea;
-        /* Standard light gray border */
-        border-radius: 8px;
-        /* Smooth corners */
-        padding: 20px;
-        /* Reliable content padding */
-        position: relative;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        background-color: #fff;
-    }
-
-    .address-card .address-actions {
-        margin-top: auto;
-        /* Pushes buttons to the bottom */
-        padding-top: 15px;
-        /* Clean spacing */
-    }
-
-    .address-card:hover {
-        border-color: #c0c0c0;
-        transform: translateY(-2px);
-        /* Smooth subtle lift transition */
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        /* Soft drop shadow on hover */
-    }
-
-    .address-card.selected {
-        border-color: var(--primary-color, #76a713);
-        background-color: #f8fbf5;
-        box-shadow: 0 0 0 2px rgba(118, 167, 19, 0.2);
-    }
-
-    /* Ensure the dot/radio look for selected state if needed */
-    .address-card.selected::after {
-        content: '\f058';
-        /* FontAwesome check-circle */
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        color: var(--primary-color, #76a713);
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        font-size: 20px;
-    }
-
-    .address-badge {
-        display: inline-block;
-        padding: 4px 12px !important;
-        font-size: 10px !important;
-        width: fit-content !important;
-        border-radius: 50px;
-        /* pill shape */
-        margin-bottom: 10px;
-        background-color: var(--primary-color, #76a713);
-        color: #fff;
-        line-height: 1;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    /* Sidebar info styling - Perfected Vertical Alignment */
-    .user-info {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 30px 15px;
-        background: #ffffff;
-        border-bottom: 2px solid #f8f8f8;
-        overflow: hidden;
-    }
-
-    .user-avatar {
-        width: 75px;
-        height: 75px;
-        background: #f4f4f4;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 18px;
-        border: 4px solid #76a713;
-        /* Use primary green */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .user-avatar i {
-        font-size: 32px;
-        color: #76a713;
-    }
-
-    .user-name {
-        font-size: 1.15rem;
-        font-weight: 800;
-        color: #1a1a1a;
-        margin-bottom: 8px;
-        width: 100%;
-        display: block;
-        line-height: 1.2;
-    }
-
-    .user-email {
-        word-break: break-all;
-        overflow-wrap: break-word;
-        font-size: 0.85rem !important;
-        color: #555 !important;
-        line-height: 1.4 !important;
-        display: block;
-        width: 100%;
-        font-weight: 500;
-        padding: 0 10px;
-    }
-</style>
 
 
 <script>

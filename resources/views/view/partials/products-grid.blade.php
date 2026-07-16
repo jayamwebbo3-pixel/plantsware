@@ -1,39 +1,39 @@
 {{-- products-grid.blade.php — rendered via AJAX for filter/sort updates --}}
-<div class="products-header-bar mb-4">
-    <div class="products-header-inner">
-        {{-- Left: Category Title + Count --}}
-        <div class="products-header-left">
-            <div class="category-title-group">
-                <i class="fas fa-leaf category-leaf-icon"></i>
-                <h2 class="category-name-heading">
-                    @if(request()->filled('q'))
-                        Search results for &ldquo;{{ request('q') }}&rdquo;
-                    @elseif(isset($category))
-                        {{ $category->name }}
-                    @elseif(isset($subcategory))
-                        {{ $subcategory->name }}
-                    @else
-                        All Categories
-                    @endif
-                </h2>
-            </div>
-            <span class="product-count-pill">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center bg-white p-3 rounded-4 shadow-sm mb-4" style="border: 1px solid rgba(0,0,0,0.05);">
+    {{-- Left: Category Title + Count --}}
+    <div class="d-flex align-items-center mb-3 mb-md-0">
+        <div class="bg-light text-success d-flex justify-content-center align-items-center rounded-circle mr-3" style="width: 45px; height: 45px; margin-right: 15px; color: #2e6a39 !important;">
+            <i class="fas fa-leaf fa-lg"></i>
+        </div>
+        <div>
+            <h2 class="h5 fw-bold mb-1" style="font-family: var(--font-main); color: #2c3e50;">
+                @if(request()->filled('q'))
+                    Search results for &ldquo;{{ request('q') }}&rdquo;
+                @elseif(isset($category))
+                    {{ $category->name }}
+                @elseif(isset($subcategory))
+                    {{ $subcategory->name }}
+                @else
+                    All Categories
+                @endif
+            </h2>
+            <span class="badge" style="background: rgba(46, 106, 57, 0.1); color: #2e6a39; font-size: 0.75rem; letter-spacing: 0.5px; padding: 4px 8px; border-radius: 6px;">
                 {{ $products->total() }} Products
             </span>
         </div>
+    </div>
 
-        {{-- Right: Sort Dropdown --}}
-        <div class="products-header-right">
-            <div class="sort-select-wrapper">
-                <i class="fas fa-sort-amount-down sort-icon"></i>
-                <select id="sort-products" class="sort-select-styled">
-                    <option value="default"    {{ request('sort') == 'default'    ? 'selected' : '' }}>Popularity</option>
-                    <option value="name-asc"   {{ request('sort') == 'name-asc'   ? 'selected' : '' }}>Name: A to Z</option>
-                    <option value="name-desc"  {{ request('sort') == 'name-desc'  ? 'selected' : '' }}>Name: Z to A</option>
-                    <option value="price-low"  {{ request('sort') == 'price-low'  ? 'selected' : '' }}>Price: Low → High</option>
-                    <option value="price-high" {{ request('sort') == 'price-high' ? 'selected' : '' }}>Price: High → Low</option>
-                </select>
-            </div>
+    {{-- Right: Sort Dropdown --}}
+    <div class="d-flex align-items-center">
+        <span class="text-muted small mr-2 fw-bold text-uppercase" style="margin-right: 10px; font-size: 0.75rem; letter-spacing: 0.5px;">Sort By:</span>
+        <div class="position-relative">
+            <select id="sort-products" class="form-select form-control shadow-none pe-4" style="border-radius: 8px; border: 1px solid #ddd; font-weight: 500; color: #444; height: 38px; cursor: pointer; padding-right: 30px; font-size: 0.9rem; min-width: 160px;">
+                <option value="popularity" {{ request('sort') == 'popularity' ? 'selected' : '' }}>Popularity</option>
+                <option value="price-low"  {{ request('sort') == 'price-low'  ? 'selected' : '' }}>Price: Low → High</option>
+                <option value="price-high" {{ request('sort') == 'price-high' ? 'selected' : '' }}>Price: High → Low</option>
+                <option value="newest"     {{ request('sort') == 'newest'     ? 'selected' : '' }}>Newest First</option>
+                <option value="discount"   {{ request('sort') == 'discount'   ? 'selected' : '' }}>Best Discount</option>
+            </select>
         </div>
     </div>
 </div>

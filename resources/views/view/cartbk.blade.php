@@ -3,6 +3,7 @@
 <!-- CSRF Token for AJAX -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
+{{-- 
 <div class="sp_header bg-white p-3">
     <div class="container">
         <div class="row">
@@ -16,6 +17,7 @@
         </div>
     </div>
 </div>
+ --}}
 
 <main class="cart-section">
     <div class="container">

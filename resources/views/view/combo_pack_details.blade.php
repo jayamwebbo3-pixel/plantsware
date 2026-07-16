@@ -1,5 +1,6 @@
 @include('view.layout.header')
 
+{{-- 
 <div class="sp_header bg-white p-3">
     <div class="container">
         <div class="row">
@@ -15,6 +16,7 @@
         </div>
     </div>
 </div>
+ --}}
 
 @php
     $constituentProducts = [];
@@ -56,7 +58,7 @@
         <div class="product-page-section">
             <div class="row">
                 <!-- Left Column: Combo Gallery -->
-                <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                <div class="col-sm-6 col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
                     <div class="combo-gallery-wrapper" style="position: relative; width: 100%; overflow: visible !important;">
                         
                         @if(count($constituentProducts) >= 2)
@@ -161,7 +163,7 @@
                 </div>
 
                 <!-- Right Column: Combo Info -->
-                <div class="col-lg-6" data-aos="fade-left">
+                <div class="col-sm-6 col-lg-6" data-aos="fade-left">
                     <div class="product-page-info ps-lg-4">
                         <h1 class="product-detail-title mb-2">{{ $comboPack->name }}</h1>
                         
@@ -187,7 +189,6 @@
                                     @endif
                                 @else
                                     <span class="product-page-current-price">₹{{ number_format($comboPack->offer_price, 2) }}</span>
-                                    <span class="badge-out-of-stock">Out of Stock</span>
                                 @endif
 
                                 @php
@@ -223,8 +224,8 @@
                         @endphp
                         @if(!empty($outOfStockConstituentNames))
                             <div class="alert alert-warning mb-4" style="border-radius: 8px; border-left: 4px solid #dc3545; background-color: #fff8f8; color: #721c24; padding: 15px; font-size: 0.95rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
-                                <div class="d-flex align-items-start gap-2">
-                                    <i class="fas fa-exclamation-triangle mt-1" style="color: #dc3545;"></i>
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-exclamation-triangle mt-1" style="color: #dc3545; margin-right: 8px;"></i>
                                     <div>
                                         <strong>Availability Issue:</strong> This combo pack is temporarily unavailable because the following item(s) are currently out of stock:
                                         <ul class="mb-0 mt-2 ps-3 fw-bold" style="color: #c53030;">
@@ -264,12 +265,13 @@
 
                             <!-- Action Buttons -->
                             <div class="product-page-action-buttons">
-                                <button type="submit" class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 flex-grow-1">
-                                    <i class="fas fa-shopping-bag"></i>
-                                    <span class="d-none d-md-inline">Add to Cart</span>
+                                <button type="submit" class="product-page-btn-add-cart btn d-flex align-items-center">
+                                    <i class="fas fa-shopping-cart" style="margin-right: 6px;"></i>
+                                    <span class="d-none d-md-inline">Add Cart</span>
                                     <span class="d-inline d-md-none">Cart</span>
                                 </button>
-                                <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1">
+                                <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn d-flex align-items-center">
+                                    <i class="fas fa-credit-card" style="margin-right: 6px;"></i>
                                     <span class="d-none d-md-inline">Buy Now</span>
                                     <span class="d-inline d-md-none">Buy</span>
                                 </button>
@@ -291,12 +293,13 @@
                             </a>
                         </div>
                         <div class="product-page-action-buttons">
-                            <a href="{{ route('login') }}" class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 flex-grow-1">
-                                <i class="fas fa-shopping-bag"></i>
-                                <span class="d-none d-md-inline">Add to Cart</span>
+                            <a href="{{ route('login') }}" class="product-page-btn-add-cart btn d-flex align-items-center">
+                                <i class="fas fa-shopping-cart" style="margin-right: 6px;"></i>
+                                <span class="d-none d-md-inline">Add Cart</span>
                                 <span class="d-inline d-md-none">Cart</span>
                             </a>
-                            <a href="{{ route('login') }}" class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1">
+                            <a href="{{ route('login') }}" class="product-page-btn-buy-now btn d-flex align-items-center">
+                                <i class="fas fa-credit-card" style="margin-right: 6px;"></i>
                                 <span class="d-none d-md-inline">Buy Now</span>
                                 <span class="d-inline d-md-none">Buy</span>
                             </a>
@@ -316,7 +319,7 @@
                             @endauth
                         </div>
                         <div class="product-page-action-buttons">
-                            <button class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 w-100" disabled>
+                            <button class="product-page-btn-add-cart btn d-flex align-items-center" disabled>
                                 Out of Stock
                             </button>
                         </div>
@@ -330,22 +333,30 @@
 </div>
 
 <!-- Related Products Section -->
-<section class="related-products py-5 bg-light border-top">
+<section class="bg-light py-5 border-top">
     <div class="container-fluid px-4">
         <div class="section-title d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0" style="font-size: 1.8rem; color: var(--secondary-color);">Related Products</h2>
-            <a href="{{ route('products.index') }}" class="btn btn-outline-success">View All Products &rarr;</a>
+            <h2>Related Products</h2>
         </div>
         
-        <div class="row g-4">
-            @php
-                $relatedProducts = \App\Models\Product::where('is_active', 1)->inRandomOrder()->limit(4)->get();
-            @endphp
-            @foreach($relatedProducts as $product)
-                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+        @php
+            $relatedProducts = \App\Models\Product::where('is_active', 1)->inRandomOrder()->limit(8)->get();
+        @endphp
+        
+        <div class="swiper product-swiper">
+            <div class="swiper-wrapper">
+                @forelse($relatedProducts as $product)
+                <div class="swiper-slide">
                     @include('view.partials.product-card', ['product' => $product])
                 </div>
-            @endforeach
+                @empty
+                <div class="swiper-slide text-center py-5">
+                    <p>No related products available</p>
+                </div>
+                @endforelse
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
         </div>
     </div>
 </section>

@@ -2,6 +2,7 @@
 
 
 <!-- Breadcrumb -->
+{{-- 
 <div class="sp_header bg-white p-3">
     <div class="container">
         <div class="row">
@@ -23,13 +24,14 @@
         </div>
     </div>
 </div>
+ --}}
 
 <div class="container">
     <div class="container-fluid product-page-container">
         <div class="product-page-section">
             <div class="row">
                 <!-- Product Gallery -->
-                <div class="col-lg-6">
+                <div class="col-sm-6 col-lg-6">
                     {{-- Dual-panel zoom wrapper --}}
                     <div class="dpz-wrapper">
 
@@ -52,13 +54,11 @@
                             {{-- Share button lives here --}}
                             <div class="product-share-container">
                                 <button type="button" class="btn-share-toggle" id="shareToggle">
-                                    <i class="fa-solid fa-share-from-square"></i>
+                                    <i class="fas fa-share-alt"></i>
                                 </button>
                                 <div class="share-dropdown" id="shareDropdown">
                                     <a href="https://wa.me/?text={{ urlencode($product->name . ' - ' . url()->current()) }}" target="_blank" class="share-item whatsapp"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
                                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" target="_blank" class="share-item facebook"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>
-                                    <!-- <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->name) }}" target="_blank" class="share-item twitter"><i class="fab fa-twitter"></i><span>Twitter</span></a>
-                                    <a href="https://www.instagram.com/" target="_blank" class="share-item instagram"><i class="fab fa-instagram"></i><span>Instagram</span></a> -->
                                 </div>
                             </div>
 
@@ -74,29 +74,25 @@
                                     <div class="out-of-stock-overlay">
                                         <span class="out-of-stock-badge">Out Of Stock</span>
                                     </div>
+                                @elseif($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
+                                    <span class="product-page-badge-sale" style="position: absolute; bottom: 15px; left: 15px; background: #dc3545; color: #fff; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; z-index: 10; box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);">
+                                        -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
+                                    </span>
+                                @endif
+                                @if($product->combo_pack_eligible === 'Yes')
+                                    <span class="product-page-badge-combo" style="position: absolute; top: 15px; right: 15px; background-color: #2e7d32; color: white; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; z-index: 10; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">
+                                        Combo Eligible
+                                    </span>
                                 @endif
                             </div>
                             {{-- Preview lives OUTSIDE the overflow:hidden wrap --}}
                             <div id="dpzPreview"></div>
-
-                            @if($product->stock_quantity <= 0)
-                                {{-- Center overlay is displayed over the image instead --}}
-                            @elseif($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                <span class="product-page-badge-sale">
-                                    -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
-                                </span>
-                            @endif
-                            @if($product->combo_pack_eligible === 'Yes')
-                                <span class="product-page-badge-combo" style="position: absolute; top: 10px; right: 10px; background-color: #2e7d32; color: white; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; z-index: 10; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">
-                                    Combo Eligible
-                                </span>
-                            @endif
                         </div>
 
                     </div>{{-- /dpz-wrapper --}}
                 </div>
                 <!-- Product Info -->
-                <div class="col-lg-6">
+                <div class="col-sm-6 col-lg-6">
                     <div class="product-page-info position-relative">
                         <h1 class="product-detail-title">{{ $product->name }}</h1>
                         @if($product->combo_pack_eligible === 'Yes')
@@ -121,7 +117,7 @@
                         @endif
                         <!-- Price -->
                         <div class="product-page-price">
-                            <div class="d-flex align-items-center flex-wrap gap-2">
+                            <div class="d-flex align-items-center flex-wrap" style="gap: 10px;">
                                 @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                     <span class="product-page-current-price" data-default="₹{{ number_format($product->sale_price, 2) }}">₹{{ number_format($product->sale_price, 2) }}</span>
                                     <span class="product-page-original-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
@@ -133,9 +129,6 @@
                                     </span>
                                 @else
                                     <span class="product-page-current-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
-                                @endif
-                                @if($product->stock_quantity <= 0)
-                                    <span class="badge-out-of-stock">Out of Stock</span>
                                 @endif
                             </div>
                             <div class="product-page-tax-info mt-1">Inclusive of all taxes</div>
@@ -272,7 +265,7 @@
                                 } else {
                                     if (addCartBtn) {
                                         addCartBtn.disabled = false;
-                                        addCartBtn.innerHTML = '<i class="fas fa-shopping-bag"></i> Add to Cart';
+                                        addCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
                                         addCartBtn.classList.remove('btn-secondary');
                                         addCartBtn.classList.add('btn-primary');
                                     }
@@ -349,12 +342,13 @@
 
                             <!-- Action Buttons -->
                             <div class="product-page-action-buttons">
-                                <button type="submit" class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 flex-grow-1">
-                                    <i class="fas fa-shopping-bag"></i>
-                                    <span class="d-none d-md-inline">Add to Cart</span>
+                                <button type="submit" class="product-page-btn-add-cart btn d-flex align-items-center">
+                                    <i class="fas fa-shopping-cart" style="margin-right: 6px;"></i>
+                                    <span class="d-none d-md-inline">Add Cart</span>
                                     <span class="d-inline d-md-none">Cart</span>
                                 </button>
-                                <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1">
+                                <button type="submit" name="buy_now" value="1" class="product-page-btn-buy-now btn d-flex align-items-center">
+                                    <i class="fas fa-credit-card" style="margin-right: 6px;"></i>
                                     <span class="d-none d-md-inline">Buy Now</span>
                                     <span class="d-inline d-md-none">Buy</span>
                                 </button>
@@ -376,12 +370,13 @@
                             </a>
                         </div>
                         <div class="product-page-action-buttons">
-                            <a href="{{ route('login') }}" class="product-page-btn-add-cart btn btn-lg d-flex align-items-center justify-content-center gap-2 flex-grow-1">
-                                <i class="fas fa-shopping-bag"></i>
-                                <span class="d-none d-md-inline">Add to Cart</span>
+                            <a href="{{ route('login') }}" class="product-page-btn-add-cart btn d-flex align-items-center">
+                                <i class="fas fa-shopping-cart" style="margin-right: 6px;"></i>
+                                <span class="d-none d-md-inline">Add Cart</span>
                                 <span class="d-inline d-md-none">Cart</span>
                             </a>
-                            <a href="{{ route('login') }}" class="product-page-btn-buy-now btn btn-lg d-flex align-items-center justify-content-center flex-grow-1">
+                            <a href="{{ route('login') }}" class="product-page-btn-buy-now btn d-flex align-items-center">
+                                <i class="fas fa-credit-card" style="margin-right: 6px;"></i>
                                 <span class="d-none d-md-inline">Buy Now</span>
                                 <span class="d-inline d-md-none">Buy</span>
                             </a>
@@ -404,38 +399,6 @@
         </div>
     </div>
 </div> <!-- Close outer container from line 27 -->
-
-    @if($product->reviews->count() > 0)
-    <div class="product-reviews-section py-5 bg-white border-top">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h3 class="mb-4">Customer Reviews</h3>
-                    <div class="reviews-list">
-                        @foreach($product->reviews as $review)
-                        <div class="review-item mb-4 pb-4 border-bottom">
-                            <div class="reviewer-header d-flex justify-content-between align-items-center mb-2">
-                                <div class="reviewer-name fw-bold" style="color: #333; font-size: 16px;">{{ $review->user->name ?? 'Anonymous' }}</div>
-                                <div class="review-date text-muted small">{{ $review->created_at->format('M d, Y') }}</div>
-                            </div>
-                            <div class="review-rating mb-2" style="color: #ffc107;">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <i class="fa{{ $i <= $review->rating ? 's' : 'r' }} fa-star"></i>
-                                    @endfor
-                            </div>
-                            @if($review->review)
-                            <div class="review-text text-secondary" style="font-size: 15px; line-height: 1.6;">
-                                {{ $review->review }}
-                            </div>
-                            @endif
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
 
     <!-- Related Products Section -->
     <section class="bg-light py-5">
@@ -461,6 +424,44 @@
             </div>
         </div>
     </section>
+
+    @if($product->reviews->count() > 0)
+    <div class="product-reviews-section py-5 bg-light border-top">
+        <div class="container-fluid px-4">
+            <div class="section-title mb-4">
+                <h2>Customer Reviews</h2>
+            </div>
+            <div class="swiper product-swiper" style="padding: 10px;">
+                <div class="swiper-wrapper">
+                    @foreach($product->reviews as $review)
+                    <div class="swiper-slide h-auto">
+                        <div class="review-card bg-white p-4 rounded shadow-sm h-100 border" style="border-color: #e2e8f0 !important;">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="reviewer-name fw-bold mb-1" style="color: #0f172a; font-size: 1.05rem;">{{ $review->user->name ?? 'Anonymous' }}</h5>
+                                    <div class="review-date text-muted" style="font-size: 0.8rem; font-weight: 500;">{{ $review->created_at->format('M d, Y') }}</div>
+                                </div>
+                                <div class="review-rating" style="color: #facc15; font-size: 0.9rem;">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fa{{ $i <= $review->rating ? 's' : 'r' }} fa-star"></i>
+                                    @endfor
+                                </div>
+                            </div>
+                            @if($review->review)
+                            <div class="review-text" style="color: #475569; font-size: 0.95rem; line-height: 1.6;">
+                                "{{ $review->review }}"
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                <div class="swiper-button-next" style="right: 0;"></div>
+                <div class="swiper-button-prev" style="left: 0;"></div>
+            </div>
+        </div>
+    </div>
+    @endif
 
 
     {{-- Lightbox markup --}}

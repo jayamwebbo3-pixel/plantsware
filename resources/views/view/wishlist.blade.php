@@ -2,6 +2,7 @@
 
 <!-- Ensure CSRF token is in header -->
 
+{{-- 
 <div class="sp_header bg-white p-3">
     <div class="container">
         <div class="row">
@@ -15,6 +16,7 @@
         </div>
     </div>
 </div>
+ --}}
 
 <div class="container wishlist-page-container">
     <div class="row">
@@ -485,197 +487,8 @@
         });
     }
 
-    // Add CSS animations
-    const style = document.createElement('style');
-    style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-    }
-    
-    .wishlist-toast {
-        font-family: Arial, sans-serif;
-    }
-    
-    .toast-content {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .toast-close {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.5rem;
-        cursor: pointer;
-        line-height: 1;
-        padding: 0;
-        margin-left: 10px;
-    }
-    
-    .empty-wishlist {
-        padding: 40px 0;
-    }
-    
-    .empty-wishlist i {
-        font-size: 4rem;
-        margin-bottom: 20px;
-    }
-    
-    .gi-btn-2 {
-        background: #72a420;
-        color: white;
-        border: none;
-        width: 45px !important;
-        height: 45px !important;
-        min-width: 45px !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 10px rgba(114, 164, 32, 0.3);
-        flex: none;
-        padding: 0;
-    }
-    
-    .gi-btn-2:hover {
-        background: #5d861a;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(114, 164, 32, 0.4);
-    }
-    
-    .gi-btn-1 {
-        background: #ff7675;
-        color: white;
-        border: none;
-        width: 45px !important;
-        height: 45px !important;
-        min-width: 45px !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 4px 10px rgba(255, 118, 117, 0.3);
-        flex: none;
-        padding: 0;
-    }
-    
-    .gi-btn-1:hover {
-        background: #ee5253;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(255, 118, 117, 0.4);
-    }
-    
-    .text-brand-success {
-        color: var(--primary-color, #6ea820) !important;
-    }
-    
-    .bg-brand-success {
-        background-color: var(--primary-color, #6ea820) !important;
-        color: white !important;
-    }
-    
-    .tbl-btn {
-        display: flex;
-        gap: 8px;
-    }
 
-    /* Simple Empty Cart Styles */
-    .empty-cart-container {
-        text-align: center;
-        padding: 60px 20px;
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
 
-    .empty-icon-wrapper {
-        width: 100px;
-        height: 100px;
-        background-color: #f3f7ed;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 25px;
-        color: var(--primary-color, #6ea820);
-        font-size: 40px;
-        transition: all 0.3s ease;
-    }
-
-    .empty-icon-wrapper:hover {
-        transform: scale(1.1) rotate(-10deg);
-    }
-
-    .empty-text {
-        font-size: 22px;
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 12px;
-    }
-
-    .empty-subtext {
-        font-size: 15px;
-        color: #777;
-        margin-bottom: 30px;
-        max-width: 400px;
-    }
-
-    .continue-shopping-btn {
-        display: inline-block;
-        background-color: var(--primary-color, #6ea820);
-        color: #fff !important;
-        padding: 12px 35px;
-        border-radius: 4px;
-        font-size: 15px;
-        font-weight: 600;
-        text-decoration: none !important;
-        transition: all 0.3s ease;
-        border: none;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .continue-shopping-btn:hover {
-        background-color: #5a8c16;
-        box-shadow: 0 5px 15px rgba(110, 168, 32, 0.3);
-    }
-
-    @media (max-width: 768px) {
-        .empty-cart-container {
-            padding: 40px 15px;
-        }
-        .empty-text {
-            font-size: 18px;
-        }
-    }
-`;
-    document.head.appendChild(style);
 
     // Initialize event listeners for add to cart buttons
     document.addEventListener('DOMContentLoaded', function() {

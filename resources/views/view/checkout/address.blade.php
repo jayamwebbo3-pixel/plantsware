@@ -2,14 +2,33 @@
 
 <div class="checkout-page-wrapper bg-light py-4 py-md-5">
     <div class="container">
-        <!-- Modern Breadcrumb/Steps -->
-        <nav aria-label="breadcrumb" class="mb-4 d-none d-md-block">
-            <ol class="breadcrumb checkout-steps justify-content-center">
-                <li class="breadcrumb-item"><a href="{{ route('cart.index') }}">Cart</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Address</li>
-                <li class="breadcrumb-item text-muted">Payment & Review</li>
-            </ol>
-        </nav>
+        <!-- Modern Step Header -->
+        <div class="d-flex align-items-center mb-4 pb-3 border-bottom d-md-none">
+            <a href="{{ route('cart.index') }}" class="text-dark text-decoration-none me-3">
+                <i class="fas fa-arrow-left fs-4"></i>
+            </a>
+            <div>
+                <div class="text-muted extra-small text-uppercase fw-bold" style="letter-spacing: 0.5px;">Step 2 of 3</div>
+                <h5 class="mb-0 fw-bold text-dark">Delivery Details</h5>
+            </div>
+        </div>
+
+        <!-- Desktop Steps Indicator -->
+        <div class="checkout-steps-container d-none d-md-flex justify-content-between align-items-center mb-4 mt-2" style="border-bottom: none; padding-bottom: 0;">
+            <div class="d-flex align-items-center">
+                <div class="step-item active fw-semibold" style="color: #388e3c; font-size: 15px;">
+                    Address
+                </div>
+                <div class="step-divider mx-3" style="color: #adb5bd;"><i class="fas fa-chevron-right" style="font-size: 11px;"></i></div>
+                
+                <div class="step-item pending fw-semibold" style="color: #adb5bd; font-size: 15px;">
+                    Payment & Review
+                </div>
+            </div>
+            <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.85rem;">
+                Step 1 of 2
+            </div>
+        </div>
 
         <div class="row g-4">
             <!-- Left Column: Address Selection & Form -->
@@ -32,55 +51,49 @@
                     @if(auth()->check() && $userAddresses->isNotEmpty())
                     <div class="card border-0 shadow-sm rounded-4 mb-4">
                         <div class="card-header bg-white py-3 border-bottom-0">
-                            <h5 class="mb-0 fw-bold d-flex align-items-center">
-                                <i class="fas fa-address-book text-success me-2"></i> Saved Addresses
+                            <h5 class="mb-0 fw-bold d-flex align-items-center" style="font-size: 18px; color: #0f172a;">
+                                <i class="fas fa-address-book fa-fw me-3" style="color: #388e3c;"></i> Saved Addresses
                             </h5>
                         </div>
                         <div class="card-body pt-0">
-                            <div class="row g-3">
+                            <div class="saved-addresses-list">
                                 @foreach($userAddresses as $addr)
                                 @php
                                 $isSelected = (isset($savedAddress['address_id']) && $savedAddress['address_id'] == $addr->id);
                                 @endphp
-                                <div class="col-md-6">
-                                    <div class="card h-100 saved-address-card border-2 transition-all cursor-pointer {{ $isSelected ? 'selected' : 'border-light' }}"
-                                        data-address='@json($addr)'
-                                        onclick="fillAddressFormFromData(this)">
-                                        <div class="card-body p-3">
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <h6 class="fw-bold mb-0 text-dark">{{ $addr->first_name }} {{ $addr->last_name }}</h6>
-                                                <div class="selection-indicator">
-                                                    <div class="indicator-dot"></div>
-                                                </div>
-                                            </div>
-                                            <!-- <div class="mt-1 mb-2">
-                                                            @if($addr->is_default)
-                                                                <span class="badge bg-primary-soft text-primary extra-small px-2">Default Address</span>
-                                                            @endif
-                                                        </div> -->
-                                            <p class="text-muted small mb-1 line-height-base">
-                                                {{ $addr->door_number ? $addr->door_number . ', ' : '' }}{{ $addr->street }}<br>
-                                                {{ $addr->city }}, {{ $addr->state }} - {{ $addr->post_code }}
-                                            </p>
-                                            <div class="text-dark small fw-medium mt-2">
-                                                <i class="fas fa-phone-alt me-1 extra-small text-muted"></i> {{ $addr->phone_number }}
-                                            </div>
+                                <div class="saved-address-card d-flex flex-column p-3 rounded shadow-sm border transition-all cursor-pointer mb-3 {{ $isSelected ? 'bg-white border-success selected' : 'bg-white border-light' }}"
+                                    data-address="{{ json_encode($addr) }}"
+                                    onclick="fillAddressFormFromData(this)"
+                                    style="border-color: {{ $isSelected ? '#388e3c' : '#e2e8f0' }} !important;">
+                                    
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="fw-bold text-uppercase" style="font-size: 12px; letter-spacing: 0.5px; color: #64748b;">
+                                            <i class="fas fa-address-card me-2"></i>Saved Address
+                                        </div>
+                                        @if($isSelected)
+                                            <span class="badge bg-success text-white px-3 py-2 rounded-pill shadow-sm" style="font-size: 12px;"><i class="fas fa-check-circle me-1"></i>Selected</span>
+                                        @else
+                                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill" style="font-size: 12px;">Select</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
+                                        <i class="fas fa-map-marker-alt fs-5 me-3" style="color: #1e293b;"></i>
+                                        <div class="text-truncate" style="font-size: 14.5px;">
+                                            <span class="fw-bold" style="color: #0f172a;">{{ explode(' ', trim($addr->first_name))[0] }}</span> 
+                                            <span class="text-muted mx-1">|</span>
+                                            <span style="color: #334155;">{{ $addr->street }}, {{ $addr->city }}, {{ $addr->state }} - {{ $addr->post_code }}</span>
                                         </div>
                                     </div>
                                 </div>
                                 @endforeach
 
-                                <!-- Add New Address Card -->
-                                <div class="col-md-6">
-                                    <div class="card h-100 border-2 border-dashed border-light transition-all cursor-pointer add-new-address-card text-center d-flex align-items-center justify-content-center p-4 bg-light shadow-sm-hover"
-                                        onclick="resetAndFocusForm()">
-                                        <div class="card-body py-4">
-                                            <div class="text-success mb-2 fs-3">
-                                                <i class="fas fa-plus-circle"></i>
-                                            </div>
-                                            <h6 class="fw-bold text-dark mb-1">Add New Address</h6>
-                                            <p class="text-muted extra-small mb-0">Enter a different delivery location</p>
-                                        </div>
+                                <!-- Add New Address Button -->
+                                <div class="d-flex align-items-center p-3 rounded border border-dashed transition-all cursor-pointer bg-light shadow-sm-hover add-new-address-card mb-3"
+                                    onclick="resetAndFocusForm()" style="border-color: #cbd5e1 !important;">
+                                    <i class="fas fa-plus-circle fs-5 me-3" style="color: #388e3c;"></i>
+                                    <div class="text-truncate" style="font-size: 14.5px;">
+                                        <span class="fw-bold" style="color: #0f172a;">Add New Address</span>
                                     </div>
                                 </div>
                             </div>
@@ -91,10 +104,10 @@
                     <!-- Shipping Form Card -->
                     <div class="card border-0 shadow-sm rounded-4 mb-4">
                         <div class="card-header bg-white py-3 border-bottom-0">
-                            <h5 class="mb-0 fw-bold d-flex align-items-center">
-                                <i class="fas fa-map-marker-alt text-success me-2"></i> Shipping Details
+                            <h5 class="mb-0 fw-bold d-flex align-items-center" style="font-size: 18px; color: #0f172a;">
+                                <i class="fas fa-map-marker-alt fa-fw me-3" style="color: #388e3c;"></i> Shipping Details
                             </h5>
-                            <p class="text-muted extra-small mb-0 mt-1">Please enter your accurate delivery information</p>
+                            <p class="text-muted extra-small mb-0 mt-1 ms-4 ps-2">Please enter your accurate delivery information</p>
                         </div>
                         <div class="card-body pt-2">
                             <form action="{{ route('checkout.saveAddress') }}" method="POST" id="shipping-address-form">
@@ -249,18 +262,27 @@
                                     </div>
                                 </div>
 
-                                <div class="checkout-actions d-flex flex-column flex-md-row justify-content-between mt-4 border-top pt-4 gap-3 px-3 px-md-4">
+                                <div class="checkout-actions d-none d-md-flex flex-column flex-md-row justify-content-between mt-4 border-top pt-4 gap-3 px-3 px-md-4">
                                     <a href="{{ route('cart.index') }}" class="btn-checkout-secondary order-2 order-md-1">
                                         <i class="fas fa-arrow-left me-2"></i>
-                                        <span class="d-none d-lg-inline">Back to Cart</span>
-                                        <span class="d-inline d-lg-none">Back</span>
+                                        Back to Cart
                                     </a>
-                                    <button type="submit" class="btn-checkout-primary order-1 order-md-2" style="font-size: 15px;">
-                                        <span class="d-none d-lg-inline">CONTINUE TO PAYMENT</span>
-                                        <span class="d-inline d-lg-none">CONTINUE</span>
-                                        <i class="fas fa-arrow-right ms-2"></i>
+                                    <button type="submit" class="btn-checkout-primary order-1 order-md-2 " style="font-size: 15px;">
+                                        CONTINUE TO PAYMENT <i class="fas fa-arrow-right mx-1"></i>
                                     </button>
                                 </div>
+                                
+                                <!-- Mobile Fixed Bottom Bar -->
+                                <div class="fixed-bottom bg-white border-top p-3 d-flex justify-content-between align-items-center shadow-lg d-md-none" style="z-index: 1050;">
+                                    <div>
+                                        <div class="fw-bold text-dark fs-5">₹{{ number_format($total, 2) }}</div>
+                                        <div class="text-primary small fw-medium" data-bs-toggle="modal" data-bs-target="#orderSummaryModal">View details</div>
+                                    </div>
+                                    <button type="submit" form="shipping-address-form" class="btn btn-dark px-4 py-2 fw-bold" style="border-radius: 6px;">
+                                        Proceed to Payment
+                                    </button>
+                                </div>
+
                             </form>
                         </div>
                     </div>
@@ -268,12 +290,46 @@
                 @endif
             </div>
 
+            <!-- Mobile Order Summary Modal -->
+            <div class="modal fade" id="orderSummaryModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-bottom modal-fullscreen-sm-down">
+                    <div class="modal-content border-0 rounded-top-4">
+                        <div class="modal-header border-bottom-0 pb-0">
+                            <h5 class="modal-title fw-bold">Order Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- We will render the same summary items here via JS or duplicate blade -->
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Bag Total</span>
+                                <span class="text-dark">₹{{ number_format($subtotal, 2) }}</span>
+                            </div>
+                            @if($discount > 0)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Bag Savings</span>
+                                <span class="text-success fw-bold">-₹{{ number_format($discount, 2) }}</span>
+                            </div>
+                            @endif
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Delivery Fee</span>
+                                <span class="text-dark">@if($shipping > 0) ₹{{ number_format($shipping, 2) }} @else <span class="text-success">Free</span> @endif</span>
+                            </div>
+                            <hr class="border-dashed">
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Amount Payable</span>
+                                <span>₹{{ number_format($total, 2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Right Column: Simplified Summary Sidebar -->
             <div class="col-lg-4">
                 <div class="sticky-top" style="top: 100px; z-index: 10;">
                     @if($cartItems && $cartItems->isNotEmpty())
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                        <div class="card-header py-3" style="background-color: var(--secondary-color, #2b6139) !important; color: #ffffff !important;">
+                        <div class="card-header py-3" style="background-color: #388e3c !important; border-bottom: none;">
                             <h6 class="mb-0 fw-bold text-center text-white" style="color: #ffffff !important;">ORDER SUMMARY</h6>
                         </div>
                         <div class="card-body p-0">
@@ -382,245 +438,6 @@
     </div>
 </div>
 
-<style>
-    :root {
-        --primary-color: #72a420;
-        --secondary-color: #0d6efd;
-        --light-bg: #f8f9fa;
-        --border-dashed: #dee2e6;
-        --primary-light: rgba(114, 164, 32, 0.1);
-    }
-
-    .checkout-page-wrapper {
-        min-height: 100vh;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    }
-
-    /* Steps */
-    .checkout-steps .breadcrumb-item+.breadcrumb-item::before {
-        content: "\f054";
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        font-size: 10px;
-        color: #adb5bd;
-    }
-
-    .checkout-steps .breadcrumb-item {
-        font-weight: 600;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .checkout-steps .breadcrumb-item.active {
-        color: var(--primary-color);
-    }
-
-    .checkout-steps .breadcrumb-item a {
-        color: #adb5bd;
-        text-decoration: none;
-    }
-
-    /* Saved Address Cards */
-    .saved-address-card,
-    .add-new-address-card {
-        border: 2px solid transparent;
-        background-color: #fff;
-    }
-
-    .saved-address-card:hover,
-    .add-new-address-card:hover {
-        border-color: var(--primary-light);
-        transform: translateY(-3px);
-    }
-
-    .shadow-sm-hover:hover {
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    }
-
-    .saved-address-card.selected {
-        border-color: var(--primary-color) !important;
-        background-color: var(--primary-light);
-    }
-
-    /* Selection Indicator styling */
-    .selection-indicator {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #dee2e6;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-
-    .indicator-dot {
-        width: 10px;
-        height: 10px;
-        background-color: #fff;
-        border-radius: 50%;
-        transform: scale(0);
-        transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-    }
-
-    .saved-address-card.selected .selection-indicator {
-        border-color: var(--primary-color);
-        background-color: var(--primary-color);
-    }
-
-    .saved-address-card.selected .indicator-dot {
-        transform: scale(1);
-    }
-
-    .border-primary-light {
-        border-color: var(--primary-light) !important;
-    }
-
-    .form-control,
-    .form-select {
-        border-radius: 10px;
-        padding: 10px 15px;
-        border: 1px solid #e9ecef;
-        background-color: #fff;
-        height: auto;
-        font-size: 14px;
-        transition: all 0.2s;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(114, 164, 32, 0.1);
-        outline: none;
-    }
-
-    .form-label {
-        margin-bottom: 0.5rem;
-    }
-
-    /* Product Thumbnail Sidebar */
-    .product-thumb-sm-preview {
-        width: 45px;
-        height: 45px;
-        flex-shrink: 0;
-        overflow: hidden;
-        margin-right: 15px !important;
-    }
-
-    /* Global Utils */
-    .bg-primary-soft {
-        background-color: rgba(13, 110, 253, 0.1);
-    }
-
-    .extra-small {
-        font-size: 11px;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-
-    .cursor-pointer {
-        cursor: pointer;
-    }
-
-    .shadow-success-hover:hover {
-        box-shadow: 0 8px 25px rgba(114, 164, 32, 0.4);
-        transform: translateY(-2px);
-        transition: all 0.3s;
-    }
-
-    .line-clamp-1 {
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    /* Buttons */
-    .btn-checkout-primary,
-    .btn-checkout-secondary {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: 100% !important; /* Full-width on mobile */
-        min-width: 170px !important;
-        max-width: 100% !important;
-        min-height: 44px !important;
-        padding: 10px 24px !important;
-        font-size: 14px !important;
-        font-weight: 700 !important;
-        text-transform: uppercase !important;
-        border-radius: 10px !important; /* Standardized 10px corner-radius box */
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        box-sizing: border-box !important;
-        border: none !important;
-        text-decoration: none !important;
-        white-space: nowrap !important;
-    }
-
-    .btn-checkout-primary {
-        background-color: #4a7856 !important;
-        color: #ffffff !important;
-        box-shadow: 0 4px 15px rgba(74, 120, 86, 0.25) !important;
-    }
-
-    .btn-checkout-primary:hover {
-        background-color: #3b6247 !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 25px rgba(59, 98, 71, 0.35) !important;
-        color: #ffffff !important;
-    }
-
-    .btn-checkout-secondary {
-        background-color: #f1f5f9 !important;
-        color: #475569 !important;
-        border: 1px solid #cbd5e1 !important;
-    }
-
-    .btn-checkout-secondary:hover {
-        background-color: #e2e8f0 !important;
-        color: #1e293b !important;
-        transform: translateY(-2px) !important;
-    }
-
-    @media (min-width: 768px) {
-        .btn-checkout-primary,
-        .btn-checkout-secondary {
-            width: auto !important; /* Auto-width on desktop/tablet */
-        }
-    }
-
-    @media (max-width: 575.98px) {
-        .btn-checkout-primary,
-        .btn-checkout-secondary {
-            min-width: 120px !important;
-            min-height: 38px !important;
-            padding: 8px 18px !important;
-            font-size: 13px !important;
-            border-radius: 8px !important;
-        }
-    }
-
-    /* Hide scrollbar but keep functionality */
-    .hover-opacity-100:hover { opacity: 1 !important; transform: scale(1.1); transition: all 0.2s; }
-    .border-dashed { border-top: 1px dashed #dee2e6 !important; background: transparent; }
-    .summary-item-row:hover { background-color: #fcfcfc; }
-
-    .cart-items-preview::-webkit-scrollbar-thumb {
-        background: #dee2e6;
-        border-radius: 10px;
-    }
-
-    @media (max-width: 991.98px) {
-        .sticky-top {
-            position: static !important;
-            margin-top: 2rem;
-        }
-    }
-</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -672,8 +489,15 @@
 
         // Remove selection from all cards
         document.querySelectorAll('.saved-address-card').forEach(card => {
-            card.classList.remove('selected', 'border-primary-light');
+            card.classList.remove('selected', 'border-success', 'border-primary-light');
             card.classList.add('border-light');
+            card.style.borderColor = '#e2e8f0';
+            
+            const badge = card.querySelector('.badge');
+            if (badge) {
+                badge.className = 'badge bg-light text-dark border px-3 py-2 rounded-pill';
+                badge.innerHTML = 'Select';
+            }
         });
 
         // Scroll to form and focus first field
@@ -685,9 +509,10 @@
     }
 
     function fillAddressFormFromData(element) {
-        const addr = JSON.parse(element.getAttribute('data-address'));
+        const addrStr = element.getAttribute('data-address');
+        const addr = JSON.parse(addrStr);
 
-        document.getElementById('address_id').value = addr.id;
+        document.getElementById('address_id').value = addr.id || '';
         document.getElementById('name').value = (addr.first_name || '') + ' ' + (addr.last_name || '');
         document.getElementById('door_number').value = addr.door_number || '';
         document.getElementById('address').value = addr.street || '';
@@ -698,12 +523,26 @@
 
         // Highlight selected card
         document.querySelectorAll('.saved-address-card').forEach(card => {
-            card.classList.remove('selected', 'border-primary-light');
+            card.classList.remove('selected', 'border-success', 'border-primary-light');
             card.classList.add('border-light');
+            card.style.borderColor = '#e2e8f0';
+            
+            const badge = card.querySelector('.badge');
+            if (badge) {
+                badge.className = 'badge bg-light text-dark border px-3 py-2 rounded-pill';
+                badge.innerHTML = 'Select';
+            }
         });
 
-        element.classList.add('selected');
+        element.classList.add('selected', 'border-success');
         element.classList.remove('border-light');
+        element.style.borderColor = '#388e3c';
+        
+        const currBadge = element.querySelector('.badge');
+        if (currBadge) {
+            currBadge.className = 'badge bg-success text-white px-3 py-2 rounded-pill shadow-sm';
+            currBadge.innerHTML = '<i class="fas fa-check-circle me-1"></i>Selected';
+        }
 
         // Scroll to form on mobile
         if (window.innerWidth < 768) {
@@ -787,7 +626,7 @@ async function removeFromCartSummary(itemId) {
     background: transparent;
     border: none;
     color: #adb5bd;
-    font-size: 14px;
+    font-size: clamp(12px, 1.2vw, 14px);
     padding: 5px;
     transition: all 0.2s;
     cursor: pointer;
@@ -802,6 +641,5 @@ async function removeFromCartSummary(itemId) {
     background-color: #fcfcfc;
 }
 /* Ensure Inter font */
-body { font-family: 'Inter', sans-serif !important; }
 </style>
 @include('view.layout.footer')

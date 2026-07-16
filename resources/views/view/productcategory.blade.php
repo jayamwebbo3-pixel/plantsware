@@ -1,37 +1,182 @@
 @include('view.layout.header')
 <style>
-    .product-card{
-margin: 0 5px !important;
+    .product-card {
+        margin: 0 5px !important;
     }
-    </style>
-<div class="sp_header bg-white p-3">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <ul class="list-unstyled mb-0">
-                    <li class="d-inline-block font-weight-bolder"><a href="{{ route('home') }}" class="text-decoration-none">home</a></li>
-                    <li class="d-inline-block font-weight-bolder mx-2">/</li>
-                    <li class="d-inline-block font-weight-bolder">
-                        <a href="{{ route('products.index') }}" class="text-decoration-none">
-                            @if(request()->filled('q'))
-                                Search Results
-                            @else
-                                Categories
-                            @endif
-                        </a>
-                    </li>
-                    @if(isset($category))
-                        <li class="d-inline-block font-weight-bolder mx-2">/</li>
-                        <li class="d-inline-block font-weight-bolder">{{ $category->name }}</li>
-                    @elseif(isset($subcategory))
-                        <li class="d-inline-block font-weight-bolder mx-2">/</li>
-                        <li class="d-inline-block font-weight-bolder">{{ $subcategory->name }}</li>
-                    @endif
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+
+    /* Premium Sidebar Form Container */
+    .side-menu {
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
+        border-radius: 16px !important;
+        padding: 24px !important;
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+    }
+
+    /* Sidebar Typography */
+    .side-menu-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #1a1a1a;
+        font-family: var(--font-main);
+        letter-spacing: -0.5px;
+    }
+    
+    .filter-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #2c3e50;
+        font-family: var(--font-main);
+        cursor: pointer;
+        transition: color 0.25s ease;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .filter-title:hover {
+        color: #2e6a39;
+    }
+    
+    .toggle-icon {
+        font-size: 0.75rem;
+        color: #95a5a6;
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .filter-section:not(.active) .toggle-icon {
+        transform: rotate(-90deg);
+    }
+    
+    .filter-options {
+        padding-top: 12px;
+        padding-bottom: 8px;
+        transition: all 0.35s ease;
+    }
+    
+    .filter-section:not(.active) .filter-options {
+        display: none;
+    }
+
+    /* Custom Checkboxes and Radios */
+    .filter-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .filter-item input[type="radio"],
+    .filter-item input[type="checkbox"] {
+        accent-color: #2e6a39;
+        width: 18px;
+        height: 18px;
+        margin-right: 12px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+    
+    .filter-item input:hover {
+        transform: scale(1.1);
+    }
+    
+    .filter-label {
+        font-size: 0.95rem;
+        color: #5a6268;
+        cursor: pointer;
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+    
+    .filter-label:hover {
+        color: #2e6a39;
+        font-weight: 500;
+        transform: translateX(3px);
+    }
+    
+    .filter-count {
+        color: #adb5bd;
+        font-size: 0.8rem;
+        background: #f8f9fa;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    /* noUiSlider Premium Overrides */
+    .noUi-connect {
+        background: #2e6a39 !important;
+    }
+    .noUi-horizontal {
+        height: 6px !important;
+        border: none !important;
+        box-shadow: inset 0 1px 4px rgba(0,0,0,0.1) !important;
+        background: #e9ecef !important;
+        border-radius: 10px !important;
+    }
+    .noUi-handle {
+        border-radius: 50% !important;
+        background: #fff !important;
+        border: 2px solid #2e6a39 !important;
+        box-shadow: 0 2px 6px rgba(46, 106, 57, 0.4) !important;
+        width: 20px !important;
+        height: 20px !important;
+        top: -7px !important;
+        right: -10px !important;
+        cursor: grab;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .noUi-handle:active {
+        cursor: grabbing;
+        transform: scale(1.15);
+        box-shadow: 0 4px 10px rgba(46, 106, 57, 0.5) !important;
+    }
+    .noUi-handle::before,
+    .noUi-handle::after {
+        display: none !important;
+    }
+
+    /* Action Buttons */
+    .btn-filter.btn-apply {
+        background: #2e6a39;
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 10px 0;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(46, 106, 57, 0.3);
+    }
+    
+    .btn-filter.btn-apply:hover {
+        background: #23522c;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(46, 106, 57, 0.4);
+    }
+    
+    .btn-filter.btn-reset {
+        background: #fff;
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 10px 0;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-filter.btn-reset:hover {
+        background: #dc3545;
+        color: #fff;
+        border-color: #dc3545;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(220, 53, 69, 0.2);
+    }
+</style>
+
+
 
 <section class="py-4">
     <div class="container-fluid">
@@ -48,11 +193,14 @@ margin: 0 5px !important;
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="side-menu-title mb-0">Filters</h2>
-                        @if(request()->except(['page']))
-                        <a href="{{ url()->current() }}" class="text-danger text-decoration-none" style="font-size:13px;">
-                            <i class="fas fa-times-circle me-1"></i>Clear All
-                        </a>
-                        @endif
+                        <div class="d-flex align-items-center">
+                            @if(request()->except(['page']))
+                            <a href="{{ url()->current() }}" class="text-danger text-decoration-none me-3" style="font-size:13px;">
+                                <i class="fas fa-times-circle me-1"></i>Clear All
+                            </a>
+                            @endif
+                            <button type="button" class="btn-close d-md-none" id="mobileFilterClose" style="border: none; background: transparent; font-size: 1.5rem; color: #333; line-height: 1;">&times;</button>
+                        </div>
                     </div>
 
     {{-- noUiSlider for Dual Price Range --}}
@@ -269,8 +417,8 @@ margin: 0 5px !important;
                     </div>
 
                     {{-- â”€â”€ Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
-                    <div class="filter-actions d-flex gap-2 mt-3">
-                        <button class="btn-filter btn-apply flex-fill" type="submit" id="applyFiltersBtn">Apply Filters</button>
+                    <div class="filter-actions d-flex mt-3">
+                        <button class="btn-filter btn-apply flex-fill mr-2" style="margin-right: 8px;" type="submit" id="applyFiltersBtn">Apply Filters</button>
                         <a href="{{ url()->current() }}"
                             class="btn-filter btn-reset flex-fill text-center text-decoration-none"
                             style="display:flex; justify-content:center; align-items:center;">Reset All</a>

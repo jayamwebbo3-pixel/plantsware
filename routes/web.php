@@ -73,6 +73,7 @@ Route::prefix('cart')->name('cart.')->group(function () {
 
 Route::prefix('wishlist')->name('wishlist.')->controller(CartController::class)->group(function () {
     Route::get('/', 'wishlist')->name('index');
+    Route::get('/drawer', 'wishlistDrawer')->name('drawer');
     Route::post('/add/{product}', 'addToWishlist')->name('add');
     Route::delete('/remove/{product}', 'removeFromWishlist')->name('remove');
     Route::post('/add-combo/{combo}', 'addToWishlistCombo')->name('add_combo');

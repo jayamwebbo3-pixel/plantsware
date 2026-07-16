@@ -15,7 +15,7 @@ class PageController extends Controller
     public function edit($slug)
     {
         $page = Page::where('slug', $slug)->first();
-        
+
         if (!$page && $slug === 'ad-banner') {
             $page = Page::create([
                 'title' => 'Ad Banner',
@@ -66,13 +66,13 @@ class PageController extends Controller
         if ($request->has('title')) {
             $page->title = $request->input('title');
         }
-        
+
         $page->content = $request->input('content');
         $page->policy_date = $request->input('policy_date');
-        
+
         // Handle extra_content merging
         $extraContent = $page->extra_content ?? [];
-        
+
         if ($request->has('features')) {
             $extraContent['features'] = $request->input('features');
         }

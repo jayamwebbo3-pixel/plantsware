@@ -71,6 +71,12 @@ class ComboPackController extends Controller
             });
         }
 
+        // Price Min Filter
+        if ($request->filled('price_min')) {
+            $priceMin = $request->price_min;
+            $query->where('offer_price', '>=', $priceMin);
+        }
+
         // Price Max Filter
         if ($request->filled('price_max')) {
             $priceMax = $request->price_max;

@@ -140,7 +140,7 @@
             @if(isset($coupon) && $coupon)
                 <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded" style="border: 1px dashed #2b6139;">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-ticket-alt text-success me-2"></i>
+                        <i class="fas fa-ticket-alt text-success mr-2"></i>
                         <span class="fw-bold text-success small text-uppercase">{{ $coupon->coupon_code }} Applied</span>
                     </div>
                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDrawerCoupon()" style="padding: 2px 8px; font-size: 11px;">Remove</button>
@@ -148,11 +148,11 @@
             @else
                 <form id="drawerCouponForm" onsubmit="applyDrawerCoupon(event)" style="margin-bottom: 12px;">
                     <label class="fw-bold mb-2 text-dark d-flex align-items-center" style="font-size: 15px;">
-                        <i class="fas fa-ticket-alt text-success me-2"></i>Have A Coupon?
+                        <i class="fas fa-ticket-alt text-success mr-2"></i>Have A Coupon?
                     </label>
-                    <div class="d-flex gap-2">
-                        <input type="text" id="drawerCouponCode" class="form-control" placeholder="ENTER CODE" style="text-transform: uppercase; font-weight: 600; font-size: 13px; border-radius: 4px; padding: 6px 12px; height: 38px;">
-                        <button class="btn btn-success" type="submit" style="background-color: #2b6139; border-color: #2b6139; border-radius: 4px; padding: 6px 12px; font-weight: 600; color: white; white-space: nowrap; flex-shrink: 0; font-size: 14px; width: auto !important;">Apply</button>
+                    <div class="d-flex">
+                        <input type="text" id="drawerCouponCode" class="form-control mr-2 flex-grow-1" placeholder="ENTER CODE" style="text-transform: uppercase; font-weight: 600; font-size: 13px; border-radius: 50px; padding: 6px 16px; height: 38px; min-width: 0;">
+                        <button class="btn btn-success flex-shrink-0" type="submit" style="background-color: #2b6139; border-color: #2b6139; border-radius: 50px; padding: 6px 16px; font-weight: 600; color: white; font-size: 14px;">Apply</button>
                     </div>
                     <div id="drawerCouponError" style="display: none; font-size: 11px; font-weight: 600; color: #dc3545 !important; margin-top: 6px; line-height: 1.3;"></div>
                 </form>
@@ -181,7 +181,7 @@
         </div>
         
         <div class="drawer-actions mt-3">
-            <a href="{{ route('checkout.address') }}" class="btn btn-success w-100 py-3 btn-checkout-drawer d-flex justify-content-between align-items-center px-3 px-sm-4" style="border-radius: 8px; font-weight: 700; letter-spacing: 0.5px; height: auto !important; line-height: 1.2;">
+            <a href="{{ route('checkout.address') }}" class="btn btn-outline-success w-100 py-3 btn-checkout-drawer d-flex justify-content-center align-items-center" style="border-radius: 50px; font-weight: 700; letter-spacing: 0.5px; height: auto !important; line-height: 1.2;">
                 <span class="d-none d-sm-inline">Checkout</span>
                 <span class="d-inline d-sm-none">Checkout</span>
                 <!-- <span>₹{{ number_format($total ?? $subtotal, 2) }}</span> -->

@@ -2,7 +2,7 @@
 <footer class="footer">
     <div class="container">
         <div class="row">
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-3 col-md-6 col-12 mb-4">
                 <h5>About Us</h5>
                 <p>{{ $headerFooter->footer_content ?? 'We are passionate about providing high-quality gardening products and solutions to help you create beautiful, thriving green spaces.' }}</p>
                 <div class="social-links">
@@ -15,7 +15,7 @@
             </div>
 
             <!-- Second Column: Quick Links -->
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-3 col-md-6 col-6 mb-4">
                 <h5>Quick Links</h5>
                 <ul>
                     <li><a href="{{ route('home') }}">Home</a></li>
@@ -29,7 +29,7 @@
                 </ul>
             </div>
 
-            <div class="col-lg-3 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6 col-6 mb-4">
                 <h5>Categories</h5>
                 <ul>
                     @foreach($headerCategories->take(6) as $category)
@@ -74,7 +74,8 @@
                 </div>
             </div>
 
-        </div>
+        </div> <!-- End row -->
+    </div> <!-- End top container -->
 
         <!-- Footer Bottom -->
         <div class="footer-bottom py-3">
@@ -83,8 +84,8 @@
                 <div class="footer-highlights-bar py-3 mb-4">
                     <div class="row">
                         <!-- Highlight 1 -->
-                        <div class="col-lg-3 col-md-6 mb-3 mb-lg-0 highlight-item">
-                            <div class="d-flex align-items-center justify-content-center justify-content-lg-start">
+                        <div class="col-lg-3 col-md-6 col-6 mb-3 mb-lg-0 highlight-item">
+                            <div class="d-flex align-items-center justify-content-start">
                                 <div class="highlight-icon-wrapper">
                                     <i class="fas fa-truck"></i>
                                 </div>
@@ -95,8 +96,8 @@
                             </div>
                         </div>
                         <!-- Highlight 2 -->
-                        <div class="col-lg-3 col-md-6 mb-3 mb-lg-0 highlight-item">
-                            <div class="d-flex align-items-center justify-content-center justify-content-lg-start">
+                        <div class="col-lg-3 col-md-6 col-6 mb-3 mb-lg-0 highlight-item">
+                            <div class="d-flex align-items-center justify-content-start">
                                 <div class="highlight-icon-wrapper">
                                     <i class="fas fa-shield-alt"></i>
                                 </div>
@@ -107,8 +108,8 @@
                             </div>
                         </div>
                         <!-- Highlight 3 -->
-                        <div class="col-lg-3 col-md-6 mb-3 mb-lg-0 highlight-item">
-                            <div class="d-flex align-items-center justify-content-center justify-content-lg-start">
+                        <div class="col-lg-3 col-md-6 col-6 mb-3 mb-lg-0 highlight-item">
+                            <div class="d-flex align-items-center justify-content-start">
                                 <div class="highlight-icon-wrapper">
                                     <i class="fas fa-undo"></i>
                                 </div>
@@ -119,8 +120,8 @@
                             </div>
                         </div>
                         <!-- Highlight 4 -->
-                        <div class="col-lg-3 col-md-6 highlight-item">
-                            <div class="d-flex align-items-center justify-content-center justify-content-lg-start">
+                        <div class="col-lg-3 col-md-6 col-6 highlight-item">
+                            <div class="d-flex align-items-center justify-content-start">
                                 <div class="highlight-icon-wrapper">
                                     <i class="fas fa-award"></i>
                                 </div>
@@ -134,47 +135,47 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-12 d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="col-12">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-3">
+                            <!-- Left Side -->
+                            <p class="m-0 text-center text-md-start mb-0" style="flex: 1;">
+                                &copy; {{ date('Y') }} Plantsware. All rights reserved.
+                            </p>
 
-                        <!-- Left Side -->
-                        <p class="mb-2 mb-md-0">
-                            &copy; 2026 Plantsware. All rights reserved.
-                        </p>
+                            <!-- Middle: Payments -->
+                            <div class="footer-bottom-payment d-flex justify-content-center flex-wrap gap-2" style="flex: 1;">
+                                <div class="payment-link bg-white px-2 py-1  d-flex align-items-center">
+                                    <img src="./assets/images/visa.png" alt="Visa" height="20" style="object-fit: contain; max-width: 40px;">
+                                </div>
+                                <div class="payment-link bg-white px-2 py-1  d-flex align-items-center">
+                                    <img src="./assets/images/rupay.png" alt="RuPay" height="20" style="object-fit: contain; max-width: 40px;">
+                                </div>
+                                <div class="payment-link bg-white px-2 py-1  d-flex align-items-center">
+                                    <img src="./assets/images/gpay.png" alt="GPay" height="20" style="object-fit: contain; max-width: 40px;">
+                                </div>
+                                <div class="payment-link bg-white px-2 py-1  d-flex align-items-center">
+                                    <img src="./assets/images/paytm.png" alt="PayTM" height="20" style="object-fit: contain; max-width: 40px;">
+                                </div>
+                                <div class="payment-link bg-white px-2 py-1  d-flex align-items-center">
+                                    <img src="./assets/images/upi.png" alt="UPI" height="20" style="object-fit: contain; max-width: 40px;">
+                                </div>
+                            </div>
 
-                        <!-- <div class="footer-bottom-payment d-flex justify-content-center">
-                            <div class="payment-link">
-                                <img src="/assets/images/visa.png" alt="payment">
-                            </div>
-                            <div class="payment-link">
-                                <img src="/assets/images/rupay.png" alt="payment">
-                            </div>
-                            <div class="payment-link">
-                                <img src="/assets/images/gpay.png" alt="payment">
-                            </div>
-                            <div class="payment-link">
-                                <img src="/assets/images/paytm.png" alt="payment">
-                            </div>
-                            <div class="payment-link">
-                                <img src="/assets/images/upi.png" alt="payment">
-                            </div>
-                        </div> -->
-
-                        <p class="mb-0">
-                            <a href="https://jayamwebsolutions.com/web-design-company-in-chennai.php" class="text-dark"> Developed by Jayam Web Solutions</a>
-                        </p>
-
+                            <!-- Right Side -->
+                            <p class="m-0 text-center text-md-end mb-0" style="flex: 1;">
+                                <a href="https://jayamwebsolutions.com/web-design-company-in-chennai.php" class="developer-link">Developed by Jayam Web Solutions</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-    </div>
 </footer>
 <!-- footer -->
 <!-- footer end -->
 <!-- Floating WhatsApp Button -->
 @if($headerFooter->whatsapp_no)
-<a href="https://wa.me/{{ $headerFooter->whatsapp_no }}?text=Hello! I have a question about your products." class="whatsapp-float shadow-lg" target="_blank">
+<a href="https://wa.me/{{ $headerFooter->whatsapp_no }}?text=Hello! I have a question about your products." class="whatsapp-float shadow-lg d-none d-md-flex" target="_blank">
     <div class="whatsapp-message-container">
         <div class="whatsapp-message">{{ $headerFooter->whatsapp_msg_1 ?? 'Chat with us' }}</div>
         <div class="whatsapp-message">{{ $headerFooter->whatsapp_msg_2 ?? 'Enquire and Order' }}</div>
@@ -182,140 +183,16 @@
     </div>
     <i class="fab fa-whatsapp"></i>
 </a>
+
+<!-- Mobile Sticky Bottom WhatsApp -->
+<div class="mobile-whatsapp-bottom d-md-none">
+    <a href="https://wa.me/{{ $headerFooter->whatsapp_no }}?text=Hello! I have a question about your products." target="_blank">
+        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+    </a>
+</div>
 @endif
 
-<style>
-    .whatsapp-float {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        width: 60px;
-        height: 60px;
-        background-color: #25d366;
-        color: #FFF;
-        border-radius: 50px;
-        text-align: center;
-        font-size: 34px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        text-decoration: none !important;
-        transition: all 0.3s ease;
-        animation: pulse-whatsapp 2s infinite;
-    }
 
-    .whatsapp-float:hover {
-        background-color: #128c7e;
-        transform: scale(1.1);
-        color: #FFF;
-    }
-
-    .whatsapp-message-container {
-        position: absolute;
-        right: 80px;
-        background: transparent;
-        color: white;
-        border-radius: 8px;
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr;
-        place-items: center;
-        opacity: 1;
-        visibility: visible;
-        pointer-events: none;
-    }
-
-    .whatsapp-message {
-        grid-area: 1 / 1 / 2 / 2;
-        position: relative;
-        opacity: 0;
-        text-align: left;
-        width: max-content;
-        background: #333;
-        padding: 8px 15px;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        font-size: 14px;
-        font-weight: 500;
-        white-space: nowrap;
-        animation: fade-sequence 15s infinite ease-in-out;
-        display: inline-flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-
-    /* Sequential timing: 5s per message in a 15s total cycle */
-    .whatsapp-message:nth-child(1) {
-        animation-delay: 0s;
-    }
-
-    .whatsapp-message:nth-child(2) {
-        animation-delay: 5s;
-    }
-
-    .whatsapp-message:nth-child(3) {
-        animation-delay: 10s;
-    }
-
-    @keyframes fade-sequence {
-        0% {
-            opacity: 0;
-            transform: translateX(10px);
-        }
-
-        1.33% { /* 0.2s fade-in */
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        6.67% { /* Stay visible until 1.0s */
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        8% { /* 0.2s fade-out (done at 1.2s) */
-            opacity: 0;
-            transform: translateX(-10px);
-        }
-
-        100% {
-            opacity: 0;
-            transform: translateX(-10px);
-        }
-    }
-
-    @keyframes pulse-whatsapp {
-        0% {
-            transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
-        }
-
-        70% {
-            transform: scale(1.05);
-            box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
-        }
-
-        100% {
-            transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
-        }
-    }
-
-    @media (max-width: 768px) {
-        .whatsapp-float {
-            width: 50px;
-            height: 50px;
-            font-size: 28px;
-            bottom: 20px;
-            right: 20px;
-        }
-
-        .whatsapp-message-container {
-            display: none;
-        }
-    }
-</style>
 
 
 <!-- Cart Drawer Overlay -->
@@ -330,9 +207,21 @@
     
     <div class="cart-drawer-body" id="cartDrawerBody">
         <div class="cart-drawer-loading">
-            <div class="spinner-border text-success" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
+            <!-- Blank state while loading -->
+        </div>
+    </div>
+</div>
+
+<!-- Wishlist Drawer -->
+<div id="wishlistDrawer" class="cart-drawer">
+    <div class="cart-drawer-header">
+        <h5 class="cart-drawer-title">My Wishlist</h5>
+        <button type="button" id="closeWishlistDrawerBtn" class="cart-drawer-close-btn">&times;</button>
+    </div>
+    
+    <div class="cart-drawer-body" id="wishlistDrawerBody">
+        <div class="cart-drawer-loading">
+            <!-- Blank state while loading -->
         </div>
     </div>
 </div>
@@ -418,9 +307,9 @@
                         slidesPerView: 4,
                         spaceBetween: 15,
                     },
-                    1300: {
+                    1180: {
                         slidesPerView: 5,
-                        spaceBetween: 20,
+                        spaceBetween: 16,
                     },
                 },
             });
@@ -466,58 +355,40 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize the carousel dynamically based on slide count
-        var catSlideCount = $('#plantCategoriesCarousel .plant-category-item').length;
-        $('#plantCategoriesCarousel').slick({
-            dots: false,
-            arrows: false,
-            infinite: catSlideCount > 1,
-            speed: 300,
-            slidesToShow: Math.min(6, catSlideCount),
-            slidesToScroll: 1,
-            autoplay: catSlideCount > 1,
-            autoplaySpeed: 3000,
-            responsive: [{
-                    breakpoint: 1024,
-                    settings: {
-                        slidesToShow: Math.min(5, catSlideCount),
-                        slidesToScroll: 1
-                    }
+        const categorySwiper = new Swiper('.plant-categories-carousel', {
+            slidesPerView: 2,
+            spaceBetween: 10,
+            loop: true,
+            speed: 800,
+            grabCursor: true,
+            freeMode: false,
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
+            breakpoints: {
+                375: {
+                    slidesPerView: 3,
+                    spaceBetween: 10,
                 },
-                {
-                    breakpoint: 768,
-                    settings: {
-                        slidesToShow: Math.min(4, catSlideCount),
-                        slidesToScroll: 1
-                    }
+                575: {
+                    slidesPerView: 4,
+                    spaceBetween: 15,
                 },
-                {
-                    breakpoint: 576,
-                    settings: {
-                        slidesToShow: Math.min(3, catSlideCount),
-                        slidesToScroll: 1
-                    }
+                768: {
+                    slidesPerView: 5,
+                    spaceBetween: 20,
                 },
-                {
-                    breakpoint: 375,
-                    settings: {
-                        slidesToShow: Math.min(2, catSlideCount),
-                        slidesToScroll: 1
-                    }
-                }
-            ]
-        });
-
-        // Custom navigation buttons
-        $('#prevBtn').click(function() {
-            $('#plantCategoriesCarousel').slick('slickPrev');
-        });
-
-        $('#nextBtn').click(function() {
-            $('#plantCategoriesCarousel').slick('slickNext');
+                1024: {
+                    slidesPerView: 6,
+                    spaceBetween: 20,
+                },
+            },
         });
     });
 </script>
+
 
 <!-- blog sharing section -->
 <script>
@@ -581,8 +452,38 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
+    // --- Wishlist Drawer JS ---
+    const wishlistDrawer = document.getElementById('wishlistDrawer');
+    const closeWishlistBtn = document.getElementById('closeWishlistDrawerBtn');
+    
+    function openWishlistDrawer() {
+        wishlistDrawer.classList.add('active');
+        cartDrawerOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        refreshWishlistDrawer();
+    }
+    
+    function closeWishlistDrawer() {
+        wishlistDrawer.classList.remove('active');
+        cartDrawerOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    function refreshWishlistDrawer() {
+        fetch("{{ route('wishlist.drawer') }}")
+            .then(res => res.text())
+            .then(html => {
+                const body = document.getElementById('wishlistDrawerBody');
+                if (body) {
+                    body.innerHTML = html;
+                }
+            })
+            .catch(err => console.error('Error fetching wishlist drawer:', err));
+    }
+    // --------------------------
+
     function updateCartCountBadges(count) {
-        document.querySelectorAll('.cart-icon-link .price_cart').forEach(el => {
+        document.querySelectorAll('.cart-icon-link .price_cart, .cart-icon-link .badge-count').forEach(el => {
             el.textContent = count;
         });
     }
@@ -596,21 +497,34 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openCartDrawer = openCartDrawer;
     window.closeCartDrawer = closeCartDrawer;
     window.refreshCartDrawer = refreshCartDrawer;
+    window.openWishlistDrawer = openWishlistDrawer;
+    window.closeWishlistDrawer = closeWishlistDrawer;
+    window.refreshWishlistDrawer = refreshWishlistDrawer;
     window.updateCartCountBadges = updateCartCountBadges;
     window.updateWishlistCountBadges = updateWishlistCountBadges;
     
-     document.addEventListener('click', function(e) {
+    document.addEventListener('click', function(e) {
         const cartLink = e.target.closest('.cart-icon-link');
         if (cartLink) {
             e.preventDefault();
             openCartDrawer();
         }
+        const wishlistLink = e.target.closest('.wishlist-icon-link');
+        if (wishlistLink) {
+            e.preventDefault();
+            openWishlistDrawer();
+        }
     });
-    // Intercept clicks on the cart icon to open the side cart drawer instead of navigating to the cart page
     
     // Close Drawer events
     if (closeBtn) closeBtn.addEventListener('click', closeCartDrawer);
-    if (cartDrawerOverlay) cartDrawerOverlay.addEventListener('click', closeCartDrawer);
+    if (closeWishlistBtn) closeWishlistBtn.addEventListener('click', closeWishlistDrawer);
+    if (cartDrawerOverlay) {
+        cartDrawerOverlay.addEventListener('click', function() {
+            closeCartDrawer();
+            closeWishlistDrawer();
+        });
+    }
     
     // Continue Shopping button inside drawer (dynamic delegate)
     document.addEventListener('click', function(e) {
@@ -948,6 +862,78 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     };
+
+    // --- AJAX Wishlist Toggle ---
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.ajax-wishlist-btn');
+        if (btn) {
+            e.preventDefault();
+            const icon = btn.querySelector('i.fa-heart');
+            const inWishlist = btn.getAttribute('data-in-wishlist') === 'true';
+            
+            // Determine URL and Method
+            const url = inWishlist ? btn.getAttribute('data-remove-url') : btn.getAttribute('data-add-url');
+            const method = inWishlist ? 'DELETE' : 'POST';
+            
+            // Optimistic UI Update
+            if (inWishlist) {
+                // Removing
+                icon.classList.remove('fas', 'text-danger');
+                icon.classList.add('far');
+                btn.setAttribute('data-in-wishlist', 'false');
+            } else {
+                // Adding
+                icon.classList.remove('far');
+                icon.classList.add('fas', 'text-danger');
+                btn.setAttribute('data-in-wishlist', 'true');
+            }
+            
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Update badge count
+                    if (data.wishlist_count !== undefined) {
+                        document.querySelectorAll('.wishlist-icon-link .badge-count').forEach(el => {
+                            el.innerText = data.wishlist_count;
+                        });
+                    }
+                } else {
+                    throw new Error(data.message || 'Something went wrong');
+                }
+            })
+            .catch(err => {
+                console.error('Wishlist error:', err);
+                // Revert on error
+                if (inWishlist) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas', 'text-danger');
+                    btn.setAttribute('data-in-wishlist', 'true');
+                } else {
+                    icon.classList.remove('fas', 'text-danger');
+                    icon.classList.add('far');
+                    btn.setAttribute('data-in-wishlist', 'false');
+                }
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+                Toast.fire({ icon: 'error', title: 'Failed to update wishlist.' });
+            });
+        }
+    });
 
     // --- Collapsible Filter Sections ---
     document.addEventListener('click', function(e) {

@@ -2,80 +2,67 @@
 
 <div class="checkout-page-wrapper bg-light py-4 py-md-5">
     <div class="container">
-        <!-- Modern Breadcrumb/Steps -->
-        <nav aria-label="breadcrumb" class="mb-4 d-none d-md-block">
-            <ol class="breadcrumb checkout-steps justify-content-center">
-                <li class="breadcrumb-item"><a href="{{ route('cart.index') }}">Cart</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('checkout.address') }}">Address</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Payment & Review</li>
-            </ol>
-        </nav>
+        <!-- Modern Step Header -->
+        <div class="d-flex align-items-center mb-4 pb-3 border-bottom d-md-none">
+            <a href="{{ route('checkout.address') }}" class="text-dark text-decoration-none me-3">
+                <i class="fas fa-arrow-left fs-4"></i>
+            </a>
+            <div>
+                <div class="text-muted extra-small text-uppercase fw-bold" style="letter-spacing: 0.5px;">Step 3 of 3</div>
+                <h5 class="mb-0 fw-bold text-dark">Order Details & Payment</h5>
+            </div>
+        </div>
+
+        <!-- Desktop Steps Indicator -->
+        <div class="checkout-steps-container d-none d-md-flex justify-content-between align-items-center mb-4 mt-2" style="border-bottom: none; padding-bottom: 0;">
+            <div class="d-flex align-items-center">
+                <div class="step-item completed fw-semibold" style="font-size: 15px;">
+                    <a href="{{ route('checkout.address') }}" class="text-decoration-none" style="color: #388e3c;">Address</a>
+                </div>
+                <div class="step-divider mx-3" style="color: #388e3c;"><i class="fas fa-chevron-right" style="font-size: 11px;"></i></div>
+                
+                <div class="step-item active fw-semibold" style="color: #388e3c; font-size: 15px;">
+                    Payment & Review
+                </div>
+            </div>
+            <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.85rem;">
+                Step 2 of 2
+            </div>
+        </div>
 
         <div class="row g-4">
             <!-- Left Column: Shipping & Payment -->
             <div class="col-lg-8">
                 <div class="checkout-main-content">
 
-                    <!-- Address Info Row -->
-                    <div class="row g-4 mb-4">
-                        <!-- Shipping Address Column -->
-                        <div class="col-md-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
-                                <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0 fw-bold d-flex align-items-center">
-                                        <i class="fas fa-shipping-fast text-success me-2"></i> Shipping Address
-                                    </h5>
-                                    <div>
-                                        <a href="{{ route('checkout.address') }}" class="btn btn-success btn-xs-comp rounded-pill px-3 shadow-sm">
-                                            <i class="fas fa-edit me-1"></i> Change
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="card-body pt-0">
-                                    <div class="shipping-info-box p-3 rounded-3 bg-light border h-100">
-                                        <div class="address-details">
-                                            <h6 class="fw-bold mb-1">{{ $shippingAddress['name'] }}</h6>
-                                            <p class="text-muted mb-0 small line-height-base">
-                                                @if(!empty($shippingAddress['door_number'])){{ $shippingAddress['door_number'] }}, @endif{{ $shippingAddress['address'] }}<br>
-                                                {{ $shippingAddress['city'] }}, {{ $shippingAddress['state'] }} - {{ $shippingAddress['pincode'] }}<br>
-                                                <span class="text-dark fw-medium mt-1 d-block"><i class="fas fa-phone-alt me-1 small"></i> {{ $shippingAddress['phone'] }}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- Shipping Address Bar -->
+                    <div class="d-flex flex-column p-3 bg-white mb-3 rounded shadow-sm border" style="border-color: #e2e8f0 !important;">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="fw-bold text-uppercase" style="font-size: 12px; letter-spacing: 0.5px; color: #64748b;"><i class="fas fa-truck me-2"></i>Shipping Address</div>
+                            <a href="{{ route('checkout.address') }}#shipping-address-form" class="text-decoration-none fw-bold px-3 py-1 rounded shadow-sm transition-all d-flex align-items-center" style="font-size: 12px; color: #1f2937; background-color: #ffffff; border: 1px solid #4b5563;"><i class="fas fa-edit me-1" style="color: #4b5563;"></i> Edit</a>
+                        </div>
+                        <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
+                            <i class="fas fa-map-marker-alt fs-5 me-3" style="color: #1e293b;"></i>
+                            <div class="text-truncate" style="font-size: 14.5px;">
+                                <span class="fw-bold" style="color: #0f172a;">{{ explode(' ', trim($shippingAddress['name'] ?? ''))[0] ?? '' }}</span> 
+                                <span class="text-muted mx-1">|</span>
+                                <span style="color: #334155;">{{ $shippingAddress['address'] ?? '' }}, {{ $shippingAddress['city'] ?? '' }}, {{ $shippingAddress['state'] ?? '' }} - {{ $shippingAddress['pincode'] ?? '' }}</span>
                             </div>
                         </div>
-                        <!-- Billing Address Column -->
-                        <div class="col-md-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
-                                <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0 fw-bold d-flex align-items-center">
-                                        <i class="fas fa-file-invoice text-success me-2"></i> Billing Address
-                                    </h5>
-                                    <div>
-                                        <a href="{{ route('checkout.address') }}" class="btn btn-success btn-xs-comp rounded-pill px-3 shadow-sm">
-                                            <i class="fas fa-edit me-1"></i> Change
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="card-body pt-0">
-                                    <div class="shipping-info-box p-3 rounded-3 bg-light border h-100">
-                                        <div class="address-details">
-                                            @if($billingSame)
-                                                <p class="text-muted mb-0 small py-3 text-center">
-                                                    <i class="fas fa-check-circle text-success me-1"></i> Same as shipping address
-                                                </p>
-                                            @else
-                                                <h6 class="fw-bold mb-1">{{ $billingAddress['name'] ?? '' }}</h6>
-                                                <p class="text-muted mb-0 small line-height-base">
-                                                    @if(!empty($billingAddress['door_number'])){{ $billingAddress['door_number'] }}, @endif{{ $billingAddress['address'] ?? '' }}<br>
-                                                    {{ $billingAddress['city'] ?? '' }}, {{ $billingAddress['state'] ?? '' }} - {{ $billingAddress['pincode'] ?? '' }}<br>
-                                                    <span class="text-dark fw-medium mt-1 d-block"><i class="fas fa-phone-alt me-1 small"></i> {{ $billingAddress['phone'] ?? '' }}</span>
-                                                </p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
+                    </div>
+
+                    <!-- Billing Address Bar -->
+                    <div class="d-flex flex-column p-3 bg-white mb-4 rounded shadow-sm border" style="border-color: #e2e8f0 !important;">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="fw-bold text-uppercase" style="font-size: 12px; letter-spacing: 0.5px; color: #64748b;"><i class="fas fa-file-invoice-dollar me-2"></i>Billing Address</div>
+                            <a href="{{ route('checkout.address') }}#shipping-address-form" class="text-decoration-none fw-bold px-3 py-1 rounded shadow-sm transition-all d-flex align-items-center" style="font-size: 12px; color: #1f2937; background-color: #ffffff; border: 1px solid #4b5563;"><i class="fas fa-edit me-1" style="color: #4b5563;"></i> Edit</a>
+                        </div>
+                        <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
+                            <i class="fas fa-map-marker-alt fs-5 me-3" style="color: #1e293b;"></i>
+                            <div class="text-truncate" style="font-size: 14.5px;">
+                                <span class="fw-bold" style="color: #0f172a;">{{ explode(' ', trim($billingAddress['name'] ?? ''))[0] ?? '' }}</span> 
+                                <span class="text-muted mx-1">|</span>
+                                <span style="color: #334155;">{{ $billingAddress['address'] ?? '' }}, {{ $billingAddress['city'] ?? '' }}, {{ $billingAddress['state'] ?? '' }} - {{ $billingAddress['pincode'] ?? '' }}</span>
                             </div>
                         </div>
                     </div>
@@ -183,9 +170,9 @@
                                                 <tr style="background-color: #f7f9f6; border-top: 2px solid #d2e1cd; border-bottom: 1px solid #d2e1cd;">
                                                     <td colspan="2" class="ps-4 py-2">
                                                         <div class="d-flex align-items-center">
-                                                            <span class="badge badge-success me-2" style="background-color: #2e7d32; font-size: 10px; font-weight: 600; padding: 3px 6px;">CUSTOM COMBO PACK</span>
+                                                            <span class="badge text-white" style="background-color: #2e7d32; font-size: 10px; font-weight: 600; padding: 4px 8px; margin-right: 8px; border-radius: 4px;">CUSTOM COMBO PACK</span>
                                                             @if($pct > 0)
-                                                            <span class="badge bg-danger text-white font-weight-bold" style="font-size: 10px; padding: 3px 6px;">{{ $pct }}% OFF APPLIED</span>
+                                                            <span class="badge bg-danger text-white" style="font-size: 10px; font-weight: 600; padding: 4px 8px; border-radius: 4px;">{{ $pct }}% OFF APPLIED</span>
                                                             @endif
                                                         </div>
                                                     </td>
@@ -246,18 +233,63 @@
                         <input type="hidden" name="payment_method" value="online">
 
                         <!-- Mobile Submit Button (Sticky Bottom) - Hidden on Desktop -->
-                        <div class="d-lg-none sticky-bottom bg-white p-3 border-top shadow-lg-reverse">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="fw-bold text-muted small">Total Payable</span>
-                                <span class="fw-bold text-dark fs-5">₹{{ number_format($total, 2) }}</span>
+                        <div class="fixed-bottom bg-white border-top p-3 d-flex justify-content-between align-items-center shadow-lg d-md-none" style="z-index: 1050;">
+                            <div>
+                                <div class="fw-bold text-dark fs-5">₹{{ number_format($total, 2) }}</div>
+                                <div class="text-primary small fw-medium" data-bs-toggle="modal" data-bs-target="#orderSummaryModalPayment">View details</div>
                             </div>
-                            <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill fw-bold py-2-5 shadow-success">
-                                <span class="d-none d-lg-inline">PAY & PLACE ORDER</span>
-                                <span class="d-inline d-lg-none">PLACE ORDER</span>
-                                <i class="fas fa-lock ms-2"></i>
+                            <button type="submit" class="btn btn-dark px-4 py-2 fw-bold" style="border-radius: 6px;">
+                                Pay Now
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Mobile Order Summary Modal for Payment Step -->
+            <div class="modal fade" id="orderSummaryModalPayment" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-bottom modal-fullscreen-sm-down">
+                    <div class="modal-content border-0 rounded-top-4">
+                        <div class="modal-header border-bottom-0 pb-0">
+                            <h5 class="modal-title fw-bold">Order Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Total Products ({{ $itemCount ?? 0 }})</span>
+                                <span class="text-dark">₹{{ number_format($subtotal, 2) }}</span>
+                            </div>
+                            @if(isset($discount) && $discount > 0)
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Bag Savings</span>
+                                <span class="text-success fw-bold">-₹{{ number_format($discount, 2) }}</span>
+                            </div>
+                            @endif
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Delivery Fee</span>
+                                <span class="text-dark">@if(isset($shipping) && $shipping > 0) ₹{{ number_format($shipping, 2) }} @else <span class="text-success">Free</span> @endif</span>
+                            </div>
+                            
+                            @if(isset($gstSettings) && $gstSettings->gst_status)
+                                @if($igst > 0)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">IGST</span>
+                                    <span class="text-dark">+₹{{ number_format($igst, 2) }}</span>
+                                </div>
+                                @elseif($cgst > 0 || $sgst > 0)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">CGST & SGST</span>
+                                    <span class="text-dark">+₹{{ number_format($cgst + $sgst, 2) }}</span>
+                                </div>
+                                @endif
+                            @endif
+                            <hr class="border-dashed">
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Amount Payable</span>
+                                <span>₹{{ number_format($total, 2) }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -265,7 +297,7 @@
             <div class="col-lg-4">
                 <div class="sticky-top" style="top: 100px; z-index: 10;">
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                        <div class="card-header py-3" style="background-color: var(--secondary-color, #2b6139) !important; color: #ffffff !important;">
+                        <div class="card-header py-3" style="background-color: #388e3c !important; border-bottom: none;">
                             <h6 class="mb-0 fw-bold text-center text-white" style="color: #ffffff !important;">ORDER SUMMARY</h6>
                         </div>
                          <div class="card-body p-4">
@@ -349,208 +381,6 @@
     </div>
 </div>
 
-<style>
-    :root {
-        --primary-color: #72a420;
-        --secondary-color: #2b6139;
-        --light-bg: #f8f9fa;
-        --border-dashed: #dee2e6;
-    }
-
-    .checkout-page-wrapper {
-        min-height: 100vh;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    }
-
-    .checkout-steps .breadcrumb-item+.breadcrumb-item::before {
-        content: "\f054";
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        font-size: 10px;
-        color: #adb5bd;
-    }
-
-    .checkout-steps .breadcrumb-item {
-        font-weight: 600;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .checkout-steps .breadcrumb-item.active {
-        color: var(--primary-color);
-    }
-
-    .checkout-steps .breadcrumb-item a {
-        color: #adb5bd;
-        text-decoration: none;
-    }
-
-    .btn-xs-comp {
-        padding: 5px 15px;
-        font-size: 13px;
-        font-weight: 700;
-        color: #fff !important;
-        letter-spacing: 0.3px;
-    }
-
-    .card {
-        transition: transform 0.2s ease;
-    }
-
-    .bg-danger-soft {
-        background-color: rgba(220, 53, 69, 0.1);
-    }
-    
-    .fs-7 { font-size: 14px; }
-    .extra-small { font-size: 11px; }
-
-    .line-height-base {
-        line-height: 1.6;
-    }
-
-    .border-dashed {
-        border: 2px dashed var(--border-dashed) !important;
-    }
-
-    .cursor-pointer {
-        cursor: pointer;
-    }
-
-    .payment-card-inner {
-        border-width: 2px !important;
-        background: #fff;
-    }
-
-    .payment-option-modern.active .payment-card-inner {
-        border-color: var(--secondary-color) !important;
-        background-color: #f4f8f5;
-    }
-
-    .payment-icon-circle {
-        width: 45px;
-        height: 45px;
-        background: #eaf0eb;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-    }
-
-    .check-icon {
-        opacity: 0;
-        transform: scale(0);
-        transition: 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-    }
-
-    .payment-option-modern.active .check-icon {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    .product-thumb-sm {
-        width: 60px;
-        height: 60px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        margin-right: 15px !important;
-    }
-
-    .product-thumb-sm img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-
-    .dual-images {
-        display: flex;
-        width: 100%;
-        height: 100%;
-    }
-
-    .dual-images img {
-        width: 50%;
-        object-fit: cover;
-    }
-
-    .btn-success {
-        background-color: var(--secondary-color, #4a7856) !important;
-        border-color: var(--secondary-color, #4a7856) !important;
-        border-radius: 10px !important;
-        border: none !important;
-    }
-
-    .btn-success:hover {
-        background-color: #1c3f24 !important;
-        border-color: #1c3f24 !important;
-    }
-
-    .shadow-success {
-        box-shadow: 0 8px 20px rgba(74, 120, 86, 0.25) !important;
-    }
-
-    .shadow-success-hover:hover {
-        box-shadow: 0 8px 25px rgba(59, 98, 71, 0.35) !important;
-        transform: translateY(-2px);
-        transition: all 0.3s;
-    }
-
-    .line-clamp-1 {
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .shadow-lg-reverse {
-        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
-        z-index: 1050;
-    }
-    .py-2-5 { padding-top: 0.8rem !important; padding-bottom: 0.8rem !important; }
-
-    @media (max-width: 991.98px) {
-        .checkout-page-wrapper {
-            padding-bottom: 120px !important;
-        }
-
-        .sticky-top {
-            position: static !important;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .payment-brand-img {
-            height: 20px;
-            margin: 6px 10px !important;
-        }
-
-        .card-header h5 {
-            font-size: 16px;
-        }
-    }
-
-    .hover-opacity-100:hover { opacity: 1 !important; transform: scale(1.1); transition: all 0.2s; }
-
-    .payment-brand-img {
-        height: 28px;
-        width: auto;
-        object-fit: contain;
-        
-        transition: all 0.3s ease;
-        margin: 8px 16px !important;
-    }
-    
-    .payment-brand-img:hover {
-        filter: grayscale(0);
-        opacity: 1;
-        transform: translateY(-2px);
-    }
-</style>
 
 <script>
 async function removeFromCartSummary(itemId) {
@@ -636,35 +466,5 @@ async function removeFromCartSummary(itemId) {
     }
 }
 </script>
-<style>
-.btn-close-style {
-    background: transparent;
-    border: none;
-    color: #adb5bd;
-    font-size: 14px;
-    padding: 5px;
-    transition: all 0.2s;
-    cursor: pointer;
-}
-.btn-close-style:hover {
-    color: #dc3545;
-}
-/* Product Thumbnails in table */
-.product-thumb-sm {
-    width: 60px;
-    height: 60px;
-    padding: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-.product-thumb-sm img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-/* Ensure Inter font */
-body { font-family: 'Inter', sans-serif !important; }
-</style>
+
 @include('view.layout.footer')

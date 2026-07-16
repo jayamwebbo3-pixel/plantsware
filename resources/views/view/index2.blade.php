@@ -41,8 +41,8 @@ use Illuminate\Support\Str;
 
 <!-- Hero Slider -->
 <div id="home_vertical_menu" class="menu_slider">
-    <div class="row">
-        <div class="col-lg-12 main_slider">
+    <div class="row m-0">
+        <div class="col-lg-12 main_slider p-0">
             <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                 @if($sliders->count() > 0)
                     <ol class="carousel-indicators">

@@ -6,7 +6,7 @@ This reference documents the complete functionality, views, routes, forms, scrip
 
 ## 1. Project Overview & Tech Stack
 * **Framework**: Laravel 11.x
-* **Database**: MySQL/MariaDB (port `3307`, database `whatelse_plantsware`)
+* **Database**: MySQL/MariaDB (port `3306`, database `whatelse_plantsware`)
 * **Styling & Icons**: Bootstrap 4.x (main styles in `style.css`, responsive adjustments in `responsive.css`, customized rules in `customized.css`), Font Awesome 6.4.0
 * **Animations**: Animate.css, AOS (required for all sections)
 * **Slider/Carousel Libraries**: Swiper 9, Slick Carousel, Owl Carousel

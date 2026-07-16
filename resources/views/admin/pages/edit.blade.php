@@ -6,7 +6,8 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Edit Informative Page: {{ $page->title }}</h4>
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Back
+                to Dashboard</a>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.pages.update', $page->slug) }}" method="POST" enctype="multipart/form-data">
@@ -15,46 +16,51 @@
 
                 @if($page->slug === 'return-refund-policy')
                     <!-- <div class="mb-4">
-                        <label for="policy_date" class="form-label fw-bold">Return Window End Date / Effective Date</label>
-                        <input type="date" name="policy_date" id="policy_date" class="form-control" style="max-width: 300px;" value="{{ old('policy_date', $page->policy_date) }}">
-                        <small class="text-muted">You can adjust the editable date for the Return/Refund policy here.</small>
-                    </div> -->
+                                <label for="policy_date" class="form-label fw-bold">Return Window End Date / Effective Date</label>
+                                <input type="date" name="policy_date" id="policy_date" class="form-control" style="max-width: 300px;" value="{{ old('policy_date', $page->policy_date) }}">
+                                <small class="text-muted">You can adjust the editable date for the Return/Refund policy here.</small>
+                            </div> -->
                 @endif
 
                 @if($page->slug === 'about-us' || $page->slug === 'services')
                     @if($page->slug === 'about-us')
-                    <div class="mb-4">
-                        <label for="image" class="form-label fw-bold">About Image</label>
-                        @if($page->image)
-                            <div class="mb-2">
-                                <img src="{{ asset('storage/' . $page->image) }}" alt="About Image" style="max-width: 200px;" class="img-thumbnail">
-                            </div>
-                        @else
-                            <p class="text-muted small">Current: assets/images/about.jpg (Default)</p>
-                        @endif
-                        <input type="file" name="image" id="image" class="form-control">
-                        <small class="text-muted">Upload a new image to replace the current one.</small>
-                    </div>
+                        <div class="mb-4">
+                            <label for="image" class="form-label fw-bold">About Image</label>
+                            @if($page->image)
+                                <div class="mb-2">
+                                    <img src="{{ asset('storage/' . $page->image) }}" alt="About Image" style="max-width: 200px;"
+                                        class="img-thumbnail">
+                                </div>
+                            @else
+                                <p class="text-muted small">Current: assets/images/about.jpg (Default)</p>
+                            @endif
+                            <input type="file" name="image" id="image" class="form-control">
+                            <small class="text-muted">Upload a new image to replace the current one.</small>
+                        </div>
                     @endif
 
                     @if($page->slug !== 'services')
-                    <div class="mb-4">
-                        <label for="editor" class="form-label fw-bold">Page Content</label>
-                        <textarea name="content" id="editor" class="form-control">{{ old('content', $page->content) }}</textarea>
-                    </div>
+                        <div class="mb-4">
+                            <label for="editor" class="form-label fw-bold">Page Content</label>
+                            <textarea name="content" id="editor"
+                                class="form-control">{{ old('content', $page->content) }}</textarea>
+                        </div>
                     @endif
 
                     @if($page->slug !== 'services')
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save"></i> Save Changes</button>
-                        <a href="{{ route('admin.dashboard') }}" class="btn btn-light ms-2">Cancel</a>
-                    </div>
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save"></i> Save Changes</button>
+                            <a href="{{ route('admin.dashboard') }}" class="btn btn-light ms-2">Cancel</a>
+                        </div>
                     @endif
 
                     <div class="mt-4 text-end">
-                        <button type="button" class="btn btn-success btn-sm" id="add-feature"><i class="fas fa-plus"></i> Add New Feature</button></div>
+                        <button type="button" class="btn btn-success btn-sm" id="add-feature"><i class="fas fa-plus"></i> Add
+                            New Feature</button>
+                    </div>
                     <div class="mb-4">
-                        <label class="form-label fw-bold">{{ $page->slug === 'about-us' ? 'Why Choose Us Features' : 'Service Highlights' }}</label>
+                        <label
+                            class="form-label fw-bold">{{ $page->slug === 'about-us' ? 'Why Choose Us Features' : 'Service Highlights' }}</label>
                         <div id="features-container">
                             @php
                                 $features = $page->extra_content['features'] ?? [];
@@ -89,61 +95,69 @@
                                     @foreach($features as $index => $feature)
                                         <tr class="feature-row">
                                             <td>
-                                                <input type="text" name="features[{{ $index }}][icon]" class="form-control" value="{{ $feature['icon'] ?? '' }}" placeholder="fas fa-star">
+                                                <input type="text" name="features[{{ $index }}][icon]" class="form-control"
+                                                    value="{{ $feature['icon'] ?? '' }}" placeholder="fas fa-star">
                                             </td>
                                             <td>
-                                                <input type="text" name="features[{{ $index }}][title]" class="form-control" value="{{ $feature['title'] ?? '' }}" placeholder="Feature Title">
+                                                <input type="text" name="features[{{ $index }}][title]" class="form-control"
+                                                    value="{{ $feature['title'] ?? '' }}" placeholder="Feature Title">
                                             </td>
                                             <td>
-                                                <textarea name="features[{{ $index }}][description]" class="form-control" rows="2" placeholder="Feature Description">{{ $feature['description'] ?? '' }}</textarea>
+                                                <textarea name="features[{{ $index }}][description]" class="form-control" rows="2"
+                                                    placeholder="Feature Description">{{ $feature['description'] ?? '' }}</textarea>
                                             </td>
                                             <td>
-                                                <button type="button" class="btn btn-danger btn-sm remove-feature"><i class="fas fa-trash"></i></button>
+                                                <button type="button" class="btn btn-danger btn-sm remove-feature"><i
+                                                        class="fas fa-trash"></i></button>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
-                            
+
                         </div>
                     </div>
 
                     @if($page->slug === 'about-us')
-                    <div class="card mt-4 border-success">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="fas fa-bullhorn me-2"></i> Bottom Call to Action (CTA) Settings</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-12">
-                                    <label for="cta_title" class="form-label fw-bold">CTA Title</label>
-                                    <input type="text" name="extra_content[cta_title]" id="cta_title" class="form-control" value="{{ old('extra_content.cta_title', $page->extra_content['cta_title'] ?? 'Ready To Transform Your Space?') }}">
+                        <div class="card mt-4 border-success">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-bullhorn me-2"></i> Bottom Call to Action (CTA) Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label for="cta_title" class="form-label fw-bold">CTA Title</label>
+                                        <input type="text" name="extra_content[cta_title]" id="cta_title" class="form-control"
+                                            value="{{ old('extra_content.cta_title', $page->extra_content['cta_title'] ?? 'Ready To Transform Your Space?') }}">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="cta_subtitle" class="form-label fw-bold">CTA Subtitle</label>
+                                        <textarea name="extra_content[cta_subtitle]" id="cta_subtitle" class="form-control"
+                                            rows="2">{{ old('extra_content.cta_subtitle', $page->extra_content['cta_subtitle'] ?? 'Join Thousands Of Satisfied Customers Who Trust PlantsWare For All Their Gardening And Natural Product Needs. Start Your Green Journey Today!') }}</textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="cta_btn_text" class="form-label fw-bold">Button Text</label>
+                                        <input type="text" name="extra_content[cta_btn_text]" id="cta_btn_text" class="form-control"
+                                            value="{{ old('extra_content.cta_btn_text', $page->extra_content['cta_btn_text'] ?? 'Shop Now') }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="cta_btn_link" class="form-label fw-bold">Button Link (URL)</label>
+                                        <input type="text" name="extra_content[cta_btn_link]" id="cta_btn_link" class="form-control"
+                                            value="{{ old('extra_content.cta_btn_link', $page->extra_content['cta_btn_link'] ?? 'products') }}">
+                                    </div>
+                                    <!-- <div class="col-md-12">
+                                                <label for="cta_bg_image" class="form-label fw-bold">CTA Background Image</label>
+                                                @if(isset($page->extra_content['cta_bg_image']))
+                                                    <div class="mb-2">
+                                                        <img src="{{ asset('storage/' . $page->extra_content['cta_bg_image']) }}" alt="CTA Bg Image" style="max-height: 100px;" class="img-thumbnail">
+                                                    </div>
+                                                @endif
+                                                <input type="file" name="cta_bg_image" id="cta_bg_image" class="form-control">
+                                                <small class="text-muted">Upload a high-quality background for the CTA section (usually a green texture or leaf image).</small>
+                                            </div> -->
                                 </div>
-                                <div class="col-md-12">
-                                    <label for="cta_subtitle" class="form-label fw-bold">CTA Subtitle</label>
-                                    <textarea name="extra_content[cta_subtitle]" id="cta_subtitle" class="form-control" rows="2">{{ old('extra_content.cta_subtitle', $page->extra_content['cta_subtitle'] ?? 'Join Thousands Of Satisfied Customers Who Trust PlantsWare For All Their Gardening And Natural Product Needs. Start Your Green Journey Today!') }}</textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="cta_btn_text" class="form-label fw-bold">Button Text</label>
-                                    <input type="text" name="extra_content[cta_btn_text]" id="cta_btn_text" class="form-control" value="{{ old('extra_content.cta_btn_text', $page->extra_content['cta_btn_text'] ?? 'Shop Now') }}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="cta_btn_link" class="form-label fw-bold">Button Link (URL)</label>
-                                    <input type="text" name="extra_content[cta_btn_link]" id="cta_btn_link" class="form-control" value="{{ old('extra_content.cta_btn_link', $page->extra_content['cta_btn_link'] ?? 'products') }}">
-                                </div>
-                                <!-- <div class="col-md-12">
-                                    <label for="cta_bg_image" class="form-label fw-bold">CTA Background Image</label>
-                                    @if(isset($page->extra_content['cta_bg_image']))
-                                        <div class="mb-2">
-                                            <img src="{{ asset('storage/' . $page->extra_content['cta_bg_image']) }}" alt="CTA Bg Image" style="max-height: 100px;" class="img-thumbnail">
-                                        </div>
-                                    @endif
-                                    <input type="file" name="cta_bg_image" id="cta_bg_image" class="form-control">
-                                    <small class="text-muted">Upload a high-quality background for the CTA section (usually a green texture or leaf image).</small>
-                                </div> -->
                             </div>
                         </div>
-                    </div>
                     @endif
                 @elseif($page->slug === 'ad-banner')
                     <div class="row g-4">
@@ -152,7 +166,8 @@
                                 <label for="image" class="form-label fw-bold">Banner Image</label>
                                 @if($page->image)
                                     <div class="mb-2">
-                                        <img src="{{ asset('storage/' . $page->image) }}" alt="Banner Image" style="max-height: 150px;" class="img-thumbnail">
+                                        <img src="{{ asset('storage/' . $page->image) }}" alt="Banner Image"
+                                            style="max-height: 150px;" class="img-thumbnail">
                                     </div>
                                 @else
                                     <p class="text-muted small">Current: Default Banner Image</p>
@@ -163,35 +178,40 @@
                         <div class="col-md-6">
                             <div class="mb-4">
                                 <label for="title" class="form-label fw-bold">Big Title</label>
-                                <input type="text" name="title" id="title" class="form-control" value="{{ old('title', $page->title) }}">
+                                <input type="text" name="title" id="title" class="form-control"
+                                    value="{{ old('title', $page->title) }}">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="mb-4">
                                 <label for="content" class="form-label fw-bold">Small Title (Description)</label>
-                                <textarea name="content" id="content" class="form-control" rows="3">{{ old('content', $page->content) }}</textarea>
+                                <textarea name="content" id="content" class="form-control"
+                                    rows="3">{{ old('content', $page->content) }}</textarea>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-4">
                                 <label for="button_text" class="form-label fw-bold">Button Text</label>
-                                <input type="text" name="extra_content[button_text]" id="button_text" class="form-control" value="{{ old('extra_content.button_text', $page->extra_content['button_text'] ?? '') }}">
+                                <input type="text" name="extra_content[button_text]" id="button_text" class="form-control"
+                                    value="{{ old('extra_content.button_text', $page->extra_content['button_text'] ?? '') }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-4">
                                 <label for="button_link" class="form-label fw-bold">Button Link (URL or product slug)</label>
-                                <input type="text" name="extra_content[button_link]" id="button_link" class="form-control" value="{{ old('extra_content.button_link', $page->extra_content['button_link'] ?? '') }}">
+                                <input type="text" name="extra_content[button_link]" id="button_link" class="form-control"
+                                    value="{{ old('extra_content.button_link', $page->extra_content['button_link'] ?? '') }}">
                             </div>
                         </div>
                     </div>
                 @else
                     <div class="mb-4">
                         <label for="editor" class="form-label fw-bold">Page Content</label>
-                        <textarea name="content" id="editor" class="form-control">{{ old('content', $page->content) }}</textarea>
+                        <textarea name="content" id="editor"
+                            class="form-control">{{ old('content', $page->content) }}</textarea>
                     </div>
                 @endif
-                
+
                 <div class="mt-4 text-end">
                     <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save"></i> Save</button>
                 </div>
@@ -223,19 +243,19 @@
                         },
                         body: data
                     })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.url) {
-                            resolve({ default: result.url }); 
-                        } else {
-                            reject(result.error || 'Upload failed');
-                        }
-                    })
-                    .catch(error => reject(error));
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.url) {
+                                resolve({ default: result.url });
+                            } else {
+                                reject(result.error || 'Upload failed');
+                            }
+                        })
+                        .catch(error => reject(error));
                 }));
             }
 
-            abort() {}
+            abort() { }
         }
 
         function MyCustomUploadAdapterPlugin(editor) {
@@ -265,36 +285,36 @@
             });
 
         // Dynamic Features Logic
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const addBtn = document.getElementById('add-feature');
             const tableBody = document.querySelector('#features-table tbody');
             let rowIndex = {{ isset($features) ? count($features) : 0 }};
 
             if (addBtn) {
-                addBtn.addEventListener('click', function() {
+                addBtn.addEventListener('click', function () {
                     const newRow = `
-                        <tr class="feature-row">
-                            <td>
-                                <input type="text" name="features[${rowIndex}][icon]" class="form-control" placeholder="fas fa-star">
-                            </td>
-                            <td>
-                                <input type="text" name="features[${rowIndex}][title]" class="form-control" placeholder="Feature Title">
-                            </td>
-                            <td>
-                                <textarea name="features[${rowIndex}][description]" class="form-control" rows="2" placeholder="Feature Description"></textarea>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm remove-feature"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    `;
+                            <tr class="feature-row">
+                                <td>
+                                    <input type="text" name="features[${rowIndex}][icon]" class="form-control" placeholder="fas fa-star">
+                                </td>
+                                <td>
+                                    <input type="text" name="features[${rowIndex}][title]" class="form-control" placeholder="Feature Title">
+                                </td>
+                                <td>
+                                    <textarea name="features[${rowIndex}][description]" class="form-control" rows="2" placeholder="Feature Description"></textarea>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm remove-feature"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
                     tableBody.insertAdjacentHTML('beforeend', newRow);
                     rowIndex++;
                 });
             }
 
             if (tableBody) {
-                tableBody.addEventListener('click', function(e) {
+                tableBody.addEventListener('click', function (e) {
                     if (e.target.closest('.remove-feature')) {
                         e.target.closest('.feature-row').remove();
                     }

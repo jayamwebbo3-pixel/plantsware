@@ -581,6 +581,18 @@ class CartController extends Controller
     }
 
     /**
+     * Show wishlist drawer content
+     */
+    public function wishlistDrawer()
+    {
+        $wishlistItems = Auth::check()
+            ? Auth::user()->wishlist()->with(['product', 'comboPack'])->get()
+            : collect();
+            
+        return view('view.partials.wishlist-drawer-content', compact('wishlistItems'));
+    }
+
+    /**
      * Helper: Authorize that the cart item belongs to current user/session
      */
     protected function authorizeCartItem(Cart $cartItem)
@@ -601,6 +613,9 @@ class CartController extends Controller
     {
         $sessionId = session()->getId();
         cache()->forget("cart_count_{$sessionId}");
+        if (Auth::check()) {
+            cache()->forget("cart_count_user_" . Auth::id());
+        }
 
         if (Auth::check()) {
             cache()->forget("wishlist_count_" . Auth::id());

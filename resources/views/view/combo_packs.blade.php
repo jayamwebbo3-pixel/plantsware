@@ -1,18 +1,9 @@
 @include('view.layout.header')
 
-<div class="sp_header bg-white p-3">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <ul class="list-unstyled mb-0">
-                    <li class="d-inline-block font-weight-bolder"><a href="{{ route('home') }}" class="text-decoration-none">home</a></li>
-                    <li class="d-inline-block font-weight-bolder mx-2">/</li>
-                    <li class="d-inline-block font-weight-bolder">Combo Packs</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+
+{{-- noUiSlider --}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
 
 <section class="py-4">
     <div class="container-fluid">
@@ -24,16 +15,35 @@
                         <h4 class="fw-bold mb-0" style="color: #6EA820;">Filters</h4>
                         <button type="button" class="btn-close" id="mobileFilterClose" style="border: none; background: transparent; font-size: 1.5rem; color: #333; line-height: 1;">&times;</button>
                     </div>
-                    <h2 class="side-menu-title mb-3 d-none d-md-block">Filters</h2>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="side-menu-title mb-0 d-none d-md-block">Filters</h2>
+                        @if(request()->except(['page']))
+                        <a href="{{ url()->current() }}" class="text-danger text-decoration-none" style="font-size:13px; font-weight:600;">
+                            <i class="fas fa-times-circle me-1"></i>Clear All
+                        </a>
+                        @endif
+                    </div>
                     
                     <!-- Price Range Filter -->
-                    <div class="filter-section active mb-3">
-                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-2">
-                            <span>Price Range <span class="price-range-value ms-2" id="display-price-range" style="font-size: 13px; font-weight: normal; color: #72a420;">₹0 - ₹{{ request('price_max', 10000) }}</span></span>
+                    <div class="filter-section active mb-4">
+                        <h3 class="filter-title d-flex justify-content-between align-items-center mb-3">
+                            Price Range
                             <i class="fas fa-chevron-down toggle-icon"></i>
                         </h3>
-                        <div class="filter-options d-flex align-items-center">
-                            <input type="range" name="price_max" class="form-range flex-grow-1 me-2" min="0" max="10000" step="100" id="price-max" value="{{ request('price_max', 10000) }}" style="width: 100%;">
+                        <div class="filter-options px-2">
+                            <div id="price-range-slider" class="mb-4 mt-3"></div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="flex-column d-flex">
+                                    <small class="text-muted mb-1" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Minimum</small>
+                                    <span class="fw-bold text-dark" id="price-min-label" style="font-size: 14px;">₹{{ request('price_min', 0) }}</span>
+                                </div>
+                                <div class="flex-column d-flex text-end">
+                                    <small class="text-muted mb-1" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Maximum</small>
+                                    <span class="fw-bold text-dark" id="price-max-label" style="font-size: 14px;">₹{{ request('price_max', 10000) }}</span>
+                                </div>
+                            </div>
+                            <input type="hidden" name="price_min" id="price-min" value="{{ request('price_min', 0) }}">
+                            <input type="hidden" name="price_max" id="price-max" value="{{ request('price_max', 10000) }}">
                         </div>
                     </div>
 
@@ -128,9 +138,9 @@
                     </div>
 
                     <!-- Filter Actions -->
-                    <div class="filter-actions d-flex gap-2 mt-3">
-                        <button class="btn btn-primary flex-fill" id="applyFiltersBtn" style="background-color: #72a420; border-color: #72a420;" type="submit">Apply Filters</button>
-                        <a href="{{ route('combo_packs.frontend_index') }}" class="btn btn-outline-secondary flex-fill text-center text-decoration-none d-flex align-items-center justify-content-center">Reset</a>
+                    <div class="filter-actions d-flex mt-3">
+                        <button class="btn-filter btn-apply flex-fill mr-2" style="margin-right: 8px;" id="applyFiltersBtn" type="submit">Apply Filters</button>
+                        <a href="{{ route('combo_packs.frontend_index') }}" class="btn-filter btn-reset flex-fill text-center text-decoration-none" style="display:flex; justify-content:center; align-items:center;">Reset</a>
                     </div>
                 </form>
             </div>
@@ -138,8 +148,21 @@
             <!-- Products Display Area -->
             <div class="col-lg-9 col-md-8">
                 <div class="products-area">
-                    <div class="products-header bg-white rounded p-3 mb-3 d-flex justify-content-between align-items-center border">
-                        <h2 class="category-name mb-0">Combo Packs Listing</h2>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center bg-white p-3 rounded-4 shadow-sm mb-4" style="border: 1px solid rgba(0,0,0,0.05);">
+                        {{-- Left: Category Title + Count --}}
+                        <div class="d-flex align-items-center mb-3 mb-md-0">
+                            <div class="bg-light text-success d-flex justify-content-center align-items-center rounded-circle mr-3" style="width: 45px; height: 45px; margin-right: 15px; color: #2e6a39 !important;">
+                                <i class="fas fa-boxes fa-lg"></i>
+                            </div>
+                            <div>
+                                <h2 class="h5 fw-bold mb-1" style="font-family: var(--font-main); color: #2c3e50;">
+                                    Combo Packs Collection
+                                </h2>
+                                <span class="badge" style="background: rgba(46, 106, 57, 0.1); color: #2e6a39; font-size: 0.75rem; letter-spacing: 0.5px; padding: 4px 8px; border-radius: 6px;">
+                                    {{ $comboPacks->total() }} Combos
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Mobile Filter Trigger (Visible only on mobile/tablet < 768px) -->
@@ -226,29 +249,37 @@
     }
 
     // ── Desktop: auto-submit on filter change ─────────────────────
+    var priceSlider   = document.getElementById('price-range-slider');
+    var minInput      = document.getElementById('price-min');
+    var maxInput      = document.getElementById('price-max');
+    var minLabel      = document.getElementById('price-min-label');
+    var maxLabel      = document.getElementById('price-max-label');
+
+    if (priceSlider) {
+        noUiSlider.create(priceSlider, {
+            start: [parseInt(minInput.value) || 0, parseInt(maxInput.value) || 10000],
+            connect: true,
+            step: 50,
+            range: { 'min': 0, 'max': 10000 },
+            format: { to: function(v){ return Math.round(v); }, from: function(v){ return parseFloat(v); } }
+        });
+        priceSlider.noUiSlider.on('update', function(values) {
+            minLabel.textContent = '₹' + values[0];
+            maxLabel.textContent = '₹' + values[1];
+            minInput.value = values[0];
+            maxInput.value = values[1];
+        });
+        priceSlider.noUiSlider.on('end', function() {
+            if (!isMobile()) fetchProducts(buildUrl());
+        });
+    }
+
     if (filterForm) {
         filterForm.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(function (input) {
             input.addEventListener('change', function () {
                 if (!isMobile()) fetchProducts(buildUrl());
             });
         });
-
-        // Price slider — debounce on 'input', fire on 'change'
-        if (priceInput) {
-            priceInput.addEventListener('input', function () {
-                if (displayPriceRange) displayPriceRange.textContent = '\u20B90 - \u20B9' + priceInput.value;
-                if (!isMobile()) {
-                    clearTimeout(debounceTimer);
-                    debounceTimer = setTimeout(function () { fetchProducts(buildUrl()); }, 400);
-                }
-            });
-            priceInput.addEventListener('change', function () {
-                if (!isMobile()) {
-                    clearTimeout(debounceTimer);
-                    fetchProducts(buildUrl());
-                }
-            });
-        }
 
         // Prevent native form submit — always use AJAX
         filterForm.addEventListener('submit', function (e) {
@@ -370,229 +401,6 @@
 }());
 </script>
 
-<style>
-/* Filter Sidebar Styles */
-.side-menu {
-    border: 1px solid #eee;
-}
-.filter-section .filter-title {
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-}
-.filter-item {
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-}
-.filter-label {
-    margin-left: 8px;
-    margin-bottom: 0;
-    cursor: pointer;
-    color: #555;
-    font-size: 14px;
-}
 
-/* Custom Card Styling based on Screenshot */
-.product-custom-card {
-    background: #fff;
-    border-radius: 15px;
-    overflow: hidden;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    border: 1px solid #f0f0f0;
-    transition: transform 0.3s ease;
-}
-
-.product-custom-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-}
-
-.card-img-container {
-    position: relative;
-    padding: 10px;
-    height: 320px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fdfdfd;
-}
-
-.card-img-container a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-
-.single-combo-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 12px;
-}
-
-.dual-image-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    width: 100%;
-    height: 100%;
-}
-
-.dual-image-wrapper img {
-    max-width: 42%;
-    max-height: 90%;
-    object-fit: contain;
-    border-radius: 8px;
-}
-
-.image-plus-sign {
-    font-size: 28px;
-    font-weight: 700;
-    color: #72a420;
-    margin-top: -5px;
-}
-
-.custom-discount-badge {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: #fbb034;
-    color: #fff;
-    padding: 5px 12px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 13px;
-    text-transform: uppercase;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 10;
-}
-
-.card-content {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-.card-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: #333;
-}
-
-.card-title a {
-    color: inherit;
-    text-decoration: none;
-}
-
-.card-price-row {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.old-price {
-    color: #999;
-    text-decoration: line-through;
-    font-size: 16px;
-}
-
-.new-price {
-    color: #72a420;
-    font-weight: 700;
-    font-size: 20px;
-}
-
-.card-actions-row {
-    display: flex;
-    align-items: stretch;
-    gap: 4px !important;
-    margin-top: auto;
-}
-
-.btn-buy-now {
-    background: #72a420;
-    color: #fff;
-    border: none;
-    padding: 6px 2px !important;
-    border-radius: 8px;
-    font-weight: 600;
-    width: 100%;
-    font-size: 12px !important;
-    transition: background 0.2s;
-    white-space: nowrap !important;
-    min-width: max-content !important;
-}
-
-.btn-buy-now:hover {
-    background: #5d871a;
-}
-
-.btn-add-to-cart {
-    background: #ebf1f5;
-    color: #333;
-    border: none;
-    padding: 6px 2px !important;
-    border-radius: 8px;
-    font-weight: 600;
-    width: 100%;
-    font-size: 12px !important;
-    transition: background 0.2s;
-    white-space: nowrap !important;
-    min-width: max-content !important;
-}
-
-.btn-add-to-cart:hover {
-    background: #dee5e9;
-}
-
-.btn-out-of-stock {
-    background: #f8f9fa;
-    color: #adb5bd;
-    border: 1px solid #dee2e6;
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-weight: 600;
-    width: 100%;
-    font-size: 13px;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.btn-wishlist-custom {
-    background: #fff;
-    border: 1px solid #eee;
-    color: #999;
-    width: 38px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    flex-shrink: 0;
-    transition: all 0.2s;
-    cursor: pointer;
-}
-
-.btn-wishlist-custom:hover {
-    background: #f9f9f9;
-    color: #e53e3e;
-    border-color: #f7d7d7;
-}
-
-.btn-wishlist-custom i {
-    font-size: 16px;
-}
-</style>
 
 @include('view.layout.footer')

@@ -10,34 +10,9 @@
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{asset ('assets/images/fav-icon.png') }}">
     <!-- bootstrap min-->
-    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
-    <!-- fontawesome -->
-    <link rel="stylesheet" type="text/css" href="assets/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/fontawesome.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/fontawesome.min.css">
-    <!-- OwlCarousel2 -->
-    <link rel="stylesheet" type="text/css" href="assets/css/owl.carousel.css">
-    <!-- fancybox -->
-    <link rel="stylesheet" type="text/css" href="assets/css/jquery.fancybox.css">
-    <!-- animate -->
-    <link rel="stylesheet" type="text/css" href="assets/css/animate.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/media.css">
-    <!-- style -->
-
-    <!-- googleapis -->
-    <link rel="preconnect" href="https://fonts.gstatic.com/">
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&amp;display=swap"
-        rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
-
-    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
-    <!-- responsive -->
-    <link rel="stylesheet" type="text/css" href="assets/css/responsive.css">
+    <!-- Vendor CSS Bundle -->
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendor.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/customized.css') }}">
 </head>
 
 

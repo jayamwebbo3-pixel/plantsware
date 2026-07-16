@@ -65,43 +65,37 @@
 
     <!-- Preload Critical Above-The-Fold Assets -->
     <link rel="preload" as="image" href="{{ asset('assets/images/logo-1.png') }}">
-    <link rel="preload" as="style" href="{{ asset('assets/css/bootstrap.min.css') }}">
-    <link rel="preload" as="style" href="{{ asset('assets/css/style.min.css') }}">
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="preload" as="style" href="{{ asset('assets/css/style.css') }}">
 
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/fav-icon.png') }}">
 
-    <!-- Critical CSS (Render-blocking kept to minimum for speed) -->
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/media.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/customized.min.css') }}?v=1.5">
+    <!-- CDNs -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}?v={{ time() }}">
 
     <!-- Google Fonts (Preloaded & Swapped) -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
     
-    <!-- Non-critical CSS loaded asynchronously -->
-    <link rel="preload" href="{{ asset('assets/css/animate.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-
     <noscript>
         <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/animate.min.css') }}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     </noscript>
 </head>
 
 <body>
-    <div class="preloader"></div>
+    <div class="preloader">
+        <div class="leaf-loader">
+            <div class="leaf"></div>
+            <div class="leaf"></div>
+            <div class="leaf"></div>
+            <div class="leaf"></div>
+        </div>
+    </div>
     <!-- header area -->
     <header>
         <!-- <div class="topbar-outer py-2 d-lg-block d-none">
@@ -124,106 +118,66 @@
             </div>
         </div> -->
         <!-- header-top -->
-        <div class="header-top py-2 border-bottom shadow-sm">
+        <div class="header-top">
             <div class="header-top-container">
-                <div class="row header_row">
-                    <div class="col-xl-3 col-lg-3 col-6 head-logo pl-md-0">
-                        <div class="text-left header-top-left pt-2">
-                            <a href="{{ url('/') }}">
-                                <img src="{{ asset('assets/images/logo-1.png') }}" class="img-responsive img" alt="logo">
+                <div class="head-logo">
+                    <a href="{{ url('/') }}">
+                        <img src="{{ asset('assets/images/logo-1.png') }}" class="img-responsive img" alt="logo">
+                    </a>
+                </div>
+                
+                <div class="head-search d-flex align-items-center" style="gap: 15px;">
+                    <div class="search-container position-relative flex-grow-1">
+                        <input type="text" id="liveSearchInput" placeholder="Search |" class="form-control search-input" autocomplete="off">
+                        <button type="button" id="liveSearchBtn" class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <!-- Autocomplete Dropdown -->
+                        <div id="searchDropdown" class="search-dropdown" style="display:none;"></div>
+                    </div>
+                    <!-- Toggler for mobile/tablet -->
+                    <button class="sticky-menu-toggle" type="button" id="menuToggle" aria-label="Open Menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                
+                <div class="head-icons">
+                    <ul class="top-icons">
+                        <li class="icon-item">
+                            <a href="{{ url('wishlist') }}" class="icon-circle wishlist-icon-link">
+                                <i class="far fa-heart"></i>
+                                <span class="price_cart badge-count">{{ $wishlistCount ?? 0 }}</span>
                             </a>
-                        </div>
-                    </div>
-                    <div class="col-xl-9 col-lg-9 col-6 head-search">
-                        <div class="d-flex navbar">
-                            <!-- Search Bar -->
-                            <div class="input-class text-left col-12 col-md-12 col-lg-7 order-2 order-lg-1">
-                                <div class="between-header mb-0 head-left" style="position:relative;">
-                                    <input type="text"
-                                        id="liveSearchInput"
-                                        placeholder="Search Products"
-                                        class="form-control"
-                                        autocomplete="off">
-                                    <button type="button"
-                                        id="liveSearchBtn"
-                                        class="btn">
-                                        <i class="fas fa-search"></i>
+                        </li>
+                        <li class="icon-item">
+                            <a href="javascript:void(0)" onclick="openCartDrawer()" class="icon-circle cart-icon-link">
+                                <i class="fas fa-shopping-basket"></i>
+                                <span class="price_cart badge-count">{{ $cartCount ?? 0 }}</span>
+                            </a>
+                        </li>
+                        <li class="icon-item dropdown">
+                            <a href="#" class="icon-circle my_account_link">
+                                <i class="far fa-user"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow border-0" style="min-width: 150px; border-radius: 8px;">
+                                @auth
+                                <a class="dropdown-item py-2" href="{{ url('user/dashboard') }}">
+                                    <i class="fas fa-tachometer-alt mr-2 text-primary" style="width:16px; text-align:center;"></i> Dashboard
+                                </a>
+                                <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item py-2" style="cursor: pointer; outline: none;">
+                                        <i class="fas fa-sign-out-alt mr-2 text-danger" style="width:16px; text-align:center;"></i> Logout
                                     </button>
-                                    <!-- Autocomplete Dropdown -->
-                                    <div id="searchDropdown" style="
-                                        display:none;
-                                        position:absolute;
-                                        top:100%;
-                                        left:0;
-                                        right:0;
-                                        background:#fff;
-                                        border:1px solid #e0e0e0;
-                                        border-top:none;
-                                        border-radius:0 0 10px 10px;
-                                        box-shadow:0 8px 24px rgba(0,0,0,0.12);
-                                        z-index:99999;
-                                        max-height:420px;
-                                        overflow-y:auto;
-                                    "></div>
-                                </div>
+                                </form>
+                                @else
+                                <a class="dropdown-item py-2" href="{{ url('login') }}">
+                                    <i class="fas fa-sign-in-alt mr-2 text-primary" style="width:16px; text-align:center;"></i> Login
+                                </a>
+                                @endauth
                             </div>
-                            <!-- Account / Cart / Wishlist -->
-                            <div class="col-xl-5 col-lg-5 head-right text-right order-1 order-lg-2">
-                                <ul class="top_cart">
-                                    <!-- Mobile Search Icon (1st Icon on Mobile) -->
-                                    <li class="d-lg-none md_acco pr-2">
-                                        <a href="javascript:void(0)" onclick="document.querySelector('.input-class').classList.toggle('mobile-active')" class="cart-qty d-flex align-items-center justify-content-center h-100">
-                                            <i class="fas fa-search" style="font-size: 22px; color: #333;"></i>
-                                        </a>
-                                    </li>
-                                    <!-- Wishlist -->
-                                    <li class="d-inline-block my-cart md_acco">
-                                        <a href="{{ url('wishlist') }}" class="cart-qty wishlist-icon-link">
-                                            <span class="price_cart d-md-inline-block align-middle font-weight-bolder">
-                                                {{ $wishlistCount ?? 0 }}
-                                            </span>
-                                            <span class="Price-amount font-weight-bolderer">
-                                                Wishlist
-                                            </span>
-                                        </a>
-                                    </li>
-                                    <!-- Cart -->
-                                    <li class="d-inline-block my-cart md_acco">
-                                        <a href="{{ url('cart') }}" class="cart-qty cart-icon-link">
-                                            <span class="price_cart d-md-inline-block align-middle font-weight-bolder">
-                                                {{ $cartCount ?? 0 }}
-                                            </span>
-                                            <span class="Price-amount font-weight-bolderer">
-                                                Cart
-                                            </span>
-                                        </a>
-                                    </li>
-                                    <!-- My Account -->
-                                    <li class="dropdown right1 md_acc md_acco">
-                                        <span class="account-block"></span>
-                                        <a href="{{ Auth::check() ? url('user/dashboard') : url('login') }}" class="my_account_link" style="text-decoration: none;">
-                                            <span class="dropdown-toggle my_account" role="menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                My account
-                                            </span>
-                                        </a>
-                                        <div class="dropdown-menu r_menu dropdown-menu-right">
-                                            @auth
-                                            <a class="dropdown-item font-weight-bolderer" href="{{ url('user/dashboard') }}">Dashboard</a>
-                                            <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
-                                                @csrf
-                                                <button type="submit" class="dropdown-item font-weight-bolderer">Logout</button>
-                                            </form>
-                                            @else
-                                            <a class="dropdown-item font-weight-bolderer" href="{{ url('login') }}">Login</a>
-                                            {{-- <a class="dropdown-item font-weight-bolderer" href="{{ url('register') }}">Register</a> --}}
-                                            @endauth
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- head-search -->
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -232,10 +186,6 @@
             <div>
                 <div class="row">
                     <div class="col-lg-12">
-                        <!-- Toggler for mobile/tablet -->
-                        <button class="navbar-toggler d-xl-none" type="button" id="menuToggle" aria-label="Open Menu">
-                            <span class="navbar-toggler-icon">☰</span>
-                        </button>
                         <ul class="main-menu navbar">
                             <button class="close-menu" id="closeMenu" aria-label="Close Menu">×</button>
                             <!-- Hamburger Logo -->
@@ -254,95 +204,68 @@
                             @endphp
 
                             <!-- Garden Products Dropdown -->
-                            <li class="dropdown mega_menu m1 level-1 font-weight-bolderer {{ $gardenCategory && Request::is('category/' . $gardenCategory->slug) ? 'active' : '' }}">
+                            <li class="dropdown m1 level-1 font-weight-bolderer {{ ($gardenCategory && (Request::is('category/' . $gardenCategory->slug) || (Request::is('sub-category/*') && $gardenCategory->subcategories->contains('slug', request()->segment(2))))) ? 'active' : '' }}">
                                 <a class="dropdown-toggle" href="{{ $gardenCategory ? route('category.show', $gardenCategory->slug) : '#' }}" role="button" data-toggle="dropdown" aria-expanded="false">
-                                    Garden Products&nbsp;<span class="ml-1"><i class="fa fa-angle-down"></i></span>
+                                    Garden Products
                                 </a>
                                 <ul class="dropdown-menu p-3">
-                                    <div class="row">
-                                        @if($gardenCategory && $gardenCategory->subcategories->count() > 0)
-                                        @php $chunks = $gardenCategory->subcategories->chunk(ceil($gardenCategory->subcategories->count() / 3)); @endphp
-                                        @foreach($chunks as $chunk)
-                                        <div class="col-lg-3 col-md-6 mb-3">
-                                            <ul class="list-unstyled">
-                                                @foreach($chunk as $sub)
-                                                <li class="h_title text-uppercase">
-                                                    <a href="{{ route('subcategory.show', $sub->slug) }}">
-                                                        {{ $sub->name }}
-                                                    </a>
-                                                </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
+                                    @if($gardenCategory && $gardenCategory->subcategories->count() > 0)
+                                    <ul class="list-unstyled">
+                                        @foreach($gardenCategory->subcategories as $sub)
+                                        <li class="h_title">
+                                            <a href="{{ route('subcategory.show', $sub->slug) }}" class="{{ Request::is('sub-category/' . $sub->slug) ? 'active' : '' }}">
+                                                {{ $sub->name }}
+                                            </a>
+                                        </li>
                                         @endforeach
-                                        @else
-                                        <div class="col-12">
-                                            <p class="text-muted small">No subcategories available.</p>
-                                        </div>
-                                        @endif
-                                    </div>
+                                    </ul>
+                                    @else
+                                    <p class="text-muted small px-3">No subcategories available.</p>
+                                    @endif
                                 </ul>
                             </li>
 
                             <!-- Planted Aquarium Products Dropdown -->
-                            <li class="dropdown mega_menu m1 level-1 font-weight-bolderer {{ $aquariumCategory && Request::is('category/' . $aquariumCategory->slug) ? 'active' : '' }}">
+                            <li class="dropdown m1 level-1 font-weight-bolderer {{ ($aquariumCategory && (Request::is('category/' . $aquariumCategory->slug) || (Request::is('sub-category/*') && $aquariumCategory->subcategories->contains('slug', request()->segment(2))))) ? 'active' : '' }}">
                                 <a class="dropdown-toggle" href="{{ $aquariumCategory ? route('category.show', $aquariumCategory->slug) : '#' }}" role="button" data-toggle="dropdown" aria-expanded="false">
-                                    Planted Aquarium Products&nbsp;<span class="ml-1"><i class="fa fa-angle-down"></i></span>
+                                    Planted Aquarium Products
                                 </a>
                                 <ul class="dropdown-menu p-3">
-                                    <div class="row">
-                                        @if($aquariumCategory && $aquariumCategory->subcategories->count() > 0)
-                                        @php $chunks = $aquariumCategory->subcategories->chunk(ceil($aquariumCategory->subcategories->count() / 2)); @endphp
-                                        @foreach($chunks as $chunk)
-                                        <div class="col-lg-4 col-md-6 mb-3">
-                                            <ul class="list-unstyled">
-                                                @foreach($chunk as $sub)
-                                                <li class="h_title text-uppercase">
-                                                    <a href="{{ route('subcategory.show', $sub->slug) }}">
-                                                        {{ $sub->name }}
-                                                    </a>
-                                                </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
+                                    @if($aquariumCategory && $aquariumCategory->subcategories->count() > 0)
+                                    <ul class="list-unstyled">
+                                        @foreach($aquariumCategory->subcategories as $sub)
+                                        <li class="h_title">
+                                            <a href="{{ route('subcategory.show', $sub->slug) }}" class="{{ Request::is('sub-category/' . $sub->slug) ? 'active' : '' }}">
+                                                {{ $sub->name }}
+                                            </a>
+                                        </li>
                                         @endforeach
-                                        @else
-                                        <div class="col-12">
-                                            <p class="text-muted small">No subcategories available.</p>
-                                        </div>
-                                        @endif
-                                    </div>
+                                    </ul>
+                                    @else
+                                    <p class="text-muted small px-3">No subcategories available.</p>
+                                    @endif
                                 </ul>
                             </li>
 
                             <!-- Natural Products Dropdown -->
-                            <li class="dropdown mega_menu mega-menu-2 m1 level-1 font-weight-bolderer {{ $naturalCategory && Request::is('category/' . $naturalCategory->slug) ? 'active' : '' }}">
+                            <li class="dropdown m1 level-1 font-weight-bolderer {{ ($naturalCategory && (Request::is('category/' . $naturalCategory->slug) || (Request::is('sub-category/*') && $naturalCategory->subcategories->contains('slug', request()->segment(2))))) ? 'active' : '' }}">
                                 <a class="dropdown-toggle" href="{{ $naturalCategory ? route('category.show', $naturalCategory->slug) : '#' }}" role="button" data-toggle="dropdown" aria-expanded="false">
-                                    Natural Products&nbsp;<span class="ml-1"><i class="fa fa-angle-down"></i></span>
+                                    Natural Products
                                 </a>
                                 <ul class="dropdown-menu p-3">
-                                    <div class="row">
-                                        @if($naturalCategory && $naturalCategory->subcategories->count() > 0)
-                                        @php $chunks = $naturalCategory->subcategories->chunk(ceil($naturalCategory->subcategories->count() / 2)); @endphp
-                                        @foreach($chunks as $chunk)
-                                        <div class="col-lg-4 col-md-6 mb-3">
-                                            <ul class="list-unstyled">
-                                                @foreach($chunk as $sub)
-                                                <li class="h_title text-uppercase">
-                                                    <a href="{{ route('subcategory.show', $sub->slug) }}">
-                                                        {{ $sub->name }}
-                                                    </a>
-                                                </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
+                                    @if($naturalCategory && $naturalCategory->subcategories->count() > 0)
+                                    <ul class="list-unstyled">
+                                        @foreach($naturalCategory->subcategories as $sub)
+                                        <li class="h_title">
+                                            <a href="{{ route('subcategory.show', $sub->slug) }}" class="{{ Request::is('sub-category/' . $sub->slug) ? 'active' : '' }}">
+                                                {{ $sub->name }}
+                                            </a>
+                                        </li>
                                         @endforeach
-                                        @else
-                                        <div class="col-12">
-                                            <p class="text-muted small">No subcategories available.</p>
-                                        </div>
-                                        @endif
-                                    </div>
+                                    </ul>
+                                    @else
+                                    <p class="text-muted small px-3">No subcategories available.</p>
+                                    @endif
                                 </ul>
                             </li>
 
@@ -388,21 +311,7 @@
                                 &times;
                             </button>
                             <!-- Autocomplete Dropdown -->
-                            <div id="stickySearchDropdown" style="
-                                display:none;
-                                position:absolute;
-                                top:100%;
-                                left:0;
-                                right:0;
-                                background:#fff;
-                                border:1px solid #e0e0e0;
-                                border-top:none;
-                                border-radius:0 0 10px 10px;
-                                box-shadow:0 8px 24px rgba(0,0,0,0.12);
-                                z-index:99999;
-                                max-height:420px;
-                                overflow-y:auto;
-                            "></div>
+                            <div id="stickySearchDropdown" class="search-dropdown" style="display:none;"></div>
                         </div>
                     </div>
                     
@@ -410,38 +319,24 @@
                     <div class="sticky-actions-col">
                         <ul class="sticky-actions-list">
                             <!-- Wishlist -->
-                            <!-- Wishlist -->
                             <li class="sticky-action-item">
-                                <a href="{{ url('wishlist') }}" class="sticky-action-link wishlist-icon-link" title="Wishlist">
-                                    <span class="price_cart sticky-badge">{{ $wishlistCount ?? 0 }}</span>
+                                <a href="{{ url('wishlist') }}" class="icon-circle wishlist-icon-link" title="Wishlist">
+                                    <i class="far fa-heart"></i>
+                                    <span class="badge-count sticky-badge">{{ $wishlistCount ?? 0 }}</span>
                                 </a>
                             </li>
                             <!-- Cart -->
                             <li class="sticky-action-item">
-                                <a href="{{ url('cart') }}" class="sticky-action-link cart-icon-link" title="Cart">
-                                    <span class="price_cart sticky-badge">{{ $cartCount ?? 0 }}</span>
+                                <a href="javascript:void(0)" onclick="openCartDrawer()" class="icon-circle cart-icon-link" title="Cart">
+                                    <i class="fas fa-shopping-basket"></i>
+                                    <span class="badge-count sticky-badge">{{ $cartCount ?? 0 }}</span>
                                 </a>
                             </li>
-                            <!-- User Login / Account -->
-                            <li class="sticky-action-item dropdown">
-                                <a href="{{ Auth::check() ? url('user/dashboard') : url('login') }}" class="sticky-action-link my_account_link" style="text-decoration: none;" id="stickyAccountToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="My Account">
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="stickyAccountToggle">
-                                    @auth
-                                    <a class="dropdown-item font-weight-bolderer" href="{{ url('user/dashboard') }}">Dashboard</a>
-                                    <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item font-weight-bolderer">Logout</button>
-                                    </form>
-                                    @else
-                                    <a class="dropdown-item font-weight-bolderer" href="{{ url('login') }}">Login</a>
-                                    @endauth
-                                </div>
-                            </li>
+
                             <!-- Hamburger Menu Toggle -->
                             <li class="sticky-action-item">
                                 <button class="sticky-menu-toggle" type="button" aria-label="Open Menu">
-                                    <span>☰</span>
+                                    <i class="fas fa-bars"></i>
                                 </button>
                             </li>
                         </ul>
@@ -517,6 +412,32 @@
                     }
                 });
             });
+
+            // Mobile Account Dropdown Toggle
+            const accountLink = document.querySelector('.my_account_link');
+            if (accountLink) {
+                accountLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (window.innerWidth < 1200) {
+                        e.stopPropagation();
+                        const parent = this.parentElement;
+                        const menu = this.nextElementSibling;
+                        parent.classList.toggle('show');
+                        if (menu) menu.classList.toggle('show');
+                    }
+                });
+                
+                // Close account dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth < 1200 && accountLink.parentElement.classList.contains('show')) {
+                        if (!accountLink.parentElement.contains(e.target)) {
+                            accountLink.parentElement.classList.remove('show');
+                            const menu = accountLink.nextElementSibling;
+                            if (menu) menu.classList.remove('show');
+                        }
+                    }
+                });
+            }
 
             // Sticky Scroll Logic
             if (stickyHeader) {

@@ -1,40 +1,22 @@
 @include('view.layout.header')
 
-<div class="sp_header bg-white p-3 border-bottom">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <ul class="list-unstyled mb-0 d-flex align-items-center">
-                    <li class="d-inline-block font-weight-bolder"><a href="{{ route('home') }}" class="text-decoration-none text-success">home</a></li>
-                    <li class="d-inline-block font-weight-bolder mx-2 text-muted">/</li>
-                    <li class="d-inline-block font-weight-bolder text-muted">Build a Combo</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
 
-<section class="py-5" style="background-color: #f7f9fb;">
-    <div class="container">
-        <div class="row mb-4">
-            <div class="col-12 text-center">
-                <h1 class="display-5 fw-bold text-dark mb-2">Build Your Custom Combo Pack</h1>
-                <p class="text-muted lead">Choose eligible products, meet discount slabs, and save big on your custom bundle!</p>
-            </div>
-        </div>
 
-        <div class="row">
+<section class="combo-py-3">
+    <div class="combo-layout-container">
+
+        <div class="combo-layout-row">
             <!-- Left Column: Products Grid & Search -->
-            <div class="col-lg-8 mb-4">
+            <div class="combo-main-col combo-mb-4">
                 <!-- Search & Filters -->
-                <div class="bg-white rounded-3 shadow-sm p-3 mb-4 border d-flex flex-wrap gap-2 justify-content-between align-items-center builder-filter-wrapper">
-                    <div class="input-group style-search-group" style="max-width: 400px; flex-grow: 1;">
-                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" id="builderSearch" class="form-control bg-light border-start-0" placeholder="Search products...">
+                <div class="combo-filter-box builder-filter-wrapper">
+                    <div class="combo-input-group combo-search-group">
+                        <span class="combo-input-icon"><i class="fas fa-search combo-text-muted"></i></span>
+                        <input type="text" id="builderSearch" class="combo-text-input" placeholder="Search products...">
                     </div>
-                    <div class="d-flex align-items-center gap-2 builder-filter-select-container">
-                        <span class="text-muted small text-nowrap">Filter:</span>
-                        <select id="builderCategory" class="form-select bg-light">
+                    <div class="combo-filter-select-wrap builder-filter-select-container">
+                        <span class="combo-text-muted combo-small combo-filter-label">Filter:</span>
+                        <select id="builderCategory" class="combo-select-input">
                             <option value="">All Categories</option>
                             @php
                                 $usedCategories = $products->pluck('category')->unique('id');
@@ -49,7 +31,7 @@
                 </div>
 
                 <!-- Products Grid -->
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" id="productsGrid">
+                <div class="combo-product-grid" id="productsGrid">
                     @foreach($products as $product)
                         @php
                             $sizeData = [];
@@ -87,55 +69,68 @@
                                 }
                             }
                         @endphp
-                        <div class="col product-item-col" 
+                        <div class="product-item-col" 
                              data-id="{{ $product->id }}" 
                              data-name="{{ $product->name }}" 
                              data-base-price="{{ $price }}" 
                              data-original-price="{{ $product->price }}"
                              data-image="{{ $image }}"
                              data-category="{{ $product->category_id }}">
-                            <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden product-builder-card position-relative">
-                                @if($hasDiscount)
-                                    <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3" style="z-index: 10 !important;">Sale</span>
-                                @endif
-                                <div class="builder-card-img-wrap">
-                                    <img src="{{ $image }}" class="builder-card-img" alt="{{ $product->name }}" loading="lazy">
-                                </div>
-                                <div class="card-body p-3 d-flex flex-column">
-                                    <h5 class="card-title text-dark fs-6 fw-bold text-truncate mb-2" title="{{ $product->name }}">{{ $product->name }}</h5>
+                            
+                            <div class="combo-card-pure {{ $product->stock_quantity <= 0 ? 'out-of-stock' : '' }} combo-product-card">
+                                <div class="combo-img-container combo-mb-3" style="position:relative;">
+                                    <img src="{{ $image }}" class="combo-img combo-w-100" alt="{{ $product->name }}" loading="lazy">
                                     
-                                    @if(count($sizeData) > 0)
-                                        <div class="mb-3">
-                                            <label class="small text-muted mb-1 d-block fw-semibold">Select Size:</label>
-                                            <select class="form-select form-select-sm size-select" data-product-id="{{ $product->id }}" onchange="changeProductSize({{ $product->id }}, this)" style="border-radius: 6px; border-color: #ced4da; font-size: 13px;">
-                                                @foreach($sizeData as $sizeName => $sizeValue)
-                                                    @php
-                                                        $sizePrice = is_array($sizeValue) ? ($sizeValue['price'] ?? null) : $sizeValue;
-                                                    @endphp
-                                                    <option value="{{ $sizeName }}" data-price="{{ $sizePrice ?? '' }}">
-                                                        {{ $sizeName }} @if($sizePrice) (₹{{ number_format($sizePrice, 2) }}) @endif
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                    @if($hasDiscount)
+                                        <div class="product-discount-badge">{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF</div>
                                     @endif
 
-                                    <div class="mt-auto">
-                                        <div class="d-flex align-items-baseline mb-3 price-container-{{ $product->id }}">
-                                            @if($hasDiscount)
-                                                <del class="text-muted small me-2">₹{{ number_format($product->price, 2) }}</del>
-                                                <span class="text-success fw-bold fs-5">₹{{ number_format($product->sale_price, 2) }}</span>
-                                            @else
-                                                <span class="text-dark fw-bold fs-5">₹{{ number_format($price, 2) }}</span>
-                                            @endif
+                                    @if($product->stock_quantity <= 0)
+                                        <div class="out-of-stock-overlay combo-oos-overlay">
+                                            <span class="combo-badge combo-badge-secondary">Out Of Stock</span>
                                         </div>
+                                    @endif
+                                </div>
+                                
+                                <div class="product-info combo-flex-1">
+                                    <div class="combo-card-header">
+                                        <h3 class="combo-card-title">
+                                            {{ $product->name }}
+                                        </h3>
+                                        
+                                        @if(count($sizeData) > 0)
+                                            <div>
+                                                <select class="combo-select-input combo-size-select" data-product-id="{{ $product->id }}" onchange="changeProductSize({{ $product->id }}, this)">
+                                                    @foreach($sizeData as $sizeName => $sizeValue)
+                                                        @php
+                                                            $sizePrice = is_array($sizeValue) ? ($sizeValue['price'] ?? null) : $sizeValue;
+                                                        @endphp
+                                                        <option value="{{ $sizeName }}" data-price="{{ $sizePrice ?? '' }}">
+                                                            {{ $sizeName }} @if($sizePrice) (₹{{ number_format($sizePrice, 0) }}) @endif
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <div class="product-price price-container-{{ $product->id }}">
+                                        @if($hasDiscount)
+                                            <span class="original-price combo-text-muted combo-text-strike">₹{{ number_format($product->price, 0) }}</span>
+                                            <span class="current-price combo-fw-bold combo-ms-2">₹{{ number_format($product->sale_price, 0) }}</span>
+                                        @else
+                                            <span class="current-price combo-fw-bold">₹{{ number_format($price, 0) }}</span>
+                                        @endif
+                                    </div>
+                                    
+                                    <div class="combo-card-actions">
                                         @auth
-                                        <button type="button" class="btn btn-outline-success btn-sm w-100 rounded-pill toggle-product-btn" onclick="toggleProduct({{ $product->id }})">
-                                            <i class="fas fa-plus me-1"></i> Add to Combo
+                                        <button type="button" class="combo-btn combo-btn-block combo-btn-pill toggle-product-btn combo-fw-bold combo-btn-add" onclick="toggleProduct({{ $product->id }})">
+                                            <i class="fas fa-plus-circle combo-me-1"></i> Add to Combo
                                         </button>
                                         @else
-                                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm w-100 rounded-pill toggle-product-btn d-flex align-items-center justify-content-center">
-                                            <i class="fas fa-plus me-1"></i> Add to Combo
+                                        <a href="{{ route('login') }}" class="combo-btn combo-btn-block combo-btn-pill combo-fw-bold combo-btn-add combo-flex-center">
+                                            <i class="fas fa-sign-in-alt combo-me-1"></i> Login to Add
                                         </a>
                                         @endauth
                                     </div>
@@ -147,47 +142,47 @@
             </div>
 
             <!-- Right Column: Sticky Summary Panel -->
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm rounded-3 overflow-hidden sticky-top" style="top: 20px; z-index: 100;">
-                    <div class="card-header bg-success text-white p-3 border-0">
-                        <h4 class="card-title mb-0 fw-bold"><i class="fas fa-box-open me-2"></i>Combo Pack Summary</h4>
+            <div class="combo-sidebar-col summary-panel-wrapper">
+                <div class="combo-card-pure combo-sticky-panel summary-panel">
+                    <div class="combo-card-header combo-border-0 combo-pb-0">
+                        <h4 class="combo-card-title combo-d-flex combo-align-center"><i class="fas fa-box-open combo-text-success combo-me-2"></i> Combo Pack Summary</h4>
                     </div>
-                    <div class="card-body p-4 bg-white">
+                    <div class="combo-p-3 combo-flex-col-grow">
                         <!-- Progress / Limits -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="fw-bold text-dark">Selection Progress</span>
-                                <span class="badge bg-light text-success border border-success px-3 py-2 fs-6" id="progressText">0 / {{ $settings->max_products }}</span>
+                        <div class="combo-mb-4">
+                            <div class="combo-d-flex combo-justify-between combo-align-center combo-mb-2">
+                                <span class="combo-fw-bold combo-text-dark">Selection Progress</span>
+                                <span class="combo-badge combo-badge-progress combo-fs-6" id="progressText">0 / {{ $settings->max_products }}</span>
                             </div>
-                            <div class="progress" style="height: 10px; border-radius: 5px;">
-                                <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="{{ $settings->max_products }}"></div>
+                            <div class="combo-progress-wrapper combo-progress-bg">
+                                <div class="combo-progress-fill combo-progress-striped" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="{{ $settings->max_products }}"></div>
                             </div>
-                            <small class="text-muted d-block mt-2">Add between 2 and {{ $settings->max_products }} products to complete the combo.</small>
+                            <small class="combo-text-muted combo-d-block combo-mt-2">Add between 2 and {{ $settings->max_products }} products to complete the combo.</small>
                         </div>
 
                         <!-- Selected Items List -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-                                <h5 class="fw-bold text-dark mb-0">Selected Products</h5>
-                                <button type="button" class="btn btn-link btn-sm text-danger p-0 text-decoration-none" id="clearAllComboBtn" onclick="clearComboBuilder()" style="font-size: 13px; display: none;">Clear All</button>
+                        <div class="combo-mb-4">
+                            <div class="combo-d-flex combo-justify-between combo-align-center combo-border-bottom combo-pb-2 combo-mb-3">
+                                <h5 class="combo-fw-bold combo-text-dark combo-mb-0">Selected Products</h5>
+                                <button type="button" class="combo-btn-link combo-btn-danger-link combo-clear-btn combo-btn-bare" id="clearAllComboBtn" onclick="clearComboBuilder()">Clear All</button>
                             </div>
-                            <div id="selectedProductsList" class="d-flex flex-column gap-2" style="max-height: 240px; overflow-y: auto;">
-                                <div class="text-center py-4 text-muted" id="emptyPlaceholder">
-                                    <i class="fas fa-shopping-basket fa-2x mb-2 text-muted opacity-50"></i>
-                                    <p class="mb-0 small">No products selected yet.</p>
+                            <div id="selectedProductsList" class="combo-d-flex combo-flex-column combo-gap-2 combo-selected-list">
+                                <div class="combo-text-center combo-py-3 combo-text-muted" id="emptyPlaceholder">
+                                    <i class="fas fa-shopping-basket fa-2x combo-mb-2 combo-text-muted combo-opacity-50"></i>
+                                    <p class="combo-mb-0 combo-small">No products selected yet.</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Discount slabs visual tracker -->
                         @if($slabs->count() > 0)
-                            <div class="mb-4 p-3 bg-light rounded-3">
-                                <h6 class="fw-bold text-dark mb-2"><i class="fas fa-percentage me-2 text-warning"></i>Discount Slabs</h6>
-                                <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+                            <div class="combo-mb-4 combo-p-3 combo-bg-white combo-rounded-3 combo-shadow-sm combo-border combo-slab-container">
+                                <h6 class="combo-fw-bold combo-text-dark combo-mb-3"><i class="fas fa-percentage combo-text-warning-me-2"></i>Discount Slabs</h6>
+                                <ul class="combo-list-unstyled combo-mb-0 combo-d-flex combo-flex-column">
                                     @foreach($slabs as $slab)
-                                        <li class="d-flex justify-content-between align-items-center py-1 border-bottom border-dashed slab-indicator-item" data-min="{{ $slab->min_amount }}" data-percent="{{ $slab->discount_percentage }}">
-                                            <span class="small text-muted">Above ₹{{ number_format($slab->min_amount, 2) }}</span>
-                                            <span class="badge bg-secondary rounded-pill slab-badge">{{ floatval($slab->discount_percentage) }}% Off</span>
+                                        <li class="combo-d-flex combo-justify-between combo-align-center combo-py-2 combo-border-bottom slab-indicator-item combo-slab-item" data-min="{{ $slab->min_amount }}" data-percent="{{ $slab->discount_percentage }}">
+                                            <span class="combo-text-muted combo-small combo-fw-semibold slab-text combo-slab-text">Above ₹{{ number_format($slab->min_amount, 2) }}</span>
+                                            <span class="combo-badge combo-badge-secondary combo-badge-pill slab-badge combo-slab-badge">{{ floatval($slab->discount_percentage) }}% Off</span>
                                         </li>
                                     @endforeach
                                 </ul>
@@ -195,36 +190,36 @@
                         @endif
 
                         <!-- Pricing Breakdown -->
-                        <div class="border-top pt-3 mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted">Subtotal (Products)</span>
-                                <span class="fw-semibold text-dark" id="subtotalPrice">₹0.00</span>
+                        <div class="combo-border-top combo-pt-3 combo-mb-4 combo-mt-auto">
+                            <div class="combo-d-flex combo-justify-between combo-align-center combo-mb-2">
+                                <span class="combo-text-muted combo-fw-semibold combo-subtotal-text">Subtotal (Products)</span>
+                                <span class="combo-fw-bold combo-text-dark" id="subtotalPrice">₹0.00</span>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center mb-2 text-success d-none" id="discountRow">
-                                <span>Combo Discount (<span id="discountPercent">0</span>%)</span>
-                                <span class="fw-semibold">-₹<span id="discountAmount">0.00</span></span>
+                            <div class="combo-d-flex combo-justify-between combo-align-center combo-mb-3 combo-text-success combo-hidden" id="discountRow">
+                                <span class="combo-fw-semibold combo-subtotal-text">Combo Discount (<span id="discountPercent">0</span>%)</span>
+                                <span class="combo-fw-bold">-₹<span id="discountAmount">0.00</span></span>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
-                                <span class="fw-bold text-dark fs-5">Total Combo Price</span>
-                                <span class="fw-bold text-success fs-4" id="totalPrice">₹0.00</span>
+                            <div class="combo-d-flex combo-justify-between combo-align-center combo-pt-3 combo-mt-2 combo-total-box">
+                                <span class="combo-fw-bold combo-text-dark combo-fs-5">Total Combo Price</span>
+                                <span class="combo-fw-bold combo-fs-4 combo-total-price" id="totalPrice">₹0.00</span>
                             </div>
-                            <div class="alert alert-info mt-3 py-2 px-3 small border-0 mb-0 d-none" id="slabNotice">
+                            <div class="combo-alert combo-mt-3 combo-p-3 combo-small combo-border-0 combo-mb-0 combo-d-none combo-rounded-3 combo-slab-notice" id="slabNotice">
                                 <!-- slab progress notice will be updated here -->
                             </div>
                         </div>
 
                         <!-- Action Button & Add Form -->
                         @auth
-                        <form action="{{ route('cart.add_custom_combo') }}" method="POST" id="customComboForm">
+                        <form action="{{ route('cart.add_custom_combo') }}" method="POST" id="customComboForm" class="combo-mt-2">
                             @csrf
                             <div id="hiddenFieldsContainer"></div>
-                            <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill py-3 fw-bold" id="checkoutBtn" disabled>
+                            <button type="submit" class="combo-btn combo-btn-block combo-btn-add combo-fw-bold" id="checkoutBtn" disabled>
                                 Add Combo To Cart
                             </button>
                         </form>
                         @else
-                        <a href="{{ route('login') }}" class="btn btn-success btn-lg w-100 rounded-pill py-3 fw-bold d-flex align-items-center justify-content-center">
-                            <i class="fas fa-sign-in-alt me-2"></i> Login to Add Combo To Cart
+                        <a href="{{ route('login') }}" class="combo-btn combo-btn-block combo-btn-add combo-fw-bold combo-flex-center combo-mt-2">
+                            <i class="fas fa-sign-in-alt combo-me-2"></i> Login to Add Combo To Cart
                         </a>
                         @endauth
                     </div>
@@ -372,15 +367,17 @@
             const id = parseInt(col.getAttribute('data-id'));
             const isSelected = selectedProducts.some(p => p.id === id);
             const btn = col.querySelector('.toggle-product-btn');
-
-            if (isSelected) {
-                btn.classList.remove('btn-outline-success');
-                btn.classList.add('btn-success');
-                btn.innerHTML = '<i class="fas fa-check me-1"></i> Added';
-            } else {
-                btn.classList.remove('btn-success');
-                btn.classList.add('btn-outline-success');
-                btn.innerHTML = '<i class="fas fa-plus me-1"></i> Add to Combo';
+            
+            if (btn) {
+                if (isSelected) {
+                    btn.className = 'combo-btn combo-btn-block combo-btn-pill toggle-product-btn combo-fw-bold combo-btn-added';
+                    btn.removeAttribute('style');
+                    btn.innerHTML = '<i class="fas fa-check-circle combo-me-1"></i> Added';
+                } else {
+                    btn.className = 'combo-btn combo-btn-block combo-btn-pill toggle-product-btn combo-fw-bold combo-btn-add';
+                    btn.removeAttribute('style');
+                    btn.innerHTML = '<i class="fas fa-plus-circle combo-me-1"></i> Add to Combo';
+                }
             }
         });
 
@@ -409,27 +406,27 @@
         } else {
             selectedProducts.forEach(p => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'd-flex align-items-center justify-content-between p-2 rounded border bg-light';
+                itemDiv.className = 'combo-d-flex combo-align-center combo-justify-between combo-p-2 combo-mb-2 combo-border combo-rounded combo-bg-light';
                 
                 let priceHtml = '';
                 if (p.originalPrice && p.originalPrice > p.price) {
-                    priceHtml = `<del class="text-muted small me-2">₹${p.originalPrice.toFixed(2)}</del><span class="text-success fw-bold small">₹${p.price.toFixed(2)}</span>`;
+                    priceHtml = `<del class="combo-text-muted combo-small combo-sel-del">₹${p.originalPrice.toFixed(2)}</del><span class="combo-text-success combo-fw-bold combo-small">₹${p.price.toFixed(2)}</span>`;
                 } else {
-                    priceHtml = `<span class="text-muted small">₹${p.price.toFixed(2)}</span>`;
+                    priceHtml = `<span class="combo-text-muted combo-small">₹${p.price.toFixed(2)}</span>`;
                 }
 
-                const sizeBadgeHtml = p.size ? `<span class="badge bg-light text-dark border ms-1" style="font-size: 10px; font-weight: 500;">Size: ${p.size}</span>` : '';
+                const sizeBadgeHtml = p.size ? `<span class="combo-badge combo-badge-light combo-border combo-ms-2 combo-sel-badge">Size: ${p.size}</span>` : '';
 
                 itemDiv.innerHTML = `
-                    <div class="d-flex align-items-center gap-2 overflow-hidden" style="flex: 1;">
-                        <img src="${p.image}" class="img-thumbnail rounded" style="width: 40px; height: 40px; object-fit: contain; background: white;" alt="">
-                        <div class="text-truncate">
-                            <span class="d-block text-dark fw-bold small text-truncate">${p.name} ${sizeBadgeHtml}</span>
-                            ${priceHtml}
+                    <div class="combo-d-flex combo-align-center combo-gap-2 combo-overflow-hidden combo-sel-item">
+                        <img src="${p.image}" class="combo-rounded combo-border combo-sel-img" alt="">
+                        <div class="combo-d-flex combo-flex-column combo-justify-center">
+                            <span class="combo-d-block combo-text-dark combo-fw-bold combo-sel-title">${p.name} ${sizeBadgeHtml}</span>
+                            <div>${priceHtml}</div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-link text-danger btn-sm p-0 ms-2" onclick="removeProduct(${p.id})">
-                        <i class="fas fa-times-circle fs-5"></i>
+                    <button type="button" class="combo-btn-link combo-btn-danger-link combo-btn-bare combo-ms-2" onclick="removeProduct(${p.id})">
+                        <i class="fas fa-times-circle combo-fs-5"></i>
                     </button>
                 `;
                 selectedList.appendChild(itemDiv);
@@ -442,7 +439,7 @@
         
         const subtotalPriceEl = document.getElementById('subtotalPrice');
         if (originalSubtotal > subtotal) {
-            subtotalPriceEl.innerHTML = `<del class="text-muted small me-2" style="font-size: 0.85em;">₹${originalSubtotal.toFixed(2)}</del><span class="text-dark">₹${subtotal.toFixed(2)}</span>`;
+            subtotalPriceEl.innerHTML = `<del class="combo-text-muted combo-small combo-me-2 combo-del-sm">₹${originalSubtotal.toFixed(2)}</del><span class="combo-text-dark">₹${subtotal.toFixed(2)}</span>`;
         } else {
             subtotalPriceEl.textContent = `₹${subtotal.toFixed(2)}`;
         }
@@ -468,15 +465,22 @@
             const min = parseFloat(item.getAttribute('data-min'));
             const percent = parseInt(item.getAttribute('data-percent'));
             const badge = item.querySelector('.slab-badge');
+            const textSpan = item.querySelector('.slab-text');
 
             if (subtotal >= min && percent === applicableDiscountPercent) {
-                item.classList.add('bg-success-subtle');
-                badge.classList.remove('bg-secondary');
-                badge.classList.add('bg-success');
+                // Active Premium Styling
+                item.classList.add('combo-slab-active');
+                textSpan.classList.remove('combo-text-muted');
+                textSpan.classList.add('combo-text-success');
+                badge.classList.remove('combo-badge-secondary');
+                badge.classList.add('combo-badge-success');
             } else {
-                item.classList.remove('bg-success-subtle');
-                badge.classList.remove('bg-success');
-                badge.classList.add('bg-secondary');
+                // Default Styling
+                item.classList.remove('combo-slab-active');
+                textSpan.classList.remove('combo-text-success');
+                textSpan.classList.add('combo-text-muted');
+                badge.classList.remove('combo-badge-success');
+                badge.classList.add('combo-badge-secondary');
             }
         });
 
@@ -486,16 +490,16 @@
 
         const discountRow = document.getElementById('discountRow');
         if (applicableDiscountPercent > 0) {
-            discountRow.classList.remove('d-none');
+            discountRow.classList.remove('combo-hidden');
             document.getElementById('discountPercent').textContent = applicableDiscountPercent;
             document.getElementById('discountAmount').textContent = discountAmount.toFixed(2);
         } else {
-            discountRow.classList.add('d-none');
+            discountRow.classList.add('combo-hidden');
         }
 
         const totalPriceEl = document.getElementById('totalPrice');
         if (originalSubtotal > total) {
-            totalPriceEl.innerHTML = `<del class="text-muted small me-2" style="font-size: 0.6em; vertical-align: middle;">₹${originalSubtotal.toFixed(2)}</del><span class="text-success">₹${total.toFixed(2)}</span>`;
+            totalPriceEl.innerHTML = `<del class="combo-text-muted combo-small combo-me-2">₹${originalSubtotal.toFixed(2)}</del><span class="combo-text-success">₹${total.toFixed(2)}</span>`;
         } else {
             totalPriceEl.textContent = `₹${total.toFixed(2)}`;
         }
@@ -504,13 +508,13 @@
         const slabNotice = document.getElementById('slabNotice');
         if (nextSlab) {
             const remaining = nextSlab.min_amount - subtotal;
-            slabNotice.innerHTML = `<i class="fas fa-info-circle me-1 text-info"></i> Add <strong>₹${remaining.toFixed(2)}</strong> more to get a <strong>${nextSlab.discount_percentage}%</strong> discount!`;
-            slabNotice.classList.remove('d-none');
+            slabNotice.innerHTML = `<i class="fas fa-info-circle combo-me-1 combo-icon-green"></i> Add <strong>₹${remaining.toFixed(2)}</strong> more to get a <strong>${nextSlab.discount_percentage}%</strong> discount!`;
+            slabNotice.classList.remove('combo-hidden');
         } else if (applicableDiscountPercent > 0) {
-            slabNotice.innerHTML = `<i class="fas fa-check-circle me-1 text-success"></i> Maximum discount level of <strong>${applicableDiscountPercent}%</strong> achieved!`;
-            slabNotice.classList.remove('d-none');
+            slabNotice.innerHTML = `<i class="fas fa-check-circle combo-me-1 combo-icon-green"></i> Maximum discount level of <strong>${applicableDiscountPercent}%</strong> achieved!`;
+            slabNotice.classList.remove('combo-hidden');
         } else {
-            slabNotice.classList.add('d-none');
+            slabNotice.classList.add('combo-hidden');
         }
 
         // Update form submission and checkout buttons
@@ -727,56 +731,6 @@
     });
 </script>
 
-<style>
-    /* Styling for the builder */
-    .border-dashed {
-        border-style: dashed !important;
-    }
-    .bg-success-subtle {
-        background-color: #d1e7dd !important;
-        border-radius: 4px;
-        padding-left: 5px;
-        padding-right: 5px;
-    }
 
-    /* Full-fill image container — no padding, no whitespace */
-    .builder-card-img-wrap {
-        width: 100%;
-        height: 220px;
-        overflow: hidden;
-        background: #ffffff;
-        position: relative;
-        display: block;
-    }
-
-    .builder-card-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-        display: block;
-        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-        backface-visibility: hidden;
-    }
-
-    /* Hover zoom on the image */
-    .product-builder-card:hover .builder-card-img {
-        transform: scale(1.08);
-    }
-
-    .product-builder-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: 1px solid #eef2f6 !important;
-    }
-    .product-builder-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 28px rgba(110, 168, 32, 0.14) !important;
-        border-color: rgba(110, 168, 32, 0.25) !important;
-    }
-    .style-search-group .form-control:focus {
-        border-color: #ced4da;
-        box-shadow: none;
-    }
-</style>
 
 @include('view.layout.footer')

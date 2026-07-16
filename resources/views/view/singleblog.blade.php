@@ -1,20 +1,7 @@
 @include('view.layout.header')
 
-<style>
-    /* USER REQUESTED BLOCKQUOTE STYLE (Pro Tip / Key Takeaway) */
-    .ck-content blockquote {
-        background: linear-gradient(135deg, rgba(110, 168, 32, 0.05) 0%, rgba(74, 120, 86, 0.05) 100%);
-        border-left: 4px solid var(--primary-color, #73bb44);
-        padding: 20px;
-        margin: 30px 0;
-        border-radius: 8px;
-        font-style: normal;
-    }
-    .ck-content blockquote strong {
-        color: var(--primary-color, #73bb44);
-        font-weight: 700;
-    }
-</style>
+
+{{-- 
 <div class="sp_header bg-white p-3">
     <div class="container">
         <div class="row">
@@ -30,6 +17,7 @@
         </div>
     </div>
 </div>
+ --}}
 
 <section class="py-4 bg-white">
     <div class="container">

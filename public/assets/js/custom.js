@@ -86,7 +86,8 @@ $('#fullcarousel').owlCarousel({
     "<i class='fa fa-chevron-left'></i>",
     "<i class='fa fa-chevron-right'></i>"
   ],
-  autoplay: false,
+  autoplay: true,
+  autoplayTimeout: 3000,
   autoplayHoverPause: true,
   responsive: {
     0: {
@@ -101,16 +102,15 @@ $('#fullcarousel').owlCarousel({
 $(document).ready(function() {
   $("#product_carousel2").owlCarousel({
   itemsCustom : [
-     [0, 1],
-    [375,2],
-    [600, 3],
-    [768,4],
-    [1200,4]
+     [0, 2],
+    [576, 2],
+    [768, 3],
+    [992, 4],
+    [1200, 4]
     ],
-    //autoPlay: 6000,
+    autoPlay: 3000,
     loop: true,
-    navigationText: ['<i class="fas fa-long-arrow-alt-left"></i>', '<i class="fas fa-long-arrow-alt-right"></i>'],
-    navigation : true,
+    navigation : false,
     pagination:false
   });
   });
@@ -118,16 +118,15 @@ $(document).ready(function() {
 $(document).ready(function() {
   $("#product_carousel1").owlCarousel({
   itemsCustom : [
-   [0, 1],
-    [375,2],
-    [600, 3],
-    [768,4],
-    [1200,4]
+     [0, 2],
+    [576, 2],
+    [768, 3],
+    [992, 4],
+    [1200, 4]
     ],
-    //autoPlay: 6000,
+    autoPlay: 3000,
     loop: true,
-  navigationText: ['<i class="fas fa-long-arrow-alt-left"></i>', '<i class="fas fa-long-arrow-alt-right"></i>'],
-    navigation : true,
+    navigation : false,
     pagination:false
   });
   });
@@ -135,16 +134,15 @@ $(document).ready(function() {
 $(document).ready(function() {
   $("#product_carousel3").owlCarousel({
   itemsCustom : [
-    [0, 1],
-    [375,2],
-    [600, 3],
-    [768,4],
-    [1200,4]
+     [0, 2],
+    [576, 2],
+    [768, 3],
+    [992, 4],
+    [1200, 4]
     ],
-    //autoPlay: 6000,
+    autoPlay: 3000,
     loop: true,
-    navigationText: ['<i class="fas fa-long-arrow-alt-left"></i>', '<i class="fas fa-long-arrow-alt-right"></i>'],
-    navigation : true,
+    navigation : false,
     pagination:false
   });
   });
@@ -154,15 +152,14 @@ $(document).ready(function() {
 $(document).ready(function() {
   $("#lastest_carousel").owlCarousel({
   itemsCustom : [
-     [0, 1],
-    [375,2],
-    [600, 3],
-    [768,4],
-    [1200,4]
+     [0, 2],
+    [576, 2],
+    [768, 3],
+    [992, 4],
+    [1200, 4]
     ],
-    //autoPlay: 6000,
+    autoPlay: 3000,
     loop: true,
-    navigationText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
     navigation : false,
     pagination:false
   });
@@ -275,7 +272,8 @@ $('#top_carousel').owlCarousel({
     "<i class='fa fa-chevron-left'></i>",
     "<i class='fa fa-chevron-right'></i>"
   ],
-  autoplay: false,
+  autoplay: true,
+  autoplayTimeout: 3000,
   autoplayHoverPause: true,
   responsive: {
     0: {
@@ -311,7 +309,7 @@ $(document).ready(function() {
     [575, 2],
     [992, 3]
     ],
-    //autoPlay: 6000,
+    autoPlay: 3000,
     loop: true,
     navigationText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
     navigation : true,
@@ -331,7 +329,8 @@ $('#head_blue_carousel').owlCarousel({
     "<i class='fa fa-chevron-left'></i>",
     "<i class='fa fa-chevron-right'></i>"
   ],
-  autoplay: false,
+  autoplay: true,
+  autoplayTimeout: 3000,
   autoplayHoverPause: true,
   responsive: {
     0: {
@@ -367,7 +366,8 @@ $('#smart_carousel').owlCarousel({
     "<i class='fa fa-chevron-left'></i>",
     "<i class='fa fa-chevron-right'></i>"
   ],
-  autoplay: false,
+  autoplay: true,
+  autoplayTimeout: 3000,
   autoplayHoverPause: true,
   responsive: {
     0: {
@@ -421,7 +421,7 @@ $(document).ready(function() {
     [1410,5],
     [1840,6]
     ],
-    //autoPlay: 6000,
+    autoPlay: 3000,
     loop: true,
     navigationText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
     navigation : false,
@@ -438,7 +438,7 @@ $(document).ready(function() {
     [640,2],
     [1599,2]
     ],
-    //autoPlay: 6000,
+    autoPlay: 3000,
     loop: true,
     navigationText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
     navigation : false,
@@ -544,7 +544,7 @@ function checkHeaderLayout() {
     var inputClass = $( ".input-class" );
     var menuToggle = $( "#menuToggle" );
     if (inputClass.length) {
-        if (width < 992) {
+        if (width <= 1024) {
             if (menuToggle.length && !inputClass.next().is("#menuToggle")) {
                 inputClass.insertBefore( menuToggle );
             }
@@ -663,7 +663,8 @@ $('#sp_pro_carousel').owlCarousel({
     "<i class='fa fa-chevron-left'></i>",
     "<i class='fa fa-chevron-right'></i>"
   ],
-  autoplay: false,
+  autoplay: true,
+  autoplayTimeout: 3000,
   autoplayHoverPause: true,
   responsive: {
     0: {
@@ -704,16 +705,15 @@ function myFunction(imgs) {
 $(document).ready(function() {
   $("#related_product_carousel").owlCarousel({
   itemsCustom : [
-     [0, 1],
-    [375,2],
-    [600, 3],
-    [768,4],
-    [1200,4]
+     [0, 2],
+    [576, 2],
+    [768, 3],
+    [992, 4],
+    [1200, 4]
     ],
-    //autoPlay: 6000,
+    autoPlay: 3000,
     loop: true,
-    navigationText: ['<i class="fas fa-long-arrow-alt-left"></i>', '<i class="fas fa-long-arrow-alt-right"></i>'],
-    navigation : true,
+    navigation : false,
     pagination:false
   });
 });
@@ -723,16 +723,15 @@ $(document).ready(function() {
 $(document).ready(function() {
   $("#custom_product_carousel").owlCarousel({
   itemsCustom : [
-     [0, 1],
-    [375,2],
-    [600, 3],
-    [768,4],
-    [1200,4]
+     [0, 2],
+    [576, 2],
+    [768, 3],
+    [992, 4],
+    [1200, 4]
     ],
-    //autoPlay: 6000,
+    autoPlay: 3000,
     loop: true,
-    navigationText: ['<i class="fas fa-long-arrow-alt-left"></i>', '<i class="fas fa-long-arrow-alt-right"></i>'],
-    navigation : true,
+    navigation : false,
     pagination:false
   });
 });

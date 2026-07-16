@@ -1,62 +1,54 @@
 
 @include('view.layout.header')
 
+
+
+{{-- 
 <div class="sp_header bg-white p-3">
     <div class="container">
         <div class="row">
             <div class="col-12">
                 <ul class="list-unstyled mb-0">
-                    <li class="d-inline-block font-weight-bolder text-capitalize"><a href="{{ url('/') }}" class="text-decoration-none" style="color: #333;">home</a></li>
-                    <li class="d-inline-block font-weight-bolder mx-2">/</li>
-                    <li class="d-inline-block font-weight-bolder text-capitalize">
-                        @if(isset($title))
-                            <a href="{{ route('blog.index') }}" class="text-decoration-none" style="color: #666;">Blogs</a>
-                        @else
-                            <a href="#" class="text-decoration-none" style="color: #333;">Blogs</a>
-                        @endif
+                    <li class="d-inline-block font-weight-bolder">
+                        <a href="{{ url('/') }}" class="text-decoration-none" style="color: #333;">home</a>
                     </li>
-                    @if(isset($title))
-                        <li class="d-inline-block font-weight-bolder mx-2">/</li>
-                        <li class="d-inline-block font-weight-bolder text-capitalize"><a href="#" class="text-decoration-none" style="color: #333;">{{ str_replace('Category: ', '', $title) }}</a></li>
-                    @endif
+                    <li class="d-inline-block font-weight-bolder mx-2">/</li>
+                    <li class="d-inline-block font-weight-bolder">
+                        <a href="{{ route('blog.index') }}" class="text-decoration-none" style="color: #333;">Blogs</a>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
+ --}}
 
     <!-- Blogs Grid -->
-    <section class="py-5">
+    <section class="blog-categories-wrapper">
         <div class="container">
             <div class="row g-4">
                 @forelse($blogs as $blog)
                     <div class="col-lg-4 col-md-6 mb-4">
-                        <div class="blog-card">
-                            <div class="blog-card-image">
-                                <a href="{{ route('blog.show', $blog->slug) }}" class="d-block w-100 h-100">
-                                    @if($blog->image)
-                                        <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}">
-                                    @else
-                                        <img src="{{ asset('assets/images/seed-to-plant.webp') }}" alt="{{ $blog->title }}">
-                                    @endif
-                                </a>
+                        <a href="{{ route('blog.show', $blog->slug) }}" class="category-card">
+                            <div class="category-icon">
+                                @if($blog->image)
+                                    <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}">
+                                @else
+                                    <img src="{{ asset('assets/images/seed-to-plant.webp') }}" alt="{{ $blog->title }}">
+                                @endif
                                 <span class="blog-card-category">{{ $blog->category->name ?? 'General' }}</span>
                             </div>
-                            <div class="blog-card-content">
-                                <div class="blog-card-date">{{ $blog->published_at ? $blog->published_at->format('M d, Y') : ($blog->created_at ? $blog->created_at->format('M d, Y') : '') }}</div>
-                                <h3 class="blog-card-title">
-                                    <a href="{{ route('blog.show', $blog->slug) }}">
-                                        {{ $blog->title }}
-                                    </a>
-                                </h3>
-                                <p class="blog-card-excerpt">
+                            <div class="category-content">
+                                <h3 class="category-title">{{ $blog->title }}</h3>
+                                <div class="category-description">
                                     {{ Str::limit(strip_tags($blog->content), 120) }}
-                                </p>
-                                <div class="blog-card-footer">
-                                    <a href="{{ route('blog.show', $blog->slug) }}" class="read-more-link">Read <i class="fas fa-arrow-right"></i></a>
+                                </div>
+                                <div class="category-meta">
+                                    <span style="color: #888; font-weight: 500;"><i class="far fa-calendar-alt me-1"></i> {{ $blog->published_at ? $blog->published_at->format('M d, Y') : ($blog->created_at ? $blog->created_at->format('M d, Y') : '') }}</span>
+                                    <span>Read More →</span>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 @empty
                     <div class="col-12 text-center py-5">

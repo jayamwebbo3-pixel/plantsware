@@ -323,7 +323,7 @@
                                     class="current-price">₹175.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -349,7 +349,7 @@
                             <div class="product-price"><span class="current-price">₹699.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -375,7 +375,7 @@
                                     class="current-price">₹350.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -398,7 +398,7 @@
                                     class="current-price">₹269.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -419,7 +419,7 @@
                             <div class="product-price"><span class="current-price">₹4,000.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -440,7 +440,7 @@
                             <div class="product-price"><span class="current-price">₹499.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -463,7 +463,7 @@
                                     class="current-price">₹550.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -484,7 +484,7 @@
                             <div class="product-price"><span class="current-price">₹1,299.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -507,7 +507,7 @@
                                     class="current-price">₹360.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -528,7 +528,7 @@
                             <div class="product-price"><span class="current-price">₹899.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -570,7 +570,7 @@
                                     class="current-price">₹750.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -591,7 +591,7 @@
                             <div class="product-price"><span class="current-price">₹599.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -614,7 +614,7 @@
                                     class="current-price">₹390.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -635,7 +635,7 @@
                             <div class="product-price"><span class="current-price">₹349.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -657,7 +657,7 @@
                                     class="current-price">₹445.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -678,7 +678,7 @@
                             <div class="product-price"><span class="current-price">₹549.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -700,7 +700,7 @@
                                     class="current-price">₹255.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -721,7 +721,7 @@
                             <div class="product-price"><span class="current-price">₹725.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -744,7 +744,7 @@
                                     class="current-price">₹169.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -765,7 +765,7 @@
                             <div class="product-price"><span class="current-price">₹1,099.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -817,7 +817,7 @@
                                     class="current-price">₹320.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -838,7 +838,7 @@
                             <div class="product-price"><span class="current-price">₹299.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -860,7 +860,7 @@
                                     class="current-price">₹405.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -881,7 +881,7 @@
                             <div class="product-price"><span class="current-price">₹1,299.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -903,7 +903,7 @@
                                     class="current-price">₹2,459.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -924,7 +924,7 @@
                             <div class="product-price"><span class="current-price">₹199.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -946,7 +946,7 @@
                                     class="current-price">₹483.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -967,7 +967,7 @@
                             <div class="product-price"><span class="current-price">₹799.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -989,7 +989,7 @@
                                     class="current-price">₹317.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1010,7 +1010,7 @@
                             <div class="product-price"><span class="current-price">₹449.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1051,7 +1051,7 @@
                                     class="current-price">₹510.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1072,7 +1072,7 @@
                             <div class="product-price"><span class="current-price">₹349.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1094,7 +1094,7 @@
                                     class="current-price">₹378.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1115,7 +1115,7 @@
                             <div class="product-price"><span class="current-price">₹249.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1138,7 +1138,7 @@
                                     class="current-price">₹473.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1159,7 +1159,7 @@
                             <div class="product-price"><span class="current-price">₹399.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1181,7 +1181,7 @@
                                     class="current-price">₹295.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1202,7 +1202,7 @@
                             <div class="product-price"><span class="current-price">₹299.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1224,7 +1224,7 @@
                                     class="current-price">₹391.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
@@ -1245,7 +1245,7 @@
                             <div class="product-price"><span class="current-price">₹199.00</span></div>
                             <div class="product-actions"><button class="btn btn-primary"
                                     data-tooltip="Buy Now"><span class="btn-text">Buy Now</span><i
-                                        class="btn-icon fas fa-shopping-bag"></i></button><button
+                                        class="btn-icon fas fa-credit-card"></i></button><button
                                     class="btn btn-secondary" data-tooltip="Add to Cart"><span class="btn-text">Add
                                         to Cart</span><i class="btn-icon fas fa-shopping-cart"></i></button><button
                                     class="btn btn-wishlist" data-tooltip="Wishlist"><i
