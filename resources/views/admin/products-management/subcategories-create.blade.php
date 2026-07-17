@@ -96,7 +96,7 @@
                         <td>{{ $subcategory->sort_order ?? 0 }}</td>
                         <td>
                             <a href="{{ route('admin.subcategories.products', $subcategory) }}" class="btn btn-sm btn-outline-primary">
-                                View Products →
+                                Products →
                             </a>
                             <a href="{{ route('admin.subcategories.edit', $subcategory) }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-edit"></i>

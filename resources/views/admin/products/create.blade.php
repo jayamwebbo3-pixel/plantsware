@@ -76,7 +76,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="sale_price" class="form-label">Sale Price</label>
+                                    <label for="sale_price" class="form-label">Offer Price</label>
                                     <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" value="{{ old('sale_price') }}">
                                 </div>
                             </div>
@@ -118,7 +118,46 @@
                                     <small class="text-muted d-block mt-1">Last Order: {{ $next_sort_order - 1 }}</small>
                                 </div>
                             </div>
+                        </div></div>
+
+                    <!-- Right Column: Images & Flags -->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Main Product Image</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*" onchange="if(this.files[0]) { document.getElementById('imagePreview').src = window.URL.createObjectURL(this.files[0]); document.getElementById('previewContainer').style.display = 'block'; } else { document.getElementById('previewContainer').style.display = 'none'; }">
+                            <div id="previewContainer" class="mt-2 text-center" style="display: none;">
+                                <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-height: 200px;">
+                                <small class="text-success d-block mt-1">New Image Preview</small>
+                            </div>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="gallery_images" class="form-label">Gallery Images (Multiple)</label>
+                            <input type="file" class="form-control" id="gallery_images" name="gallery_images[]" accept="image/*" multiple>
+                            <div id="galleryPreviewContainer" class="d-flex flex-wrap mt-2"></div>
+                            <small class="text-muted">Hold Ctrl to select multiple images</small>
+                        </div>
+
+                        <!-- <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_featured">Mark as Featured Product</label>
+                            </div>
+                        </div> -->
+
+                        <div class="mb-3">
+                            <label for="combo_pack_eligible" class="form-label fw-bold">Combo Pack Eligible</label>
+                            <select name="combo_pack_eligible" id="combo_pack_eligible" class="form-select">
+                                <option value="No" {{ old('combo_pack_eligible') == 'No' ? 'selected' : '' }}>No</option>
+                                <option value="Yes" {{ old('combo_pack_eligible') == 'Yes' ? 'selected' : '' }}>Yes</option>
+                            </select>
+                            <small class="text-muted">If 'Yes', this product can be added to custom customer-created combo packs.</small>
+                        </div>
+                    </div>
+                </div>
+<!-- Variants Section (Moved for Full Width) -->
+<div class="row"><div class="col-12">
+
                         
 
                         @php
@@ -283,6 +322,13 @@
                         </div> -->
 
                         <style>
+                            #product_code::placeholder,
+                            #batch_code::placeholder,
+                            #weight::placeholder {
+                                color: #888888 !important;
+                                opacity: 1;
+                            }
+                            
                             .bg-light-subtle { background-color: #f8f9fa !important; }
                             .attr-name-display:focus { box-shadow: none !important; }
                             .attribute-row:hover { background-color: #fcfcfc; }
@@ -492,48 +538,14 @@
                             </div>
                         </div> -->
 
-                    </div>
+                    
+</div></div>
 
-                    <!-- Right Column: Images & Flags -->
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Main Product Image</label>
-                            <input type="file" class="form-control" id="image" name="image" accept="image/*" onchange="if(this.files[0]) { document.getElementById('imagePreview').src = window.URL.createObjectURL(this.files[0]); document.getElementById('previewContainer').style.display = 'block'; } else { document.getElementById('previewContainer').style.display = 'none'; }">
-                            <div id="previewContainer" class="mt-2 text-center" style="display: none;">
-                                <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail" style="max-height: 200px;">
-                                <small class="text-success d-block mt-1">New Image Preview</small>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="gallery_images" class="form-label">Gallery Images (Multiple)</label>
-                            <input type="file" class="form-control" id="gallery_images" name="gallery_images[]" accept="image/*" multiple>
-                            <div id="galleryPreviewContainer" class="d-flex flex-wrap mt-2"></div>
-                            <small class="text-muted">Hold Ctrl to select multiple images</small>
-                        </div>
-
-                        <!-- <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
-                                <label class="form-check-label" for="is_featured">Mark as Featured Product</label>
-                            </div>
-                        </div> -->
-
-                        <div class="mb-3">
-                            <label for="combo_pack_eligible" class="form-label fw-bold">Combo Pack Eligible</label>
-                            <select name="combo_pack_eligible" id="combo_pack_eligible" class="form-select">
-                                <option value="No" {{ old('combo_pack_eligible') == 'No' ? 'selected' : '' }}>No</option>
-                                <option value="Yes" {{ old('combo_pack_eligible') == 'Yes' ? 'selected' : '' }}>Yes</option>
-                            </select>
-                            <small class="text-muted">If 'Yes', this product can be added to custom customer-created combo packs.</small>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Submit Buttons -->
                 <div class="mt-5 text-end">
                     <a href="{{ url()->previous() }}" class="btn btn-secondary me-2">Cancel</a>
-                    <button type="submit" class="btn btn-primary px-5">Create Product</button>
+                    <button type="submit" class="btn btn-primary px-5">Submit</button>
                 </div>
             </form>
         </div>

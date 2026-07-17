@@ -241,7 +241,7 @@ section {
     background: #f4f5f2; /* Light greyish-green */
     border-bottom: 1px solid var(--border-color);
     position: relative;
-    z-index: 998; /* Ensure header creates a stacking context above page content */
+    z-index: 997; /* Ensure header creates a stacking context above page content */
 }
 .main-menu {
     display: flex;
@@ -2104,10 +2104,12 @@ section:has(.product-swiper) {
 .product-page-rating-badge { background: #388e3c; color: #fff; padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; margin-right: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 .product-page-rating-badge i { font-size: 10px; margin-left: 4px; }
 .product-page-price { margin-bottom: 15px; border-bottom: 1px dashed #edf2f7; padding-bottom: 15px; }
-.product-page-current-price { font-size: 1.7rem; font-weight: 800; color: #2e6a39; margin-right: 8px; line-height: 1; }
-.product-page-original-price { font-size: 1rem; color: #94a3b8; text-decoration: line-through; text-decoration-thickness: 1.5px; font-weight: 500; margin-right: 12px; }
-.badge-discount-save { background: rgba(239, 68, 68, 0.08); color: #ef4444; padding: 4px 10px; border-radius: 50px; font-size: 12px; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.15); display: inline-flex; align-items: center; transform: translateY(-3px); }
-.product-page-tax-info { font-size: 12px; color: #64748b; font-weight: 500; }
+.product-page-current-price { font-size: 2.2rem; font-weight: 800; color: #1a202c; margin-right: 8px; line-height: 1; }
+@media (max-width: 575px) { .product-page-current-price { font-size: 1.8rem; } }
+.product-page-original-price { font-size: 1.2rem; color: #94a3b8; text-decoration: line-through; text-decoration-thickness: 1.5px; font-weight: 600; margin-right: 8px; }
+.badge-discount-save { color: #ef4444; font-size: 15px; font-weight: 700; margin-left: 2px; letter-spacing: 0.2px; }
+@media (max-width: 575px) { .badge-discount-save { font-size: 13px; } }
+.product-page-tax-info { font-size: 13px; color: #0d9488; font-weight: 600; }
 .product-page-attributes { margin-bottom: 15px; }
 .custom-size-selector-container { display: flex; flex-wrap: wrap; gap: 8px; }
 .custom-size-radio { display: none; }
@@ -2146,11 +2148,32 @@ section:has(.product-swiper) {
 .dpz-img-wrap:hover::before { animation: shine 0.8s ease-in-out; }
 #dpzLens { position: absolute; border: 1px solid #d1d5db; width: 150px; height: 150px; background-color: rgba(255, 255, 255, 0.4); display: none; pointer-events: none; z-index: 10; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 #dpzPreview { position: fixed; width: 400px; height: 400px; border-radius: 12px; border: 1px solid #e2e8f0; background-color: #fff; background-repeat: no-repeat; display: none; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.15); pointer-events: none; }
-@media (max-width: 991px) {
-    .dpz-wrapper { flex-direction: column-reverse; }
-    .dpz-thumbs { flex-direction: row; width: 100%; overflow-x: auto; overflow-y: hidden; padding-bottom: 5px; max-height: none; }
-    .dpz-thumb { width: 60px; height: 60px; flex-shrink: 0; }
+@media (max-width: 991px) and (min-width: 476px) {
+    .dpz-wrapper { flex-direction: row; gap: 12px; }
+    .dpz-thumbs { flex-direction: column; width: 65px; max-height: 350px; overflow-y: auto; overflow-x: hidden; padding-right: 4px; gap: 8px; }
+    .dpz-thumb { width: 60px; height: 60px; flex-shrink: 0; border-radius: 8px; }
+    .dpz-main { flex: 1; width: calc(100% - 77px); }
     #dpzPreview, #dpzLens { display: none !important; }
+    
+    .product-page-info { margin-top: 25px; }
+}
+
+@media (max-width: 475px) {
+    .dpz-wrapper { flex-direction: row; gap: 8px; }
+    .dpz-thumbs { flex-direction: column; width: 50px; max-height: 280px; overflow-y: auto; overflow-x: hidden; padding-right: 2px; gap: 6px; }
+    .dpz-thumb { width: 45px; height: 45px; flex-shrink: 0; border-radius: 6px; }
+    .dpz-main { flex: 1; width: calc(100% - 58px); }
+    .dpz-img-wrap { border-radius: 8px; }
+    #dpzPreview, #dpzLens { display: none !important; }
+    
+    .product-detail-title { font-size: 1.2rem; margin-top: 5px; margin-bottom: 8px; }
+    .product-page-description { font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px; }
+    .product-page-price { font-size: 1rem; }
+    .product-page-current-price { font-size: 1.25rem; }
+    .product-page-original-price { font-size: 0.85rem; }
+    
+    .product-page-action-buttons { flex-direction: row; gap: 8px; }
+    .product-page-btn-add-cart, .product-page-btn-buy-now { padding: 8px 10px; font-size: 0.9rem; flex: 1; justify-content: center; }
 }
 
 /* ==========================================================================

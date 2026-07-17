@@ -27,8 +27,8 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 24px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 50px 40px;
-            max-width: 450px;
+            padding: 40px 30px;
+            max-width: 380px;
             width: 90%;
             transition: all 0.3s ease;
         }
@@ -44,7 +44,7 @@
         }
         .form-label {
             font-weight: 600;
-            color: #444;
+            color: #ffffff; /* Changed to white */
             margin-bottom: 8px;
         }
         .input-group-text {
@@ -94,7 +94,7 @@
     <div class="login-card">
         <div class="login-header">
              @php $headerFooter = \App\Models\HeaderFooter::first(); @endphp
-                     <img src="{{ asset('assets/images/logo-1.png') }}" alt="Plantly Logo" style="background-color: #fff; border: 1px solid #bd1313ff; border-radius: 10px; margin-bottom: 15px;height: 13vh;width: 14vw;object-fit: cover;">
+             <img src="{{ asset('assets/images/logo-1.png') }}" alt="Plantly Logo" style="background-color: #fff; border-radius: 8px; padding: 10px; margin-bottom: 15px; height: 75px; width: auto; max-width: 100%; object-fit: contain;">
             <!-- <p class="text-muted">Plantsware Admin Panel</p> -->
         </div>
 

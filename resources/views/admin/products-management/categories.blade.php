@@ -106,7 +106,7 @@
                         <td class="text-nowrap">
                             <div class="d-flex gap-2">
                                 <a href="{{ route('admin.categories.subcategories', $category) }}" class="btn btn-sm btn-outline-primary">
-                                    View Subcategories →
+                                    Subcategories →
                                 </a>
                                 <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-primary" title="Edit">
                                     <i class="fas fa-edit"></i>

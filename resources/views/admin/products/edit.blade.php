@@ -73,7 +73,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="sale_price" class="form-label">Sale Price</label>
+                                <label for="sale_price" class="form-label">Offer Price</label>
                                 <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" value="{{ old('sale_price', $product->sale_price) }}">
                             </div>
                         </div>
@@ -349,7 +349,7 @@
 
                                             @if(!$hasAny)
                                                 <tr id="no-attributes-msg">
-                                                    <td colspan="3" class="text-center py-5">
+                                                    <td colspan="7" class="text-center py-5">
                                                         <div class="empty-state">
                                                             <i class="fas fa-layer-group fa-3x text-light mb-3"></i>
                                                             <h6 class="text-muted">No attributes defined</h6>
@@ -400,6 +400,13 @@
                     </div> -->
 
                     <style>
+                        #product_code::placeholder,
+                        #batch_code::placeholder,
+                        #weight::placeholder {
+                            color: #888888 !important;
+                            opacity: 1;
+                        }
+                        
                         .bg-light-subtle { background-color: #f8f9fa !important; }
                         .attr-name-display:focus { box-shadow: none !important; }
                         .attribute-row:hover { background-color: #fcfcfc; }

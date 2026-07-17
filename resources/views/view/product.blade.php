@@ -26,12 +26,12 @@
 </div>
  --}}
 
-<div class="container">
+<div class="">
     <div class="container-fluid product-page-container">
         <div class="product-page-section">
             <div class="row">
                 <!-- Product Gallery -->
-                <div class="col-sm-6 col-lg-6">
+                <div class="col-md-6 col-lg-6">
                     {{-- Dual-panel zoom wrapper --}}
                     <div class="dpz-wrapper">
 
@@ -74,10 +74,7 @@
                                     <div class="out-of-stock-overlay">
                                         <span class="out-of-stock-badge">Out Of Stock</span>
                                     </div>
-                                @elseif($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
-                                    <span class="product-page-badge-sale" style="position: absolute; bottom: 15px; left: 15px; background: #dc3545; color: #fff; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 6px; z-index: 10; box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);">
-                                        -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
-                                    </span>
+
                                 @endif
                                 @if($product->combo_pack_eligible === 'Yes')
                                     <span class="product-page-badge-combo" style="position: absolute; top: 15px; right: 15px; background-color: #2e7d32; color: white; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; z-index: 10; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">
@@ -92,13 +89,13 @@
                     </div>{{-- /dpz-wrapper --}}
                 </div>
                 <!-- Product Info -->
-                <div class="col-sm-6 col-lg-6">
+                <div class="col-md-6 col-lg-6">
                     <div class="product-page-info position-relative">
                         <h1 class="product-detail-title">{{ $product->name }}</h1>
                         @if($product->combo_pack_eligible === 'Yes')
                             <div class="mb-3">
                                 <span class="combo-eligible-badge">
-                                    <i class="fas fa-box-open"></i> Eligible for Custom Combo Packs
+                                    <i class="fas fa-check-circle"></i> Combo Eligible
                                 </span>
                             </div>
                         @endif
@@ -117,7 +114,7 @@
                         @endif
                         <!-- Price -->
                         <div class="product-page-price">
-                            <div class="d-flex align-items-center flex-wrap" style="gap: 10px;">
+                            <div class="d-flex align-items-center " style="gap: 10px;">
                                 @if($product->sale_price && $product->sale_price > 0 && $product->sale_price < $product->price)
                                     <span class="product-page-current-price" data-default="₹{{ number_format($product->sale_price, 2) }}">₹{{ number_format($product->sale_price, 2) }}</span>
                                     <span class="product-page-original-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
@@ -125,7 +122,7 @@
                                         $discount = round((($product->price - $product->sale_price) / $product->price) * 100);
                                     @endphp
                                     <span class="badge-discount-save">
-                                        Save ₹{{ number_format($product->price - $product->sale_price, 2) }} ({{ $discount }}% OFF)
+                                        ({{ $discount }}% OFF)
                                     </span>
                                 @else
                                     <span class="product-page-current-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
@@ -311,10 +308,13 @@
                         <!-- Quantity Selector and Action Buttons inside Single Form -->
                         @if($product->stock_quantity > 0)
                         @auth
-                        <!-- Wishlist Form (Standalone to avoid HTML nested form issue) -->
-                        <form id="wishlistForm-{{ $product->id }}" action="{{ route('wishlist.add', $product) }}" method="POST" class="d-none">
-                            @csrf
-                        </form>
+                        @php
+                            $inWishlist = false;
+                            if (auth()->check() && auth()->user()->wishlist) {
+                                $inWishlist = auth()->user()->wishlist->contains('product_id', $product->id);
+                            }
+                        @endphp
+                        <!-- Removed Standalone Wishlist Form -->
 
                         <!-- Quantity Selector and Action Buttons inside Single Form -->
                         <form action="{{ route('cart.add', $product) }}" method="POST" id="mainCartForm">
@@ -335,8 +335,11 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" form="wishlistForm-{{ $product->id }}" class="wishlist-btn flex-shrink-0">
-                                    <i class="far fa-heart"></i>
+                                <button type="button" class="wishlist-btn flex-shrink-0 ajax-wishlist-btn"
+                                        data-add-url="{{ route('wishlist.add', $product) }}"
+                                        data-remove-url="{{ route('wishlist.remove', $product) }}"
+                                        data-in-wishlist="{{ $inWishlist ? 'true' : 'false' }}">
+                                    <i class="{{ $inWishlist ? 'fas fa-heart text-danger' : 'far fa-heart' }}"></i>
                                 </button>
                             </div>
 
