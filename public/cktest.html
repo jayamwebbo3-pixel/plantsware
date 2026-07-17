@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CKEditor Test</title>
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.js"></script>
+</head>
+<body>
+    <textarea id="editor"></textarea>
+    <script>
+        CKEDITOR.ClassicEditor
+            .create(document.querySelector('#editor'), {
+                toolbar: [
+                    'heading', '|',
+                    'bold', 'italic', 'underline', 'link', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'outdent', 'indent', '|',
+                    'alignment', '|',
+                    'blockQuote', 'insertTable', '|',
+                    'imageUpload', 'mediaEmbed', '|',
+                    'undo', 'redo'
+                ],
+                removePlugins: [
+                    'CKBox', 'CKFinder', 'EasyImage', 'RealTimeCollaborativeComments', 'RealTimeCollaborativeTrackChanges', 'RealTimeCollaborativeRevisionHistory', 'PresenceList', 'Comments', 'TrackChanges', 'TrackChangesData', 'RevisionHistory', 'Pagination', 'WProofreader', 'MathType', 'SlashCommand', 'Template', 'DocumentOutline', 'FormatPainter', 'TableOfContents', 'PasteFromOfficeEnhanced'
+                ]
+            })
+            .then(editor => {
+                console.log('CKEditor ready!');
+            })
+            .catch(error => {
+                console.error('CKEditor error:', error);
+            });
+    </script>
+</body>
+</html>

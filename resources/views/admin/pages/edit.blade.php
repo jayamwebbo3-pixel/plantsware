@@ -221,7 +221,7 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.js"></script>
 
     <script>
         // Custom Upload Adapter (reusing from blog integration)
@@ -262,7 +262,7 @@
             editor.plugins.get('FileRepository').createUploadAdapter = loader => new MyUploadAdapter(loader);
         }
 
-        ClassicEditor
+        CKEDITOR.ClassicEditor
             .create(document.querySelector('#editor'), {
                 extraPlugins: [MyCustomUploadAdapterPlugin],
                 toolbar: [
@@ -270,9 +270,13 @@
                     'bold', 'italic', 'underline', 'link', '|',
                     'bulletedList', 'numberedList', '|',
                     'outdent', 'indent', '|',
+                    'alignment', '|',
                     'blockQuote', 'insertTable', '|',
                     'imageUpload', 'mediaEmbed', '|',
                     'undo', 'redo'
+                ],
+                removePlugins: [
+                    'CKBox', 'CKFinder', 'EasyImage', 'RealTimeCollaborativeComments', 'RealTimeCollaborativeTrackChanges', 'RealTimeCollaborativeRevisionHistory', 'PresenceList', 'Comments', 'TrackChanges', 'TrackChangesData', 'RevisionHistory', 'Pagination', 'WProofreader', 'MathType', 'SlashCommand', 'Template', 'DocumentOutline', 'FormatPainter', 'TableOfContents', 'PasteFromOfficeEnhanced', 'CaseChange', 'Checklist', 'ExportPdf', 'ExportWord', 'ImportWord', 'MergeFields', 'MultiLevelList', 'TokenView', 'RestrictedEditingMode', 'StandardEditingMode', 'AIAssistant'
                 ]
             })
             .then(editor => {

@@ -147,8 +147,7 @@
     </div>
 
     @push('scripts')
-        <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor5.css">
-        <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+        <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.js"></script>
 
         <script>
             // Custom Upload Adapter (proven from your CodeIgniter reference)
@@ -190,7 +189,7 @@
                 editor.plugins.get('FileRepository').createUploadAdapter = loader => new MyUploadAdapter(loader);
             }
 
-            ClassicEditor
+            CKEDITOR.ClassicEditor
                 .create(document.querySelector('#editor'), {
                     extraPlugins: [MyCustomUploadAdapterPlugin],
                     toolbar: [
@@ -213,7 +212,10 @@
                     },
                     pasteFromOffice: {
                         removeStyles: false
-                    }
+                    },
+                    removePlugins: [
+                        'CKBox', 'CKFinder', 'EasyImage', 'RealTimeCollaborativeComments', 'RealTimeCollaborativeTrackChanges', 'RealTimeCollaborativeRevisionHistory', 'PresenceList', 'Comments', 'TrackChanges', 'TrackChangesData', 'RevisionHistory', 'Pagination', 'WProofreader', 'MathType', 'SlashCommand', 'Template', 'DocumentOutline', 'FormatPainter', 'TableOfContents', 'PasteFromOfficeEnhanced', 'CaseChange', 'Checklist', 'ExportPdf', 'ExportWord', 'ImportWord', 'MergeFields', 'MultiLevelList', 'TokenView', 'RestrictedEditingMode', 'StandardEditingMode', 'AIAssistant'
+                    ]
                 })
                 .then(editor => {
                     console.log('CKEditor ready with custom image upload!');

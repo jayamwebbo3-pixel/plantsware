@@ -300,7 +300,7 @@
                                                     $comboEligibleValue  = is_array($data) ? ($data['combo_eligible'] ?? 'No') : 'No';
                                                     $imagePath           = is_array($data) ? ($data['image'] ?? null) : null;
                                                 @endphp
-                                                <tr class="attribute-row animate__animated animate__fadeIn">
+                                                <tr class="attribute-row animate__animated animate__fadeIn" id="variant-{{ \Illuminate\Support\Str::slug($name) }}">
                                                     <td class="ps-4">
                                                         <div class="d-flex align-items-center">
                                                             <input type="hidden" name="sizes[{{ $name }}][checked]" value="1">

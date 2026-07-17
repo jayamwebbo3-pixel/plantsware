@@ -404,9 +404,37 @@
                                 </td>
                                 <td>
                                     <div class="fw-bold text-dark">{{ $item->name }}</div>
+                                    @php
+                                        $outOfStockVariants = [];
+                                        if ($item->size) {
+                                            $sizeData = is_array($item->size) ? $item->size : json_decode($item->size, true);
+                                            if (is_array($sizeData)) {
+                                                foreach ($sizeData as $variantName => $variantData) {
+                                                    if (is_array($variantData) && isset($variantData['stock']) && $variantData['stock'] !== '' && (int)$variantData['stock'] <= 0) {
+                                                        $outOfStockVariants[] = $variantName;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    @endphp
+                                    @if(count($outOfStockVariants) > 0)
+                                        <div class="small mt-1">
+                                            @foreach($outOfStockVariants as $variant)
+                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle fw-normal">{{ $variant }}</span>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('admin.products.edit', $item->id) }}" class="btn btn-sm btn-primary rounded-pill px-3">
+                                    @php
+                                        $editUrl = route('admin.products.edit', $item->id);
+                                        if (count($outOfStockVariants) > 0) {
+                                            $editUrl .= '#variant-' . \Illuminate\Support\Str::slug($outOfStockVariants[0]);
+                                        } else {
+                                            $editUrl .= '#stock_quantity';
+                                        }
+                                    @endphp
+                                    <a href="{{ $editUrl }}" class="btn btn-sm btn-primary rounded-pill px-3">
                                         Update Stock
                                     </a>
                                 </td>

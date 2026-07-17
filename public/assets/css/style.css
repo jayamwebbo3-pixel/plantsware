@@ -1908,7 +1908,7 @@ section:has(.product-swiper) {
 .glassmorphic-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08); }
 
 .about-image-wrapper { position: relative; border-radius: 16px; z-index: 1; }
-.about-image-wrapper::before { content: ''; position: absolute; top: -15px; right: -15px; width: 100%; height: 100%; border: 3px solid #2e6a39; border-radius: 16px; z-index: -1; opacity: 0.2; }
+/* .about-image-wrapper::before { content: ''; position: absolute; top: -15px; right: -15px; width: 100%; height: 100%; border: 3px solid #2e6a39; border-radius: 16px; z-index: -1; opacity: 0.2; } */
 .about-image.glassmorphic-border { padding: 10px; background: rgba(255,255,255,0.4); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); position: relative; }
 .about-experience-badge { position: absolute; bottom: 30px; left: -20px; background: #fff; padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 15px; border-left: 5px solid #2e6a39; animation: float 6s ease-in-out infinite; }
 .exp-years { font-size: 2.5rem; font-weight: 800; color: #2e6a39; line-height: 1; }
