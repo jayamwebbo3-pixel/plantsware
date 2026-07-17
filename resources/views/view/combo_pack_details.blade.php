@@ -58,7 +58,7 @@
         <div class="product-page-section">
             <div class="row">
                 <!-- Left Column: Combo Gallery -->
-                <div class="col-sm-6 col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                <div class="col-md-6 col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
                     <div class="combo-gallery-wrapper" style="position: relative; width: 100%; overflow: visible !important;">
                         
                         @if(count($constituentProducts) >= 2)
@@ -163,7 +163,7 @@
                 </div>
 
                 <!-- Right Column: Combo Info -->
-                <div class="col-sm-6 col-lg-6" data-aos="fade-left">
+                <div class="col-md-6 col-lg-6" data-aos="fade-left">
                     <div class="product-page-info ps-lg-4">
                         <h1 class="product-detail-title mb-2">{{ $comboPack->name }}</h1>
                         
@@ -181,7 +181,7 @@
 
                         <!-- Price Section -->
                         <div class="product-page-price">
-                            <div class="d-flex align-items-center flex-wrap gap-2">
+                            <div class="d-flex align-items-center  gap-2">
                                 @if($comboPack->stock_quantity > 0)
                                     <span class="product-page-current-price">₹{{ number_format($comboPack->offer_price, 2) }}</span>
                                     @if($comboPack->total_price > $comboPack->offer_price)
@@ -199,7 +199,7 @@
                                 @endphp
                                 @if($discount > 0 && $comboPack->stock_quantity > 0)
                                     <span class="badge-discount-save">
-                                        Save ₹{{ number_format($comboPack->total_price - $comboPack->offer_price, 2) }} ({{ $discount }}% OFF)
+                                        ({{ $discount }}% OFF)
                                     </span>
                                 @endif
                             </div>
@@ -239,6 +239,12 @@
                         @endif
 
                         <!-- Main Purchase Form -->
+                        @php
+                            $inWishlist = false;
+                            if (auth()->check() && auth()->user()->wishlist) {
+                                $inWishlist = auth()->user()->wishlist->contains('combo_pack_id', $comboPack->id);
+                            }
+                        @endphp
                         @if($comboPack->stock_quantity > 0)
                         @auth
                         <form action="{{ route('cart.add_combo', $comboPack->id) }}" method="POST" id="mainCartForm">
@@ -259,7 +265,7 @@
                                 </div>
 
                                 <button type="button" class="wishlist-btn wishlist-btn-combo flex-shrink-0" data-id="{{ $comboPack->id }}">
-                                    <i class="far fa-heart"></i>
+                                    <i class="{{ $inWishlist ? 'fas fa-heart text-danger' : 'far fa-heart' }}"></i>
                                 </button>
                             </div>
 
@@ -310,7 +316,7 @@
                         <div class="d-flex align-items-center mb-4 flex-nowrap" style="gap: 15px;">
                             @auth
                             <button type="button" class="wishlist-btn wishlist-btn-combo flex-shrink-0" data-id="{{ $comboPack->id }}">
-                                <i class="far fa-heart"></i>
+                                <i class="{{ $inWishlist ? 'fas fa-heart text-danger' : 'far fa-heart' }}"></i>
                             </button>
                             @else
                             <a href="{{ route('login') }}" class="wishlist-btn flex-shrink-0 d-flex align-items-center justify-content-center">
@@ -407,9 +413,17 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             const id = this.getAttribute('data-id');
             const currentBtn = this;
+            const icon = currentBtn.querySelector('i');
+            const isAdded = icon && icon.classList.contains('fas');
             
-            fetch("{{ url('/wishlist/add-combo') }}/" + id, {
-                method: "POST",
+            const url = isAdded 
+                ? "{{ url('/wishlist/remove-combo') }}/" + id
+                : "{{ url('/wishlist/add-combo') }}/" + id;
+                
+            const method = isAdded ? "DELETE" : "POST";
+            
+            fetch(url, {
+                method: method,
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": "{{ csrf_token() }}",
@@ -435,13 +449,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.querySelectorAll('.wishlist-icon-link .price_cart').forEach(el => {
                         el.textContent = data.wishlist_count;
                     });
-                    // Update UI to show it's added
-                    const icon = currentBtn.querySelector('i');
-                    if (icon) {
-                        icon.classList.remove('far', 'fa-heart');
-                        icon.classList.add('fas', 'fa-heart', 'text-danger');
+                    
+                    if (isAdded) {
+                        if (icon) {
+                            icon.classList.remove('fas', 'fa-heart', 'text-danger');
+                            icon.classList.add('far', 'fa-heart');
+                        }
+                        currentBtn.style.backgroundColor = '';
+                    } else {
+                        if (icon) {
+                            icon.classList.remove('far', 'fa-heart');
+                            icon.classList.add('fas', 'fa-heart', 'text-danger');
+                        }
+                        currentBtn.style.backgroundColor = '#fff5f5';
                     }
-                    currentBtn.style.backgroundColor = '#fff5f5';
                 }
             })
             .catch(error => {
