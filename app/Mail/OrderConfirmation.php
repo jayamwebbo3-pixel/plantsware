@@ -59,7 +59,17 @@ class OrderConfirmation extends Mailable
                 $order->loadMissing(['items.product', 'items.comboPack', 'couponUsage.coupon']);
 
                 $user = $order->user;
+                
+                $billingAddress = $order->billing_address;
+                if (empty($billingAddress) || !isset($billingAddress['name'])) {
+                    $billingAddress = $order->shipping_address;
+                }
+                
                 $shippingAddress = $order->shipping_address;
+                if (empty($shippingAddress) || empty($shippingAddress['address'])) {
+                    $shippingAddress = $billingAddress;
+                }
+
                 $gstSettings = \App\Models\HeaderFooter::first();
 
                 $data = [
@@ -71,10 +81,11 @@ class OrderConfirmation extends Mailable
                     'store_address'    => $gstSettings->address ?? 'Plantsware Admin, Tamil Nadu',
                     'store_email'      => $gstSettings->email ?? 'support@plantsware.in',
                     'store_phone'      => $gstSettings->mobile_no ?? '+91 98765 43210',
-                    'customer_name'    => ($shippingAddress['name'] ?? ($user->name ?? 'Guest')),
+                    'customer_name'    => ($billingAddress['name'] ?? ($user->name ?? 'Guest')),
                     'customer_email'   => $user->email ?? 'N/A',
-                    'customer_phone'   => ($shippingAddress['phone'] ?? 'N/A'),
-                    'customer_address' => $shippingAddress,
+                    'customer_phone'   => ($billingAddress['phone'] ?? 'N/A'),
+                    'customer_address' => $billingAddress,
+                    'shipping_address' => $shippingAddress,
                     'order_items'      => $order->items,
                     'subtotal'         => $order->subtotal,
                     'discount_amount'  => $order->discount,

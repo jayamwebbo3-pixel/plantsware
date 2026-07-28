@@ -44,17 +44,6 @@ class ImageService
             $targetWidth = (int) ($image->width() * 0.30);
             $watermark->scale(width: $targetWidth);
 
-            /*
-            -----------------------------------------
-            STEP 2 — CROP WATERMARK (REMOVE TAGLINE)
-            -----------------------------------------
-            Keep top 85% only
-            */
-            $watermark->crop(
-                width: $watermark->width(),
-                height: (int) ($watermark->height() * 0.85),
-                position: 'top'
-            );
 
             /*
             -----------------------------------------

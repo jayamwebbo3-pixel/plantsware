@@ -55,8 +55,8 @@
                                 }
                             }
 
-                            $price = $product->sale_price && $product->sale_price < $product->price ? $product->sale_price : $product->price;
-                            $hasDiscount = $product->sale_price && $product->sale_price < $product->price;
+                            $price = $product->sale_price > 0 && $product->sale_price < $product->price ? $product->sale_price : $product->price;
+                            $hasDiscount = $product->sale_price > 0 && $product->sale_price < $product->price;
                             $image = $product->image ? asset('storage/' . $product->image) : asset('assets/images/product/default.jpg');
 
                             if (count($sizeData) > 0) {

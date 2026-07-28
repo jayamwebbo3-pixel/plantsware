@@ -126,6 +126,7 @@
                                     </span>
                                 @else
                                     <span class="product-page-current-price" data-default="₹{{ number_format($product->price, 2) }}">₹{{ number_format($product->price, 2) }}</span>
+                                    <span class="product-page-original-price" style="display:none;" data-default=""></span>
                                 @endif
                             </div>
                             <div class="product-page-tax-info mt-1">Inclusive of all taxes</div>
@@ -154,33 +155,94 @@
                         }
                         @endphp
                         @if(count($sizeData) > 0)
+                        @php
+                            $sizeItems = [];
+                            $colorItems = [];
+                            $defaultVariantName = null;
+                            $firstVariantName = null;
+                            foreach($sizeData as $name => $val) {
+                                if (!$firstVariantName) $firstVariantName = $name;
+                                $type = is_array($val) ? ($val['type'] ?? 'size') : 'size';
+                                $stock = is_array($val) ? (int)($val['stock'] ?? 0) : 0;
+                                if ($stock > 0 && !$defaultVariantName) {
+                                    $defaultVariantName = $name;
+                                }
+                                if ($type === 'color') $colorItems[$name] = $val;
+                                else $sizeItems[$name] = $val;
+                            }
+                            if (!$defaultVariantName) $defaultVariantName = $firstVariantName;
+                            $loopIndex = 0;
+                        @endphp
 
                         <div class="product-page-attributes">
+                            @if(count($sizeItems) > 0)
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="fw-bold m-0">Available Size</label>
                             </div>
-                            <div class="custom-size-selector-container" id="sizeSelectorContainer">
-                                @php $loopIndex = 0; @endphp
-                                @foreach($sizeData as $sizeName => $sizeValue)
+                            <div class="custom-size-selector-container mb-3" id="sizeSelectorContainer">
+                                @foreach($sizeItems as $sizeName => $sizeValue)
                                 @php 
                                     $price = is_array($sizeValue) ? ($sizeValue['price'] ?? null) : $sizeValue;
+                                    $salePrice = is_array($sizeValue) ? ($sizeValue['sale_price'] ?? null) : null;
                                     $image = is_array($sizeValue) ? ($sizeValue['image'] ?? null) : null;
                                     $stock = is_array($sizeValue) ? ($sizeValue['stock'] ?? null) : null;
                                     $weight = is_array($sizeValue) ? ($sizeValue['weight'] ?? null) : null;
                                 @endphp
-                                <input type="radio" class="custom-size-radio size-radio" name="size" id="size-{{ $loopIndex }}" value="{{ $sizeName }}" autocomplete="off" form="mainCartForm" {{ $loopIndex === 0 ? 'checked' : '' }} required 
+                                <input type="radio" class="custom-size-radio size-radio" name="size" id="size-{{ $loopIndex }}" value="{{ $sizeName }}" autocomplete="off" form="mainCartForm" {{ $sizeName === $defaultVariantName ? 'checked' : '' }} required 
                                     data-price="{{ $price ?? '' }}" 
+                                    data-sale-price="{{ $salePrice ?? '' }}"
                                     data-image="{{ $image ? asset('storage/' . $image) : '' }}"
                                     data-stock="{{ $stock ?? '' }}"
                                     data-weight="{{ $weight ?? '' }}"
                                     onchange="updateProductPrice(this)">
                                 <label class="custom-size-label" for="size-{{ $loopIndex }}">
                                     {{ $sizeName }}
-                                    @if($price) <small>(₹{{ $price }})</small> @endif
+                                    @if($salePrice)
+                                        <small>(₹{{ $salePrice }})</small>
+                                    @elseif($price)
+                                        <small>(₹{{ $price }})</small>
+                                    @endif
                                 </label>
                                 @php $loopIndex++; @endphp
                                 @endforeach
                             </div>
+                            @endif
+
+                            @if(count($colorItems) > 0)
+                            <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
+                                <label class="fw-bold m-0">Available Color</label>
+                            </div>
+                            <div class="custom-size-selector-container mb-3" id="colorSelectorContainer">
+                                @foreach($colorItems as $sizeName => $sizeValue)
+                                @php 
+                                    $price = is_array($sizeValue) ? ($sizeValue['price'] ?? null) : $sizeValue;
+                                    $salePrice = is_array($sizeValue) ? ($sizeValue['sale_price'] ?? null) : null;
+                                    $image = is_array($sizeValue) ? ($sizeValue['image'] ?? null) : null;
+                                    $stock = is_array($sizeValue) ? ($sizeValue['stock'] ?? null) : null;
+                                    $weight = is_array($sizeValue) ? ($sizeValue['weight'] ?? null) : null;
+                                    
+                                    $colorNameStr = preg_replace('/[^a-zA-Z]/', '', $sizeName);
+                                    if(empty($colorNameStr)) $colorNameStr = 'transparent';
+                                @endphp
+                                <input type="radio" class="custom-size-radio size-radio" name="size" id="size-{{ $loopIndex }}" value="{{ $sizeName }}" autocomplete="off" form="mainCartForm" {{ $sizeName === $defaultVariantName ? 'checked' : '' }} required 
+                                    data-price="{{ $price ?? '' }}" 
+                                    data-sale-price="{{ $salePrice ?? '' }}"
+                                    data-image="{{ $image ? asset('storage/' . $image) : '' }}"
+                                    data-stock="{{ $stock ?? '' }}"
+                                    data-weight="{{ $weight ?? '' }}"
+                                    onchange="updateProductPrice(this)">
+                                <label class="custom-size-label" for="size-{{ $loopIndex }}">
+                                    {{ $sizeName }}
+                                    @if($salePrice)
+                                        <small>(₹{{ $salePrice }})</small>
+                                    @elseif($price)
+                                        <small>(₹{{ $price }})</small>
+                                    @endif
+                                </label>
+                                @php $loopIndex++; @endphp
+                                @endforeach
+                            </div>
+                            @endif
                         </div>
                         <script>
                             function updateProductPrice(radio) {
@@ -204,6 +266,7 @@
                                 window.history.replaceState({}, '', url);
 
                                 let newPrice = radio.getAttribute('data-price');
+                                let newSalePrice = radio.getAttribute('data-sale-price');
                                 let newStock = radio.getAttribute('data-stock');
                                 let stockVal = parseInt(newStock) || 0;
                                 
@@ -212,7 +275,13 @@
                                 let currentPriceEl = document.querySelector('.product-page-current-price');
                                 let originalPriceEl = document.querySelector('.product-page-original-price');
 
-                                if (newPrice && parseFloat(newPrice) > 0) {
+                                if (newSalePrice && parseFloat(newSalePrice) > 0) {
+                                    if (currentPriceEl) currentPriceEl.innerText = '₹' + parseFloat(newSalePrice).toFixed(2);
+                                    if (originalPriceEl) {
+                                        originalPriceEl.style.display = 'inline';
+                                        originalPriceEl.innerText = '₹' + parseFloat(newPrice).toFixed(2);
+                                    }
+                                } else if (newPrice && parseFloat(newPrice) > 0) {
                                     if (currentPriceEl) currentPriceEl.innerText = '₹' + parseFloat(newPrice).toFixed(2);
                                     if (originalPriceEl) originalPriceEl.style.display = 'none';
                                 } else {

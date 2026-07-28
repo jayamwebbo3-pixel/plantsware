@@ -72,10 +72,11 @@ class ProductController extends Controller
             'subcategory_id' => 'nullable|exists:subcategories,id',
             'description' => 'nullable|string',
             'short_description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
+            'price' => $request->boolean('has_variants') ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
             'sku' => 'nullable|string|unique:products,sku',
             'stock_quantity' => 'nullable|integer|min:0',
+            'stock_alert_qty' => 'nullable|integer|min:0',
             'image' => 'nullable|image|max:2048',
             'gallery_images' => 'nullable|array',
             'gallery_images.*' => 'image|max:2048',
@@ -107,6 +108,8 @@ class ProductController extends Controller
             $rules['sizes.*.price'] = 'required|numeric|min:0';
             $rules['sizes.*.stock'] = 'required|integer|min:0';
             $rules['sizes.*.weight'] = 'required|numeric|min:0';
+            $rules['sizes.*.sale_price'] = 'nullable|numeric|min:0';
+            $rules['sizes.*.stock_alert_qty'] = 'nullable|integer|min:0';
         }
 
         $validated = $request->validate($rules, [
@@ -142,9 +145,12 @@ class ProductController extends Controller
                 if (!empty($sizeData['checked'])) {
                     $sizeEntry = [
                         'price' => $sizeData['price'] ?? null,
+                        'sale_price' => (!empty($sizeData['sale_price']) && $sizeData['sale_price'] > 0) ? $sizeData['sale_price'] : null,
                         'stock' => $sizeData['stock'] ?? null,
+                        'stock_alert_qty' => $sizeData['stock_alert_qty'] ?? null,
                         'weight' => $sizeData['weight'] ?? null,
                         'combo_eligible' => $sizeData['combo_eligible'] ?? 'No',
+                        'type' => $sizeData['type'] ?? 'size',
                         'image' => null
                     ];
 
@@ -176,7 +182,10 @@ class ProductController extends Controller
             $validated['gallery_images'] = $galleryPaths;
         }
 
+        $validated['price'] = $validated['price'] ?? 0;
+        $validated['sale_price'] = (!empty($validated['sale_price']) && $validated['sale_price'] > 0) ? $validated['sale_price'] : null;
         $validated['stock_quantity'] = $validated['stock_quantity'] ?? 0;
+        $validated['stock_alert_qty'] = $validated['stock_alert_qty'] ?? 0;
         $validated['weight'] = $validated['weight'] ?? 0;
 
         // Auto-increment sort_order within the subcategory
@@ -225,10 +234,11 @@ class ProductController extends Controller
             'subcategory_id' => 'nullable|exists:subcategories,id',
             'description' => 'nullable|string',
             'short_description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
+            'price' => $request->boolean('has_variants') ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
             'sku' => 'nullable|string|unique:products,sku,' . $product->id,
             'stock_quantity' => 'nullable|integer|min:0',
+            'stock_alert_qty' => 'nullable|integer|min:0',
             'image' => 'nullable|image|max:2048',
             'gallery_images' => 'nullable|array',
             'gallery_images.*' => 'image|max:2048',
@@ -260,6 +270,8 @@ class ProductController extends Controller
             $rules['sizes.*.price'] = 'required|numeric|min:0';
             $rules['sizes.*.stock'] = 'required|integer|min:0';
             $rules['sizes.*.weight'] = 'required|numeric|min:0';
+            $rules['sizes.*.sale_price'] = 'nullable|numeric|min:0';
+            $rules['sizes.*.stock_alert_qty'] = 'nullable|integer|min:0';
         }
 
         $validated = $request->validate($rules, [
@@ -301,9 +313,12 @@ class ProductController extends Controller
                 if (!empty($sizeData['checked'])) {
                     $sizeEntry = [
                         'price' => $sizeData['price'] ?? null,
+                        'sale_price' => (!empty($sizeData['sale_price']) && $sizeData['sale_price'] > 0) ? $sizeData['sale_price'] : null,
                         'stock' => $sizeData['stock'] ?? null,
+                        'stock_alert_qty' => $sizeData['stock_alert_qty'] ?? null,
                         'weight' => $sizeData['weight'] ?? null,
                         'combo_eligible' => $sizeData['combo_eligible'] ?? 'No',
+                        'type' => $sizeData['type'] ?? 'size',
                         'image' => $sizeData['existing_image'] ?? null
                     ];
 
@@ -364,7 +379,10 @@ class ProductController extends Controller
         }
         $validated['gallery_images'] = $currentGallery;
 
+        $validated['price'] = $validated['price'] ?? 0;
+        $validated['sale_price'] = (!empty($validated['sale_price']) && $validated['sale_price'] > 0) ? $validated['sale_price'] : null;
         $validated['stock_quantity'] = $validated['stock_quantity'] ?? 0;
+        $validated['stock_alert_qty'] = $validated['stock_alert_qty'] ?? 0;
         $validated['weight'] = $validated['weight'] ?? 0;
 
         if ($request->has('sort_order') && $validated['sort_order'] != $product->sort_order) {

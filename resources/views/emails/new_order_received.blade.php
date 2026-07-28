@@ -130,29 +130,29 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="2" class="text-right" style="padding-top: 20px; color: #718096; border-bottom: none;">Subtotal:</td>
+                        <td colspan="3" class="text-right" style="padding-top: 20px; color: #718096; border-bottom: none;">Subtotal:</td>
                         <td class="text-right" style="padding-top: 20px; color: #2d3748; border-bottom: none;">₹{{ number_format($order->subtotal, 2) }}</td>
                     </tr>
                     @if($order->couponUsage)
                     <tr>
-                        <td colspan="2" class="text-right" style="color: #718096; border-bottom: none;">Coupon Discount ({{ $order->couponUsage->coupon->coupon_code ?? '' }}):</td>
+                        <td colspan="3" class="text-right" style="color: #718096; border-bottom: none;">Coupon Discount ({{ $order->couponUsage->coupon->coupon_code ?? '' }}):</td>
                         <td class="text-right" style="color: #2d3748; border-bottom: none;">-₹{{ number_format($order->couponUsage->discount_amount, 2) }}</td>
                     </tr>
                     @endif
                     @if($order->shipping > 0)
                     <tr>
-                        <td colspan="2" class="text-right" style="color: #718096; border-bottom: none;">Shipping:</td>
+                        <td colspan="3" class="text-right" style="color: #718096; border-bottom: none;">Shipping:</td>
                         <td class="text-right" style="color: #2d3748; border-bottom: none;">₹{{ number_format($order->shipping, 2) }}</td>
                     </tr>
                     @endif
                     @if($order->tax > 0)
                     <tr>
-                        <td colspan="2" class="text-right" style="color: #718096; border-bottom: none;">Tax:</td>
+                        <td colspan="3" class="text-right" style="color: #718096; border-bottom: none;">Tax:</td>
                         <td class="text-right" style="color: #2d3748; border-bottom: none;">₹{{ number_format($order->tax, 2) }}</td>
                     </tr>
                     @endif
                     <tr class="total-row">
-                        <td colspan="2" class="text-right" style="padding-top: 15px;">Grand Total:</td>
+                        <td colspan="3" class="text-right" style="padding-top: 15px;">Grand Total:</td>
                         <td class="text-right" style="padding-top: 15px;">₹{{ number_format($order->total, 2) }}</td>
                     </tr>
                 </tfoot>

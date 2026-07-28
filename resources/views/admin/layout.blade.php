@@ -264,11 +264,75 @@
         <nav class="navbar navbar-light bg-white mb-3">
             <div class="container-fluid">
                 <span class="navbar-brand mb-0 h1">@yield('title', 'Dashboard')</span>
-                <div class="dropdown ms-auto">
-                    <button class="btn btn-light dropdown-toggle d-flex align-items-center rounded-pill px-3 shadow-sm border-0" type="button" id="adminUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-circle me-2 text-primary fs-5"></i>
-                        <span class="fw-semibold text-dark">{{ auth()->guard('admin')->user()->name ?? 'Admin' }}</span>
-                    </button>
+                
+                @php
+                    $lowStockAlerts = collect();
+                    $allProducts = \App\Models\Product::all();
+                    foreach($allProducts as $product) {
+                        if ($product->has_variants && $product->size) {
+                            $sizesObj = is_string($product->size) ? json_decode($product->size, true) : $product->size;
+                            if (is_array($sizesObj)) {
+                                foreach ($sizesObj as $variantName => $val) {
+                                    $variantStock = is_array($val) ? (int)($val['stock'] ?? 0) : 0;
+                                    $variantAlertQty = is_array($val) ? (int)($val['stock_alert_qty'] ?? 0) : 0;
+                                    if ($variantStock <= $variantAlertQty) {
+                                        $lowStockAlerts->push((object)[
+                                            'id' => $product->id,
+                                            'name' => $variantName,
+                                            'stock_quantity' => $variantStock,
+                                            'is_variant' => true
+                                        ]);
+                                    }
+                                }
+                            }
+                        } else {
+                            if ($product->getRawOriginal('stock_quantity') <= $product->stock_alert_qty) {
+                                $lowStockAlerts->push((object)[
+                                    'id' => $product->id,
+                                    'name' => $product->name,
+                                    'stock_quantity' => $product->getRawOriginal('stock_quantity'),
+                                    'is_variant' => false
+                                ]);
+                            }
+                        }
+                    }
+                @endphp
+                
+                <div class="d-flex align-items-center ms-auto">
+                    <!-- Stock Alert Bell -->
+                    <div class="dropdown me-3">
+                        <button class="btn btn-light rounded-circle shadow-sm border-0 position-relative d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" type="button" id="stockAlertDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell text-warning fs-5"></i>
+                            @if($lowStockAlerts->count() > 0)
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+                                    {{ $lowStockAlerts->count() }}
+                                    <span class="visually-hidden">unread messages</span>
+                                </span>
+                            @endif
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 py-2" aria-labelledby="stockAlertDropdown" style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+                            <li><h6 class="dropdown-header fw-bold text-uppercase pb-2 border-bottom">Stock Alerts</h6></li>
+                            @forelse($lowStockAlerts as $alert)
+                                <li>
+                                    <a class="dropdown-item d-flex justify-content-between align-items-center py-2 border-bottom" href="{{ route('admin.products.edit', $alert->id) }}{{ $alert->is_variant ? '#variant-'.\Illuminate\Support\Str::slug($alert->name) : '#stock_quantity' }}">
+                                        <div class="text-truncate pe-2" style="max-width: 200px;">
+                                            <span class="fw-semibold text-dark">{{ $alert->name }}</span>
+                                        </div>
+                                        <span class="badge bg-danger rounded-pill">{{ $alert->stock_quantity }} Left</span>
+                                    </a>
+                                </li>
+                            @empty
+                                <li><span class="dropdown-item text-muted py-3 text-center">No stock alerts</span></li>
+                            @endforelse
+                        </ul>
+                    </div>
+
+                    <!-- User Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle d-flex align-items-center rounded-pill px-3 shadow-sm border-0" type="button" id="adminUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-2 text-primary fs-5"></i>
+                            <span class="fw-semibold text-dark">{{ auth()->guard('admin')->user()->name ?? 'Admin' }}</span>
+                        </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 py-2" aria-labelledby="adminUserDropdown">
                         <li>
                             <h6 class="dropdown-header small text-muted text-uppercase fw-bold pb-2">Admin Profile</h6>
@@ -290,6 +354,7 @@
                             </form>
                         </li>
                     </ul>
+                    </div>
                 </div>
             </div>
         </nav>

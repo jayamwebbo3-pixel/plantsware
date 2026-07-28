@@ -20,11 +20,14 @@
                         'delivered' => 'order-status-delivered',
                         'completed' => 'order-status-completed',
                         'cancelled' => 'order-status-cancelled',
+                        'return_rejected' => 'order-status-cancelled',
+                        'return_requested' => 'order-status-pending',
+                        'returned' => 'order-status-cancelled',
                     ];
                     $statusClass = $statusColors[strtolower($order->status)] ?? 'order-status-default';
                 @endphp
-                <span class="order-status-badge {{ $statusClass }}">
-                    {{ str_replace('_', ' ', $order->status) }}
+                <span class="order-status-badge {{ $statusClass }}" style="{{ in_array(strtolower($order->status), ['return_rejected', 'cancelled', 'returned']) ? 'background-color: #dc3545; color: white;' : (strtolower($order->status) == 'return_requested' ? 'background-color: #ffc107; color: black;' : '') }}">
+                    {{ ucwords(str_replace('_', ' ', $order->status)) }}
                 </span>
             </div>
         </div>
@@ -48,7 +51,7 @@
                         </div>
                         <div class="order-info-row">
                             <span class="order-info-label">Status:</span>
-                            <span class="order-info-value">{{ ucfirst($order->status) }}</span>
+                            <span class="order-info-value">{{ ucwords(str_replace('_', ' ', $order->status)) }}</span>
                         </div>
                         <div class="order-info-row">
                             <span class="order-info-label">Payment Method:</span>
@@ -63,12 +66,26 @@
                                 {{ ucfirst($order->payment_status ?? 'pending') }}
                             </span>
                         </div>
+                        @if(!in_array(strtolower($order->status), ['returned', 'return_rejected', 'return_requested', 'cancelled']))
                         <div class="order-info-row border-top-row">
                             <span class="order-info-label">Arriving On:</span>
                             <span class="order-info-value">
                                 {{ $order->created_at->addDays(2)->format('n/j/Y') }} <span class="order-info-note">(Estimated)</span>
                             </span>
                         </div>
+                        @endif
+
+                        @if(strtolower($order->status) === 'return_rejected')
+                        <div class="order-info-row border-top-row" style="background-color: #f8d7da; padding: 10px; border-radius: 6px; margin-top: 15px; flex-direction: column; align-items: flex-start; border: 1px solid #f5c6cb;">
+                            <span class="order-info-label" style="color: #721c24; font-weight: bold; margin-bottom: 5px;"><i class="fas fa-exclamation-circle"></i> Rejection Reason:</span>
+                            <span class="order-info-value" style="color: #721c24; text-align: left; line-height: 1.4;">{{ $order->return_rejection_reason ?? 'No reason provided.' }}</span>
+                        </div>
+                        @elseif(in_array(strtolower($order->status), ['return_requested', 'returned']))
+                        <div class="order-info-row border-top-row" style="background-color: #fff3cd; padding: 10px; border-radius: 6px; margin-top: 15px; flex-direction: column; align-items: flex-start; border: 1px solid #ffeeba;">
+                            <span class="order-info-label" style="color: #856404; font-weight: bold; margin-bottom: 5px;"><i class="fas fa-undo"></i> Return Reason:</span>
+                            <span class="order-info-value" style="color: #856404; text-align: left; line-height: 1.4;">{{ $order->return_reason ?? 'No reason provided.' }}</span>
+                        </div>
+                        @endif
                     </div>
                 </div>
 

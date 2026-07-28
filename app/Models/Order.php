@@ -33,7 +33,9 @@ class Order extends Model
         'return_rejection_reason',
         'return_images',
         'tracking_number',
-        'tracking_link'
+        'tracking_link',
+        'cancel_reason',
+        'returned_items'
     ];
 
     protected static function boot()
@@ -64,7 +66,8 @@ class Order extends Model
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
         'return_requested_at' => 'datetime',
-        'return_images' => 'array'
+        'return_images' => 'array',
+        'returned_items' => 'array'
     ];
 
     public function user()

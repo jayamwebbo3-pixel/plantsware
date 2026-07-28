@@ -103,7 +103,16 @@ class OrderController extends Controller
             $data['return_rejection_reason'] = $request->input('return_rejection_reason', 'Rejected by admin');
         }
 
+        if ($request->status === 'cancelled' && $order->status !== 'cancelled') {
+            $tempCartService = app(\App\Services\TempCartService::class);
+            foreach ($order->items as $item) {
+                $tempCartService->restoreStock($item);
+            }
+        }
+
         $order->update($data);
+
+        // The email for order shipped has been intentionally removed per user request
 
         return back()->with('success', 'Order status updated successfully.');
     }
@@ -135,6 +144,11 @@ class OrderController extends Controller
         if (empty($billingAddress) || !isset($billingAddress['name'])) {
             $billingAddress = $order->shipping_address;
         }
+        
+        $shippingAddress = $order->shipping_address;
+        if (empty($shippingAddress) || empty($shippingAddress['address'])) {
+            $shippingAddress = $billingAddress;
+        }
 
         $data = [
             'invoice_number' => $order->order_number,
@@ -149,6 +163,7 @@ class OrderController extends Controller
             'customer_email' => $order->user->email ?? 'N/A',
             'customer_phone' => collect($billingAddress)->get('phone') ?? 'N/A',
             'customer_address' => $billingAddress,
+            'shipping_address' => $shippingAddress,
             'order_items' => $order->items,
             'subtotal' => $order->subtotal,
             'discount_amount' => $order->discount,

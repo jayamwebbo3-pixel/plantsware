@@ -13,7 +13,7 @@
             @endif
             <div class="product-badges-row d-flex justify-content-between w-100 position-absolute" style="top: 8px; left: 0; padding: 0 8px; z-index: 105; pointer-events: none;">
                 <div style="pointer-events: auto;">
-                    @if($product->sale_price && $product->sale_price < $product->price)
+                    @if($product->sale_price > 0 && $product->sale_price < $product->price)
                         <div class="product-discount-badge" style="position: static !important;">{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF</div>
                     @endif
                 </div>
@@ -82,7 +82,7 @@
 
         <div class="product-price">
             @if($product->stock_quantity > 0)
-                @if($product->sale_price && $product->sale_price < $product->price)
+                @if($product->sale_price > 0 && $product->sale_price < $product->price)
                     <span class="original-price text-muted text-decoration-line-through">₹{{ number_format($product->price, 0) }}</span>
                     <span class="current-price ms-2 fw-bold">₹{{ number_format($product->sale_price, 0) }}</span>
                 @else

@@ -14,13 +14,13 @@
         background-color: #fff;
         color: #6c757d;
         font-weight: 600;
-        border-radius: 8px;
-        margin-right: 8px;
-        margin-bottom: 8px;
+        border-radius: 6px;
+        margin-right: 4px;
+        margin-bottom: 4px;
         transition: all 0.2s;
         box-shadow: none;
-        padding: 10px 22px !important;
-        font-size: 15.5px !important;
+        padding: 6px 14px !important;
+        font-size: 13px !important;
     }
 
     .order-status-btn.active {
@@ -131,6 +131,21 @@
         background: #ffb74d !important;
         color: #fff !important;
         border-color: #ffb74d !important;
+    }
+
+    /* Return Requested Status Button */
+    .order-status-btn.status-return-requested {
+        border-color: #f6c23e;
+        color: #f6c23e;
+        background: #fff;
+    }
+    .order-status-btn.status-return-requested:hover {
+        background: #fdf6e2;
+    }
+    .order-status-btn.status-return-requested.active {
+        background: #f6c23e !important;
+        color: #fff !important;
+        border-color: #f6c23e !important;
     }
 
     .orders-table-wrapper {
@@ -245,9 +260,8 @@
                     
                     <button type="button" class="btn btn-warning btn-sm" disabled title="Select orders to change payment status">Change Payment Status</button>
                 </div> -->
-                <div class="col-md-9 text-center">
-
-                    <div class="d-inline-flex flex-nowrap" role="group">
+                <div class="col-md-9 text-start">
+                    <div class="d-inline-flex flex-wrap" role="group">
                         @php
                         $statuses = [
                         '' => ['label' => 'All', 'class' => 'status-all'],
@@ -256,6 +270,7 @@
                         'shipped' => ['label' => 'Shipped', 'class' => 'status-shipped'],
                         'delivered' => ['label' => 'Delivered', 'class' => 'status-delivered'],
                         'cancelled' => ['label' => 'Cancelled', 'class' => 'status-cancelled'],
+                        'return_requested' => ['label' => 'Return Requested', 'class' => 'status-return-requested'],
                         'returned' => ['label' => 'Returned', 'class' => 'status-returned'],
                         ];
                         $currentStatus = request('status') ?: '';

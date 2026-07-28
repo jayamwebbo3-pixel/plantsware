@@ -18,6 +18,8 @@ class Product extends Model
         'sale_price',
         'sku',
         'stock_quantity',
+        'stock_alert_qty',
+        'sold_quantity',
         'image',
         'gallery_images',
         'is_featured',
@@ -50,6 +52,8 @@ class Product extends Model
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
         'stock_quantity' => 'integer',
+        'stock_alert_qty' => 'integer',
+        'sold_quantity' => 'integer',
         'gallery_images' => 'array',
         'size' => 'array',
         'is_featured' => 'boolean',
@@ -142,13 +146,35 @@ class Product extends Model
         return $value;
     }
 
+    public function getSoldQuantityAttribute($value)
+    {
+        if ($this->has_variants && $this->size) {
+            $sizesObj = is_string($this->size) ? json_decode($this->size, true) : $this->size;
+            if (is_array($sizesObj)) {
+                $totalSold = 0;
+                foreach ($sizesObj as $val) {
+                    $totalSold += is_array($val) ? (int)($val['sold_quantity'] ?? 0) : 0;
+                }
+                return $totalSold;
+            }
+        }
+        return $value;
+    }
+
     public function getPriceAttribute($value)
     {
         if ($this->has_variants && $this->size) {
             $sizesObj = is_string($this->size) ? json_decode($this->size, true) : $this->size;
             if (is_array($sizesObj) && count($sizesObj) > 0) {
-                $first = reset($sizesObj);
-                $price = is_array($first) ? ($first['price'] ?? null) : $first;
+                $target = reset($sizesObj);
+                foreach ($sizesObj as $val) {
+                    $stock = is_array($val) ? (int)($val['stock'] ?? 0) : 0;
+                    if ($stock > 0) {
+                        $target = $val;
+                        break;
+                    }
+                }
+                $price = is_array($target) ? ($target['price'] ?? null) : $target;
                 if ($price !== null && $price > 0) {
                     return $price;
                 }
@@ -160,7 +186,22 @@ class Product extends Model
     public function getSalePriceAttribute($value)
     {
         if ($this->has_variants && $this->size) {
-            return null; // When variants are enabled, use the variant price directly
+            $sizesObj = is_string($this->size) ? json_decode($this->size, true) : $this->size;
+            if (is_array($sizesObj) && count($sizesObj) > 0) {
+                $target = reset($sizesObj);
+                foreach ($sizesObj as $val) {
+                    $stock = is_array($val) ? (int)($val['stock'] ?? 0) : 0;
+                    if ($stock > 0) {
+                        $target = $val;
+                        break;
+                    }
+                }
+                $sale_price = is_array($target) ? ($target['sale_price'] ?? null) : null;
+                if ($sale_price !== null && $sale_price > 0) {
+                    return $sale_price;
+                }
+                return null;
+            }
         }
         return $value;
     }

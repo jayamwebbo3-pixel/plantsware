@@ -231,6 +231,19 @@ class CartController extends Controller
                 $sizesObj = is_string($item->size) ? json_decode($item->size, true) : $item->size;
                 if (is_array($sizesObj) && count($sizesObj) > 0) {
                     $selectedSize = array_key_first($sizesObj);
+                    foreach ($sizesObj as $key => $val) {
+                        $stock = is_array($val) ? (int)($val['stock'] ?? 0) : 0;
+                        if ($stock > 0) {
+                            $selectedSize = $key;
+                            break;
+                        }
+                    }
+                    // Crucially, if we auto-selected a size, update $options so it is saved in the DB
+                    if ($selectedSize) {
+                        $optionsObj = $options ? json_decode($options, true) : [];
+                        $optionsObj['size'] = $selectedSize;
+                        $options = json_encode($optionsObj);
+                    }
                 }
             }
             if ($selectedSize && $item->size) {

@@ -73,7 +73,7 @@
                                         @endif
                                     </a>
                                 </th>
-                                <th>Stock
+                                <th>Available Qty
                                     <a href="{{ route('admin.subcategories.products', $subcategory) }}?sort=stock_quantity&direction={{ request('direction') == 'asc' ? 'desc' : 'asc' }}&search={{ request('search') }}&per_page={{ request('per_page') }}">
                                         
                                         @if(request('sort') == 'stock_quantity')
@@ -81,6 +81,7 @@
                                         @endif
                                     </a>
                                 </th>
+                                <th>Attributes</th>
                                 <th>Sort Order
                                     <a href="{{ route('admin.subcategories.products', $subcategory) }}?sort=sort_order&direction={{ request('direction') == 'asc' ? 'desc' : 'asc' }}&search={{ request('search') }}&per_page={{ request('per_page') }}">
                                         
@@ -109,7 +110,7 @@
                                     </td>
                                     <td>{{ $product->name }}</td>
                                     <td>
-                                        @if($product->sale_price && $product->sale_price < $product->price)
+                                        @if($product->sale_price > 0 && $product->sale_price < $product->price)
 
                                             <span class="text-success">₹{{ number_format($product->sale_price, 2) }}</span><br>
                                              <del class="text-muted small">₹{{ number_format($product->price, 2) }}</del>
@@ -121,6 +122,71 @@
                                         <span class="badge {{ $product->stock_quantity > 0 ? 'bg-success' : 'bg-danger' }}">
                                             {{ $product->stock_quantity }}
                                         </span>
+                                    </td>
+                                    <td>
+                                        @if($product->has_variants && !empty($product->size))
+                                            <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#attributesModal{{ $product->id }}">
+                                                <i class="fas fa-shopping-bag me-1"></i> View
+                                            </button>
+                                            
+                                            <!-- Modal for Attributes -->
+                                            <div class="modal fade" id="attributesModal{{ $product->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title"><i class="fas fa-list me-2"></i> Attributes for {{ $product->name }}</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body p-0">
+                                                            <div class="table-responsive">
+                                                                <table class="table table-hover align-middle mb-0 text-center">
+                                                                    <thead class="table-light">
+                                                                        <tr>
+                                                                            <th>IMAGE</th>
+                                                                            <th>ATTRIBUTE NAME</th>
+                                                                            <th>STOCK</th>
+                                                                            <th>PRICE</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @php
+                                                                            $sizes = is_string($product->size) ? json_decode($product->size, true) : $product->size;
+                                                                        @endphp
+                                                                        @if(is_array($sizes))
+                                                                            @foreach($sizes as $attrName => $attrData)
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        @if(!empty($attrData['image']))
+                                                                                            <img src="{{ asset('storage/' . $attrData['image']) }}" alt="{{ $attrName }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                                                                        @else
+                                                                                            <div class="bg-light border d-flex align-items-center justify-content-center rounded mx-auto" style="width: 50px; height: 50px;">
+                                                                                                <i class="fas fa-image text-muted"></i>
+                                                                                            </div>
+                                                                                        @endif
+                                                                                    </td>
+                                                                                    <td><span class="fw-semibold text-success">{{ $attrName }}</span></td>
+                                                                                    <td>
+                                                                                        <span class="badge {{ ($attrData['stock'] ?? 0) > 0 ? 'bg-success' : 'bg-danger' }}">
+                                                                                            {{ $attrData['stock'] ?? 0 }} 
+                                                                                        </span>
+                                                                                    </td>
+                                                                                    <td>₹{{ number_format($attrData['price'] ?? 0, 2) }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        @endif
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <span class="text-muted small">-</span>
+                                        @endif
                                     </td>
                                     <td>{{ $product->sort_order ?? 0 }}</td>
                                     <td>
@@ -156,7 +222,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-5 text-muted">
+                                    <td colspan="10" class="text-center py-5 text-muted">
                                         No products found in this subcategory.
                                         <a href="{{ route('admin.products.create') }}?subcategory_id={{ $subcategory->id }}" class="d-block mt-2">
                                             <i class="fas fa-plus"></i> Add your first product

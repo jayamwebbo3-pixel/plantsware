@@ -17,6 +17,23 @@
                     <!-- Left Column: Main Product Details -->
                     <div class="col-md-8">
 
+                        @php
+                            $hasVariants = old('has_variants') || count(old('sizes', [])) > 0;
+                        @endphp
+                        
+                        <!-- Toggle Switch for Product has size / color variants? -->
+                        <div class="card border-0 shadow-sm rounded-4 mb-4 p-3 bg-light border-primary">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-dark">Product has size / color variants?</h6>
+                                    <small class="text-muted d-block" id="variants-help-text">OFF — Single product options (no variants)</small>
+                                </div>
+                                <div class="form-check form-switch fs-4">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="has_variants" name="has_variants" value="1" {{ $hasVariants ? 'checked' : '' }} onchange="toggleVariantsSection()">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
@@ -67,26 +84,31 @@
                             <textarea class="form-control" id="description" name="description" rows="5">{{ old('description') }}</textarea>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-4">
+                        <div class="row" id="base-price-fields">
+                            <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
                                     <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ old('price') }}" required>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="sale_price" class="form-label">Offer Price</label>
                                     <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" value="{{ old('sale_price') }}">
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="mb-3">
-                                    <label for="stock_quantity" class="form-label">Stock Quantity</label>
+                                    <label for="stock_quantity" class="form-label">Stock Qty</label>
                                     <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', 0) }}" min="0">
                                 </div>
                             </div>
-                            
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="stock_alert_qty" class="form-label">Stock Alert Qty</label>
+                                    <input type="number" class="form-control" id="stock_alert_qty" name="stock_alert_qty" value="{{ old('stock_alert_qty', 0) }}" min="0">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -105,7 +127,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6" id="base-weight-fields">
                                 <div class="mb-3">
                                     <label for="weight" class="form-label">Weight (grams)</label>
                                     <input type="number" step="any" class="form-control" id="weight" name="weight" value="{{ old('weight') }}" min="0" placeholder="e.g. 500">
@@ -160,22 +182,7 @@
 
                         
 
-                        @php
-                            $hasVariants = old('has_variants') || count(old('sizes', [])) > 0;
-                        @endphp
-                        
-                        <!-- Toggle Switch for Product has size / color variants? -->
-                        <div class="card border-0 shadow-sm rounded-4 mb-4 mt-5 p-3">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6 class="mb-1 fw-bold text-dark">Product has size / color variants?</h6>
-                                    <small class="text-muted d-block" id="variants-help-text">OFF — Single product options (no variants)</small>
-                                </div>
-                                <div class="form-check form-switch fs-4">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="has_variants" name="has_variants" value="1" {{ $hasVariants ? 'checked' : '' }} onchange="toggleVariantsSection()">
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Removed Toggle Switch from here -->
 
                         <!-- Professional Product Attributes Section -->
                         <div id="variants-section" style="display: {{ $hasVariants ? 'block' : 'none' }};">
@@ -209,10 +216,13 @@
                                                 <thead class="bg-light">
                                                     <tr>
                                                         <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="min-width: 180px;">Attribute Option</th>
-                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 130px;">Price Override (₹)</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 120px;">Type</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 120px;">Price (₹)</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 120px;">Offer (₹)</th>
                                                         <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 90px;">Stock</th>
-                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 110px;">Weight (grams)</th>
-                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 120px;">Combo Eligible</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 90px;">Alert Qty</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 100px;">Weight (g)</th>
+                                                        <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 110px;">Combo Eligible</th>
                                                         <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 220px;">Image</th>
                                                         <th class="text-center py-3 text-uppercase small fw-bold text-muted" style="width: 70px; min-width: 70px;">Remove</th>
                                                     </tr>
@@ -235,14 +245,31 @@
                                                                     </div>
                                                                 </td>
                                                                 <td>
+                                                                    <select name="sizes[{{ $name }}][type]" class="form-select form-select-sm" required>
+                                                                        <option value="size" {{ ($data['type'] ?? 'size') === 'size' ? 'selected' : '' }}>Size</option>
+                                                                        <option value="color" {{ ($data['type'] ?? 'size') === 'color' ? 'selected' : '' }}>Color</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td>
                                                                     <div class="input-group input-group-sm w-100">
                                                                         <span class="input-group-text bg-light border-end-0">₹</span>
-                                                                        <input type="number" step="0.01" name="sizes[{{ $name }}][price]" class="form-control border-start-0" value="{{ $data['price'] ?? '' }}" placeholder="Price Override" required>
+                                                                        <input type="number" step="0.01" name="sizes[{{ $name }}][price]" class="form-control border-start-0" value="{{ $data['price'] ?? '' }}" placeholder="Price" required>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="input-group input-group-sm w-100">
+                                                                        <span class="input-group-text bg-light border-end-0">₹</span>
+                                                                        <input type="number" step="0.01" name="sizes[{{ $name }}][sale_price]" class="form-control border-start-0" value="{{ $data['sale_price'] ?? '' }}" placeholder="Offer">
                                                                     </div>
                                                                 </td>
                                                                 <td>
                                                                     <div class="input-group input-group-sm w-100">
                                                                         <input type="number" name="sizes[{{ $name }}][stock]" class="form-control" value="{{ $data['stock'] ?? '' }}" placeholder="Qty" required>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="input-group input-group-sm w-100">
+                                                                        <input type="number" name="sizes[{{ $name }}][stock_alert_qty]" class="form-control" value="{{ $data['stock_alert_qty'] ?? '' }}" placeholder="Alert">
                                                                     </div>
                                                                 </td>
                                                                 <td>
@@ -270,7 +297,7 @@
 
                                                     @if(!$hasOldAttributes)
                                                         <tr id="no-attributes-msg">
-                                                            <td colspan="7" class="text-center py-5">
+                                                            <td colspan="10" class="text-center py-5">
                                                                 <div class="empty-state">
                                                                     <i class="fas fa-layer-group fa-3x text-light mb-3"></i>
                                                                     <h6 class="text-muted">No attributes defined</h6>
@@ -381,14 +408,31 @@
                                         </div>
                                     </td>
                                     <td>
+                                        <select name="sizes[${displayName}][type]" class="form-select form-select-sm" required>
+                                            <option value="size" selected>Size</option>
+                                            <option value="color">Color</option>
+                                        </select>
+                                    </td>
+                                    <td>
                                         <div class="input-group input-group-sm w-100">
                                             <span class="input-group-text bg-light border-end-0">₹</span>
-                                            <input type="number" step="0.01" name="sizes[${displayName}][price]" class="form-control border-start-0" value="${price}" placeholder="Price Override" required>
+                                            <input type="number" step="0.01" name="sizes[${displayName}][price]" class="form-control border-start-0" value="${price}" placeholder="Price" required>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group input-group-sm w-100">
+                                            <span class="input-group-text bg-light border-end-0">₹</span>
+                                            <input type="number" step="0.01" name="sizes[${displayName}][sale_price]" class="form-control border-start-0" placeholder="Offer">
                                         </div>
                                     </td>
                                     <td>
                                         <div class="input-group input-group-sm w-100">
                                             <input type="number" name="sizes[${displayName}][stock]" class="form-control" placeholder="Qty" required>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group input-group-sm w-100">
+                                            <input type="number" name="sizes[${displayName}][stock_alert_qty]" class="form-control" placeholder="Alert">
                                         </div>
                                     </td>
                                     <td>
@@ -430,8 +474,11 @@
                                         const row = input.closest('tr');
                                         input.value = newName;
                                         row.querySelector('input[name*="[checked]"]').name = `sizes[${newName}][checked]`;
+                                        row.querySelector('select[name*="[type]"]').name = `sizes[${newName}][type]`;
                                         row.querySelector('input[name*="[price]"]').name = `sizes[${newName}][price]`;
+                                        row.querySelector('input[name*="[sale_price]"]').name = `sizes[${newName}][sale_price]`;
                                         row.querySelector('input[name*="[stock]"]').name = `sizes[${newName}][stock]`;
+                                        row.querySelector('input[name*="[stock_alert_qty]"]').name = `sizes[${newName}][stock_alert_qty]`;
                                         row.querySelector('input[name*="[weight]"]').name = `sizes[${newName}][weight]`;
                                         row.querySelector('select[name*="[combo_eligible]"]').name = `sizes[${newName}][combo_eligible]`;
                                         row.querySelector('input[name*="[image]"]').name = `sizes[${newName}][image]`;
@@ -442,7 +489,7 @@
                             function checkEmptyAttributes() {
                                 const body = document.getElementById('attributes-body');
                                 if (body.querySelectorAll('.attribute-row').length === 0) {
-                                    body.innerHTML = `<tr id="no-attributes-msg"><td colspan="7" class="text-center py-5"><div class="empty-state"><i class="fas fa-layer-group fa-3x text-light mb-3"></i><h6 class="text-muted">No attributes defined</h6><p class="text-secondary small">Add custom sizes or use one of our predefined templates</p></div></td></tr>`;
+                                    body.innerHTML = `<tr id="no-attributes-msg"><td colspan="10" class="text-center py-5"><div class="empty-state"><i class="fas fa-layer-group fa-3x text-light mb-3"></i><h6 class="text-muted">No attributes defined</h6><p class="text-secondary small">Add custom sizes or use one of our predefined templates</p></div></td></tr>`;
                                 }
                             }
 
@@ -558,6 +605,9 @@
             const hasVariants = document.getElementById('has_variants').checked;
             const variantsSection = document.getElementById('variants-section');
             const helpText = document.getElementById('variants-help-text');
+            const basePriceFields = document.getElementById('base-price-fields');
+            const baseWeightFields = document.getElementById('base-weight-fields');
+            const basePriceInput = document.getElementById('price');
             
             if (hasVariants) {
                 variantsSection.style.display = 'block';
@@ -565,12 +615,21 @@
                 variantsSection.querySelectorAll('input, select, textarea').forEach(el => {
                     el.removeAttribute('disabled');
                 });
+                
+                if (basePriceFields) basePriceFields.style.display = 'none';
+                if (baseWeightFields) baseWeightFields.style.display = 'none';
+                if (basePriceInput) basePriceInput.removeAttribute('required');
+                
             } else {
                 variantsSection.style.display = 'none';
                 helpText.innerText = 'OFF — Single product options (no variants)';
                 variantsSection.querySelectorAll('input, select, textarea').forEach(el => {
                     el.setAttribute('disabled', 'disabled');
                 });
+                
+                if (basePriceFields) basePriceFields.style.display = 'flex';
+                if (baseWeightFields) baseWeightFields.style.display = 'block';
+                if (basePriceInput) basePriceInput.setAttribute('required', 'required');
             }
         };
 

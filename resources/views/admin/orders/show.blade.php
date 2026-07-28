@@ -108,36 +108,110 @@
                 @if (in_array($order->status, ['cancelled', 'returned']))
                 <div class="alert alert-secondary border-0 mb-0 text-center">
                     This order is <strong>{{ ucfirst($order->status) }}</strong>. It is read-only.
+                    @if($order->status === 'cancelled')
+                        <hr class="my-2">
+                        <div class="text-left mt-2">
+                            <small><strong>Reason for cancellation:</strong> {{ $order->cancel_reason ?: 'Not provided' }}</small>
+                        </div>
+                    @endif
                 </div>
+                @if($order->status === 'returned' && $order->return_reason)
+                <div class="alert alert-warning border-0 mt-3 mb-2">
+                    <strong>Return Reason:</strong><br>
+                    <small>{{ $order->return_reason }}</small>
+                    @if(!empty($order->returned_items))
+                        <hr class="my-2 border-secondary">
+                        <strong>Returned Items:</strong>
+                        <ul class="mb-0 ps-3 small">
+                            @foreach((is_string($order->returned_items) ? json_decode($order->returned_items, true) : $order->returned_items) as $item)
+                                <li>
+                                    {{ is_array($item) ? ($item['name'] . ' (Qty: ' . $item['quantity'] . ') - ₹' . number_format($item['total'], 2)) : $item }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+                @endif
+                @if($order->status === 'returned' && $order->return_images && count($order->return_images) > 0)
+                    <div class="mb-3 mt-3">
+                        <p class="small fw-bold mb-1">Return Images:</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach($order->return_images as $image)
+                                <a href="javascript:void(0)" onclick="Swal.fire({imageUrl: '{{ asset('storage/' . $image) }}', imageAlt: 'Return Image', width: 'auto', showCloseButton: true, showConfirmButton: false, customClass: { image: 'img-fluid' }, didOpen: () => { document.querySelector('.swal2-image').style.maxHeight = '70vh'; document.querySelector('.swal2-image').style.objectFit = 'contain'; }})">
+                                    <img src="{{ asset('storage/' . $image) }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; cursor: pointer;">
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
                 @elseif (in_array($order->status, ['completed']))
                 <div class="alert alert-success border-0 mb-0 text-center">
                     This order is <strong>Completed</strong> and the return window is closed.
                 </div>
                 @elseif ($order->status === 'return_rejected')
-                <div class="alert alert-danger border-0 mb-0 text-center">
+                <div class="alert alert-danger border-0 mb-2 text-center">
                     Return request was <strong>Rejected</strong>. Reason: {{ $order->return_rejection_reason ?? 'Admin rejection' }}
                 </div>
-                @elseif ($order->status === 'delivered')
-                <div class="alert alert-success border-0 mb-3 text-center">
-                    This order has been <strong>Delivered</strong>.
-                </div>
-                <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST">
-                    @csrf @method('PATCH')
-                    <button type="submit" name="status" value="returned" class="btn btn-warning w-100" onclick="return confirm('Are you sure you want to mark this order as returned?')">Return Order</button>
-                </form>
-                @elseif ($order->status === 'return_requested')
+                @if($order->return_reason)
                 <div class="alert alert-warning border-0 mb-2">
-                    <strong>Return Requested</strong><br>
-                    <small>Reason: {{ $order->return_reason ?? 'User requested a return' }}</small>
+                    <strong>Return Reason:</strong><br>
+                    <small>{{ $order->return_reason }}</small>
+                    @if(!empty($order->returned_items))
+                        <hr class="my-2 border-secondary">
+                        <strong>Returned Items:</strong>
+                        <ul class="mb-0 ps-3 small">
+                            @foreach((is_string($order->returned_items) ? json_decode($order->returned_items, true) : $order->returned_items) as $item)
+                                <li>
+                                    {{ is_array($item) ? ($item['name'] . ' (Qty: ' . $item['quantity'] . ') - ₹' . number_format($item['total'], 2)) : $item }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
                 </div>
-                
+                @endif
                 @if($order->return_images && count($order->return_images) > 0)
                     <div class="mb-3">
                         <p class="small fw-bold mb-1">Return Images:</p>
                         <div class="d-flex flex-wrap gap-2">
                             @foreach($order->return_images as $image)
-                                <a href="{{ asset('storage/' . $image) }}" target="_blank">
-                                    <img src="{{ asset('storage/' . $image) }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                                <a href="javascript:void(0)" onclick="Swal.fire({imageUrl: '{{ asset('storage/' . $image) }}', imageAlt: 'Return Image', width: 'auto', showCloseButton: true, showConfirmButton: false, customClass: { image: 'img-fluid' }, didOpen: () => { document.querySelector('.swal2-image').style.maxHeight = '70vh'; document.querySelector('.swal2-image').style.objectFit = 'contain'; }})">
+                                    <img src="{{ asset('storage/' . $image) }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; cursor: pointer;">
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+                @elseif ($order->status === 'delivered')
+                <div class="alert alert-success border-0 mb-3 text-center">
+                    This order has been <strong>Delivered</strong>.
+                </div>
+                <!-- Admin cannot initiate return, only user can request a return -->
+                @elseif ($order->status === 'return_requested')
+                <div class="alert alert-warning border-0 mb-2 text-center">
+                    <strong>Return Requested</strong>
+                </div>
+                <div class="alert alert-warning border-0 mb-2">
+                    <strong>Return Reason:</strong><br>
+                    <small>{{ $order->return_reason ?? 'User requested a return' }}</small>
+                    @if(!empty($order->returned_items))
+                        <hr class="my-2 border-secondary">
+                        <strong>Items to Return:</strong>
+                        <ul class="mb-0 ps-3 small">
+                            @foreach((is_string($order->returned_items) ? json_decode($order->returned_items, true) : $order->returned_items) as $item)
+                                <li>
+                                    {{ is_array($item) ? ($item['name'] . ' (Qty: ' . $item['quantity'] . ') - ₹' . number_format($item['total'], 2)) : $item }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+                @if($order->return_images && count($order->return_images) > 0)
+                    <div class="mb-3">
+                        <p class="small fw-bold mb-1">Return Images:</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach($order->return_images as $image)
+                                <a href="javascript:void(0)" onclick="Swal.fire({imageUrl: '{{ asset('storage/' . $image) }}', imageAlt: 'Return Image', width: 'auto', showCloseButton: true, showConfirmButton: false, customClass: { image: 'img-fluid' }, didOpen: () => { document.querySelector('.swal2-image').style.maxHeight = '70vh'; document.querySelector('.swal2-image').style.objectFit = 'contain'; }})">
+                                    <img src="{{ asset('storage/' . $image) }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; cursor: pointer;">
                                 </a>
                             @endforeach
                         </div>

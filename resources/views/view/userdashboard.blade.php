@@ -460,7 +460,7 @@
                     <!-- Saved Addresses -->
                     <div id="saved-addresses" class="address-cards">
                         @forelse($addresses as $address)
-                        <div class="address-card {{ $address->is_default ? 'selected' : '' }}">
+                        <div class="address-card {{ $address->is_default ? 'selected' : '' }}" id="address-card-{{ $address->id }}">
                             @if($address->is_default)
                             <span class="address-badge">DEFAULT</span>
                             @endif
@@ -473,10 +473,7 @@
                             <div class="address-phone">📱 {{ $address->phone_number }}</div>
                             <div class="address-actions">
                                 @if(!$address->is_default)
-                                <form action="{{ route('user.address.default', $address->id) }}" method="POST" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="address-btn address-btn-edit" style="background-color: var(--primary-color); color: white; border: none;">Set Default</button>
-                                </form>
+                                <button type="button" class="address-btn address-btn-edit btn-set-default" onclick="setAddressDefault(this, {{ $address->id }})" style="background-color: var(--primary-color); color: white; border: none;">Set Default</button>
                                 @endif
                                 <button type="button" class="address-btn address-btn-edit" onclick="editAddress({{ json_encode($address) }})">Edit</button>
                                 <form action="{{ route('user.address.delete', $address->id) }}" method="POST" style="display: inline;" class="delete-address-form">
@@ -627,7 +624,19 @@
                             <div class="order-info">
                                 <h4>
                                     @if($order->items && $order->items->count() > 0)
-                                    {{ $order->items->first()->product_name }}
+                                    @php
+                                        $firstItem = $order->items->first();
+                                        $optionsStr = '';
+                                        if (!empty($firstItem->options)) {
+                                            $options = is_string($firstItem->options) ? json_decode($firstItem->options, true) : $firstItem->options;
+                                            if (is_array($options) && isset($options['size'])) {
+                                                $optionsStr = ' (Size: ' . $options['size'] . ')';
+                                            } elseif (is_string($options)) {
+                                                $optionsStr = ' (Size: ' . $options . ')';
+                                            }
+                                        }
+                                    @endphp
+                                    {{ $firstItem->product_name }}{{ $optionsStr }}
                                     @if($order->items->count() > 1)
                                     <span style="font-size: 0.8em; color: gray; display: block; margin-top: 4px; font-weight: normal;">+ {{ $order->items->count() - 1 }} more item(s)</span>
                                     @endif
@@ -637,25 +646,38 @@
                                 </h4>
                                 <p>Date: {{ $order->created_at->format('d M Y') }}</p>
 
-                                <span class="order-status {{ strtolower($order->status) }}" style="padding: 3px 8px; border-radius: 4px; color: white; background-color: {{ in_array(strtolower($order->status), ['cancelled', 'return_rejected']) ? '#dc3545' : (strtolower($order->status) === 'shipped' ? '#17a2b8' : (in_array(strtolower($order->status), ['delivered', 'completed']) ? '#28a745' : (strtolower($order->status) === 'returned' ? '#343a40' : '#ffc107'))) }};">
-                                    {{ ucfirst(str_replace('_', ' ', $order->status)) }}
-                                </span>
+                                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px;">
+                                    <span class="order-status {{ strtolower($order->status) }}" style="padding: 3px 8px; border-radius: 4px; color: white; background-color: {{ in_array(strtolower($order->status), ['cancelled', 'return_rejected']) ? '#dc3545' : (strtolower($order->status) === 'shipped' ? '#17a2b8' : (in_array(strtolower($order->status), ['delivered', 'completed']) ? '#28a745' : (strtolower($order->status) === 'returned' ? '#343a40' : '#ffc107'))) }};">
+                                        {{ ucwords(str_replace('_', ' ', $order->status)) }}
+                                    </span>
 
-                                @if(!in_array(strtolower($order->status), ['shipped', 'delivered', 'cancelled', 'returned', 'return_requested', 'return_rejected', 'completed']))
-                                <form action="{{ route('user.order.cancel', $order->id) }}" method="POST" style="display:inline; margin-left:10px;" class="cancel-order-form">
-                                    @csrf
-                                    <button type="button" onclick="event.stopPropagation(); confirmCancelOrder(this.form);" style="background-color: transparent; border: 1px solid #dc3545; color: #dc3545; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Cancel</button>
-                                </form>
-                                @endif
+                                    @if(!in_array(strtolower($order->status), ['shipped', 'delivered', 'cancelled', 'returned', 'return_requested', 'return_rejected', 'completed']))
+                                    <form action="{{ route('user.order.cancel', $order->id) }}" method="POST" style="margin: 0;" class="cancel-order-form">
+                                        @csrf
+                                        <button type="button" onclick="event.stopPropagation(); confirmCancelOrder(this.form);" style="background-color: transparent; border: 1px solid #dc3545; color: #dc3545; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Cancel</button>
+                                    </form>
+                                    @endif
 
-                                @if(strtolower($order->status) === 'delivered' && $order->delivered_at && $order->delivered_at->diffInDays(now()) <= 3)
-                                    <button type="button" class="btn-return" onclick="event.stopPropagation(); openReturnModal({{ $order->id }}, '{{ $order->order_number }}')" style="background-color: transparent; border: 1px solid #ffc107; color: #ffc107; border-radius: 4px; padding: 2px 8px; margin-left:10px; cursor: pointer;">Request Return</button>
+                                    @if(strtolower($order->status) === 'shipped')
+                                        <button type="button" 
+                                            data-tracking-id="{{ $order->tracking_number }}" 
+                                            data-tracking-link="{{ $order->tracking_link }}"
+                                            onclick="event.stopPropagation(); openTrackOrderModal(this);" 
+                                            style="background-color: transparent; border: 1px solid #17a2b8; color: #17a2b8; border-radius: 4px; padding: 2px 8px; cursor: pointer; text-decoration: none; font-size: 0.9em;">
+                                            Track Order
+                                        </button>
+                                    @endif
+
+                                    @if(strtolower($order->status) === 'delivered' && $order->delivered_at && $order->delivered_at->diffInDays(now()) <= 3)
+                                        <button type="button" class="btn-return" onclick="event.stopPropagation(); openReturnModal({{ $order->id }}, '{{ $order->order_number }}')" style="background-color: transparent; border: 1px solid #ffc107; color: #ffc107; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Request Return</button>
                                     @endif
 
                                     @if(in_array(strtolower($order->status), ['delivered', 'completed']))
-                                    <button type="button" class="btn-review" onclick="event.stopPropagation(); openReviewModal({{ $order->id }}, '{{ $order->order_number }}')" style="background-color: var(--primary-color); border: none; color: white; border-radius: 4px; padding: 2px 8px; margin-left: 10px; cursor: pointer;">Review & Rating</button>
+                                        <button type="button" class="btn-review" onclick="event.stopPropagation(); openReviewModal({{ $order->id }}, '{{ $order->order_number }}')" style="background-color: var(--primary-color); border: none; color: white; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Review & Rating</button>
                                     @endif
-                                    <a href="{{ route('user.order.invoice', $order->id) }}" class="btn-invoice" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); border-radius: 4px; padding: 2px 8px; margin-left: 10px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 0.85rem;">Invoice</a>
+                                    
+                                    <a href="{{ route('user.order.invoice', $order->id) }}" class="btn-invoice" onclick="event.stopPropagation();" style="background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); border-radius: 4px; padding: 2px 8px; cursor: pointer; text-decoration: none; font-size: 0.85rem;">Invoice</a>
+                                </div>
                             </div>
                             <div class="order-price" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-start; gap: 10px;">
                                 <div>₹{{ number_format($order->total ?? 0, 2) }}</div>
@@ -703,12 +725,12 @@
                                     </a>
                                 </h3>
                                 @php
-                                $dashPriceToUse = ($item->product->sale_price && $item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
+                                $dashPriceToUse = ($item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
                                     ? $item->product->sale_price
                                     : $item->product->price;
                                 @endphp
                                 <div class="product-price">
-                                    @if($item->product->sale_price && $item->product->sale_price < $item->product->price)
+                                    @if($item->product->sale_price > 0 && $item->product->sale_price < $item->product->price)
                                         <span class="original-price text-muted text-decoration-line-through">₹{{ number_format($item->product->price, 2) }}</span>
                                         <span class="current-price ms-2 fw-bold">₹{{ number_format($item->product->sale_price, 2) }}</span>
                                     @else
@@ -837,7 +859,7 @@
 
 <!-- Review Modal -->
 <div id="reviewModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-    <div class="modal-content" style="background-color: #fefefe; margin: 5% auto; padding: 30px; border-radius: 12px; width: 50%; max-width: 600px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 12px; width: 95%; max-width: 600px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3 style="margin: 0; color: var(--dark-color); font-weight: 700;">Rate & Review Order <span id="modalOrderNumber"></span></h3>
             <span class="close-modal" onclick="closeReviewModal()" style="color: #666; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
@@ -862,7 +884,7 @@
 
 <!-- Return Request Modal -->
 <div id="returnModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-    <div class="modal-content" style="background-color: #fefefe; margin: 5% auto; padding: 30px; border-radius: 12px; width: 50%; max-width: 600px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 12px; width: 95%; max-width: 600px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3 style="margin: 0; color: var(--dark-color); font-weight: 700;">Request Return for Order <span id="returnModalOrderNumber"></span></h3>
             <span class="close-modal" onclick="closeReturnModal()" style="color: #666; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
@@ -870,15 +892,27 @@
 
         <form id="returnForm" action="" method="POST" enctype="multipart/form-data">
             @csrf
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label class="form-label">Select Items to Return *</label>
+                <div id="returnOrderItemsList" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;">
+                    <!-- Order items will be loaded here via JS -->
+                    <p style="text-align: center; color: #888; margin: 0;">Loading items...</p>
+                </div>
+                <small class="text-danger" id="returnItemsError" style="display: none;">Please select at least one item to return.</small>
+            </div>
+
             <div class="form-group" style="margin-bottom: 15px;">
                 <label class="form-label">Reason for Return *</label>
                 <textarea name="reason" class="form-control" placeholder="Please explain why you want to return the items..." rows="4" required></textarea>
             </div>
 
-            <div class="form-group" style="margin-bottom: 20px;">
-                <label class="form-label">Product Images (Optional)</label>
-                <input type="file" name="images[]" class="form-control" multiple accept="image/*">
-                <small class="text-muted">You can upload multiple images to help us understand the issue.</small>
+            <div class="form-group" style="margin-bottom: 20px;" id="dynamicImageContainer">
+                <label class="form-label">Product Images *</label>
+                <div id="dynamicImageFields">
+                    <input type="file" name="images[]" class="form-control mb-2" accept="image/*" required>
+                </div>
+                <small class="text-muted">You must upload at least 1 image (Max: 1MB per image). Others are optional. Images will be automatically converted to WebP.</small>
             </div>
 
             <div style="text-align: right;">
@@ -960,6 +994,60 @@
         }
     }
 
+    function setAddressDefault(btn, id) {
+        const originalText = btn.innerText;
+        btn.innerText = "Setting...";
+        btn.disabled = true;
+
+        fetch("{{ url('user/address') }}/" + id + "/default", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            }
+        }).then(response => {
+            if(response.ok) {
+                // Remove 'selected' class and 'DEFAULT' badge from all cards
+                document.querySelectorAll('.address-card').forEach(card => {
+                    card.classList.remove('selected');
+                    const badge = card.querySelector('.address-badge');
+                    if(badge) badge.remove();
+                    
+                    // If it doesn't have a Set Default button, it was the old default, so add one
+                    const actions = card.querySelector('.address-actions');
+                    if(!actions.querySelector('.btn-set-default')) {
+                        const cardId = card.id.replace('address-card-', '');
+                        const newBtn = document.createElement('button');
+                        newBtn.type = 'button';
+                        newBtn.className = 'address-btn address-btn-edit btn-set-default';
+                        newBtn.style = 'background-color: var(--primary-color); color: white; border: none;';
+                        newBtn.innerText = 'Set Default';
+                        newBtn.onclick = function() { setAddressDefault(this, cardId) };
+                        actions.insertBefore(newBtn, actions.firstChild);
+                    }
+                });
+
+                // Set current card as default
+                const currentCard = document.getElementById('address-card-' + id);
+                currentCard.classList.add('selected');
+                const badge = document.createElement('span');
+                badge.className = 'address-badge';
+                badge.innerText = 'DEFAULT';
+                currentCard.insertBefore(badge, currentCard.firstChild);
+                
+                // Remove the Set Default button from current card
+                btn.remove();
+            } else {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }).catch(error => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            console.error('Error:', error);
+        });
+    }
+
     function editAddress(address) {
         const savedAddresses = document.getElementById('saved-addresses');
         const newAddressForm = document.getElementById('new-address-form');
@@ -994,6 +1082,39 @@
         });
     }
 
+    // Track Order Modal
+    function openTrackOrderModal(btn) {
+        const trackingId = btn.getAttribute('data-tracking-id');
+        const trackingLink = btn.getAttribute('data-tracking-link');
+
+        let htmlContent = `
+            <div style="text-align: left; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--primary-color, #1b8744);">
+                <p style="margin-bottom: 10px; font-size: 1.1em;"><strong>Tracking ID:</strong> <span style="font-family: monospace; font-size: 1.1em; color: #333;">${trackingId || 'Not provided'}</span></p>
+        `;
+        
+        if (trackingLink) {
+            htmlContent += `<p style="margin-bottom: 0;"><strong>Tracking Link:</strong> <br> <a href="${trackingLink}" target="_blank" style="color: var(--primary-color, #1b8744); word-break: break-all; display: inline-block; margin-top: 5px; text-decoration: underline;">${trackingLink}</a></p>`;
+        } else {
+            htmlContent += `<p style="margin-bottom: 0; color: #6c757d; font-size: 0.9em;">No tracking link available.</p>`;
+        }
+        htmlContent += `</div>`;
+
+        Swal.fire({
+            title: '<i class="fas fa-shipping-fast" style="color: var(--primary-color, #1b8744); margin-right: 10px;"></i> Order Tracking',
+            html: htmlContent,
+            showCloseButton: true,
+            showConfirmButton: trackingLink ? true : true,
+            confirmButtonText: trackingLink ? 'Track Now <i class="fas fa-external-link-alt ms-1"></i>' : 'Close',
+            confirmButtonColor: trackingLink ? 'var(--primary-color, #1b8744)' : '#6c757d',
+            customClass: {
+                title: 'text-start'
+            }
+        }).then((result) => {
+            if (result.isConfirmed && trackingLink) {
+                window.open(trackingLink, '_blank');
+            }
+        });
+    }
 
 
     // Profile Name Editing
@@ -1135,12 +1256,107 @@
 
         orderNumberSpan.innerText = '#' + orderNumber;
         form.action = "{{ route('user.order.return', ':id') }}".replace(':id', orderId);
+        
+        // Fetch order items for return selection
+        const itemsList = document.getElementById('returnOrderItemsList');
+        itemsList.innerHTML = '<p style="text-align: center; color: #888; margin: 0;">Loading items...</p>';
+
+        const fetchUrl = "{{ route('user.order.items', ':id') }}".replace(':id', orderId);
+
+        fetch(fetchUrl)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                if (data.items && data.items.length > 0) {
+                    let html = '';
+                    data.items.forEach((item, index) => {
+                        const itemId = item.id; // Using order_item id
+                        // Using a compound value or just name for simplicity
+                        html += `
+                            <div style="display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox" name="returned_items[]" value="${item.id}" id="return_item_${index}" style="margin-right: 10px;" class="return-item-checkbox" onchange="updateImageFields()">
+                                <label for="return_item_${index}" style="margin: 0; cursor: pointer; font-size: 0.95rem; flex: 1;">${item.name}</label>
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <label style="font-size: 0.85rem; color: #666; margin: 0;">Qty:</label>
+                                    <input type="number" name="return_quantities[${item.id}]" value="${item.quantity}" min="1" max="${item.quantity}" class="form-control" style="width: 70px; padding: 2px 5px; height: auto;" onchange="updateImageFields()">
+                                </div>
+                            </div>
+                        `;
+                    });
+                    itemsList.innerHTML = html;
+                    updateImageFields();
+                } else {
+                    itemsList.innerHTML = '<p style="text-align: center; color: #888; margin: 0;">No items found for this order.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching items:', error);
+                itemsList.innerHTML = '<p style="text-align: center; color: #dc3545; margin: 0;">Error loading items.</p>';
+            });
+
+        // Form validation to ensure at least one item is checked
+        form.onsubmit = function(e) {
+            const checkboxes = document.querySelectorAll('.return-item-checkbox');
+            let isChecked = false;
+            checkboxes.forEach(cb => {
+                if(cb.checked) isChecked = true;
+            });
+            if(!isChecked && checkboxes.length > 0) {
+                e.preventDefault();
+                document.getElementById('returnItemsError').style.display = 'block';
+            } else {
+                document.getElementById('returnItemsError').style.display = 'none';
+            }
+        };
+
         modal.style.display = 'block';
     }
 
     function closeReturnModal() {
         document.getElementById('returnModal').style.display = 'none';
         document.getElementById('returnForm').reset();
+        const container = document.getElementById('dynamicImageFields');
+        if(container) {
+            container.innerHTML = '<input type="file" name="images[]" class="form-control mb-2" accept="image/*" required>';
+        }
+    }
+
+    function updateImageFields() {
+        const checkboxes = document.querySelectorAll('.return-item-checkbox');
+        let totalQty = 0;
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                const qtyInput = document.querySelector(`input[name="return_quantities[${cb.value}]"]`);
+                if (qtyInput) {
+                    totalQty += parseInt(qtyInput.value) || 0;
+                }
+            }
+        });
+
+        if (totalQty < 1) totalQty = 1;
+
+        const container = document.getElementById('dynamicImageFields');
+        const currentFields = container.querySelectorAll('input[type="file"]').length;
+
+        if (totalQty > currentFields) {
+            for (let i = currentFields; i < totalQty; i++) {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.name = 'images[]';
+                input.className = 'form-control mb-2';
+                input.accept = 'image/*';
+                container.appendChild(input);
+            }
+        } else if (totalQty < currentFields) {
+            const inputs = container.querySelectorAll('input[type="file"]');
+            for (let i = currentFields - 1; i >= totalQty; i--) {
+                if (i > 0) {
+                    inputs[i].remove();
+                }
+            }
+        }
     }
 
     // Close modal when clicking outside
@@ -1197,6 +1413,17 @@
             title: 'Cancel Order?',
             text: "Are you sure you want to cancel this order?",
             icon: 'warning',
+            input: 'textarea',
+            inputPlaceholder: 'Reason for cancellation...',
+            inputAttributes: {
+                'aria-label': 'Reason for cancellation',
+                'required': 'true'
+            },
+            inputValidator: (value) => {
+                if (!value || value.trim() === '') {
+                    return 'You need to write a reason!'
+                }
+            },
             showCancelButton: true,
             confirmButtonColor: '#dc3545',
             cancelButtonColor: '#6c757d',
@@ -1204,6 +1431,11 @@
             cancelButtonText: 'No, keep it'
         }).then((result) => {
             if (result.isConfirmed) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'cancel_reason';
+                input.value = result.value;
+                form.appendChild(input);
                 form.submit();
             }
         });

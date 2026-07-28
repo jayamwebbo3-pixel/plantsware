@@ -52,8 +52,9 @@
         }
         .address-box td {
             vertical-align: top;
-            width: 50%;
+            width: 33.33%;
             line-height: 1.5;
+            padding-right: 15px;
         }
         .address-title {
             font-size: 14px;
@@ -167,6 +168,14 @@
                 {{ $store_address }}<br>
                 {{ $store_email }}<br>
                 {{ $store_phone }}
+            </td>
+            <td>
+                <div class="address-title">Shipping Address:</div>
+                <strong>{{ $shipping_address['name'] ?? $customer_name }}</strong><br>
+                @if(!empty($shipping_address['door_number'])){{ $shipping_address['door_number'] }}, @endif @if(!empty($shipping_address['street'])){{ $shipping_address['street'] }}, @endif {{ $shipping_address['address'] ?? 'N/A' }}<br>
+                {{ $shipping_address['city'] ?? '' }} - {{ $shipping_address['pincode'] ?? '' }}<br>
+                {{ $shipping_address['phone'] ?? $customer_phone }}<br>
+                {{ $shipping_address['email'] ?? $customer_email }}
             </td>
             <td>
                 <div class="address-title">Billed To:</div>

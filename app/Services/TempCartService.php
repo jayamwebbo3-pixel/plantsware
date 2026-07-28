@@ -118,6 +118,8 @@ class TempCartService
                                 throw new Exception("Insufficient stock for {$product->name} ({$selectedSize}).");
                             }
                             $sizesObj[$foundKey]['stock'] = $sizeStock - $quantity;
+                            $currentSold = isset($sizesObj[$foundKey]['sold_quantity']) ? (int)$sizesObj[$foundKey]['sold_quantity'] : 0;
+                            $sizesObj[$foundKey]['sold_quantity'] = $currentSold + $quantity;
                             $product->size = $sizesObj;
                             $product->save();
                             return;
@@ -130,6 +132,7 @@ class TempCartService
                 throw new Exception("Insufficient stock for {$product->name}.");
             }
             $product->decrement('stock_quantity', $quantity);
+            $product->increment('sold_quantity', $quantity);
         }
     }
 
@@ -220,6 +223,9 @@ class TempCartService
                             $sizeStock = $sizesObj[$foundKey]['stock'];
                             if ($sizeStock !== null && $sizeStock !== '') {
                                 $sizesObj[$foundKey]['stock'] = (int)$sizeStock + $quantity;
+                                $currentSold = isset($sizesObj[$foundKey]['sold_quantity']) ? (int)$sizesObj[$foundKey]['sold_quantity'] : 0;
+                                $newSold = $currentSold - $quantity;
+                                $sizesObj[$foundKey]['sold_quantity'] = $newSold >= 0 ? $newSold : 0;
                                 $product->size = $sizesObj;
                                 $product->save();
                                 return;
@@ -229,6 +235,12 @@ class TempCartService
                 }
 
                 $product->increment('stock_quantity', $quantity);
+                if ($product->sold_quantity >= $quantity) {
+                    $product->decrement('sold_quantity', $quantity);
+                } else {
+                    $product->sold_quantity = 0;
+                    $product->save();
+                }
             }
         }
     }
@@ -238,7 +250,11 @@ class TempCartService
         foreach ($productIds as $id) {
             if (str_starts_with($id, 'p_')) {
                 $realId = str_replace('p_', '', $id);
-                Product::where('id', $realId)->decrement('stock_quantity', $orderQuantity);
+                $prod = Product::find($realId);
+                if ($prod) {
+                    $prod->decrement('stock_quantity', $orderQuantity);
+                    $prod->increment('sold_quantity', $orderQuantity);
+                }
             } elseif (str_starts_with($id, 'co_')) {
                 $realId = str_replace('co_', '', $id);
                 ComboOnlyProduct::where('id', $realId)->decrement('stock_quantity', $orderQuantity);
@@ -264,7 +280,16 @@ class TempCartService
         foreach ($productIds as $id) {
             if (str_starts_with($id, 'p_')) {
                 $realId = str_replace('p_', '', $id);
-                Product::where('id', $realId)->increment('stock_quantity', $orderQuantity);
+                $prod = Product::find($realId);
+                if ($prod) {
+                    $prod->increment('stock_quantity', $orderQuantity);
+                    if ($prod->sold_quantity >= $orderQuantity) {
+                        $prod->decrement('sold_quantity', $orderQuantity);
+                    } else {
+                        $prod->sold_quantity = 0;
+                        $prod->save();
+                    }
+                }
             } elseif (str_starts_with($id, 'co_')) {
                 $realId = str_replace('co_', '', $id);
                 ComboOnlyProduct::where('id', $realId)->increment('stock_quantity', $orderQuantity);

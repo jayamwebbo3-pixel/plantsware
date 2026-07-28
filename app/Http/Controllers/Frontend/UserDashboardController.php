@@ -125,7 +125,7 @@ class UserDashboardController extends Controller
         $address = $user->addresses()->findOrFail($id);
         $address->update(['is_default' => true]);
 
-        return back()->with('success', 'Default address updated.');
+        return back();
     }
 
     public function deleteAddress($id)
@@ -147,7 +147,7 @@ class UserDashboardController extends Controller
         return back()->with('success', 'Address deleted successfully.');
     }
 
-    public function cancelOrder($id)
+    public function cancelOrder(\Illuminate\Http\Request $request, $id)
     {
         $order = Auth::user()->orders()->findOrFail($id);
 
@@ -155,7 +155,15 @@ class UserDashboardController extends Controller
             return back()->with('error', 'This order cannot be cancelled.');
         }
 
-        $order->update(['status' => 'cancelled']);
+        $tempCartService = app(\App\Services\TempCartService::class);
+        foreach ($order->items as $item) {
+            $tempCartService->restoreStock($item);
+        }
+
+        $order->update([
+            'status' => 'cancelled',
+            'cancel_reason' => $request->input('cancel_reason')
+        ]);
 
         return back()->with('success', 'Order has been successfully cancelled.');
     }
@@ -173,14 +181,54 @@ class UserDashboardController extends Controller
 
         $request->validate([
             'reason' => 'required|string',
-            'images' => 'nullable|array',
-            'images.*' => 'image|max:2048'
+            'images' => 'required|array|min:1',
+            'images.*' => 'image|max:1024',
+            'returned_items' => 'required|array|min:1'
         ]);
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
+            $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+            if (!file_exists(storage_path('app/public/return_images'))) {
+                mkdir(storage_path('app/public/return_images'), 0755, true);
+            }
             foreach ($request->file('images') as $image) {
-                $imagePaths[] = $image->store('return_images', 'public');
+                $filename = 'return_images/' . uniqid() . '_' . time() . '.webp';
+                $fullPath = storage_path('app/public/' . $filename);
+                $img = $manager->read($image->getRealPath());
+                $img->toWebp(80)->save($fullPath);
+                $imagePaths[] = $filename;
+            }
+        }
+
+        $returnedItemsDetails = [];
+        if (is_array($request->returned_items)) {
+            $orderItems = $order->items()->whereIn('id', $request->returned_items)->get();
+            foreach ($orderItems as $item) {
+                $optionsStr = '';
+                if (!empty($item->options)) {
+                    $options = is_string($item->options) ? json_decode($item->options, true) : $item->options;
+                    if (is_array($options) && isset($options['size'])) {
+                        $optionsStr = ' (Size: ' . $options['size'] . ')';
+                    } elseif (is_string($options)) {
+                        $optionsStr = ' (Size: ' . $options . ')';
+                    }
+                }
+                $returnQty = isset($request->return_quantities[$item->id]) ? (int)$request->return_quantities[$item->id] : $item->quantity;
+                if ($returnQty > $item->quantity) {
+                     $returnQty = $item->quantity;
+                }
+                if ($returnQty < 1) {
+                     $returnQty = 1;
+                }
+
+                $returnedItemsDetails[] = [
+                    'id' => $item->id,
+                    'name' => $item->product_name . $optionsStr,
+                    'price' => $item->price,
+                    'quantity' => $returnQty,
+                    'total' => $item->price * $returnQty
+                ];
             }
         }
 
@@ -188,7 +236,8 @@ class UserDashboardController extends Controller
             'status' => 'return_requested',
             'return_requested_at' => now(),
             'return_reason' => $request->reason,
-            'return_images' => $imagePaths
+            'return_images' => $imagePaths,
+            'returned_items' => $returnedItemsDetails
         ]);
 
         return back()->with('success', 'Return request submitted successfully.');
@@ -216,14 +265,25 @@ class UserDashboardController extends Controller
                     $isEditable = $review->updated_at->diffInDays(now()) <= 30;
                 }
 
+                $optionsStr = '';
+                if (!empty($item->options)) {
+                    $options = is_string($item->options) ? json_decode($item->options, true) : $item->options;
+                    if (is_array($options) && isset($options['size'])) {
+                        $optionsStr = ' (Size: ' . $options['size'] . ')';
+                    } elseif (is_string($options)) {
+                        $optionsStr = ' (Size: ' . $options . ')';
+                    }
+                }
+
                 return [
                     'id' => $item->id,
-                    'name' => $item->product_name,
+                    'name' => $item->product_name . $optionsStr,
                     'product_id' => $item->product_id,
                     'combo_pack_id' => $item->combo_pack_id,
                     'existing_rating' => $review ? $review->rating : null,
                     'existing_review' => $review ? $review->review : null,
                     'is_editable' => $isEditable,
+                    'quantity' => $item->quantity,
                 ];
             })
         ]);
@@ -263,6 +323,11 @@ class UserDashboardController extends Controller
             $billingAddress = $order->shipping_address;
         }
 
+        $shippingAddress = $order->shipping_address;
+        if (empty($shippingAddress) || empty($shippingAddress['address'])) {
+            $shippingAddress = $billingAddress;
+        }
+
         $data = [
             'invoice_number'   => $order->order_number,
             'order_date'       => $order->created_at->format('d/M/Y'),
@@ -276,6 +341,7 @@ class UserDashboardController extends Controller
             'customer_email'   => $user->email ?? 'N/A',
             'customer_phone'   => ($billingAddress['phone'] ?? 'N/A'),
             'customer_address' => $billingAddress,
+            'shipping_address' => $shippingAddress,
             'order_items'      => $order->items,
             'subtotal'         => $order->subtotal,
             'discount_amount'  => $order->discount,

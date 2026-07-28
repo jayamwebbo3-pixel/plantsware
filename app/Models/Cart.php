@@ -53,11 +53,18 @@ class Cart extends Model
                 }
             }
 
-            // Fallback: If no size option is specified but the product has size options defined, default to the first size option
+            // Fallback: If no size option is specified but the product has size options defined, default to the first in-stock size option
             if (!$selectedSize && $p->size) {
                 $sizesObj = is_string($p->size) ? json_decode($p->size, true) : $p->size;
                 if (is_array($sizesObj) && count($sizesObj) > 0) {
                     $selectedSize = array_key_first($sizesObj);
+                    foreach ($sizesObj as $key => $val) {
+                        $stock = is_array($val) ? (int)($val['stock'] ?? 0) : 0;
+                        if ($stock > 0) {
+                            $selectedSize = $key;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -80,8 +87,12 @@ class Cart extends Model
 
                 if ($foundSize) {
                     $sizePrice = is_array($foundSize) ? ($foundSize['price'] ?? null) : $foundSize;
+                    $sizeSalePrice = is_array($foundSize) ? ($foundSize['sale_price'] ?? null) : null;
                     if ($sizePrice !== null && $sizePrice > 0) {
                         $price = $sizePrice;
+                        if ($sizeSalePrice !== null && $sizeSalePrice > 0 && $sizeSalePrice < $sizePrice) {
+                            $price = $sizeSalePrice;
+                        }
                     }
                 }
             }
@@ -110,11 +121,18 @@ class Cart extends Model
                 }
             }
 
-            // Fallback: If no size option is specified but the product has size options defined, default to the first size option
+            // Fallback: If no size option is specified but the product has size options defined, default to the first in-stock size option
             if (!$selectedSize && $p->size) {
                 $sizesObj = is_string($p->size) ? json_decode($p->size, true) : $p->size;
                 if (is_array($sizesObj) && count($sizesObj) > 0) {
                     $selectedSize = array_key_first($sizesObj);
+                    foreach ($sizesObj as $key => $val) {
+                        $stock = is_array($val) ? (int)($val['stock'] ?? 0) : 0;
+                        if ($stock > 0) {
+                            $selectedSize = $key;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -167,11 +185,18 @@ class Cart extends Model
                 }
             }
 
-            // Fallback: If no size option is specified but the product has size options defined, default to the first size option
+            // Fallback: If no size option is specified but the product has size options defined, default to the first in-stock size option
             if (!$selectedSize && $p->size) {
                 $sizesObj = is_string($p->size) ? json_decode($p->size, true) : $p->size;
                 if (is_array($sizesObj) && count($sizesObj) > 0) {
                     $selectedSize = array_key_first($sizesObj);
+                    foreach ($sizesObj as $key => $val) {
+                        $stock = is_array($val) ? (int)($val['stock'] ?? 0) : 0;
+                        if ($stock > 0) {
+                            $selectedSize = $key;
+                            break;
+                        }
+                    }
                 }
             }
         }

@@ -18,6 +18,27 @@
                 <!-- Left Column: Main Details + Attributes -->
                 <div class="col-md-8">
 
+                    {{-- has_variants flag: always submit true so controller saves sizes --}}
+                    <input type="hidden" name="has_variants" value="{{ $product->has_variants ? '1' : '0' }}" id="has_variants_input">
+
+                    <!-- Product has size/color variants toggle -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 p-3 bg-light border-primary">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1 fw-bold text-dark">Product has size / color variants?</h6>
+                                <small class="text-muted" id="variants-toggle-label">
+                                    {{ $product->has_variants ? 'ON — Add multiple variants with color, size options' : 'OFF — Single product, no size/color options' }}
+                                </small>
+                            </div>
+                            <div class="form-check form-switch fs-4 m-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="has_variants_toggle"
+                                    {{ old('has_variants', $product->has_variants) ? 'checked' : '' }}
+                                    onchange="toggleVariantsSection(this)"
+                                    style="cursor: pointer;">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $product->name) }}" required>
@@ -64,26 +85,31 @@
                         <textarea class="form-control" id="description" name="description" rows="5">{{ old('description', $product->description) }}</textarea>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-4">
+                    <div class="row" id="base-price-fields">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
                                 <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ old('price', $product->price) }}" required>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="sale_price" class="form-label">Offer Price</label>
                                 <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" value="{{ old('sale_price', $product->sale_price) }}">
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
-                                <label for="stock_quantity" class="form-label">Stock Quantity</label>
+                                <label for="stock_quantity" class="form-label">Stock Qty</label>
                                 <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', $product->stock_quantity) }}" min="0">
                             </div>
                         </div>
-                        
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="stock_alert_qty" class="form-label">Stock Alert Qty</label>
+                                <input type="number" class="form-control" id="stock_alert_qty" name="stock_alert_qty" value="{{ old('stock_alert_qty', $product->stock_alert_qty) }}" min="0">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -102,7 +128,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6" id="base-weight-fields">
                             <div class="mb-3">
                                 <label for="weight" class="form-label">Weight (grams)</label>
                                 <input type="number" step="any" class="form-control" id="weight" name="weight" value="{{ old('weight', $product->weight) }}" min="0" placeholder="e.g. 500">
@@ -190,30 +216,7 @@
                 <div class="row mt-2">
                     <div class="col-12">
 
-                    {{-- has_variants flag: always submit true so controller saves sizes --}}
-                    <input type="hidden" name="has_variants" value="{{ $product->has_variants ? '1' : '0' }}" id="has_variants_input">
-
-                    <!-- Product has size/color variants toggle -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-3 overflow-hidden">
-                        <div class="card-body py-3 d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-0 fw-semibold text-dark">Product has size / color variants?</h6>
-                                <small class="text-muted" id="variants-toggle-label">
-                                    {{ $product->has_variants ? 'ON — Add multiple variants with color, size options' : 'OFF — Single product, no size/color options' }}
-                                </small>
-                            </div>
-                            <div class="form-check form-switch m-0">
-                                <input class="form-check-input" type="checkbox" role="switch" id="has_variants_toggle"
-                                    {{ old('has_variants', $product->has_variants) ? 'checked' : '' }}
-                                    onchange="
-                                        document.getElementById('has_variants_input').value = this.checked ? '1' : '0';
-                                        document.getElementById('attributes-section').style.display = this.checked ? '' : 'none';
-                                        document.getElementById('variants-toggle-label').textContent = this.checked ? 'ON — Add multiple variants with color, size options' : 'OFF — Single product, no size/color options';
-                                    "
-                                    style="width: 3rem; height: 1.5rem; cursor: pointer;">
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Toggle moved to top -->
 
                     <!-- Professional Product Attributes Section -->
                     <div id="attributes-section" style="{{ old('has_variants', $product->has_variants) ? '' : 'display:none;' }}">
@@ -246,13 +249,16 @@
                                     <table class="table table-hover align-middle mb-0" id="attributes-table">
                                         <thead class="bg-light">
                                                 <tr>
-                                                    <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="min-width: 110px;">Attribute Option</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 90px;">Price Override (₹)</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 65px;">Stock</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 80px;">Weight (grams)</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 95px;">Combo Eligible</th>
-                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 140px;">Image</th>
-                                                    <th class="text-center py-3 text-uppercase small fw-bold text-muted" style="width: 50px; min-width: 50px;">Remove</th>
+                                                    <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="min-width: 180px;">Attribute Option</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 120px;">Type</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 120px;">Price (₹)</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 120px;">Offer (₹)</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 90px;">Stock</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 90px;">Alert Qty</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 100px;">Weight (g)</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 110px;">Combo Eligible</th>
+                                                    <th class="py-3 text-uppercase small fw-bold text-muted" style="min-width: 220px;">Image</th>
+                                                    <th class="text-center py-3 text-uppercase small fw-bold text-muted" style="width: 70px; min-width: 70px;">Remove</th>
                                                 </tr>
                                         </thead>
                                         <tbody id="attributes-body">
@@ -280,8 +286,10 @@
                                                             $currentSizes[$s] = [
                                                                 'price'          => $data['price'] ?? null,
                                                                 'stock'          => $data['stock'] ?? null,
+                                                                'stock_alert_qty'=> $data['stock_alert_qty'] ?? null,
                                                                 'weight'         => $data['weight'] ?? null,
                                                                 'combo_eligible' => $data['combo_eligible'] ?? 'No',
+                                                                'type'           => $data['type'] ?? 'size',
                                                                 'image'          => $data['existing_image'] ?? null
                                                             ];
                                                         }
@@ -292,12 +300,14 @@
                                             @endphp
 
                                             @foreach($currentSizes as $name => $data)
-                                                {{-- Handle bothold string values and new array objects for backward compatibility during migration period --}}
                                                 @php 
                                                     $priceValue          = is_array($data) ? ($data['price'] ?? '') : $data;
+                                                    $salePriceValue      = is_array($data) ? ($data['sale_price'] ?? '') : '';
                                                     $stockValue          = is_array($data) ? ($data['stock'] ?? '') : '';
+                                                    $stockAlertQtyValue  = is_array($data) ? ($data['stock_alert_qty'] ?? '') : '';
                                                     $weightValue         = is_array($data) ? ($data['weight'] ?? '') : '';
                                                     $comboEligibleValue  = is_array($data) ? ($data['combo_eligible'] ?? 'No') : 'No';
+                                                    $typeValue           = is_array($data) ? ($data['type'] ?? 'size') : 'size';
                                                     $imagePath           = is_array($data) ? ($data['image'] ?? null) : null;
                                                 @endphp
                                                 <tr class="attribute-row animate__animated animate__fadeIn" id="variant-{{ \Illuminate\Support\Str::slug($name) }}">
@@ -309,19 +319,36 @@
                                                         </div>
                                                     </td>
                                                     <td>
+                                                        <select name="sizes[{{ $name }}][type]" class="form-select form-select-sm" required>
+                                                            <option value="size" {{ $typeValue === 'size' ? 'selected' : '' }}>Size</option>
+                                                            <option value="color" {{ $typeValue === 'color' ? 'selected' : '' }}>Color</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
                                                         <div class="input-group input-group-sm w-100">
                                                             <span class="input-group-text bg-light border-end-0">₹</span>
-                                                            <input type="number" step="0.01" name="sizes[{{ $name }}][price]" class="form-control border-start-0" value="{{ $priceValue }}" placeholder="Use Base Price">
+                                                            <input type="number" step="0.01" name="sizes[{{ $name }}][price]" class="form-control border-start-0" value="{{ $priceValue }}" placeholder="Price" required>
                                                         </div>
                                                     </td>
                                                     <td>
                                                         <div class="input-group input-group-sm w-100">
-                                                            <input type="number" name="sizes[{{ $name }}][stock]" class="form-control" value="{{ $stockValue }}" placeholder="Qty">
+                                                            <span class="input-group-text bg-light border-end-0">₹</span>
+                                                            <input type="number" step="0.01" name="sizes[{{ $name }}][sale_price]" class="form-control border-start-0" value="{{ $salePriceValue }}" placeholder="Offer">
                                                         </div>
                                                     </td>
                                                     <td>
                                                         <div class="input-group input-group-sm w-100">
-                                                            <input type="number" step="any" name="sizes[{{ $name }}][weight]" class="form-control" value="{{ $weightValue }}" placeholder="grams">
+                                                            <input type="number" name="sizes[{{ $name }}][stock]" class="form-control" value="{{ $stockValue }}" placeholder="Qty" required>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group input-group-sm w-100">
+                                                            <input type="number" name="sizes[{{ $name }}][stock_alert_qty]" class="form-control" value="{{ $stockAlertQtyValue }}" placeholder="Alert">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group input-group-sm w-100">
+                                                            <input type="number" step="any" name="sizes[{{ $name }}][weight]" class="form-control" value="{{ $weightValue }}" placeholder="grams" required>
                                                         </div>
                                                     </td>
                                                     <td>
@@ -349,7 +376,7 @@
 
                                             @if(!$hasAny)
                                                 <tr id="no-attributes-msg">
-                                                    <td colspan="7" class="text-center py-5">
+                                                    <td colspan="10" class="text-center py-5">
                                                         <div class="empty-state">
                                                             <i class="fas fa-layer-group fa-3x text-light mb-3"></i>
                                                             <h6 class="text-muted">No attributes defined</h6>
@@ -364,40 +391,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Secondary Attributes (Shape / Material) -->
-                    <!-- <div class="row g-4 mb-4">
-                        <div class="col-md-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100">
-                                <div class="card-body p-4">
-                                    <label for="shape" class="form-label fw-bold text-dark d-flex align-items-center mb-3">
-                                        <i class="fas fa-shapes text-info me-2"></i>Product Shape
-                                    </label>
-                                    <select class="form-select border-light-subtle py-2" id="shape" name="shape">
-                                        <option value="">Standard / N/A</option>
-                                        <option value="Circular" {{ old('shape', $product->shape) == 'Circular' ? 'selected' : '' }}>Circular (Round)</option>
-                                        <option value="Rectangular" {{ old('shape', $product->shape) == 'Rectangular' ? 'selected' : '' }}>Rectangular (Wide)</option>
-                                        <option value="Square" {{ old('shape', $product->shape) == 'Square' ? 'selected' : '' }}>Square (Box)</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100">
-                                <div class="card-body p-4">
-                                    <label for="material" class="form-label fw-bold text-dark d-flex align-items-center mb-3">
-                                        <i class="fas fa-boxes-stacked text-warning me-2"></i>Primary Material
-                                    </label>
-                                    <select class="form-select border-light-subtle py-2" id="material" name="material">
-                                        <option value="">Not Specified</option>
-                                        <option value="HDPE" {{ old('material', $product->material) == 'HDPE' ? 'selected' : '' }}>HDPE (High-Density Polyethylene)</option>
-                                        <option value="Fabric" {{ old('material', $product->material) == 'Fabric' ? 'selected' : '' }}>Premium Fabric</option>
-                                        <option value="Non-woven" {{ old('material', $product->material) == 'Non-woven' ? 'selected' : '' }}>Non-Woven Geotextile</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
 
                     <style>
                         #product_code::placeholder,
@@ -459,19 +452,36 @@
                                     </div>
                                 </td>
                                 <td>
+                                    <select name="sizes[${displayName}][type]" class="form-select form-select-sm" required>
+                                        <option value="size">Size</option>
+                                        <option value="color">Color</option>
+                                    </select>
+                                </td>
+                                <td>
                                     <div class="input-group input-group-sm w-100">
                                         <span class="input-group-text bg-light border-end-0">₹</span>
-                                        <input type="number" step="0.01" name="sizes[${displayName}][price]" class="form-control border-start-0" value="${price}" placeholder="Use Base Price">
+                                        <input type="number" step="0.01" name="sizes[${displayName}][price]" class="form-control border-start-0" value="${price}" placeholder="Price" required>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="input-group input-group-sm w-100">
-                                        <input type="number" name="sizes[${displayName}][stock]" class="form-control" placeholder="Qty">
+                                        <span class="input-group-text bg-light border-end-0">₹</span>
+                                        <input type="number" step="0.01" name="sizes[${displayName}][sale_price]" class="form-control border-start-0" placeholder="Offer">
                                     </div>
                                 </td>
-                                <td class="text-center">
+                                <td>
                                     <div class="input-group input-group-sm w-100">
-                                        <input type="number" step="any" name="sizes[${displayName}][weight]" class="form-control" placeholder="grams">
+                                        <input type="number" name="sizes[${displayName}][stock]" class="form-control" placeholder="Qty" required>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm w-100">
+                                        <input type="number" name="sizes[${displayName}][stock_alert_qty]" class="form-control" placeholder="Alert">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm w-100">
+                                        <input type="number" step="any" name="sizes[${displayName}][weight]" class="form-control" placeholder="grams" required>
                                     </div>
                                 </td>
                                 <td>
@@ -508,8 +518,11 @@
                                     const row = input.closest('tr');
                                     input.value = newName;
                                     row.querySelector('input[name*="[checked]"]').name = `sizes[${newName}][checked]`;
+                                    row.querySelector('select[name*="[type]"]').name = `sizes[${newName}][type]`;
                                     row.querySelector('input[name*="[price]"]').name = `sizes[${newName}][price]`;
+                                    row.querySelector('input[name*="[sale_price]"]').name = `sizes[${newName}][sale_price]`;
                                     row.querySelector('input[name*="[stock]"]').name = `sizes[${newName}][stock]`;
+                                    row.querySelector('input[name*="[stock_alert_qty]"]').name = `sizes[${newName}][stock_alert_qty]`;
                                     row.querySelector('input[name*="[weight]"]').name = `sizes[${newName}][weight]`;
                                     const comboSel = row.querySelector('select[name*="[combo_eligible]"]');
                                     if (comboSel) comboSel.name = `sizes[${newName}][combo_eligible]`;
@@ -524,7 +537,7 @@
                         function checkEmptyAttributes() {
                             const body = document.getElementById('attributes-body');
                             if (body.querySelectorAll('.attribute-row').length === 0) {
-                                body.innerHTML = `<tr id="no-attributes-msg"><td colspan="7" class="text-center py-5"><div class="empty-state"><i class="fas fa-layer-group fa-3x text-light mb-3"></i><h6 class="text-muted">No attributes defined</h6><p class="text-secondary small">Add custom sizes or use one of our predefined templates</p></div></td></tr>`;
+                                body.innerHTML = `<tr id="no-attributes-msg"><td colspan="10" class="text-center py-5"><div class="empty-state"><i class="fas fa-layer-group fa-3x text-light mb-3"></i><h6 class="text-muted">No attributes defined</h6><p class="text-secondary small">Add custom sizes or use one of our predefined templates</p></div></td></tr>`;
                             }
                         }
 
@@ -555,6 +568,22 @@
                                 });
                             }
                         }
+
+                        document.addEventListener('DOMContentLoaded', function() {
+                            if (window.location.hash && window.location.hash.startsWith('#variant-')) {
+                                const targetId = window.location.hash;
+                                const row = document.querySelector(targetId);
+                                if (row) {
+                                    setTimeout(() => {
+                                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        row.classList.add('table-danger');
+                                        setTimeout(() => {
+                                            row.classList.remove('table-danger');
+                                        }, 4000);
+                                    }, 500); // small delay to allow page render
+                                }
+                            }
+                        });
                     </script>
 
                     <!-- <div class="row">
@@ -639,7 +668,39 @@
 
 @push('scripts')
     <script>
+        window.toggleVariantsSection = function(checkbox) {
+            const isChecked = checkbox ? checkbox.checked : document.getElementById('has_variants_toggle').checked;
+            document.getElementById('has_variants_input').value = isChecked ? '1' : '0';
+            document.getElementById('attributes-section').style.display = isChecked ? '' : 'none';
+            document.getElementById('variants-toggle-label').textContent = isChecked ? 'ON — Add multiple variants with color, size options' : 'OFF — Single product, no size/color options';
+            
+            const basePriceFields = document.getElementById('base-price-fields');
+            const baseWeightFields = document.getElementById('base-weight-fields');
+            const basePriceInput = document.getElementById('price');
+            const variantsSection = document.getElementById('attributes-section');
+
+            if (isChecked) {
+                if (basePriceFields) basePriceFields.style.display = 'none';
+                if (baseWeightFields) baseWeightFields.style.display = 'none';
+                if (basePriceInput) basePriceInput.removeAttribute('required');
+                
+                variantsSection.querySelectorAll('input, select, textarea').forEach(el => {
+                    el.removeAttribute('disabled');
+                });
+            } else {
+                if (basePriceFields) basePriceFields.style.display = 'flex';
+                if (baseWeightFields) baseWeightFields.style.display = 'block';
+                if (basePriceInput) basePriceInput.setAttribute('required', 'required');
+                
+                variantsSection.querySelectorAll('input, select, textarea').forEach(el => {
+                    el.setAttribute('disabled', 'disabled');
+                });
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize on load
+            toggleVariantsSection(document.getElementById('has_variants_toggle'));
             // Dynamic subcategory filtering based on selected category (preserves current selection on edit)
             const allSubcategories = {!! json_encode($subcategories) !!};
             const currentCategoryId = "{{ old('category_id', $product->category_id) }}";

@@ -88,14 +88,14 @@
 </head>
 
 <body>
-    <div class="preloader">
+    <!-- <div class="preloader">
         <div class="leaf-loader">
             <div class="leaf"></div>
             <div class="leaf"></div>
             <div class="leaf"></div>
             <div class="leaf"></div>
         </div>
-    </div>
+    </div> -->
     <!-- header area -->
     <header>
         <!-- <div class="topbar-outer py-2 d-lg-block d-none">
@@ -490,7 +490,7 @@
                     items.forEach(function(p, i) {
                         var price = '';
                         if (p.stock_quantity > 0) {
-                            price = (p.sale_price && p.sale_price < p.price) ?
+                            price = (p.sale_price > 0 && p.sale_price < p.price) ?
                                 '<s style="color:#aaa;font-size:11px;">&#8377;' + fmt(p.price) + '</s>&nbsp;<span style="color:#6EA820;font-weight:700;">&#8377;' + fmt(p.sale_price) + '</span>' :
                                 '<span style="color:#6EA820;font-weight:700;">&#8377;' + fmt(p.price) + '</span>';
                         } else {
