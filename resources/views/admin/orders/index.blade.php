@@ -377,8 +377,10 @@
                                                                     $imgData = is_string($img) ? json_decode($img, true) : $img;
                                                                     $firstImg = is_array($imgData) ? $imgData[0] : $img;
                                                                     @endphp
-                                                                    @if($firstImg)
+                                                                    @if($firstImg && Illuminate\Support\Facades\Storage::disk('public')->exists($firstImg))
                                                                     <img src="{{ asset('storage/' . $firstImg) }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                                                    @elseif($item->product && $item->product->image && Illuminate\Support\Facades\Storage::disk('public')->exists($item->product->image))
+                                                                    <img src="{{ asset('storage/' . $item->product->image) }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
                                                                     @else
                                                                     <img src="{{ asset('assets/images/product/product1.jpg') }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
                                                                     @endif

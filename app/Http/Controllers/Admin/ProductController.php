@@ -324,9 +324,9 @@ class ProductController extends Controller
 
                     // Handle new size-specific image upload
                     if ($request->hasFile("sizes.$sizeKey.image")) {
-                        // Delete old image if exists
+                        // Delete old image if exists (Commented out to preserve for order history)
                         if ($sizeEntry['image']) {
-                            Storage::disk('public')->delete($sizeEntry['image']);
+                            // Storage::disk('public')->delete($sizeEntry['image']);
                         }
                         $tempPath = $request->file("sizes.$sizeKey.image")->store('products/attributes', 'public');
                         $sizeEntry['image'] = $this->imageService->applyWatermark($tempPath);
@@ -337,10 +337,10 @@ class ProductController extends Controller
             }
         }
 
-        // Cleanup: Delete images for sizes that were removed or if variants were completely disabled
+        // Cleanup: Delete images for sizes that were removed or if variants were completely disabled (Commented out to preserve for order history)
         foreach($currentSizes as $name => $data) {
             if ((!$validated['has_variants'] || !isset($validatedSizes[$name])) && isset($data['image']) && $data['image']) {
-                Storage::disk('public')->delete($data['image']);
+                // Storage::disk('public')->delete($data['image']);
             }
         }
 
@@ -350,7 +350,7 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             if ($product->image) {
-                Storage::disk('public')->delete($product->image);
+                // Storage::disk('public')->delete($product->image); // Preserve old image for order history
             }
             $tempPath = $request->file('image')->store('products', 'public');
             $validated['image'] = $this->imageService->applyWatermark($tempPath);
@@ -439,17 +439,17 @@ class ProductController extends Controller
         }
 
         if ($product->image) {
-            Storage::disk('public')->delete($product->image);
+            // Storage::disk('public')->delete($product->image);
         }
         if ($product->gallery_images) {
             foreach ($product->gallery_images as $image) {
-                Storage::disk('public')->delete($image);
+                // Storage::disk('public')->delete($image);
             }
         }
         if ($product->size && is_array($product->size)) {
             foreach ($product->size as $sizeData) {
                 if (isset($sizeData['image']) && $sizeData['image']) {
-                    Storage::disk('public')->delete($sizeData['image']);
+                    // Storage::disk('public')->delete($sizeData['image']);
                 }
             }
         }

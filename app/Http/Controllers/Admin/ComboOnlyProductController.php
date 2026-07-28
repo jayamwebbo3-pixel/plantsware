@@ -91,7 +91,7 @@ class ComboOnlyProductController extends Controller
 
         if ($request->hasFile('image')) {
             if ($product->image) {
-                Storage::disk('public')->delete($product->image);
+                // Storage::disk('public')->delete($product->image); // Preserve for order history
             }
             $tempPath = $request->file('image')->store('combo-only-products', 'public');
             $product->image = $this->imageService->applyWatermark($tempPath);
@@ -113,7 +113,7 @@ class ComboOnlyProductController extends Controller
     {
         $product = ComboOnlyProduct::findOrFail($id);
         if ($product->image) {
-            Storage::disk('public')->delete($product->image);
+            // Storage::disk('public')->delete($product->image);
         }
         $product->delete();
 

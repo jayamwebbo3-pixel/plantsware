@@ -145,19 +145,19 @@
                             <!-- Middle: Payments -->
                             <div class="footer-bottom-payment d-flex justify-content-center flex-wrap gap-2" style="flex: 1;">
                                 <div class="payment-link bg-white px-2 py-1  d-flex align-items-center">
-                                    <img src="./assets/images/visa.png" alt="Visa" height="20" style="object-fit: contain; max-width: 40px;">
+                                    <img src="{{ asset('assets/images/visa.png') }}" alt="Visa" height="20" style="object-fit: contain; max-width: 40px;">
                                 </div>
                                 <div class="payment-link bg-white px-2 py-1  d-flex align-items-center">
-                                    <img src="./assets/images/rupay.png" alt="RuPay" height="20" style="object-fit: contain; max-width: 40px;">
+                                    <img src="{{ asset('assets/images/rupay.png') }}" alt="RuPay" height="20" style="object-fit: contain; max-width: 40px;">
                                 </div>
                                 <div class="payment-link bg-white px-2 py-1  d-flex align-items-center">
-                                    <img src="./assets/images/gpay.png" alt="GPay" height="20" style="object-fit: contain; max-width: 40px;">
+                                    <img src="{{ asset('assets/images/gpay.png') }}" alt="GPay" height="20" style="object-fit: contain; max-width: 40px;">
                                 </div>
                                 <div class="payment-link bg-white px-2 py-1  d-flex align-items-center">
-                                    <img src="./assets/images/paytm.png" alt="PayTM" height="20" style="object-fit: contain; max-width: 40px;">
+                                    <img src="{{ asset('assets/images/paytm.png') }}" alt="PayTM" height="20" style="object-fit: contain; max-width: 40px;">
                                 </div>
                                 <div class="payment-link bg-white px-2 py-1  d-flex align-items-center">
-                                    <img src="./assets/images/upi.png" alt="UPI" height="20" style="object-fit: contain; max-width: 40px;">
+                                    <img src="{{ asset('assets/images/upi.png') }}" alt="UPI" height="20" style="object-fit: contain; max-width: 40px;">
                                 </div>
                             </div>
 

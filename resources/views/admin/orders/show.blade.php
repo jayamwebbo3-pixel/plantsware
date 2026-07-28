@@ -44,9 +44,18 @@
                                     <img src="{{ asset('storage/' . ($imgData[0] ?? $item->product_image)) }}" style="width:100%; height:100%; object-fit:cover;">
                                     @endif
                                     @elseif($item->product_image)
-                                    <img src="{{ asset('storage/' . $item->product_image) }}" style="width:100%; height:100%; object-fit:cover;">
+                                    @php
+                                        $img = $item->product_image;
+                                        $imgData = is_string($img) ? json_decode($img, true) : $img;
+                                        $firstImg = is_array($imgData) ? $imgData[0] : $img;
+                                    @endphp
+                                    @if($firstImg && Illuminate\Support\Facades\Storage::disk('public')->exists($firstImg))
+                                    <img src="{{ asset('storage/' . $firstImg) }}" style="width:100%; height:100%; object-fit:cover;">
+                                    @elseif($item->product && $item->product->image && Illuminate\Support\Facades\Storage::disk('public')->exists($item->product->image))
+                                    <img src="{{ asset('storage/' . $item->product->image) }}" style="width:100%; height:100%; object-fit:cover;">
                                     @else
                                     <img src="{{ asset('assets/images/product/product1.jpg') }}" style="width:100%; height:100%; object-fit:cover;">
+                                    @endif
                                     @endif
                                 </div>
                                 @php 
