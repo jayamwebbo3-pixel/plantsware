@@ -644,9 +644,11 @@
                                         </button>
                                     @endif
 
+                                    {{--
                                     @if(strtolower($order->status) === 'delivered' && $order->delivered_at && $order->delivered_at->diffInDays(now()) <= 3)
                                         <button type="button" class="btn-return" onclick="event.stopPropagation(); openReturnModal({{ $order->id }}, '{{ $order->order_number }}')" style="background-color: transparent; border: 1px solid #ffc107; color: #ffc107; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Request Return</button>
                                     @endif
+                                    --}}
 
                                     @if(in_array(strtolower($order->status), ['delivered', 'completed']))
                                         <button type="button" class="btn-review" onclick="event.stopPropagation(); openReviewModal({{ $order->id }}, '{{ $order->order_number }}')" style="background-color: var(--primary-color); border: none; color: white; border-radius: 4px; padding: 2px 8px; cursor: pointer;">Review & Rating</button>

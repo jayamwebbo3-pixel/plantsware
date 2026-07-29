@@ -216,10 +216,12 @@
                             <small class="text-muted">Cancelled</small>
                         </div>
 
+                        {{--
                         <div class="col-lg-2 col-md-4 col-6 mb-3">
                             <h4 class="mb-0 text-secondary">{{ $stats['returned'] ?? 0 }}</h4>
                             <small class="text-muted">Returned</small>
                         </div>
+                        --}}
                         <!-- <div class="col-lg-10 col-md-8 col-6 mb-3 text-start small text-muted d-flex align-items-center">
                             <span>
                                 Returned Requested: {{ $stats['return_requested'] ?? 0 }} |
@@ -270,8 +272,8 @@
                         'shipped' => ['label' => 'Shipped', 'class' => 'status-shipped'],
                         'delivered' => ['label' => 'Delivered', 'class' => 'status-delivered'],
                         'cancelled' => ['label' => 'Cancelled', 'class' => 'status-cancelled'],
-                        'return_requested' => ['label' => 'Return Requested', 'class' => 'status-return-requested'],
-                        'returned' => ['label' => 'Returned', 'class' => 'status-returned'],
+                        //'return_requested' => ['label' => 'Return Requested', 'class' => 'status-return-requested'],
+                        //'returned' => ['label' => 'Returned', 'class' => 'status-returned'],
                         ];
                         $currentStatus = request('status') ?: '';
                         @endphp

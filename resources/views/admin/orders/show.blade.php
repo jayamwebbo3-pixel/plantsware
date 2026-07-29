@@ -195,6 +195,7 @@
                     This order has been <strong>Delivered</strong>.
                 </div>
                 <!-- Admin cannot initiate return, only user can request a return -->
+                {{--
                 @elseif ($order->status === 'return_requested')
                 <div class="alert alert-warning border-0 mb-2 text-center">
                     <strong>Return Requested</strong>
@@ -243,6 +244,7 @@
                         </div>
                     </form>
                 </div>
+                --}}
                 @else
                 <form action="{{ route('admin.orders.updateStatus', $order) }}" method="POST">
                     @csrf @method('PATCH')
