@@ -155,8 +155,16 @@
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <label for="state" class="form-label text-dark fw-bold small">State <span class="text-danger">*</span></label>
-                                            <input type="text" name="state" id="state" class="form-control @error('state') is-invalid @enderror"
-                                                placeholder="State name" required value="{{ old('state', $savedAddress['state'] ?? '') }}">
+                                            <select name="state" id="state" class="form-control form-select w-100 @error('state') is-invalid @enderror" required>
+                                                <option value="">Select a State</option>
+                                                @php
+                                                    $shippingStates = \App\Models\ShippingRate::orderBy('state_name')->pluck('state_name');
+                                                    $selectedState = old('state', $savedAddress['state'] ?? '');
+                                                @endphp
+                                                @foreach($shippingStates as $sState)
+                                                    <option value="{{ $sState }}" {{ $selectedState == $sState ? 'selected' : '' }}>{{ $sState }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         @error('state') <div class="text-danger extra-small ms-1">{{ $message }}</div> @enderror
                                     </div>

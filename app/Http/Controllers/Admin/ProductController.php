@@ -97,9 +97,9 @@ class ProductController extends Controller
             'length_meters' => 'nullable|numeric|min:0',
             'pack_quantity' => 'integer|min:1',
             'warranty_months' => 'nullable|integer|min:0',
-            'weight' => 'nullable|numeric|min:0',
-            'product_code' => 'nullable|string|max:100',
-            'batch_code' => 'nullable|string|max:100',
+            'weight' => $request->boolean('has_variants') ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
+            'product_code' => 'required|string|max:100',
+            'batch_code' => 'required|string|max:100',
             'combo_pack_eligible' => 'nullable|in:Yes,No',
         ];
 
@@ -259,9 +259,9 @@ class ProductController extends Controller
             'length_meters' => 'nullable|numeric|min:0',
             'pack_quantity' => 'integer|min:1',
             'warranty_months' => 'nullable|integer|min:0',
-            'weight' => 'nullable|numeric|min:0',
-            'product_code' => 'nullable|string|max:100',
-            'batch_code' => 'nullable|string|max:100',
+            'weight' => $request->boolean('has_variants') ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
+            'product_code' => 'required|string|max:100',
+            'batch_code' => 'required|string|max:100',
             'combo_pack_eligible' => 'nullable|in:Yes,No',
         ];
 

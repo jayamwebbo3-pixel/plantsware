@@ -114,14 +114,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="product_code" class="form-label">Product Code</label>
-                                    <input type="text" class="form-control" id="product_code" name="product_code" value="{{ old('product_code') }}" placeholder="e.g. PRD-001">
+                                    <label for="product_code" class="form-label">Product Code <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="product_code" name="product_code" value="{{ old('product_code') }}" placeholder="e.g. PROD-1001" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="batch_code" class="form-label">Batch Code</label>
-                                    <input type="text" class="form-control" id="batch_code" name="batch_code" value="{{ old('batch_code') }}" placeholder="e.g. BATCH-2024-01">
+                                    <label for="batch_code" class="form-label">Batch Code <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="batch_code" name="batch_code" value="{{ old('batch_code') }}" placeholder="e.g. BATCH-2024-01" required>
                                 </div>
                             </div>
                         </div>
@@ -129,8 +129,9 @@
                         <div class="row">
                             <div class="col-md-6" id="base-weight-fields">
                                 <div class="mb-3">
-                                    <label for="weight" class="form-label">Weight (grams)</label>
+                                    <label for="weight" class="form-label">Weight (kg) <span class="text-danger" id="weight-asterisk">*</span></label>
                                     <input type="number" step="any" class="form-control" id="weight" name="weight" value="{{ old('weight') }}" min="0" placeholder="e.g. 500">
+                                    <div class="form-text">Required unless variants are enabled.</div>
                                 </div>
                             </div>
                             <div class="col-md-6">

@@ -80,59 +80,31 @@
         <!-- Footer Bottom -->
         <div class="footer-bottom py-3">
             <div class="container">
+                @php
+                    $servicesPage = \App\Models\Page::where('slug', 'services')->first();
+                    $serviceHighlights = $servicesPage && isset($servicesPage->extra_content['features']) ? $servicesPage->extra_content['features'] : [];
+                @endphp
+
+                @if(!empty($serviceHighlights) && count($serviceHighlights) > 0)
                 <!-- Footer Bottom Highlights (Creative UX) -->
                 <div class="footer-highlights-bar py-3 mb-4">
-                    <div class="row">
-                        <!-- Highlight 1 -->
+                    <div class="row justify-content-center">
+                        @foreach($serviceHighlights as $highlight)
                         <div class="col-lg-3 col-md-6 col-6 mb-3 mb-lg-0 highlight-item">
                             <div class="d-flex align-items-center justify-content-start">
                                 <div class="highlight-icon-wrapper">
-                                    <i class="fas fa-truck"></i>
+                                    <i class="{{ $highlight['icon'] ?? 'fas fa-check' }}"></i>
                                 </div>
                                 <div class="highlight-info">
-                                    <h6 class="highlight-title">Fast Delivery</h6>
-                                    <span class="highlight-desc">Fast Shipping On All Orders</span>
+                                    <h6 class="highlight-title">{{ $highlight['title'] ?? '' }}</h6>
+                                    <span class="highlight-desc">{{ $highlight['description'] ?? '' }}</span>
                                 </div>
                             </div>
                         </div>
-                        <!-- Highlight 2 -->
-                        <div class="col-lg-3 col-md-6 col-6 mb-3 mb-lg-0 highlight-item">
-                            <div class="d-flex align-items-center justify-content-start">
-                                <div class="highlight-icon-wrapper">
-                                    <i class="fas fa-shield-alt"></i>
-                                </div>
-                                <div class="highlight-info">
-                                    <h6 class="highlight-title">Secure Payment</h6>
-                                    <span class="highlight-desc">100% Secure Payment</span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Highlight 3 -->
-                        <div class="col-lg-3 col-md-6 col-6 mb-3 mb-lg-0 highlight-item">
-                            <div class="d-flex align-items-center justify-content-start">
-                                <div class="highlight-icon-wrapper">
-                                    <i class="fas fa-undo"></i>
-                                </div>
-                                <div class="highlight-info">
-                                    <h6 class="highlight-title">Easy Returns</h6>
-                                    <span class="highlight-desc">30-Day Return Policy</span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Highlight 4 -->
-                        <div class="col-lg-3 col-md-6 col-6 highlight-item">
-                            <div class="d-flex align-items-center justify-content-start">
-                                <div class="highlight-icon-wrapper">
-                                    <i class="fas fa-award"></i>
-                                </div>
-                                <div class="highlight-info">
-                                    <h6 class="highlight-title">Quality Guarantee</h6>
-                                    <span class="highlight-desc">Premium Quality Products</span>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
+                @endif
 
                 <div class="row">
                     <div class="col-12">
